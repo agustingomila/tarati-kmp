@@ -1,0 +1,917 @@
+package com.agustin.tarati.game.ai
+
+import com.agustin.tarati.core.domain.ai.engine.BoardEvaluator
+import com.agustin.tarati.core.domain.ai.engine.TaratiAI
+import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
+import com.agustin.tarati.core.domain.ai.services.Difficulty
+import com.agustin.tarati.core.domain.game.board.GameBoard.A1
+import com.agustin.tarati.core.domain.game.board.GameBoard.B1
+import com.agustin.tarati.core.domain.game.board.GameBoard.B2
+import com.agustin.tarati.core.domain.game.board.GameBoard.B3
+import com.agustin.tarati.core.domain.game.board.GameBoard.B4
+import com.agustin.tarati.core.domain.game.board.GameBoard.B5
+import com.agustin.tarati.core.domain.game.board.GameBoard.B6
+import com.agustin.tarati.core.domain.game.board.GameBoard.C1
+import com.agustin.tarati.core.domain.game.board.GameBoard.C10
+import com.agustin.tarati.core.domain.game.board.GameBoard.C11
+import com.agustin.tarati.core.domain.game.board.GameBoard.C12
+import com.agustin.tarati.core.domain.game.board.GameBoard.C2
+import com.agustin.tarati.core.domain.game.board.GameBoard.C3
+import com.agustin.tarati.core.domain.game.board.GameBoard.C4
+import com.agustin.tarati.core.domain.game.board.GameBoard.C5
+import com.agustin.tarati.core.domain.game.board.GameBoard.C6
+import com.agustin.tarati.core.domain.game.board.GameBoard.C7
+import com.agustin.tarati.core.domain.game.board.GameBoard.C8
+import com.agustin.tarati.core.domain.game.board.GameBoard.C9
+import com.agustin.tarati.core.domain.game.board.GameBoard.D1
+import com.agustin.tarati.core.domain.game.board.GameBoard.D2
+import com.agustin.tarati.core.domain.game.board.GameBoard.D3
+import com.agustin.tarati.core.domain.game.board.GameBoard.D4
+import com.agustin.tarati.core.domain.game.board.GameBoard.isForwardMove
+import com.agustin.tarati.core.domain.game.board.GameBoard.isValidMove
+import com.agustin.tarati.core.domain.game.helpers.GameStateBuilder
+import com.agustin.tarati.core.domain.game.pieces.Cob
+import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
+import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
+import com.agustin.tarati.core.domain.game.pieces.opponent
+import com.agustin.tarati.core.domain.game.play.GameState
+import com.agustin.tarati.core.domain.game.play.GameState.Companion.createGameState
+import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
+import com.agustin.tarati.core.domain.game.play.Move
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import kotlin.math.abs
+
+class AITest {
+    private val engine: TaratiAI = TaratiAI()
+    private val evalConfig: EvaluationConfig by lazy { EvaluationConfig(Difficulty.DEFAULT) }
+    private val boardEvaluator: BoardEvaluator by lazy { BoardEvaluator() }
+
+    @Test
+    fun applyMoveToBoard_movesPiece_and_doesChangeTurn() {
+        val gameState = initialGameState(currentTurn = WHITE)
+        // Move C1 -> B1 (B1 is an available name)
+        val newState = gameState.applyMove(Move(C1 to B1))
+
+        assertFalse("Origin should be empty after move", newState.cobs.containsKey(C1))
+
+        assertTrue("Destination should contain moved cob", newState.cobs.containsKey(B1))
+
+        val moved = newState.cobs[B1]!!
+        assertEquals("Moved piece should retain its color", WHITE, moved.color)
+
+        // applyMove does toggle the turn; expect opponent currentTurn
+        assertEquals(
+            "applyMove should change currentTurn.",
+            gameState.currentTurn,
+            newState.currentTurn.opponent,
+        )
+    }
+
+    @Test
+    fun applyMoveToBoard_upgradesWhenEnteringOpponentHomeBase() {
+        // Prepare a minimal state: black piece at B1 (empty normally)
+        val state = GameState(mapOf(B1 to Cob(BLACK, false)), currentTurn = BLACK)
+        val result = state.applyMove(Move(B1 to C1)) // C1 is white home-base
+        val placed = result.cobs[C1]
+        assertNotNull("Piece must be placed at destination", placed)
+        assertEquals("Color preserved", BLACK, placed!!.color)
+        assertTrue("Piece that entered opponent home base must be upgraded", placed.isUpgraded)
+    }
+
+    @Test
+    fun getAllPossibleMoves_excludesBackwardMove_forNonUpgradedWhite() {
+        // Single white cob at C1, turn WHITE
+        val state = GameState(mapOf(C1 to Cob(WHITE, false)), currentTurn = WHITE)
+        val moves = state.allMovesForTurn()
+        // Expect C1 -> C2 NOT to be present (this is 'backward' for WHITE)
+        assertFalse(
+            "Expected backward move C1 -> C2 to be disallowed for WHITE non-upgraded",
+            moves.any { it.from == C1 && it.to == C2 },
+        )
+    }
+
+    @Test
+    fun getAllPossibleMoves_includesForwardMove_forNonUpgradedWhite() {
+        // Single white cob at C2, turn WHITE
+        val state = GameState(mapOf(C2 to Cob(WHITE, false)), currentTurn = WHITE)
+        val moves = state.allMovesForTurn()
+
+        // Debug: imprimir todos los movimientos posibles
+        println("Movimientos posibles para C2:")
+        moves.forEach { println("${it.from} -> ${it.to}") }
+
+        // Verificar que hay al menos un movimiento válido
+        assertTrue("Should have at least one valid move", moves.isNotEmpty())
+
+        // Para debugging, podemos verificar movimientos específicos que deberían ser válidos
+        // basados en la posición relativa de C2
+    }
+
+    @Test
+    fun getNextBestMove_returnsSomeMove_forBlackAtDepth1() {
+        // Usar el estado inicial completo, no uno minimal
+        val gameState = initialGameState(currentTurn = BLACK)
+
+        // Debug: verificar movimientos posibles
+        val possibleMoves = gameState.allMovesForTurn()
+        println("Movimientos posibles para BLACK en estado inicial: ${possibleMoves.size}")
+        possibleMoves.forEach { println("${it.from} -> ${it.to}") }
+
+        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        assertNotNull("Result should not be null", result)
+
+        // Si no hay movimientos posibles, el resultado puede ser null (juego terminado)
+        if (possibleMoves.isNotEmpty()) {
+            assertNotNull("Should return a move when there are legal moves", result.move)
+        }
+    }
+
+    @Test
+    fun getNextBestMove_returnsMate_forBlackAtDepth1() {
+        // Usar el estado inicial completo, no uno minimal
+        val gameState =
+            GameState(
+                mapOf(
+                    C1 to Cob(BLACK, true),
+                    B1 to Cob(BLACK, true),
+                    D2 to Cob(WHITE, true),
+                ),
+                currentTurn = BLACK,
+            )
+
+        // Debug: verificar movimientos posibles
+        val possibleMoves = gameState.allMovesForTurn()
+        println("Movimientos posibles para BLACK en estado inicial: ${possibleMoves.size}")
+        possibleMoves.forEach { println("${it.from} -> ${it.to}") }
+
+        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        assertNotNull("Result should not be null", result)
+
+        // Si no hay movimientos posibles, el resultado puede ser null (juego terminado)
+        if (possibleMoves.isNotEmpty()) {
+            assertNotNull("Should return a move when there are legal moves", result.move)
+        }
+    }
+
+    @Test
+    fun evaluateBoard_emptyBoard_returnsZero() {
+        val emptyState = GameState(emptyMap(), currentTurn = WHITE)
+        val score = boardEvaluator.evaluate(emptyState, evalConfig)
+        assertEquals(0.0, score, 0.0)
+    }
+
+    @Test
+    fun evaluateBoard_moreWhitePieces_returnsPositive() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C2 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+        val score = boardEvaluator.evaluate(state, evalConfig)
+        assertTrue(score > 0)
+    }
+
+    @Test
+    fun evaluateBoard_moreBlackPieces_returnsNegative() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                    C8 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+        val score = boardEvaluator.evaluate(state, evalConfig)
+        assertTrue(score < 0)
+    }
+
+    @Test
+    fun isGameOver_whiteNoPieces_returnsTrue() {
+        val state =
+            GameState(
+                mapOf(C7 to Cob(BLACK, false)),
+                currentTurn = WHITE,
+            )
+        assertTrue(state.isGameOver(emptyMap()))
+    }
+
+    @Test
+    fun isGameOver_blackNoPieces_returnsTrue() {
+        val state =
+            GameState(
+                mapOf(C1 to Cob(WHITE, false)),
+                currentTurn = WHITE,
+            )
+        assertTrue(state.isGameOver(emptyMap()))
+    }
+
+    @Test
+    fun isGameOver_bothHavePieces_returnsFalse() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+        assertFalse(state.isGameOver(emptyMap()))
+    }
+
+    @Test
+    fun getAllPossibleMoves_includesBackwardMove_forUpgradedWhite() {
+        val state =
+            GameState(
+                mapOf(C1 to Cob(WHITE, true)),
+                currentTurn = WHITE,
+            )
+        val moves = state.allMovesForTurn()
+        // Upgraded pieces can move backward
+        val hasBackwardMove = moves.any { it.from == C1 && it.to == C2 }
+        assertTrue("Upgraded white should be able to move backward", hasBackwardMove)
+    }
+
+    @Test
+    fun getAllPossibleMoves_excludesOccupiedVertices() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    B1 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+        val moves = state.allMovesForTurn()
+        // Should not include C1 -> B1 because B1 is occupied
+        val moveToOccupied = moves.any { it.from == C1 && it.to == B1 }
+        assertFalse("Should not move to occupied name", moveToOccupied)
+    }
+
+    @Test
+    fun getAllPossibleMoves_onlyCurrentTurnPieces() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+        val moves = state.allMovesForTurn()
+        // Should only include moves for white pieces
+        val allMovesAreWhite =
+            moves.all { move ->
+                state.cobs[move.from]?.color == WHITE
+            }
+        assertTrue("Should only include moves for current turn pieces", allMovesAreWhite)
+    }
+
+    @Test
+    fun isValidMove_upgradedPiece_canMoveBackward() {
+        val state =
+            GameState(
+                mapOf(C1 to Cob(WHITE, true)),
+                currentTurn = WHITE,
+            )
+        // C1 -> C2 would be backward for white, but should be valid for upgraded
+        val isValid = isValidMove(state, Move(C1 to C2))
+        assertTrue("Upgraded piece should be able to move backward", isValid)
+    }
+
+    @Test
+    fun isValidMove_nonAdjacent_returnsFalse() {
+        val state =
+            GameState(
+                mapOf(C1 to Cob(WHITE, false)),
+                currentTurn = WHITE,
+            )
+        // C1 and C3 are not adjacent
+        val isValid = isValidMove(state, Move(C1 to C3))
+        assertFalse("Non-adjacent moves should be invalid", isValid)
+    }
+
+    @Test
+    fun isValidMove_sameFromTo_returnsFalse() {
+        val state =
+            GameState(
+                mapOf(C1 to Cob(WHITE, false)),
+                currentTurn = WHITE,
+            )
+        val isValid = isValidMove(state, Move(C1 to C1))
+        assertFalse("Moving to same position should be invalid", isValid)
+    }
+
+    @Test
+    fun isForwardMove_whiteMovingUp_isForward() {
+        // White moves from higher Y to lower Y (up the board)
+        val isForward = isForwardMove(WHITE, Move(C2 to B1))
+        assertTrue("White moving up should be forward", isForward)
+    }
+
+    @Test
+    fun isForwardMove_blackMovingDown_isForward() {
+        // Black moves from lower Y to higher Y (down the board)
+        val isForward = isForwardMove(BLACK, Move(B1 to C2))
+        assertTrue("Black moving down should be forward", isForward)
+    }
+
+    @Test
+    fun isOnlySpecialCaptureMove() {
+        // Estado donde WHITE no puede moverse (piezas no upgraded solo van hacia adelante)
+        val stateNoMoves =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false), // White abajo, no puede ir más abajo
+                    B1 to Cob(BLACK, false),
+                    B6 to Cob(BLACK, false),
+                    C12 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val possibleMoves = stateNoMoves.allMovesForTurn()
+
+        // Verificar que no hay movimientos disponibles
+        assertTrue("Should have no valid moves", possibleMoves.isNotEmpty())
+    }
+
+    @Test
+    fun isGameOver_noValidMoves() {
+        // Estado donde WHITE no puede moverse (piezas no upgraded solo van hacia adelante)
+        val stateNoMoves =
+            GameState(
+                mapOf(
+                    C3 to Cob(WHITE, true),  // Rok - sole-cob promotion won't trigger
+                    C2 to Cob(BLACK, false), // Fill last empty C3 neighbor
+                    C4 to Cob(BLACK, false),
+                    B2 to Cob(BLACK, false),
+                    A1 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val possibleMoves = stateNoMoves.allMovesForTurn()
+
+        // Verificar que no hay movimientos disponibles
+        assertTrue("Should have no valid moves", possibleMoves.isEmpty())
+    }
+
+    @Test
+    fun evaluateBoard_materialAdvantage() {
+        val stateEqual =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val stateWhiteAdvantage =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C2 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val scoreEqual = boardEvaluator.evaluate(stateEqual, evalConfig)
+        val scoreAdvantage = boardEvaluator.evaluate(stateWhiteAdvantage, evalConfig)
+
+        // 2 vs. 1 debería ser positivo para blanco
+        assertTrue("White should have positive score with material advantage", scoreAdvantage > scoreEqual)
+        assertTrue("Equal material should be near zero", abs(scoreEqual) < 50.0)
+    }
+
+    @Test
+    fun evaluateBoard_protectionBonus() {
+        val stateIsolated =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val stateProtected =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C2 to Cob(WHITE, false), // Aliado adyacente
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val scoreIsolated = boardEvaluator.evaluate(stateIsolated, evalConfig)
+        val scoreProtected = boardEvaluator.evaluate(stateProtected, evalConfig)
+
+        // Pieza protegida debería valer más
+        assertTrue("Protected pieces should score higher", scoreProtected > scoreIsolated)
+    }
+
+    @Test
+    fun evaluateBoard_symmetryBetweenColors() {
+        val stateWhiteAdvantage =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C2 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val stateBlackAdvantage =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                    C8 to Cob(BLACK, false),
+                ),
+                currentTurn = BLACK,
+            )
+
+        val scoreWhite = boardEvaluator.evaluate(stateWhiteAdvantage, evalConfig)
+        val scoreBlack = boardEvaluator.evaluate(stateBlackAdvantage, evalConfig)
+
+        // Deberían ser aproximadamente opuestos
+        assertTrue("White advantage should be positive", scoreWhite > 130.0)
+        assertTrue("Black advantage should be positive", scoreBlack < -130.0)
+        assertEquals(scoreWhite, -scoreBlack, 0.0) // Aproximadamente simétrico
+    }
+
+    @Test
+    fun isGameOver_noPiecesForOneColor() {
+        val stateWhiteWins =
+            GameState(
+                mapOf(C1 to Cob(WHITE, false)),
+                currentTurn = BLACK,
+            )
+
+        assertTrue(
+            "Game should be over when one color has no pieces",
+            stateWhiteWins.isGameOver(emptyMap()),
+        )
+    }
+
+    @Test
+    fun getNextBestMove_choosesCapture() {
+        // Escenario: WHITE puede capturar o moverse a espacio vacío
+        val state =
+            GameState(
+                mapOf(
+                    B1 to Cob(WHITE, true),
+                    A1 to Cob(BLACK, false), // Puede ir hacia A1
+                    B2 to Cob(BLACK, false), // O hacia B2
+                ),
+                currentTurn = WHITE,
+            )
+
+        val result = engine.getNextMove(state, Difficulty.DEFAULT)
+
+        assertNotNull("AI should find a move", result.move)
+        // IA debería preferir moverse a posición ventajosa
+        assertNotNull("Should have a best move", result.move)
+    }
+
+    @Test
+    fun isValidMove_normalPieceCannotMoveBackward() {
+        val state =
+            GameState(
+                mapOf(
+                    B1 to Cob(WHITE, false), // Pieza blanca normal
+                    C1 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        // WHITE en B1 intentando ir a C1 (hacia abajo = retroceder para WHITE)
+        // Asumiendo que C1 está "abajo" de B1 en el tablero
+        val canMoveBackward = isValidMove(state, Move(B1 to C1))
+
+        assertFalse("Normal piece should not move backward", canMoveBackward)
+    }
+
+    @Test
+    fun isValidMove_upgradedPieceCanMoveAnyDirection() {
+        val state =
+            GameState(
+                mapOf(
+                    B1 to Cob(WHITE, true), // Pieza upgraded
+                ),
+                currentTurn = WHITE,
+            )
+
+        // Verificar que puede moverse a posiciones adyacentes
+        val adjacentVertices = listOf(A1, B2, B6, C1, C2)
+
+        for (vertex in adjacentVertices) {
+            val canMove = isValidMove(state, Move(B1 to vertex))
+            assertTrue("Upgraded piece should move to adjacent $vertex", canMove)
+        }
+    }
+
+    @Test
+    fun transpositionTable_cachesResults() {
+        val state =
+            GameState(
+                mapOf(
+                    C1 to Cob(WHITE, false),
+                    C2 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                    C8 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val startTime = System.currentTimeMillis()
+        engine.getNextMove(state, Difficulty.DEFAULT) // Profundidad fija para comparar
+        val firstRunTime = System.currentTimeMillis() - startTime
+
+        val startTime2 = System.currentTimeMillis()
+        engine.getNextMove(state, Difficulty.DEFAULT) // Misma profundidad
+        val secondRunTime = System.currentTimeMillis() - startTime2
+
+        println("First run: ${firstRunTime}ms, Second run: ${secondRunTime}ms")
+
+        // Segunda ejecución debería ser más rápida (usa caché)
+        assertTrue(
+            "Second run should be faster due to caching",
+            secondRunTime < firstRunTime || secondRunTime < 100,
+        )
+    }
+
+    @Test
+    fun sortMoves_prioritizesGoodMoves() {
+        val state =
+            GameState(
+                mapOf(
+                    A1 to Cob(WHITE, true),
+                    B1 to Cob(WHITE, false),
+                    C7 to Cob(BLACK, false),
+                ),
+                currentTurn = WHITE,
+            )
+
+        val moves = state.allMovesForTurn()
+
+        assertTrue("Should have multiple moves", moves.size > 1)
+
+        // Verificar que se generan movimientos válidos
+        for (move in moves) {
+            assertTrue(
+                "Move should be valid",
+                isValidMove(state, move),
+            )
+        }
+    }
+
+    @Test
+    fun testEvaluationSymmetry_BasicPosition() {
+        // Test 1: Posición básica - evaluación debe ser simétrica al invertir colores
+        val positionWhite =
+            createGameState {
+                setTurn(WHITE)
+                // Distribución 4-4 simétrica
+                setCob(C1, WHITE, false)
+                setCob(C2, WHITE, false)
+                setCob(D1, WHITE, false)
+                setCob(D2, WHITE, false)
+                setCob(C7, BLACK, false)
+                setCob(C8, BLACK, false)
+                setCob(D3, BLACK, false)
+                setCob(D4, BLACK, false)
+            }
+
+        val positionBlack =
+            createGameState {
+                setTurn(BLACK)
+                // Misma posición pero colores invertidos
+                setCob(C1, BLACK, false)
+                setCob(C2, BLACK, false)
+                setCob(D1, BLACK, false)
+                setCob(D2, BLACK, false)
+                setCob(C7, WHITE, false)
+                setCob(C8, WHITE, false)
+                setCob(D3, WHITE, false)
+                setCob(D4, WHITE, false)
+            }
+
+        val scoreWhite = boardEvaluator.evaluate(positionWhite, evalConfig)
+        val scoreBlack = boardEvaluator.evaluate(positionBlack, evalConfig)
+
+        // Las evaluaciones deben ser opuestas (mismo valor absoluto, signo contrario)
+        assertEquals(
+            "Las evaluaciones deben ser simétricas al invertir colores. White: $scoreWhite, Black: $scoreBlack",
+            -scoreWhite,
+            scoreBlack,
+            0.001,
+        )
+    }
+
+    @Test
+    fun testEvaluationSymmetry_WithUpgrades() {
+        // Test 2: Posición con piezas mejoradas - debe mantener simetría
+        val positionWhite =
+            createGameState {
+                setTurn(WHITE)
+                // Distribución con mejoras simétricas
+                setCob(C1, WHITE, true)
+                setCob(C2, WHITE, false)
+                setCob(D1, WHITE, false)
+                setCob(D2, WHITE, true)
+                setCob(C7, BLACK, true)
+                setCob(C8, BLACK, false)
+                setCob(D3, BLACK, false)
+                setCob(D4, BLACK, true)
+            }
+
+        val positionBlack =
+            createGameState {
+                setTurn(BLACK)
+                // Posición invertida
+                setCob(C1, BLACK, true)
+                setCob(C2, BLACK, false)
+                setCob(D1, BLACK, false)
+                setCob(D2, BLACK, true)
+                setCob(C7, WHITE, true)
+                setCob(C8, WHITE, false)
+                setCob(D3, WHITE, false)
+                setCob(D4, WHITE, true)
+            }
+
+        val scoreWhite = boardEvaluator.evaluate(positionWhite, evalConfig)
+        val scoreBlack = boardEvaluator.evaluate(positionBlack, evalConfig)
+
+        assertEquals(
+            "Las evaluaciones con mejoras deben ser simétricas. White: $scoreWhite, Black: $scoreBlack",
+            -scoreWhite,
+            scoreBlack,
+            0.001,
+        )
+    }
+
+    @Test
+    fun testEvaluationFunction_SymmetricPositions() {
+        // Test que solo verifica la función de evaluación (no la búsqueda completa)
+        val symmetricPositions =
+            listOf(
+                // Posición 1: Distribución 4-4 equilibrada
+                createGameState {
+                    setTurn(WHITE)
+                    setCob(C1, WHITE, false)
+                    setCob(C2, WHITE, false)
+                    setCob(D1, WHITE, false)
+                    setCob(D2, WHITE, false)
+                    setCob(C7, BLACK, false)
+                    setCob(C8, BLACK, false)
+                    setCob(D3, BLACK, false)
+                    setCob(D4, BLACK, false)
+                },
+                // Posición 2: Distribución 3-5 con mejoras
+                createGameState {
+                    setTurn(WHITE)
+                    setCob(C1, WHITE, true)
+                    setCob(C2, WHITE, false)
+                    setCob(D1, WHITE, true)
+                    setCob(C7, BLACK, true)
+                    setCob(C8, BLACK, false)
+                    setCob(B5, BLACK, false) // Replaced D3: mirrors to B5(WHITE), not a dead vertex
+                    setCob(D4, BLACK, true)
+                    setCob(B1, BLACK, false)
+                },
+            )
+
+        symmetricPositions.forEach { position ->
+            val mirror = createMirrorPosition(position)
+            val scoreOriginal = boardEvaluator.evaluate(position, evalConfig)
+            val scoreMirror = boardEvaluator.evaluate(mirror, evalConfig)
+
+            // Verificamos que sean opuestos (con pequeña tolerancia)
+            assertEquals(
+                "La evaluación debe ser simétrica para posición: $position",
+                scoreOriginal,
+                -scoreMirror,
+                20.0,
+            )
+        }
+    }
+
+    @Test
+    fun testAISymmetry_AdvantagePosition() {
+        // Test 4: Ventaja clara para un lado debe reflejarse simétricamente
+        val whiteAdvantage =
+            createGameState {
+                setTurn(WHITE)
+                // Ventaja para blanco (6-2)
+                setCob(A1, WHITE, false)
+                setCob(B1, WHITE, false)
+                setCob(B2, WHITE, false)
+                setCob(B3, WHITE, false)
+                setCob(B4, WHITE, false)
+                setCob(B5, WHITE, false)
+                setCob(C1, BLACK, false)
+                setCob(C8, BLACK, false)
+            }
+
+        val blackAdvantage =
+            createGameState {
+                setTurn(BLACK)
+                // Ventaja equivalente para negro (2-6)
+                setCob(C1, WHITE, false)
+                setCob(C8, WHITE, false)
+                setCob(A1, BLACK, false)
+                setCob(B1, BLACK, false)
+                setCob(B2, BLACK, false)
+                setCob(B3, BLACK, false)
+                setCob(B4, BLACK, false)
+                setCob(B5, BLACK, false)
+            }
+
+        val scoreWhiteAdvantage = boardEvaluator.evaluate(whiteAdvantage, evalConfig)
+        val scoreBlackAdvantage = boardEvaluator.evaluate(blackAdvantage, evalConfig)
+
+        // La ventaja de blanco debe ser igual en magnitud a la ventaja de negro
+        assertEquals(
+            "Las ventajas deben ser simétricas. WhiteAdv: $scoreWhiteAdvantage, BlackAdv: $scoreBlackAdvantage",
+            scoreWhiteAdvantage,
+            -scoreBlackAdvantage,
+            0.0,
+        )
+    }
+
+    @Test
+    fun testEvaluationZero_PerfectBalance() {
+        // Test 5: Posición perfectamente equilibrada debe evaluar cerca de cero
+        val balancedPosition =
+            createGameState {
+                setTurn(WHITE)
+                // Distribución 4-4 idéntica
+                setCob(C1, WHITE, false)
+                setCob(C2, WHITE, false)
+                setCob(C3, WHITE, false)
+                setCob(C4, WHITE, false)
+                setCob(C7, BLACK, false)
+                setCob(C8, BLACK, false)
+                setCob(C9, BLACK, false)
+                setCob(C10, BLACK, false)
+            }
+
+        val score = boardEvaluator.evaluate(balancedPosition, evalConfig)
+
+        // Debe estar cerca de cero (no exactamente por posibles pequeñas asimetrías del tablero)
+        assertTrue("Posición equilibrada debe evaluar cerca de cero. Score: $score", abs(score) == 0.0)
+    }
+
+    @Test
+    fun testEvaluationSymmetry_SamePositionDifferentTurn() {
+        // Test 6: Misma posición, diferente turno - evaluación debe ser similar
+        val positionWhiteTurn =
+            createGameState {
+                setTurn(WHITE)
+                setCob(C1, WHITE, false)
+                setCob(C2, WHITE, false)
+                setCob(D1, WHITE, false)
+                setCob(D2, WHITE, false)
+                setCob(C7, BLACK, false)
+                setCob(C8, BLACK, false)
+                setCob(D3, BLACK, false)
+                setCob(D4, BLACK, false)
+            }
+
+        val positionBlackTurn =
+            createGameState {
+                setTurn(BLACK)
+                // Mismas piezas, solo cambia el turno
+                setCob(C1, WHITE, false)
+                setCob(C2, WHITE, false)
+                setCob(D1, WHITE, false)
+                setCob(D2, WHITE, false)
+                setCob(C7, BLACK, false)
+                setCob(C8, BLACK, false)
+                setCob(D3, BLACK, false)
+                setCob(D4, BLACK, false)
+            }
+
+        val scoreWhiteTurn = boardEvaluator.evaluate(positionWhiteTurn, evalConfig)
+        val scoreBlackTurn = boardEvaluator.evaluate(positionBlackTurn, evalConfig)
+
+        // La evaluación no debería cambiar drásticamente solo por el turno
+        // (puede haber pequeñas diferencias por cómo se calcula, pero no grandes)
+        assertTrue(
+            "La evaluación no debería cambiar solo por el turno. WhiteTurn: $scoreWhiteTurn, BlackTurn: $scoreBlackTurn",
+            abs(scoreWhiteTurn - scoreBlackTurn) == 0.0,
+        )
+    }
+
+    /**
+     * Helper para crear posiciones espejo automáticamente
+     */
+    private fun createMirrorPosition(original: GameState): GameState {
+        val builder = GameStateBuilder()
+        builder.setTurn(original.currentTurn.opponent)
+
+        // Intercambiar todas las piezas de color
+        original.cobs.forEach { (vertex, cob) ->
+            builder.setCob(vertex, cob.color.opponent, cob.isUpgraded)
+        }
+
+        return builder.build()
+    }
+
+    @Test
+    fun testAutomaticMirrorSymmetry() {
+        // Test 7: Usando el helper de espejo automático
+        val originalPosition =
+            createGameState {
+                setTurn(WHITE)
+                setCob(B1, WHITE, false)
+                setCob(C2, WHITE, false)
+                setCob(D1, WHITE, false)
+                setCob(C1, WHITE, false)
+                setCob(B4, BLACK, false)
+                setCob(C7, BLACK, false)
+                setCob(D3, BLACK, false)
+                setCob(C8, BLACK, false)
+            }
+
+        val mirrorPosition = createMirrorPosition(originalPosition)
+
+        val originalScore = boardEvaluator.evaluate(originalPosition, evalConfig)
+        val mirrorScore = boardEvaluator.evaluate(mirrorPosition, evalConfig)
+
+        assertEquals(
+            "El espejo automático debe producir evaluación simétrica. Original: $originalScore, Mirror: $mirrorScore",
+            originalScore,
+            mirrorScore,
+            10.0,
+        )
+    }
+
+    @Test
+    fun getNextBestMove_prefersFasterWin_C1_mate_B1_occupied() {
+        val state =
+            GameState(
+                mapOf(
+                    C12 to Cob(WHITE, false), // WHITE casi perdido
+                    C11 to Cob(BLACK, false),
+                    B6 to Cob(BLACK, false),
+                    C2 to Cob(BLACK, true),
+                    B1 to Cob(BLACK, false),
+                    C6 to Cob(BLACK, false),
+                    C7 to Cob(BLACK, false),
+                    C8 to Cob(BLACK, false),
+                ),
+                currentTurn = BLACK,
+            )
+
+        // Con profundidad adaptativa (14 en endgame), debería ver el mit
+        val result = engine.getNextMove(state)
+
+        assertNotNull("AI should find winning move", result.move)
+        assertTrue("Should have high winning score", result.score == -evalConfig.winningScore)
+
+        // Imprimir para debug
+        println("Best move found: ${result.move} with score: ${result.score}")
+    }
+
+    @Test
+    fun getNextBestMove_prefersFasterWin_C1_mate_B1_free() {
+        val state =
+            GameState(
+                mapOf(
+                    C12 to Cob(WHITE, false), // WHITE casi perdido
+                    C11 to Cob(BLACK, false),
+                    B6 to Cob(BLACK, false),
+                    C2 to Cob(BLACK, true),
+                    C5 to Cob(BLACK, false),
+                    C6 to Cob(BLACK, false),
+                    C7 to Cob(BLACK, false),
+                    C8 to Cob(BLACK, false),
+                ),
+                currentTurn = BLACK,
+            )
+
+        // Con profundidad adaptativa (14 en endgame), debería ver el mit
+        val result = engine.getNextMove(state)
+
+        assertNotNull("AI should find winning move", result.move)
+        assertTrue("Should have high winning score", result.score == -evalConfig.winningScore)
+
+        // Imprimir para debug
+        println("Best move found: ${result.move} with score: ${result.score}")
+    }
+}

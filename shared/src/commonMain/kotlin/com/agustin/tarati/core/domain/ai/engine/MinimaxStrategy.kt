@@ -1,0 +1,334 @@
+package com.agustin.tarati.core.domain.ai.engine
+
+import com.agustin.tarati.core.domain.ai.cache.HybridEvaluationCache
+import com.agustin.tarati.core.domain.ai.cache.TranspositionTable
+import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
+import com.agustin.tarati.core.domain.ai.evaluator.MoveEval
+import com.agustin.tarati.core.domain.ai.services.Difficulty
+import com.agustin.tarati.core.domain.ai.strategy.IAIStrategy
+import com.agustin.tarati.core.domain.game.pieces.isMaximizingPlayer
+import com.agustin.tarati.core.domain.game.pieces.opponent
+import com.agustin.tarati.core.domain.game.play.GameState
+import com.agustin.tarati.core.domain.game.play.Move
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.random.Random
+import kotlin.time.Clock
+
+/**
+ * Motor de búsqueda Minimax con poda Alpha-Beta, Profundización Iterativa
+ * y heurísticas de ordenamiento de movimientos.
+ *
+ * ## Algoritmo principal
+ * La búsqueda utiliza **Iterative Deepening** (profundización iterativa): en lugar
+ * de buscar directamente a la profundidad máxima, realiza búsquedas completas de
+ * profundidad 1, 2, 3... hasta alcanzar [Difficulty.depth] o el límite de tiempo.
+ * Esto garantiza que siempre hay un resultado disponible si el tiempo se agota,
+ * y permite usar los resultados de niveles anteriores para ordenar movimientos en
+ * el siguiente nivel — compensando el costo aparente de repetir la búsqueda.
+ *
+ * ## Poda Alpha-Beta
+ * La poda estándar se extiende con un umbral de victoria configurable
+ * ([EvaluationConfig.winningThreshold]): si un movimiento supera ese umbral,
+ * se trata como ganador inmediato y se corta la búsqueda sin evaluar el resto
+ * del árbol. Esto reduce drásticamente el número de nodos en finales de partida.
+ *
+ * ## Evitación de triple repetición
+ * Cuando un movimiento causaría la 3ª ocurrencia de una posición (derrota
+ * inmediata por la regla de triple repetición), ese movimiento **nunca** se
+ * elige como mejor movimiento — a menos que todos los movimientos legales
+ * lleven a la derrota por repetición. En ese caso de fuerza mayor, el primero
+ * de los movimientos repetición se usa como último recurso.
+ * Este comportamiento es independiente de la profundidad de búsqueda, por lo
+ * que funciona correctamente incluso en EASY (depth=2) donde la búsqueda corta
+ * no puede anticipar la regla por sí sola.
+ *
+ * ## Desempate aleatorio
+ * Cuando dos movimientos tienen exactamente el mismo score, se selecciona entre
+ * ellos con probabilidad uniforme (reservoir sampling de un elemento). Esto
+ * produce variedad en el juego sin sacrificar calidad.
+ *
+ * ## Límite de tiempo
+ * Un [SearchContext] con timestamp de inicio permite cortar la búsqueda si se
+ * supera el 90% del tiempo máximo ([timeLimitMs]). El margen del 10% absorbe
+ * la latencia del hilo y la serialización del resultado.
+ *
+ * ## LMR por branching de roks
+ * Cuando un nodo tiene más de
+ * [SearchWeights.lmrBranchingThreshold] movimientos
+ * disponibles (típico en posiciones con muchos roks), los movimientos tardíos del
+ * ordenamiento se buscan a
+ * depth-[SearchWeights.lmrDepthReduction].
+ * Si el resultado supera alpha se re-busca a profundidad completa. Esta técnica preserva la calidad
+ * táctica (nunca se reduce el primer movimiento, capturas ni victorias inmediatas)
+ * mientras reduce drásticamente los nodos en posiciones de alta movilidad.
+ */
+class MinimaxStrategy(
+    private val boardEvaluator: BoardEvaluator,
+    private val moveEvaluator: MoveEvaluator,
+    private val transpositionTable: TranspositionTable,
+    private val cache: HybridEvaluationCache,
+    private val positionHistory: Map<String, Int>,
+    private val evalConfig: () -> EvaluationConfig,
+) : IAIStrategy {
+    private var nodesEvaluated = 0
+    private var cacheHits = 0
+    private var cutoffs = 0
+    private val timeLimitMs = 10_000L
+
+    override fun getNextMove(
+        gameState: GameState,
+        difficulty: Difficulty,
+    ): MoveEval {
+        resetStats()
+        return iterativeDeepening(gameState, difficulty)
+    }
+
+    private fun iterativeDeepening(
+        gameState: GameState,
+        difficulty: Difficulty,
+    ): MoveEval {
+        val config = evalConfig()
+        val maxDepth = min(difficulty.depth, Difficulty.MAX.depth)
+        var bestResult = MoveEval(0.0, null)
+
+        val context = SearchContext(maxTimeMs = timeLimitMs)
+        lastContext = context
+
+        for (depth in 1..maxDepth) {
+            val currentResult =
+                minimax(
+                    gameState = gameState,
+                    depth = depth,
+                    alpha = Double.NEGATIVE_INFINITY,
+                    beta = Double.POSITIVE_INFINITY,
+                    config = config,
+                    context = context,
+                )
+
+            bestResult = currentResult
+
+            if (isWinningScore(bestResult.score, config)) break
+            if (shouldStopSearch(context)) break
+        }
+
+        return bestResult
+    }
+
+    private fun minimax(
+        gameState: GameState,
+        depth: Int,
+        alpha: Double,
+        beta: Double,
+        config: EvaluationConfig,
+        context: SearchContext,
+    ): MoveEval {
+        context.nodesEvaluated++
+
+        val terminalResult = checkTerminalState(gameState, depth, config)
+        if (terminalResult != null) return terminalResult
+
+        val boardHash = gameState.hashBoard()
+        transpositionTable.get(boardHash, depth)?.let {
+            cacheHits++
+            return it
+        }
+
+        val moves = gameState.allMovesForTurn()
+        if (moves.isEmpty()) {
+            val score = getCachedEvaluation(gameState, config)
+            return MoveEval(score, null)
+        }
+
+        val sortedMoves =
+            moveEvaluator.sortMoves(moves, gameState, gameState.currentTurn, config, depth, context)
+
+        // Winning-move detection is handled inside searchBestMove: the first
+        // move that satisfies isGameOver() && winner == currentTurn triggers
+        // an early return, avoiding a separate O(N) applyMove pass here.
+        return searchBestMove(gameState, sortedMoves, depth, alpha, beta, config, context)
+            .also { result ->
+                transpositionTable.put(boardHash, depth, result)
+            }
+    }
+
+    private fun searchBestMove(
+        gameState: GameState,
+        moves: List<Move>,
+        depth: Int,
+        alphaInit: Double,
+        betaInit: Double,
+        config: EvaluationConfig,
+        context: SearchContext,
+    ): MoveEval {
+        val isMaximizing = gameState.currentTurn.isMaximizingPlayer()
+        var bestMove: Move? = null
+        var bestScore = if (isMaximizing) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
+        var alpha = alphaInit
+        var beta = betaInit
+        var tiedCount = 0
+        // Last-resort move used only when every legal move causes triple-repetition defeat.
+        var repetitionFallback: Move? = null
+
+        for ((index, move) in moves.withIndex()) {
+            val newState = gameState.applyMove(move)
+
+            // Immediate win: return without recursing.
+            // Score is from the parent's perspective (isMaximizing), not the child's,
+            // because checkTerminalState scores from the TO-MOVE player's viewpoint
+            // (which after the winning move is the opponent -- wrong sign for the parent).
+            if (newState.isGameOver(positionHistory) && newState.getWinner(positionHistory) == gameState.currentTurn) {
+                val score = if (isMaximizing) config.winningScore else -config.winningScore
+                return MoveEval(score, move)
+            }
+
+            val newHash = newState.hashBoard()
+            val futureCount = (positionHistory[newHash] ?: 0) + 1
+
+            if (futureCount >= 3) {
+                // Definitive loss: the moving player caused the 3rd repetition and loses
+                // immediately. Never prefer this over any evaluated move — store it only
+                // as a last resort in case every legal move leads to repetition defeat.
+                if (repetitionFallback == null) repetitionFallback = move
+                continue
+            }
+
+            // Branching LMR: reduce depth for late moves in high-branching nodes.
+            // Conditions where we NEVER reduce:
+            //   - first [lmrMoveIndexThreshold] moves (highest-ranked by ordering)
+            //   - captures (flipsCob or flipsRoc > 0) — already checked via isGameOver above
+            //   - depth <= 2 (close to leaves, reduction would skip too much)
+            //   - the node has few moves (not a high-branching position)
+            val lmr = config.lmrBranchingThreshold
+            val canReduce = depth > 2
+                    && moves.size > lmr
+                    && index >= config.lmrMoveIndexThreshold
+            val searchDepth = if (canReduce) depth - 1 - config.lmrDepthReduction else depth - 1
+
+            var result = minimax(newState, searchDepth, alpha, beta, config, context)
+
+            // Re-search at full depth if the reduced search beat alpha — it may be
+            // a genuinely good move that the reduction underestimated.
+            if (canReduce && result.score > alpha) {
+                result = minimax(newState, depth - 1, alpha, beta, config, context)
+            }
+
+            // Penalizar movimientos que acercan a la 2ª repetición para desalentar
+            // ciclos que podrían forzar luego la 3ª derrota.
+            val score = if (futureCount == 2) {
+                val penalty = config.winningScore * config.repetitionPenaltyMultiplier
+                if (isMaximizing) result.score - penalty else result.score + penalty
+            } else result.score
+
+            val causesCutoff = shouldPrune(score, alpha, beta, isMaximizing, config)
+            if (causesCutoff && index < 3) {
+                moveEvaluator.recordKillerMove(move, depth, context)
+            }
+
+            val isNewBest = if (isMaximizing) score > bestScore else score < bestScore
+            val isTied = score == bestScore
+            if (isNewBest) {
+                bestScore = score
+                bestMove = move
+                tiedCount = 1
+
+                if (!causesCutoff) {
+                    moveEvaluator.recordHistoryMove(move, depth, context)
+                }
+            } else if (isTied) {
+                tiedCount++
+                if (Random.nextDouble() < 1.0 / tiedCount) {
+                    bestMove = move
+                }
+            }
+
+            when {
+                isMaximizing -> alpha = max(alpha, bestScore)
+                else -> beta = min(beta, bestScore)
+            }
+
+            if (causesCutoff) {
+                cutoffs++
+                break
+            }
+        }
+
+        // Si no hubo ningún movimiento evaluado (todos causaban 3ª repetición),
+        // marcar esta posición como DERROTA — no como ±infinito (que confundiría
+        // al nodo padre haciéndole creer que es una posición ganadora).
+        val finalScore = if (bestMove == null && repetitionFallback != null) {
+            if (isMaximizing) -config.winningScore else config.winningScore
+        } else {
+            bestScore
+        }
+        return MoveEval(finalScore, bestMove ?: repetitionFallback ?: moves.firstOrNull())
+    }
+
+    private fun getCachedEvaluation(gameState: GameState, config: EvaluationConfig): Double {
+        val base = cache.getFullEvaluation(gameState) ?: boardEvaluator.evaluate(gameState, config).also {
+            cache.putFullEvaluation(gameState, it)
+        }
+        val noise = config.evalNoise
+        return if (noise > 0.0) base + (Random.nextDouble() - 0.5) * noise else base
+    }
+
+    private fun checkTerminalState(
+        gameState: GameState,
+        depth: Int,
+        config: EvaluationConfig,
+    ): MoveEval? {
+        if (depth != 0 && !gameState.isGameOver(positionHistory)) return null
+
+        val score =
+            if (gameState.isGameOver(positionHistory)) {
+                when (gameState.getWinner(positionHistory)) {
+                    gameState.currentTurn -> config.winningScore
+                    gameState.currentTurn.opponent -> -config.winningScore
+                    else -> getCachedEvaluation(gameState, config)
+                }
+            } else {
+                getCachedEvaluation(gameState, config)
+            }
+        return MoveEval(score, null)
+    }
+
+    private fun shouldPrune(
+        bestScore: Double,
+        alpha: Double,
+        beta: Double,
+        isMaximizing: Boolean,
+        config: EvaluationConfig,
+    ): Boolean {
+        val winThreshold = config.winningScore * config.winningThreshold
+        return (isMaximizing && bestScore >= winThreshold) ||
+                (!isMaximizing && bestScore <= -winThreshold) ||
+                beta <= alpha
+    }
+
+    private fun isWinningScore(
+        score: Double,
+        config: EvaluationConfig,
+    ): Boolean {
+        val winThreshold = config.winningScore * config.winningThreshold
+        return score >= winThreshold || score <= -winThreshold
+    }
+
+    private fun shouldStopSearch(context: SearchContext): Boolean {
+        val elapsed = Clock.System.now().toEpochMilliseconds() - context.startTimeMs
+        return elapsed > context.maxTimeMs * 0.9
+    }
+
+    private fun resetStats() {
+        nodesEvaluated = 0
+        cacheHits = 0
+        cutoffs = 0
+    }
+
+    fun getStats(): Triple<Long, Int, Int> = Triple(
+        nodesEvaluated.toLong() + lastContext.nodesEvaluated,
+        cutoffs,
+        cacheHits,
+    )
+
+    private var lastContext: SearchContext = SearchContext()
+}

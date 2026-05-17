@@ -1,0 +1,43 @@
+package com.agustin.tarati.core.domain.game.play
+
+import kotlinx.serialization.Serializable
+
+/**
+ * Wrapper de lista de historial de movimientos con contrato de estabilidad
+ * para Compose y soporte de serialización de estado.
+ *
+ * ## Por qué no usar List<HistoryEntry> directamente
+ * `List<T>` es una interfaz mutable en Kotlin — el compilador de Compose no
+ * puede inferir su estabilidad y la trata como "runtime", lo que deshabilita
+ * los skip de recomposición en los composables que la reciben. Esto causaría
+ * recomposiciones innecesarias en el historial de movimientos del sidebar
+ * cada vez que cualquier otro estado del juego cambiara.
+ *
+ * Al envolver la lista en una clase anotada con [@Stable], se comunica al
+ * compilador de Compose que el contenido no cambiará de forma observable
+ * entre recomposiciones para la misma instancia, habilitando los skips.
+ *
+ * ## Parcelable para SavedStateHandle
+ * La anotación [@Parcelize] permite serializar el historial en
+ * [androidx.lifecycle.SavedStateHandle], sobreviviendo rotaciones de pantalla
+ * y muerte de proceso. Una `List<HistoryEntry>` plana no sería serializable
+ * directamente por `SavedStateHandle` sin configuración adicional.
+ */
+@Serializable
+class StableHistoryList(
+    private val entries: List<HistoryEntry>,
+) {
+    operator fun get(index: Int): HistoryEntry = entries[index]
+
+    val size: Int get() = entries.size
+
+    fun toList(): List<HistoryEntry> = entries
+
+    fun getMoves(): List<Move> = entries.indices.map { entries[it].move }
+
+    fun getMove(index: Int): Move = entries[index].move
+
+    fun getGameState(index: Int): GameState = entries[index].gameState
+
+    fun iterator() = entries.iterator()
+}

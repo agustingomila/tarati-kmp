@@ -1,0 +1,356 @@
+# Tarati — Un Juego de Tablero por George Spencer-Brown
+
+<div align="center">
+
+<img src="screenshots/logo.png" alt="Logo" style="display: block; margin: 0 auto;">
+
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-purple.svg)](https://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.10.3-blue.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![Room](https://img.shields.io/badge/Room-2.8.4-red.svg)](https://developer.android.com/jetpack/androidx/releases/room)
+[![Android](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://www.android.com)
+[![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-orange.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![en](https://flagcdn.com/w20/gb.png)](README.md)
+
+**Implementación multiplataforma (Android · Desktop · iOS) del juego de estrategia Tarati**
+
+[Google Play](#descargar) · [Reglas](#reglas) · [Tecnologías](#tecnologías) · [Descargar Desktop](#desktop)
+
+</div>
+
+---
+
+## Plataformas Disponibles
+
+### Android
+
+**Versión 1.0.0** — Disponible en Google Play  
+Requisitos: Android 8.0+ (API 26)
+
+### Desktop
+
+**Versión 1.0.0** — Windows · macOS · Linux  
+Requisitos: JVM 17+
+
+### iOS
+
+En desarrollo
+
+---
+
+## El Juego
+
+**Tarati** es un juego de mesa estratégico creado por George Spencer-Brown, autor de *Laws of Form*, que aplica su
+cálculo de distinciones al juego. La estructura es minimalista pero las consecuencias son profundas: los jugadores
+mueven piezas, voltean piezas enemigas y promueven las propias a través de un tablero de 23 vértices organizados en
+zonas concéntricas.
+
+<img src="screenshots/board.png" alt="Board" style="display: block; margin: 0 auto;">
+
+### Origen
+
+Diseñado como aplicación práctica del cálculo de distinciones de Brown, Tarati encarna los principios matemáticos y
+filosóficos de *Laws of Form* — obra fundamental que explora la lógica a través del concepto de distinción.
+
+---
+
+## Reglas
+
+### Objetivo
+
+Capturar la última pieza enemiga en un solo movimiento (Mit) o dejar al oponente sin movimientos legales (Stalemit).
+
+### Estructura del Tablero
+
+El tablero tiene 23 vértices distribuidos en cuatro zonas (no completamente disjuntas):
+
+- **Centro absoluto**: 1 vértice (A1)
+- **Puente**: 6 vértices que conectan el centro con la circunferencia
+- **Circunferencia**: 12 vértices que forman el anillo exterior
+- **Bases domésticas**: 4 vértices por jugador (8 en total); 2 son vértices D exclusivos y 2 son vértices C compartidos
+  con la circunferencia
+
+Cada jugador comienza con 4 Cobs colocados en su base doméstica.
+
+### Piezas
+
+**Cob** — la pieza básica. Se mueve solo hacia adelante, por aristas en dirección a la base enemiga. No puede retroceder
+salvo que sea promovida.
+
+**Rok** — un Cob promovido. Se mueve libremente en cualquier dirección a lo largo de cualquier arista. Un Cob se
+convierte en Rok al entrar en cualquier vértice de la base doméstica del oponente. Un Rok capturado conserva su estado
+de Rok: cambia de color, pero sigue siendo Rok.
+
+### Movimiento
+
+Una pieza se mueve a un vértice adyacente libre. Al llegar, voltea todas las piezas enemigas elegibles conectadas
+directamente a ese vértice, convirtiéndolas al color del jugador activo.
+
+Excepción: un Cob en su propia base doméstica puede moverse en cualquier dirección, pero solo si ese movimiento produce
+al menos una captura.
+
+### Regla de Pre-adyacencia
+
+Solo se puede capturar una pieza enemiga si la pieza que se mueve **no era adyacente a ella antes del movimiento**. Es
+decir, únicamente las piezas enemigas que son nuevas vecinas del destino — y no lo eran del origen — quedan volteadas.
+Las piezas que ya eran adyacentes al origen quedan protegidas.
+
+Esta es la regla táctica más importante del juego: hay que aproximarse desde afuera.
+
+### Piezas Muertas y Promoción Forzada
+
+Un Cob puede quedar **muerto** — atrapado sin posibilidad de avanzar. La patente define dos situaciones en las que esto
+ocurre:
+
+**Muerte primaria.** Un Cob que es capturado y volteado sobre uno de los dos vértices más exteriores de la base enemiga
+queda muerto de inmediato. Desde esos vértices no existe ningún camino hacia adelante: la pieza no puede moverse por sus
+propios medios.
+
+**Muerte por cadena.** Un Cob también queda muerto si todos sus vértices adyacentes hacia adelante están ocupados por
+Cobs muertos del mismo color. Esta condición se propaga: una pieza puede morir porque la bloquea otra que murió por la
+misma razón, y así sucesivamente. La cadena siempre termina en un vértice de muerte primaria.
+
+**Qué no produce muerte.** Una pieza no queda muerta por estar bloqueada por una pieza enemiga, por un Cob vivo del
+mismo color, ni por un Rok de cualquier color — porque cualquiera de esos bloqueadores puede moverse y liberar el
+camino. Solo los Cobs muertos del mismo color bloquean de forma permanente. Los Roks nunca están muertos.
+
+**Cuándo se puede promover una pieza muerta.** La promoción de un Cob muerto a Rok no es automática. Solo ocurre cuando
+el jugador no puede realizar ningún movimiento normal. En ese caso, puede promover uno de sus Cobs muertos — pero
+únicamente si el Rok resultante tendría al menos un movimiento disponible. Si la promoción no resuelve la inmovilidad,
+esa pieza no puede promoverse.
+
+**Caso especial — última pieza.** Si un Cob es la única pieza del jugador que queda en el tablero, debe promoverse a Rok
+de forma obligatoria, sin importar en qué vértice se encuentre y aunque el jugador todavía pueda mover otras piezas.
+
+### Condiciones de Fin de Partida
+
+La partida termina cuando:
+
+- **Mit**: un jugador captura todas las piezas enemigas en un solo movimiento.
+- **Stalemit**: el jugador activo no tiene movimientos normales ni promociones forzadas disponibles. Gana el oponente.
+- **Triple repetición**: la misma posición de tablero aparece tres veces con el mismo jugador a mover. Pierde el jugador
+  que provocó la tercera repetición.
+- **Regla de 50 movimientos**: si transcurren 100 semimovimientos consecutivos sin un movimiento de Cob ni ninguna
+  promoción, el jugador activo puede reclamar tablas. Un jugador con un movimiento ganador disponible no puede reclamar.
+- **Tiempo agotado**: en partidas con control de tiempo, el jugador que supera su límite pierde.
+
+---
+
+## Logros
+
+¡Tarati tiene logros! (Android)
+
+**Empezando**
+
+<img src="screenshots/achievements_1.png" alt="Board" style="display: block; margin: 0 auto;">
+
+- Bienvenido a Tarati — Termina el tutorial
+- Primera captura — Voltea tu primera pieza
+- Primera promoción — Sube un Cob a Rok
+- Primera victoria — Gana a la IA
+
+**El farmeo**
+
+<img src="screenshots/achievements_2.png" alt="Board" style="display: block; margin: 0 auto;">
+
+- 10 partidas jugadas — Lo que dice
+- El volteador — 50 capturas total
+- Maestro Rok — 25 promociones en todas las partidas
+- Imparable — 10 victorias vs IA
+- Campeón — Gana en dificultad máxima
+
+Y hay **logros secretos** escondidos. Descúbrelos tú mismo.
+
+---
+
+## Capturas de Pantalla
+
+### Android
+
+| <img src="/screenshots/screenshot8.png" width="300"/> | <img src="/screenshots/screenshot10.png" width="300"/> | <img src="/screenshots/screenshot4.png" width="300"/> |
+|-------------------------------------------------------|--------------------------------------------------------|-------------------------------------------------------|
+| <img src="/screenshots/screenshot3.png" width="300"/> | <img src="/screenshots/screenshot2.png" width="300"/>  | <img src="/screenshots/screenshot9.png" width="300"/> |
+
+### Desktop (Windows)
+
+| <img src="/screenshots/screenshot11.png" width="500"/> | <img src="/screenshots/screenshot13.png" width="300"/> |
+|--------------------------------------------------------|--------------------------------------------------------|
+| <img src="/screenshots/screenshot12.png" width="500"/> | <img src="/screenshots/screenshot14.png" width="300"/> |
+
+Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
+
+---
+
+## Descargar
+
+### Android
+
+[<img src="https://play.google.com/intl/es/badges/static/images/badges/es_badge_web_generic.png" alt="Disponible en Google Play" height="70">](https://play.google.com/store/apps/details?id=com.agustin.tarati)
+
+[![Descargar APK](https://img.shields.io/badge/Descargar_APK-v1.0.0-success?style=for-the-badge&logo=android)](https://github.com/AgustinGomila/tarati-kmp/releases)
+
+**Requisitos:**
+
+- Android 8.0 (API 26) o superior
+- 5–10 MB de espacio libre
+- Pantalla táctil
+
+### Desktop
+
+[![Descargar Windows](https://img.shields.io/badge/Windows-v1.0.0-0078D6?style=for-the-badge&logo=windows)](https://github.com/AgustinGomila/tarati-kmp/releases)
+[![Descargar macOS](https://img.shields.io/badge/macOS-v1.0.0-000000?style=for-the-badge&logo=apple)](https://github.com/AgustinGomila/tarati-kmp/releases)
+[![Descargar Linux](https://img.shields.io/badge/Linux-v1.0.0-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/AgustinGomila/tarati-kmp/releases)
+
+**Requisitos:**
+
+- Windows 10+, macOS 11+, o Linux (Ubuntu 20.04+)
+- JVM 17 o superior
+- 50–100 MB de espacio libre
+
+---
+
+## Características
+
+- **Motor IA con cuatro niveles de dificultad** — Minimax con poda Alpha-Beta, profundización iterativa y tabla de
+  transposición
+- **Control de tiempo** — Unlimited, Sudden Death, Fischer, Bronstein y Byoyomi con formatos adaptativos
+- **Pre-movimientos** — selección anticipada durante el turno de la IA
+- **Paletas de colores intercambiables** — incluyendo paletas de temporada y temas especiales
+- **Tipos de pieza personalizables** — selector visual con animación
+- **Biblioteca de partidas** — historial completo con navegación por movimientos
+- **Tutorial interactivo** — burbujas de guía superpuestas al tablero
+- **Logros** — integración con Google Play Games (Android)
+- **Soporte bilingüe** — español e inglés con selector in-app
+- **Multiplataforma** — mismo código compartido entre Android y Desktop
+
+---
+
+## Tecnologías
+
+| Componente                | Librería / Versión                                                            |
+|---------------------------|-------------------------------------------------------------------------------|
+| Lenguaje                  | Kotlin 2.3.21                                                                 |
+| Arquitectura              | Kotlin Multiplatform (KMP)                                                    |
+| UI                        | Compose Multiplatform 1.10.3, Material Design 3                               |
+| Inyección de dependencias | Koin 4.2.1                                                                    |
+| Almacenamiento local      | Room 2.8.4 (Android/Desktop), DataStore 1.2.1 (Android)                       |
+| Tests                     | JUnit 4.13.2, MockK 1.14.9, Coroutines Test 1.11.0                            |
+| Concurrencia              | Kotlin Coroutines 1.11.0                                                      |
+| Networking                | Ktor 3.4.3 (servidor, próximamente online)                                    |
+| Serialización             | kotlinx-serialization 1.11.0                                                  |
+| Tiempo                    | kotlinx-datetime 0.8.0                                                        |
+| IA                        | Minimax con poda Alpha-Beta, profundización iterativa, tabla de transposición |
+
+### Arquitectura Multiplatforma
+
+```
+Tarati/
+├── shared/              # Kotlin Multiplatform (~90% código compartido)
+│   ├── commonMain/     # Código común (UI, lógica, IA, ViewModels)
+│   ├── androidMain/    # Android-specific (APIs gráficas)
+│   ├── jvmMain/        # Desktop-specific (Skia, java.util)
+│   └── iosMain/        # iOS (en desarrollo)
+├── androidApp/         # Aplicación Android (MainActivity, Services)
+├── desktopApp/         # Aplicación Desktop (Main.kt, window)
+├── iosApp/             # Aplicación iOS (pendiente)
+└── server/             # Servidor Ktor (partidas online, en desarrollo)
+```
+
+### Estructura del Proyecto
+
+```
+shared/commonMain/
+├── core/
+│   ├── data/
+│   │   ├── database/          # Base de datos Room y DAOs
+│   │   └── repositories/      # Implementaciones de repositorios
+│   ├── domain/
+│   │   ├── ai/                # Motor, evaluador, estrategia minimax
+│   │   ├── game/              # Tablero, estado de juego, lógica de movimientos
+│   │   │   └── time/          # Control de tiempo (modos, estado del reloj)
+│   │   ├── repository/        # Interfaces de repositorio
+│   │   └── tutorial/          # Definición de pasos del tutorial
+│   └── utils/
+│       ├── helpers/            # Auxiliares de fecha/hora
+│       └── logging/            # Sistema de logging
+├── di/
+│   └── SharedModule.kt        # Koin modules compartidos
+├── features/
+│   ├── game/                  # Pantalla de juego principal y ViewModels
+│   ├── detail/                # Pantalla de detalle de partida
+│   ├── library/               # Biblioteca de partidas guardadas
+│   ├── settings/              # Pantalla de configuración
+│   └── splash/                # Pantalla de inicio
+├── services/
+│   ├── ai/                    # Servicio de IA y ViewModel
+│   ├── clipboard/             # Exportación de partidas por portapapeles
+│   ├── clock/                 # Reloj de partida y lógica de control de tiempo
+│   ├── dialogs/               # Sistema de diálogos
+│   └── localization/          # Gestión de idiomas
+└── ui/
+    ├── components/
+    │   ├── game/              # Tablero, highlights, animaciones, pre-movimientos
+    │   ├── editor/            # Editor de tablero
+    │   ├── navigation/        # Grafo de navegación
+    │   ├── sidebar/           # Panel lateral
+    │   ├── topbar/            # Barra superior
+    │   ├── turnIndicator/     # Indicador de turno
+    │   └── tutorial/          # Componentes de UI del tutorial
+    └── theme/                 # Sistema de diseño, temas y paletas
+
+androidApp/
+├── features/
+│   ├── seasonal/              # Eventos de temporada (Android)
+│   └── settings/              # Settings Android-specific
+└── services/
+    ├── achievements/          # Google Play Games
+    ├── billing/               # Google Play Billing
+    ├── clipboard/             # ClipboardManager Android
+    └── sound/                 # MediaPlayer Android
+
+desktopApp/
+├── desktop/
+│   ├── data/                  # Desktop database builder
+│   ├── di/                    # Desktop Koin modules
+│   └── services/              # Desktop services (clipboard, no-ops)
+├── features/
+│   ├── game/                  # Desktop GameViewModel
+│   └── settings/              # Desktop SettingsViewModel
+└── Main.kt                    # Entry point Desktop
+
+server/
+└── Application.kt             # Servidor Ktor (partidas online)
+```
+
+Más de 400 tests unitarios y previews de Compose.
+
+---
+
+## Créditos
+
+- **Concepto original**: George Spencer-Brown — *Laws of Form*
+- **Referencia de implementación React**: [Adam Blvck](https://github.com/adamblvck/tarati-react)
+- **Efectos de sonido**: [MattRuthSound](https://freesound.org/people/MattRuthSound)
+
+### Para Profundizar
+
+Tarati está fundamentado en *Laws of Form* de George Spencer-Brown, que introduce un cálculo matemáticamente completo
+construido íntegramente sobre el concepto de distinción.
+
+- [Louis Kauffman — Laws of Form (video)](https://youtu.be/UqMl_Wb04nU)
+- [Conferencia LoF 2019](https://www.youtube.com/playlist?list=PLl8xLayCI7YcFU3huTvSPC11xBFioxtpo)
+- [Mini Curso LoF por Leon Conrad](https://www.youtube.com/playlist?list=PLoK3NtWr5NbqEOdjQrWaq1sDweF7NJ5NB)
+
+---
+
+<div style="text-align: center;">
+
+_"Enseñar el orgullo en el conocimiento es poner una barrera efectiva contra cualquier avance sobre lo que ya se
+conoce."_
+— George Spencer-Brown
+
+</div>
+
+---
+
+*Este proyecto es una implementación educativa y no tiene fines comerciales. Todos los derechos del concepto original
+pertenecen a George Spencer-Brown.*

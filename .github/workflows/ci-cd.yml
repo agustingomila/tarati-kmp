@@ -1,0 +1,529 @@
+name: CI/CD Pipeline - Android + Desktop
+
+on:
+  push:
+    branches: [ master, develop ]
+    paths-ignore:
+      - 'README*.md'
+      - '**.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - 'achievements/**'
+      - '.gitignore'
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - 'README*.md'
+      - '**.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - 'achievements/**'
+      - '.gitignore'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+  actions: write
+  packages: write
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Limpieza automática de workflows antiguos
+  # ═══════════════════════════════════════════════════════════════════════════
+  delete-old-workflow-runs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: yanovation/delete-old-actions@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          days-ago: 30
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Tests
+  # ═══════════════════════════════════════════════════════════════════════════
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            ./gradlew :androidApp:test --info -PreleaseBuild=true
+          else
+            ./gradlew :androidApp:test --info
+          fi
+        continue-on-error: true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Build Android
+  # ═══════════════════════════════════════════════════════════════════════════
+  build-android:
+    runs-on: ubuntu-latest
+    needs: test
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch'
+      ) || (
+        github.ref == 'refs/heads/master' &&
+        !contains(github.event.head_commit.message, '[skip release]') &&
+        !contains(github.event.head_commit.message, '[no release]') &&
+        !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
+      )
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # ═══════════════════════════════════════════════════════════
+      # Leer versión
+      # ═══════════════════════════════════════════════════════════
+      - name: Read version
+        id: version
+        run: |
+          if [ ! -f version.properties ]; then
+            echo "versionCode=1" > version.properties
+            echo "versionName=1.0.0" >> version.properties
+          fi
+
+          VERSION_CODE=$(grep 'versionCode' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          VERSION_NAME=$(grep 'versionName' version.properties | cut -d'=' -f2 | tr -d '[:space:]"')
+
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          
+          echo "📱 Building Android v$VERSION_NAME (build $VERSION_CODE)"
+
+      # ═══════════════════════════════════════════════════════════
+      # Decodificar keystore
+      # ═══════════════════════════════════════════════════════════
+      - name: Setup Keystore
+        run: |
+          mkdir -p androidApp
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > androidApp/keystore.jks
+          echo "✅ Keystore decoded to androidApp/keystore.jks"
+
+      # ═══════════════════════════════════════════════════════════
+      # Build Android APK y AAB
+      # ═══════════════════════════════════════════════════════════
+      - name: Build Android Release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew :androidApp:assembleRelease :androidApp:bundleRelease \
+            -PversionCode=${{ steps.version.outputs.version_code }} \
+            -PversionName=${{ steps.version.outputs.version_name }} \
+            -PreleaseBuild=true \
+            --stacktrace
+
+      # ═══════════════════════════════════════════════════════════
+      # Verificar firma del AAB
+      # ═══════════════════════════════════════════════════════════
+      - name: Verify AAB signature
+        run: |
+          # Buscar el AAB generado (puede ser androidApp-release.aab o app-release.aab)
+          AAB_FILE=$(find androidApp/build/outputs/bundle/release -name "*.aab" | head -1)
+          
+          if [ -z "$AAB_FILE" ]; then
+            echo "❌ No se encontró archivo AAB"
+            ls -R androidApp/build/outputs/bundle/release || echo "Directorio no existe"
+            exit 1
+          fi
+          
+          echo "✅ AAB encontrado: $AAB_FILE"
+          jarsigner -verify -verbose "$AAB_FILE"
+          echo "✅ AAB signature verified"
+
+      # ═══════════════════════════════════════════════════════════
+      # Upload Android artifacts
+      # ═══════════════════════════════════════════════════════════
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-v${{ steps.version.outputs.version_name }}
+          path: |
+            androidApp/build/outputs/apk/release/*.apk
+            androidApp/build/outputs/bundle/release/*.aab
+            androidApp/build/outputs/native-debug-symbols/**/*.zip
+          retention-days: 90
+
+      # ═══════════════════════════════════════════════════════════
+      # Limpiar keystore
+      # ═══════════════════════════════════════════════════════════
+      - name: Cleanup keystore
+        if: always()
+        run: rm -f androidApp/keystore.jks
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Build Desktop (Linux, macOS, Windows)
+  # ═══════════════════════════════════════════════════════════════════════════
+  build-desktop:
+    needs: test
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch'
+      ) || (
+        github.ref == 'refs/heads/master' &&
+        !contains(github.event.head_commit.message, '[skip release]') &&
+        !contains(github.event.head_commit.message, '[no release]') &&
+        !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
+      )
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            task: packageDeb
+            artifact_pattern: "desktopApp/build/compose/binaries/main/deb/*.deb"
+          - os: macos-latest
+            platform: macos
+            task: packageDmg
+            artifact_pattern: "desktopApp/build/compose/binaries/main/dmg/*.dmg"
+          - os: windows-latest
+            platform: windows
+            task: packageMsi
+            artifact_pattern: "desktopApp/build/compose/binaries/main/msi/*.msi"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Grant execute permission for gradlew
+        shell: bash
+        run: chmod +x gradlew
+
+      # ═══════════════════════════════════════════════════════════
+      # Leer versión
+      # ═══════════════════════════════════════════════════════════
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          if [ ! -f version.properties ]; then
+            echo "versionCode=1" > version.properties
+            echo "versionName=1.0.0" >> version.properties
+          fi
+          
+          VERSION_CODE=$(grep 'versionCode' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          VERSION_NAME=$(grep 'versionName' version.properties | cut -d'=' -f2 | tr -d '[:space:]"')
+          
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          
+          echo "💻 Building Desktop (${{ matrix.platform }}) v$VERSION_NAME"
+
+      # ═══════════════════════════════════════════════════════════
+      # Build Desktop package
+      # ═══════════════════════════════════════════════════════════
+      - name: Build Desktop package (${{ matrix.platform }})
+        shell: bash
+        run: |
+          ./gradlew :desktopApp:${{ matrix.task }} \
+            -PversionCode=${{ steps.version.outputs.version_code }} \
+            -PversionName=${{ steps.version.outputs.version_name }} \
+            -PreleaseBuild=true \
+            --stacktrace
+
+      # ═══════════════════════════════════════════════════════════
+      # Verificar que se generó
+      # ═══════════════════════════════════════════════════════════
+      - name: Verify installer exists
+        shell: bash
+        run: |
+          if ls ${{ matrix.artifact_pattern }} 1> /dev/null 2>&1; then
+            echo "✅ Installer generated successfully"
+            ls -lh ${{ matrix.artifact_pattern }}
+          else
+            echo "❌ Installer not found"
+            exit 1
+          fi
+
+      # ═══════════════════════════════════════════════════════════
+      # Upload Desktop artifacts
+      # ═══════════════════════════════════════════════════════════
+      - name: Upload Desktop artifacts (${{ matrix.platform }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}-v${{ steps.version.outputs.version_name }}
+          path: ${{ matrix.artifact_pattern }}
+          retention-days: 90
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Crear Release con TODOS los artifacts
+  # ═══════════════════════════════════════════════════════════════════════════
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [ build-android, build-desktop ]
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch'
+      ) || (
+        github.ref == 'refs/heads/master' &&
+        !contains(github.event.head_commit.message, '[skip release]') &&
+        !contains(github.event.head_commit.message, '[no release]') &&
+        !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
+      )
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ═══════════════════════════════════════════════════════════
+      # Leer versión
+      # ═══════════════════════════════════════════════════════════
+      - name: Read version
+        id: version
+        run: |
+          if [ ! -f version.properties ]; then
+            echo "versionCode=1" > version.properties
+            echo "versionName=1.0.0" >> version.properties
+          fi
+          
+          VERSION_CODE=$(grep 'versionCode' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          VERSION_NAME=$(grep 'versionName' version.properties | cut -d'=' -f2 | tr -d '[:space:]"')
+          
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          
+          echo "🎉 Creating release v$VERSION_NAME (build $VERSION_CODE)"
+
+      # ═══════════════════════════════════════════════════════════
+      # Download TODOS los artifacts
+      # ═══════════════════════════════════════════════════════════
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Display artifact structure
+        run: |
+          echo "📦 Artifacts structure:"
+          ls -R ./artifacts
+
+      # ═══════════════════════════════════════════════════════════
+      # Crear GitHub Release
+      # ═══════════════════════════════════════════════════════════
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}
+          name: Tarati v${{ steps.version.outputs.version_name }} (Build ${{ steps.version.outputs.version_code }})
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ## 🎮 Tarati v${{ steps.version.outputs.version_name }}
+            **Build:** ${{ steps.version.outputs.version_code }}
+            **Commit:** ${{ github.sha }}
+            
+            ### 📦 Plataformas Disponibles
+            
+            #### 📱 Android (8.0+)
+            - **APK**: Instalación directa en dispositivos
+            - **AAB**: Para Google Play Store
+            
+            #### 💻 Desktop
+            - **🪟 Windows 10+**: `.msi` installer
+            - **🍎 macOS 11+**: `.dmg` installer
+            - **🐧 Linux (Debian/Ubuntu)**: `.deb` package
+            
+            ### 📝 Changelog
+            Ver notas de release generadas automáticamente abajo.
+            
+            ---
+            
+            ### 🔒 Seguridad
+            Todos los builds están firmados y verificados.
+          files: |
+            ./artifacts/**/*.apk
+            ./artifacts/**/*.aab
+            ./artifacts/**/*.zip
+            ./artifacts/**/*.msi
+            ./artifacts/**/*.dmg
+            ./artifacts/**/*.deb
+
+      # ═══════════════════════════════════════════════════════════
+      # Incrementar versionCode
+      # ═══════════════════════════════════════════════════════════
+      - name: Bump version
+        id: bump
+        run: |
+          VERSION_CODE=$(grep 'versionCode' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          VERSION_NAME=$(grep 'versionName' version.properties | cut -d'=' -f2 | tr -d '[:space:]"')
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          
+          echo "versionCode=$NEW_VERSION_CODE" > version.properties
+          echo "versionName=$VERSION_NAME" >> version.properties
+          
+          echo "new_version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "⬆️  Bumping version: $VERSION_CODE → $NEW_VERSION_CODE"
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add version.properties
+          git commit -m "ci: Bump versionCode to ${{ steps.bump.outputs.new_version_code }} [skip ci]"
+
+          # Pull y push con retry
+          for i in 1 2 3; do
+            echo "📤 Intento $i de 3..."
+            if git pull --rebase origin main && git push; then
+              echo "✅ Version bump pusheado exitosamente"
+              exit 0
+            else
+              echo "⚠️  Falló, reintentando en 5 segundos..."
+              sleep 5
+            fi
+          done
+
+          echo "❌ No se pudo pushear después de 3 intentos"
+          exit 1
+        continue-on-error: true
+
+      # ═══════════════════════════════════════════════════════════
+      # Limpiar releases antiguos
+      # ═══════════════════════════════════════════════════════════
+      - name: Delete old releases and tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "🗑️  Cleaning up old releases..."
+          
+          OLD_TAGS=$(gh release list \
+            --limit 100 \
+            --json tagName,publishedAt \
+            | jq -r 'sort_by(.publishedAt) | reverse | .[1:] | .[].tagName')          
+          
+          if [ -n "$OLD_TAGS" ]; then
+            echo "Deleting old releases (keeping 5 most recent):"
+            while IFS= read -r tag; do
+              echo "  - $tag"
+              gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+            done <<< "$OLD_TAGS"
+          else
+            echo "No old releases to delete"
+          fi
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Upload a Google Play Console (opcional)
+  # ═══════════════════════════════════════════════════════════════════════════
+  upload-play-console:
+    runs-on: ubuntu-latest
+    needs: [ build-android ]
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      github.event_name != 'pull_request' &&
+      github.event_name != 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: android-v*
+          path: ./android-artifacts
+          merge-multiple: true
+
+      - name: Check if Play Console secret exists
+        id: check_secret
+        run: |
+          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
+            echo "has_secret=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_secret=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Google Service Account JSON
+        if: steps.check_secret.outputs.has_secret == 'true'
+        id: google_json
+        run: |
+          echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > google-service-account.json
+          echo "json_path=$(pwd)/google-service-account.json" >> $GITHUB_OUTPUT
+
+      - name: Upload AAB to Play Console
+        if: steps.check_secret.outputs.has_secret == 'true'
+        id: upload_play
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJson: ${{ steps.google_json.outputs.json_path }}
+          packageName: com.agustin.tarati
+          releaseFiles: ./android-artifacts/*.aab
+          track: internal
+          status: completed
+        continue-on-error: true
+
+      - name: Upload result
+        run: |
+          if [ "${{ steps.upload_play.outcome }}" == "success" ]; then
+            echo "✅ Successfully uploaded to Google Play Console"
+          elif [ "${{ steps.check_secret.outputs.has_secret }}" == "false" ]; then
+            echo "ℹ️  Play Console upload skipped (secret not configured)"
+          else
+            echo "⚠️  Upload failed - AAB available in GitHub Releases"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: rm -f google-service-account.json

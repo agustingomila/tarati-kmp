@@ -1,0 +1,182 @@
+[versions]
+# Android Core
+agp = "8.13.2"
+compileSdk = "36"
+minSdk = "26"
+ndk = "29.0.14206865"
+jvmCompatibility = "11"
+
+# Kotlin
+kotlin = "2.3.21"
+kotlinxCoroutines = "1.11.0"
+kotlinxSerialization = "1.11.0"
+kotlinxDatetime = "0.8.0"
+kotlinxAtomicfu = "0.32.1"
+
+# Compose
+compose-bom = "2026.05.00"
+compose-multiplatform = "1.10.3"
+activity-compose = "1.13.0"
+compose-material-icons = "1.7.8"
+lifecycle-view-model = "2.10.0"
+navigation-compose = "2.9.8"
+navigation-compose-multiplatform = "2.9.2"
+
+# AndroidX
+core-ktx = "1.18.0"
+lifecycle-runtime-ktx = "2.10.0"
+datastore = "1.2.1"
+
+# Room Multiplatform
+room = "2.8.4"
+ksp = "2.2.21-2.0.5"
+sqlite = "2.6.2"
+
+# DI
+koin = "4.2.1"
+
+# Testing
+junit = "4.13.2"
+kotlin-test = "2.3.21"
+mockk = "1.14.9"
+uiGraphics = "1.11.1"
+koinTest = "4.2.1"
+
+# Quality Checks
+detekt = "1.23.8"
+ktlint = "14.2.0"
+
+# Google Services
+playServicesGamesV2 = "21.0.0"
+integrity = "1.6.0"
+junitKtx = "1.3.0"
+androidTestRunner = "1.7.0"
+billing = "8.3.0"
+
+# Ktor
+ktor = "3.4.3"
+
+# Server
+exposedCore = "1.2.0"
+postgresql = "42.7.11"
+logback = "1.5.32"
+
+# Utils
+uuid = "0.8.4"
+material3 = "1.9.0"
+
+[libraries]
+# ── Kotlin Multiplatform ──────────────────────────────────────────────────────
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinxAtomicfu" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+kotlinx-coroutines-play = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
+
+# ── Compose Multiplatform — shared/KMP (con versión explícita) ────────────────
+# Estas 5 entradas son las que usa shared/build.gradle.kts
+androidx-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+androidx-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+androidx-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+androidx-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+androidx-compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+androidx-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose-multiplatform" }
+
+# ── Compose Debug — androidMain ───────────────────────────────────────────────
+androidx-compose-uiTooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
+# ── Compose AndroidX — androidApp (gestionadas por BOM) ──────────────────────
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose-material-icons" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+
+# ── AndroidX ──────────────────────────────────────────────────────────────────
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-view-model" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+
+# ── Room Multiplatform ────────────────────────────────────────────────────────
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+# ── SQLite for Desktop ────────────────────────────────────────────────────────
+androidx-sqlite = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+
+# ── DataStore ─────────────────────────────────────────────────────────────────
+datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# ── DI — Koin ─────────────────────────────────────────────────────────────────
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
+
+koin-compose-multiplatform = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+android-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiGraphics" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidTestRunner" }
+
+# ── Quality Checks ────────────────────────────────────────────────────────────
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
+
+# ── Google Services ───────────────────────────────────────────────────────────
+integrity = { module = "com.google.android.play:integrity", version.ref = "integrity" }
+play-services-games-v2 = { module = "com.google.android.gms:play-services-games-v2", version.ref = "playServicesGamesV2" }
+billing = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
+
+# ── Ktor Client — androidApp ──────────────────────────────────────────────────
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# ── Ktor Server ───────────────────────────────────────────────────────────────
+ktor-server-core = { module = "io.ktor:ktor-server-core" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt" }
+
+# ── Server ────────────────────────────────────────────────────────────────────
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposedCore" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+[plugins]
+# Android
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
+# Kotlin
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Quality Checks
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+
+# Tools
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
+
+# Compose
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

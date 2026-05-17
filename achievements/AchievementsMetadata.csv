@@ -1,0 +1,22 @@
+Welcome to Tarati,Complete the tutorial to learn the rules of the game.,False,,Revealed,5,10
+First Capture,Flip an opponent's piece for the first time.,False,,Revealed,5,20
+First Promotion,Promote a Cob to a Rok for the first time.,False,,Revealed,5,30
+First Victory,Win your first game against the AI.,False,,Revealed,10,40
+Play 10 Games,Complete 10 games against the AI.,False,,Revealed,10,50
+The Flipper,Capture 50 enemy pieces in total.,True,50,Revealed,20,60
+Rok Master,Promote 25 Cobs to Roks across all games.,True,25,Revealed,20,70
+Unstoppable,Win 10 games against the AI.,True,10,Revealed,25,80
+Champion,Win a game on Champion difficulty.,False,,Revealed,50,90
+Mit,Win a game by Mit: capture every enemy piece.,False,,Hidden,15,100
+Stalemit,Win a game by Stalemit: leave your opponent with no legal moves.,False,,Hidden,15,110
+Eternal Loop,Win a game by triple repetition.,False,,Hidden,25,120
+Fifty Move Rule,Claim a draw using the fifty-move rule.,False,,Hidden,15,130
+Dead but Dangerous,Promote a dead Cob to win the game.,False,,Hidden,25,140
+Grandmaster,Win 50 games against the AI.,True,50,Hidden,50,150
+Halloween Theme,Win on Champion difficulty on October 31st to unlock the Halloween theme forever.,False,,Hidden,50,160
+Christmas Theme,Win on Champion difficulty on December 25th to unlock the Christmas theme forever.,False,,Hidden,50,170
+Apprentice,Win a game on Easy difficulty.,False,,Revealed,5,180
+Strategist,Win a game on Medium difficulty.,False,,Revealed,10,190
+Tactician,Win a game on Hard difficulty.,False,,Revealed,25,200
+The First Light,Win a game as White on April 4th–6th to unlock an exclusive palette forever.,False,,Hidden,50,210
+The Dark Side,Win a game as Black on April 4th–6th to unlock an exclusive palette forever.,False,,Hidden,50,220
