@@ -1,0 +1,136 @@
+package com.agustin.tarati.features.settings
+
+import com.agustin.tarati.core.domain.ai.services.Difficulty
+import com.agustin.tarati.core.domain.game.board.BoardOrientation
+import com.agustin.tarati.core.domain.game.time.TimeControlMode
+import com.agustin.tarati.services.localization.AppLanguage
+import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
+import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * Interfaz multiplataforma para persistencia de settings.
+ *
+ * Implementaciones:
+ * - [AndroidSettingsRepository] en androidApp (usa DataStore)
+ * - [DesktopSettingsRepository] en desktopApp (con persistencia)
+ */
+interface SettingsRepository {
+    val isDarkTheme: Flow<Boolean>
+    val difficulty: Flow<Difficulty>
+
+    /** Difficulty for the Black side. */
+    val difficultyBlack: Flow<Difficulty>
+
+    /** Difficulty for the White side (AI). */
+    val difficultyWhite: Flow<Difficulty>
+
+    val userName: Flow<String>
+    val language: Flow<AppLanguage>
+    val palette: Flow<String>
+    val labelsVisibility: Flow<Boolean>
+    val verticesVisibility: Flow<Boolean>
+    val edgesVisibility: Flow<Boolean>
+    val regionsVisibility: Flow<Boolean>
+    val perimeterVisibility: Flow<Boolean>
+    val animateEffects: Flow<Boolean>
+    val conversionAnimationStyle: Flow<ConversionAnimationStyle>
+    val soundEnabled: Flow<Boolean>
+    val soundVolume: Flow<Float>
+    val tutorialSeen: Flow<Boolean>
+
+    /** "MM-dd" of the last day a seasonal theme was auto-applied. Empty string if never. */
+    val seasonalAutoAppliedDate: Flow<String>
+
+    /** Palette name to restore after a seasonal day ends. Empty string if none. */
+    val preSeasonalPalette: Flow<String>
+
+    /**
+     * Id del [PieceType] seleccionado.
+     * Se resuelve con [PieceTypes.findById] al leer. Default: [PieceTypes.default.id].
+     */
+    val pieceTypeId: Flow<String>
+
+    // ── Game session preferences (survive app restarts) ────────────────────────
+
+    /** Whether the White band is controlled by the AI engine. */
+    val whiteIsAI: Flow<Boolean>
+
+    /** Whether the Black band is controlled by the AI engine. */
+    val blackIsAI: Flow<Boolean>
+
+    /**
+     * Last board orientation chosen by the user.
+     * Stored as the [BoardOrientation] enum name string.
+     */
+    val boardOrientation: Flow<String>
+
+    /**
+     * Whether the user has manually rotated the board. When true,
+     * [GameEffects] skips the automatic
+     * orientation recalculation on screen rotation.
+     * Persisted in DataStore so it survives app restarts.
+     */
+    val isManuallyRotated: Flow<Boolean>
+
+    // ── Time control & pre-moves ───────────────────────────────────────────────
+
+    /**
+     * Modo de control de tiempo aplicado a las partidas nuevas.
+     * Default: [TimeControlMode.Unlimited] — sin reloj, sin timeout.
+     *
+     * Se serializa con [TimeControlMode.serialize] y se deserializa de forma
+     * tolerante: cualquier valor inválido o no reconocido (incluidos cambios de
+     * schema en versiones futuras) cae al default Unlimited, preservando la
+     * compatibilidad hacia atrás.
+     */
+    val timeControl: Flow<TimeControlMode>
+
+    /**
+     * Whether the pre-move feature is enabled. When `true`, the human player
+     * can pre-select a move while the AI is thinking; the move auto-executes
+     * on their turn if still legal. Default `true`.
+     */
+    val preMovesEnabled: Flow<Boolean>
+
+    // ── Setters ────────────────────────────────────────────────────────────────
+
+    suspend fun setTutorialSeen(seen: Boolean)
+    suspend fun setDarkTheme(enabled: Boolean)
+    suspend fun setDifficulty(difficulty: Difficulty)
+    suspend fun setDifficultyBlack(difficulty: Difficulty)
+    suspend fun setDifficultyWhite(difficulty: Difficulty)
+    suspend fun setUserName(userName: String)
+    suspend fun setLanguage(language: AppLanguage)
+    suspend fun setPalette(paletteName: String)
+    suspend fun setLabelsVisibility(visibility: Boolean)
+    suspend fun setVerticesVisibility(visibility: Boolean)
+    suspend fun setEdgesVisibility(visibility: Boolean)
+    suspend fun setRegionsVisibility(visibility: Boolean)
+    suspend fun setPerimeterVisibility(visibility: Boolean)
+    suspend fun setAnimateEffects(animate: Boolean)
+    suspend fun setConversionAnimationStyle(style: ConversionAnimationStyle)
+    suspend fun setSoundEnabled(enabled: Boolean)
+    suspend fun setSoundVolume(volume: Float)
+    suspend fun setSeasonalAutoAppliedDate(date: String)
+    suspend fun setPreSeasonalPalette(paletteName: String)
+    suspend fun clearPreSeasonalPalette()
+
+    /** Persiste el id del tipo de pieza seleccionado. */
+    suspend fun setPieceTypeId(pieceTypeId: String)
+
+    // ── Game session setters ───────────────────────────────────────────────────
+
+    suspend fun setWhiteIsAI(isAI: Boolean)
+    suspend fun setBlackIsAI(isAI: Boolean)
+    suspend fun setBoardOrientation(orientation: BoardOrientation)
+    suspend fun setManuallyRotated(value: Boolean)
+
+    // ── Time control & pre-moves setters ──────────────────────────────────────
+
+    /** Persiste el modo de reloj. Se serializa con [TimeControlMode.serialize]. */
+    suspend fun setTimeControl(mode: TimeControlMode)
+
+    /** Persiste el flag de pre-movimientos. */
+    suspend fun setPreMovesEnabled(enabled: Boolean)
+}

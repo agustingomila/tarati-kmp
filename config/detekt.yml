@@ -1,0 +1,64 @@
+build:
+  maxIssues: 0
+  weights:
+    complexity: 2
+    LongParameterList: 1
+    style: 1
+    comments: 1
+
+complexity:
+  active: true
+  ComplexCondition:
+    active: true
+    threshold: 4
+  LongMethod:
+    active: true
+    threshold: 30
+  LargeClass:
+    active: true
+    threshold: 200
+  LongParameterList:
+    active: true
+    functionThreshold: 5
+    constructorThreshold: 5
+
+style:
+  active: true
+  ForbiddenComment:
+    active: true
+    comments:
+      - 'TODO'
+      - 'FIXME'
+      - 'STOPSHIP'
+  MagicNumber:
+    active: true
+    ignoreNumbers:
+      - "-1"
+      - "0"
+      - "1"
+      - "2"
+    excludes:
+      - "**/EvaluationConfig.kt"
+  NewLineAtEndOfFile:
+    active: true
+  OptionalUnit:
+    active: true
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    excludes:
+      - "**/ui/**"
+      - "**/compose/**"
+      - "**/presentation/**"
+
+empty-blocks:
+  active: true
+  EmptyCatchBlock:
+    active: true
+    allowedExceptionNameRegex: "^(_|ignore.*|Ignore.*)"
+
+formatting:
+  active: true
+  autoCorrect: true

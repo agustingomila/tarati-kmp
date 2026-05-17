@@ -1,0 +1,272 @@
+<resources>
+    <string name="app_name">Tarati</string>
+    <string name="game_over_wins">Game Over! %1$s wins by Mit!</string>
+    <string name="game_over_stalemit">Game Over! %1$s wins by Stalemit!</string>
+    <string name="black">BLACK</string>
+    <string name="white">WHITE</string>
+    <string name="about_tarati">About Tarati</string>
+    <string name="tarati_is_a_strategic_board_game_created_by_george_spencer_brown">Tarati is a strategic board game
+        created by George Spencer Brown, based on his work \'Laws of Form\'. The game combines elements of traditional
+        board games with unique movement and capture mechanics.
+    </string>
+    <string name="game_rules">Game Rules:</string>
+    <string name="players_2_white_vs_black_objective_control_the_board">• Players: 2 (WHITE vs BLACK)\n • Objective:
+        Control the board by converting opponent pieces\n • Movement: Pieces move along edges to adjacent vertices\n •
+        Upgrades: Pieces become upgraded in opponent\'s home base\n • Capture: Moving adjacent to opponent pieces
+        converts them
+    </string>
+    <string name="credits">Credits:</string>
+    <string name="original_concept_george_spencer_brown">• Original concept: George Spencer Brown\n • React
+        implementation: Adam Blvck\n • Kotlin/Android port: Agustín Gomila\n • Sounds: MattRuthSound
+    </string>
+    <string name="close">Close</string>
+    <string name="game_over">Game Over</string>
+    <string name="new_game">New Game</string>
+    <string name="continue_">Continue</string>
+    <string name="are_you_sure_you_want_to_start_a_new_game">Are you sure you want to start a new game? Current progress
+        will be lost.
+    </string>
+    <string name="tarati">Tarati</string>
+    <string name="menu">Menu</string>
+    <string name="a_board_game_by_george_spencer_brown">A Board Game by George Spencer Brown</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="difficulty_champion">Champion</string>
+    <string name="disable_ai">Disable AI</string>
+    <string name="enable_ai">Enable AI</string>
+    <string name="back">Back</string>
+    <string name="about">About</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="spanish">Spanish</string>
+    <string name="english">English</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="appearance">Appearance</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="your_turn">Your turn</string>
+    <string name="opponent_turn">Opponent turn</string>
+    <string name="light_theme">Light theme</string>
+    <string name="board_labels">Board labels</string>
+    <string name="edit">Edit</string>
+    <string name="editing">Editing</string>
+    <string name="start_game">Start game</string>
+    <string name="invalid_schema">Invalid schema</string>
+    <string name="clear_board">Clear board</string>
+    <string name="rotate_board">Rotate board</string>
+    <string name="start">Start</string>
+    <string name="turn">Turn</string>
+    <string name="piece">Piece</string>
+    <string name="side">Side</string>
+    <string name="ai_thinking">AI thinking…</string>
+    <string name="human_turn">Human turn</string>
+    <string name="you_won">You won with %1$s</string>
+    <string name="you_lost">You lost with %1$s</string>
+    <string name="game_over_triple_repetition">Game over: %1$s wins by triple repetition!</string>
+    <string name="show_tutorial">Show tutorial</string>
+    <string name="next">Next</string>
+    <string name="skip_tutorial">Skip tutorial</string>
+    <string name="collapse_step">Collapse step</string>
+    <string name="expand_step">Expand step</string>
+    <string name="repeat_explanation">Repeat explanation</string>
+    <string name="board_vertices">Vertices</string>
+    <string name="color_palette">Color Palette</string>
+    <string name="select_color_palette">Select color palette</string>
+    <string name="piece_type">Piece Type</string>
+    <string name="select_piece_type">Select piece type</string>
+    <string name="piece_type_circle">Circle</string>
+    <string name="piece_type_hexagon">Hexagon</string>
+    <string name="piece_type_square">Square</string>
+    <string name="piece_type_triangle">Triangle</string>
+    <string name="piece_type_diamond">Diamond</string>
+    <string name="piece_type_pentagon">Pentagon</string>
+    <string name="piece_type_capsule">Capsule</string>
+    <string name="animate_effects">Board effects</string>
+    <string name="board_edges">Edges</string>
+    <string name="tutorial_introduction_title">Welcome to Tarati</string>
+    <string name="tutorial_introduction_description">Tarati is a strategic game of movement and capture. Learn the
+        basic rules to start playing.
+    </string>
+    <string name="tutorial_center_title">The Center</string>
+    <string name="tutorial_center_description">Vertex A1 is the Absolute Center, connected to the 6 Bridge vertices
+        (B1–B6).
+    </string>
+    <string name="tutorial_bridge_title">The Bridge</string>
+    <string name="tutorial_bridge_description">The 6 Bridge vertices surround the center. They connect the center to
+        the outer circumference. Each Bridge vertex has 5 edges.
+    </string>
+    <string name="tutorial_circumference_title">The Circumference</string>
+    <string name="tutorial_circumference_description">12 vertices form the outer ring. Each one connects to its two
+        circumference neighbors and to one Bridge vertex.
+    </string>
+    <string name="tutorial_domestic_bases_title">Home Bases</string>
+    <string name="tutorial_domestic_bases_description">Each player has 4 vertices in their home base (2 of type C and
+        2 of type D). Pieces start here and can return here.
+    </string>
+    <string name="tutorial_cobs_title">The Pieces</string>
+    <string name="tutorial_cobs_description">Each player starts with 4 Cobs (plain pieces). Cobs can only advance
+        toward the enemy base. Once there, they become Roks (marked with an inner circle), which can move in any
+        direction.
+    </string>
+    <string name="tutorial_basic_moves_title">Basic Movement</string>
+    <string name="tutorial_basic_moves_description">Cobs move to adjacent empty vertices, advancing toward the enemy
+        base only. Exception: from their own home base, a Cob may move in any direction, but only to make a capture.
+    </string>
+    <string name="tutorial_captures_title">Capturing Pieces</string>
+    <string name="tutorial_captures_description">When you move to a vertex, every enemy piece adjacent to your
+        destination switches to your color. Multiple pieces can be captured in a single move. Pieces are never
+        removed — they change sides.
+    </string>
+    <string name="tutorial_pre_adjacency_title">The Pre-Adjacency Rule</string>
+    <string name="tutorial_pre_adjacency_description">You can only capture an enemy piece if your piece was NOT
+        adjacent to it before the move. You must approach from outside. This is the most important tactical rule in
+        the game.
+    </string>
+    <string name="tutorial_upgrade_title">Promotion to Rok</string>
+    <string name="tutorial_upgrade_description">A Cob that reaches the enemy home base becomes a Rok. Roks move in
+        any direction and keep their rank even if captured and switched to the other color.
+    </string>
+    <string name="tutorial_dead_piece_title">Dead Pieces</string>
+    <string name="tutorial_dead_piece_description">A Cob is dead if it sits on the outermost enemy base vertices
+        (D3/D4 for White), or if all its exits are blocked by other dead friendly Cobs. If you have no other moves,
+        you may promote a dead Cob to a Rok in place.
+    </string>
+    <string name="tutorial_domestic_capture_title">Capturing in Your Own Base</string>
+    <string name="tutorial_domestic_capture_description">A Cob on its own home base can also move sideways or backward
+        to capture an enemy piece already inside your base. The destination must be empty, and the pre-adjacency rule
+        still applies: you can only capture a piece you were not already adjacent to.
+    </string>
+    <string name="tutorial_end_conditions_title">How the Game Ends</string>
+    <string name="tutorial_end_conditions_description">You win by Mit: the last enemy piece switches to your color.
+        Or by Stalemit: your opponent has no legal moves left. If your opponent causes the same position three times,
+        you win as well.
+    </string>
+    <string name="perform_the_indicated_move">%1$s\n\nMake the indicated move.</string>
+    <string name="tutorial_completed_title">Tutorial Complete</string>
+    <string name="tutorial_completed_description">You have completed the basic Tarati tutorial. Now try playing a
+        game!
+    </string>
+    <string name="general">General</string>
+    <string name="board_display">Board display</string>
+    <string name="animations">Animations</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="move_history">Move history</string>
+    <string name="ai_opponent">AI opponent</string>
+    <string name="board_regions">Areas</string>
+    <string name="board_perimeter">Perimeter</string>
+    <string name="move_history_copied_to_clipboard">Move history copied to clipboard</string>
+    <string name="copy_move_history">Copy move history</string>
+    <string name="copied">Copied</string>
+    <string name="sound">Sound</string>
+    <string name="sound_effects">Default sounds</string>
+    <string name="auto_theme">Auto</string>
+    <string name="volume">Volume</string>
+    <string name="volume_muted">Volume muted</string>
+    <string name="volume_low">Volume low</string>
+    <string name="volume_medium">Volume medium</string>
+    <string name="volume_high">Volumen high</string>
+    <string name="sound_disabled">Sound disabled</string>
+    <string name="paste_board_position">Paste position</string>
+    <string name="board_notation">POS</string>
+    <string name="board_position_copied_to_clipboard">Board position copied to clipboard</string>
+    <string name="copy_position">Copy position</string>
+    <string name="game_details">Game details</string>
+    <string name="load_to_board">Load to board</string>
+    <string name="toggle_details">Toggle details</string>
+    <string name="delete_game">Delete game</string>
+    <string name="saved_games">Saved games</string>
+    <string name="game_information">Game information</string>
+    <string name="save_game">Save game</string>
+    <string name="no_saves">No saves</string>
+    <string name="event">Event</string>
+    <string name="site">Site</string>
+    <string name="round">Round</string>
+    <string name="game_type">Game Type</string>
+    <string name="rules">Rules</string>
+    <string name="time_control">Time Control</string>
+    <string name="termination">Termination</string>
+    <string name="result">Result</string>
+    <string name="date">Date</string>
+    <string name="vs">%1$s vs %2$s</string>
+    <string name="game_saved">Game saved</string>
+    <string name="total_moves">Total moves: %1$s</string>
+    <string name="moves">Moves</string>
+    <string name="players">Players</string>
+    <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="jump_to_current_position">Jump to Current Position</string>
+    <string name="save">Save</string>
+    <string name="observations">Observations</string>
+    <string name="vs_">vs</string>
+    <string name="delete">Delete</string>
+    <string name="games_deleted">%1$s games deleted</string>
+    <string name="delete_games">Delete games</string>
+    <string name="confirm_delete_games">Delete %1$s games</string>
+    <string name="game_deleted">Game deleted</string>
+    <string name="confirm_delete_game">Delete the game</string>
+    <string name="select_games">Select games</string>
+    <string name="delete_selected">Delete selected</string>
+    <string name="games_selected">%1$s selected</string>
+    <string name="user_name">Name</string>
+    <string name="user_name_empty">Name empty</string>
+    <string name="toggle_move_history">Toggle history</string>
+    <string name="move_controls">Move controls</string>
+    <string name="go_to_end">Goto end</string>
+    <string name="go_to_begin">Goto begin</string>
+    <string name="move_n_of_n">Move %1$d of %2$d</string>
+    <string name="must_promote">Must promote</string>
+    <string name="game_over_fifty_moves">Game over (50 mov)</string>
+    <string name="achievements">Achievements</string>
+    <string name="achievements_sign_in_required">Sign in to Google Play Games to view achievements</string>
+    <string name="halloween_theme_unlocked">🎃 You\'ve unlocked the Halloween theme permanently!</string>
+    <string name="christmas_theme_unlocked">🎄 You\'ve unlocked the Christmas theme permanently!</string>
+    <string name="status_turn">%1$s to move</string>
+    <string name="status_wins_mit">%1$s wins · Mit</string>
+    <string name="status_wins_stalemit">%1$s wins · Stalemit</string>
+    <string name="status_wins_triple">%1$s wins · Triple repetition</string>
+    <string name="status_draw_fifty">Draw · 50-move rule</string>
+    <string name="player_human">Human</string>
+    <string name="player_ai">AI</string>
+    <string name="undo_warning_title">Undo warning</string>
+    <string name="undo_warning_message">Undoing a move loses the chance for the game to produce achievements</string>
+    <string name="undo_anyway">Confirm Undo</string>
+    <string name="conversion_animation">Conversion animation</string>
+    <string name="conversion_animation_transform">Transform</string>
+    <string name="conversion_animation_flip">Flip</string>
+    <string name="conversion_animation_surprise">Surprise</string>
+    <string name="search_games">Search games</string>
+    <string name="clear_search">Clear search</string>
+    <string name="no_results_for_query">No results for query</string>
+    <string name="special_event_gift_icon_desc">Special event</string>
+    <string name="special_event_understood">Got it</string>
+    <string name="special_event_first_light_title">The First Light</string>
+    <string name="special_event_first_light_desc">Win a game playing as White today to discover the surprise that awaits
+        you.
+    </string>
+    <string name="special_event_dark_side_title">The Dark Side</string>
+    <string name="special_event_dark_side_desc">Win a game playing as Black today to discover the surprise that awaits
+        you.
+    </string>
+    <string name="special_event_palette_aurora">Aurora</string>
+    <string name="special_event_palette_ember">Ember</string>
+    <string name="special_event_palette_unlocked_title">New palette unlocked!</string>
+    <string name="special_event_palette_unlocked_desc">The %1$s palette is now available.</string>
+    <string name="special_event_palette_available_in_settings">Always selectable in Settings → Theme.</string>
+    <string name="special_event_celebrate_button">Awesome!</string>
+    <string name="game_over_timeout">Game over! %1$s wins on time</string>
+    <string name="gameplay">Gameplay</string>
+    <string name="time_control_subtitle">Applied to new games</string>
+    <string name="pre_moves">Pre-moves</string>
+    <string name="time_control_unlimited">Unlimited</string>
+    <string name="time_control_sudden_death_label">%1$d min</string>
+    <string name="time_control_fischer_label">%1$d + %2$d (Fischer)</string>
+    <string name="time_control_bronstein_label">%1$d + %2$d (Bronstein)</string>
+    <string name="time_control_byoyomi_label">%1$d + %2$d × %3$d (Byoyomi)</string>
+    <string name="time_control_reset_warning_title">Change time control</string>
+    <string name="time_control_reset_warning_message">Changing the time control will restart the current game.
+        Continue?
+    </string>
+    <string name="confirm">Confirm</string>
+</resources>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
+<resources>
+    <!--app_id-->
+    <string name="app_id" translatable="false">89869009666</string>
+    <!--package_name-->
+    <string name="package_name" translatable="false">com.agustin.tarati</string>
+    <!--achievement Welcome to Tarati-->
+    <string name="achievement_welcome_to_tarati" translatable="false">CgkIgobx5M4CEAIQCQ</string>
+    <!--achievement First Capture-->
+    <string name="achievement_first_capture" translatable="false">CgkIgobx5M4CEAIQAQ</string>
+    <!--achievement First Promotion-->
+    <string name="achievement_first_promotion" translatable="false">CgkIgobx5M4CEAIQBw</string>
+    <!--achievement First Victory-->
+    <string name="achievement_first_victory" translatable="false">CgkIgobx5M4CEAIQDw</string>
+    <!--achievement Play 10 Games-->
+    <string name="achievement_play_10_games" translatable="false">CgkIgobx5M4CEAIQCA</string>
+    <!--achievement The Flipper-->
+    <string name="achievement_the_flipper" translatable="false">CgkIgobx5M4CEAIQAg</string>
+    <!--achievement Rok Master-->
+    <string name="achievement_rok_master" translatable="false">CgkIgobx5M4CEAIQDg</string>
+    <!--achievement Unstoppable-->
+    <string name="achievement_unstoppable" translatable="false">CgkIgobx5M4CEAIQAw</string>
+    <!--achievement Champion-->
+    <string name="achievement_champion" translatable="false">CgkIgobx5M4CEAIQCg</string>
+    <!--achievement Mit-->
+    <string name="achievement_mit" translatable="false">CgkIgobx5M4CEAIQDA</string>
+    <!--achievement Stalemit-->
+    <string name="achievement_stalemit" translatable="false">CgkIgobx5M4CEAIQBg</string>
+    <!--achievement Eternal Loop-->
+    <string name="achievement_eternal_loop" translatable="false">CgkIgobx5M4CEAIQBA</string>
+    <!--achievement Fifty Move Rule-->
+    <string name="achievement_fifty_move_rule" translatable="false">CgkIgobx5M4CEAIQCw</string>
+    <!--achievement Dead but Dangerous-->
+    <string name="achievement_dead_but_dangerous" translatable="false">CgkIgobx5M4CEAIQDQ</string>
+    <!--achievement Grandmaster-->
+    <string name="achievement_grandmaster" translatable="false">CgkIgobx5M4CEAIQBQ</string>
+    <!--achievement Halloween Theme-->
+    <string name="achievement_halloween_theme" translatable="false">CgkIgobx5M4CEAIQEQ</string>
+    <!--achievement Christmas Theme-->
+    <string name="achievement_christmas_theme" translatable="false">CgkIgobx5M4CEAIQEg</string>
+    <!--achievement Apprentice-->
+    <string name="achievement_apprentice" translatable="false">CgkIgobx5M4CEAIQFQ</string>
+    <!--achievement Strategist-->
+    <string name="achievement_strategist" translatable="false">CgkIgobx5M4CEAIQFA</string>
+    <!--achievement Tactician-->
+    <string name="achievement_tactician" translatable="false">CgkIgobx5M4CEAIQEw</string>
+    <!--achievement The First Light-->
+    <string name="achievement_the_first_light" translatable="false">CgkIgobx5M4CEAIQFg</string>
+    <!--achievement The Dark Side-->
+    <string name="achievement_the_dark_side" translatable="false">CgkIgobx5M4CEAIQFw</string>
+</resources>

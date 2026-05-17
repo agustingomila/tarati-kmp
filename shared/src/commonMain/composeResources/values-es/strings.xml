@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tarati</string>
+    <string name="game_over_wins">¡Juego Terminado! ¡%1$s gana por Mit!</string>
+    <string name="game_over_stalemit">¡Juego Terminado! ¡%1$s gana por Ahogado!</string>
+    <string name="black">NEGRO</string>
+    <string name="white">BLANCO</string>
+    <string name="about_tarati">Acerca de Tarati</string>
+    <string name="tarati_is_a_strategic_board_game_created_by_george_spencer_brown">Tarati es un juego de mesa
+        estratégico
+        creado por George Spencer Brown, basado en su trabajo \"Leyes de la Forma\". El juego combina elementos de
+        juegos
+        de mesa tradicionales con mecánicas únicas de movimiento y captura.
+    </string>
+    <string name="game_rules">Reglas del Juego:</string>
+    <string name="players_2_white_vs_black_objective_control_the_board">• Jugadores: 2 (BLANCO vs NEGRO)\n • Objetivo:
+        Controlar el tablero convirtiendo las piezas del oponente\n • Movimiento: Las piezas se mueven por las aristas
+        hacia vértices adyacentes\n •
+        Mejoras: Las piezas se mejoran en la base del oponente\n • Captura: Moverse adyacente a piezas oponentes las
+        convierte
+    </string>
+    <string name="credits">Créditos:</string>
+    <string name="original_concept_george_spencer_brown">• Concepto original: George Spencer Brown\n • Implementación en
+        React: Adam Blvck\n • Adaptación a Kotlin/Android: Agustín Gomila\n • Sonidos: MattRuthSound
+    </string>
+    <string name="close">Cerrar</string>
+    <string name="game_over">Juego Terminado</string>
+    <string name="new_game">Nuevo Juego</string>
+    <string name="continue_">Continuar</string>
+    <string name="are_you_sure_you_want_to_start_a_new_game">¿Estás seguro de que quieres comenzar un nuevo juego? Se
+        perderá
+        el progreso actual.
+    </string>
+    <string name="tarati">Tarati</string>
+    <string name="menu">Menú</string>
+    <string name="a_board_game_by_george_spencer_brown">Un Juego de Mesa de George Spencer Brown</string>
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_medium">Medio</string>
+    <string name="difficulty_hard">Difícil</string>
+    <string name="difficulty_champion">Campeón</string>
+    <string name="disable_ai">Desactivar IA</string>
+    <string name="enable_ai">Activar IA</string>
+    <string name="back">Atrás</string>
+    <string name="about">Acerca de</string>
+    <string name="settings">Configuración</string>
+    <string name="language">Idioma</string>
+    <string name="spanish">Español</string>
+    <string name="english">Inglés</string>
+    <string name="dark_theme">Tema oscuro</string>
+    <string name="appearance">Apariencia</string>
+    <string name="yes">Sí</string>
+    <string name="cancel">Cancelar</string>
+    <string name="your_turn">Tu turno</string>
+    <string name="opponent_turn">Turno oponente</string>
+    <string name="light_theme">Tema claro</string>
+    <string name="board_labels">Etiquetas visibles</string>
+    <string name="edit">Editar</string>
+    <string name="editing">Editando</string>
+    <string name="start_game">Empezar partida</string>
+    <string name="invalid_schema">Distribución inválida</string>
+    <string name="clear_board">Limpiar tablero</string>
+    <string name="rotate_board">Rotar tablero</string>
+    <string name="start">Comenzar</string>
+    <string name="turn">Turno</string>
+    <string name="piece">Pieza</string>
+    <string name="side">Lado</string>
+    <string name="ai_thinking">IA pensando…</string>
+    <string name="human_turn">Turno humano</string>
+    <string name="you_won">Ganaste con %1$s</string>
+    <string name="you_lost">Perdiste con %1$s</string>
+    <string name="game_over_triple_repetition">¡Juego Terminado! ¡%1$s gana por triple repetición!</string>
+    <string name="show_tutorial">Ver tutorial</string>
+    <string name="next">Siguiente</string>
+    <string name="skip_tutorial">Saltar tutorial</string>
+    <string name="collapse_step">Colapsar paso</string>
+    <string name="expand_step">Expandir paso</string>
+    <string name="repeat_explanation">Repetir explicación</string>
+    <string name="board_vertices">Vértices</string>
+    <string name="color_palette">Paleta de Colores</string>
+    <string name="select_color_palette">Seleccionar paleta de colores</string>
+    <string name="piece_type">Tipo de pieza</string>
+    <string name="select_piece_type">Seleccionar pieza</string>
+    <string name="piece_type_circle">Círculo</string>
+    <string name="piece_type_hexagon">Hexágono</string>
+    <string name="piece_type_square">Cuadrado</string>
+    <string name="piece_type_triangle">Triángulo</string>
+    <string name="piece_type_diamond">Diamante</string>
+    <string name="piece_type_pentagon">Pentágono</string>
+    <string name="piece_type_capsule">Cápsula</string>
+    <string name="animate_effects">Efectos animados</string>
+    <string name="board_edges">Aristas</string>
+    <string name="tutorial_introduction_title">Bienvenido a Tarati</string>
+    <string name="tutorial_introduction_description">Tarati es un juego estratégico de captura y movimiento. Aprendé
+        las reglas básicas para comenzar a jugar.
+    </string>
+    <string name="tutorial_center_title">El Centro del Tablero</string>
+    <string name="tutorial_center_description">El vértice A1 es el Centro Absoluto, conectado a los 6 vértices del
+        Puente (B1–B6).
+    </string>
+    <string name="tutorial_bridge_title">El Puente</string>
+    <string name="tutorial_bridge_description">Los 6 vértices del Puente rodean el centro. Conectan el centro con la
+        circunferencia exterior. Cada vértice del Puente conecta 5 aristas.
+    </string>
+    <string name="tutorial_circumference_title">La Circunferencia</string>
+    <string name="tutorial_circumference_description">12 vértices forman el anillo exterior. Cada uno conecta con sus
+        dos vecinos en la circunferencia y con un vértice del Puente.
+    </string>
+    <string name="tutorial_domestic_bases_title">Bases Domésticas</string>
+    <string name="tutorial_domestic_bases_description">Cada jugador tiene 4 vértices en su base (2 de tipo C y 2 de
+        tipo D). Aquí comienzan y regresan las piezas.
+    </string>
+    <string name="tutorial_cobs_title">Las Piezas</string>
+    <string name="tutorial_cobs_description">Cada jugador empieza con 4 Cobs (sin marca). Los Cobs solo avanzan
+        hacia la base enemiga. Al llegar allí se convierten en Roks (con círculo interior), que pueden moverse en
+        cualquier dirección.
+    </string>
+    <string name="tutorial_basic_moves_title">Movimientos Básicos</string>
+    <string name="tutorial_basic_moves_description">Los Cobs avanzan a vértices adyacentes vacíos. Solo pueden avanzar
+        hacia la base enemiga. Excepción: desde su propia base, un Cob puede moverse en cualquier dirección, pero
+        solo para capturar.
+    </string>
+    <string name="tutorial_captures_title">Captura de Piezas</string>
+    <string name="tutorial_captures_description">Al llegar a un vértice, toda pieza enemiga adyacente al destino
+        cambia a tu color. Se pueden capturar varias en un mismo movimiento. Las piezas no se eliminan: cambian
+        de bando.
+    </string>
+    <string name="tutorial_pre_adjacency_title">La Regla de Pre-Adyacencia</string>
+    <string name="tutorial_pre_adjacency_description">Solo podés capturar una pieza enemiga si tu pieza NO estaba
+        adyacente a ella antes del movimiento. Para capturar, debés acercarte desde afuera. Esta es la restricción
+        táctica más importante del juego.
+    </string>
+    <string name="tutorial_upgrade_title">Mejora a Rok</string>
+    <string name="tutorial_upgrade_description">Un Cob que llega a la base enemiga se convierte en Rok. Los Roks se
+        mueven en cualquier dirección y conservan su rango incluso si son capturados y cambian de color.
+    </string>
+    <string name="tutorial_dead_piece_title">Pieza Muerta</string>
+    <string name="tutorial_dead_piece_description">Un Cob está muerto si ocupa los vértices más exteriores de la base
+        enemiga (D3/D4 para blancas), o si todas sus salidas están bloqueadas por Cobs muertos propios. Si no tenés
+        otros movimientos, podés promover un Cob muerto a Rok en su lugar.
+    </string>
+    <string name="tutorial_domestic_capture_title">Capturar en tu propia base</string>
+    <string name="tutorial_domestic_capture_description">Un Cob en su propia base doméstica también puede moverse de
+        costado o hacia atrás para capturar una pieza enemiga que ya esté dentro de tu base. El destino debe estar
+        vacío, y la regla de pre-adyacencia sigue aplicando: solo podés capturar una pieza a la que no eras adyacente
+        antes del movimiento.
+    </string>
+    <string name="tutorial_end_conditions_title">Cómo Termina la Partida</string>
+    <string name="tutorial_end_conditions_description">Ganás por Mit: la última pieza enemiga cambia a tu color. O por
+        Stalemit: el rival queda sin movimientos legales. Si el rival provoca tres veces la misma posición, también
+        perdés.
+    </string>
+    <string name="perform_the_indicated_move">%1$s\n\nRealizá el movimiento indicado.</string>
+    <string name="tutorial_completed_title">Tutorial completado</string>
+    <string name="tutorial_completed_description">Has completado el tutorial básico de Tarati. ¡Ahora probá jugar una
+        partida!
+    </string>
+    <string name="general">General</string>
+    <string name="board_display">Tablero</string>
+    <string name="animations">Animaciones</string>
+    <string name="enabled">Activado</string>
+    <string name="disabled">Desactivado</string>
+    <string name="move_history">Movimientos</string>
+    <string name="ai_opponent">Oponente IA</string>
+    <string name="board_regions">Áreas</string>
+    <string name="board_perimeter">Perímetro</string>
+    <string name="move_history_copied_to_clipboard">Movimientos copiados al portapapeles</string>
+    <string name="copy_move_history">Copiar historial de movimientos</string>
+    <string name="copied">Copiado</string>
+    <string name="sound">Sonido</string>
+    <string name="sound_effects">Sonidos predeterminados</string>
+    <string name="auto_theme">Automático</string>
+    <string name="volume">Volumen</string>
+    <string name="volume_muted">Silenciado</string>
+    <string name="volume_low">Volumen bajo</string>
+    <string name="volume_medium">Volumen medio</string>
+    <string name="volume_high">Volumen alto</string>
+    <string name="sound_disabled">Sonido desactivado</string>
+    <string name="paste_board_position">Pegar posición</string>
+    <string name="board_notation">POS</string>
+    <string name="board_position_copied_to_clipboard">Posición copiada al portapapeles</string>
+    <string name="copy_position">Copiar posición</string>
+    <string name="game_details">Detalle</string>
+    <string name="load_to_board">Cargar</string>
+    <string name="toggle_details">Detalles</string>
+    <string name="delete_game">Eliminar partida</string>
+    <string name="saved_games">Partidas guardadas</string>
+    <string name="game_information">Información</string>
+    <string name="save_game">Guardar partida</string>
+    <string name="no_saves">No hay partidas guardadas</string>
+    <string name="event">Evento</string>
+    <string name="site">Lugar</string>
+    <string name="round">Ronda</string>
+    <string name="game_type">Tipo de Partida</string>
+    <string name="rules">Reglas</string>
+    <string name="time_control">Control de Tiempo</string>
+    <string name="termination">Finalización</string>
+    <string name="result">Resultado</string>
+    <string name="date">Fecha</string>
+    <string name="vs">%1$s vs %2$s</string>
+    <string name="game_saved">Partida guardada</string>
+    <string name="total_moves">Movimientos: %1$s</string>
+    <string name="moves">Movimientos</string>
+    <string name="players">Jugadores</string>
+    <string name="undo">Atrás</string>
+    <string name="redo">Rehacer</string>
+    <string name="jump_to_current_position">Ir a la posición actual</string>
+    <string name="save">Guardar</string>
+    <string name="observations">Observaciones</string>
+    <string name="vs_">vs</string>
+    <string name="delete">Eliminar</string>
+    <string name="games_deleted">%1$s partidas eliminadas</string>
+    <string name="delete_games">Eliminar partidas</string>
+    <string name="confirm_delete_games">Eliminar %1$s partidas</string>
+    <string name="game_deleted">Partida eliminada</string>
+    <string name="confirm_delete_game">Eliminar la partida</string>
+    <string name="select_games">Seleccionar partidas</string>
+    <string name="delete_selected">Eliminar seleccionadas</string>
+    <string name="games_selected">%1$s seleccionadas</string>
+    <string name="user_name">Nombre</string>
+    <string name="user_name_empty">Nombre vacío</string>
+    <string name="toggle_move_history">Historial</string>
+    <string name="move_controls">Controles</string>
+    <string name="go_to_end">Ir al final</string>
+    <string name="go_to_begin">Ir al inicio</string>
+    <string name="move_n_of_n">Movimiento %1$d de %2$d</string>
+    <string name="must_promote">Debe promocionar</string>
+    <string name="game_over_fifty_moves">Partida terminada (50 mov)</string>
+    <string name="achievements">Logros</string>
+    <string name="achievements_sign_in_required">Inicia sesión en Google Play Games para ver los logros</string>
+    <string name="halloween_theme_unlocked">🎃 ¡Has desbloqueado el tema de Halloween para siempre!</string>
+    <string name="christmas_theme_unlocked">🎄 ¡Has desbloqueado el tema navideño para siempre!</string>
+    <string name="status_turn">%1$s mueven</string>
+    <string name="status_wins_mit">%1$s ganan · Mit</string>
+    <string name="status_wins_stalemit">%1$s ganan · Ahogado</string>
+    <string name="status_wins_triple">%1$s ganan · Triple repetición</string>
+    <string name="status_draw_fifty">Tablas · regla de 50 movimientos</string>
+    <string name="player_human">Humano</string>
+    <string name="player_ai">IA</string>
+    <string name="undo_warning_title">Advertencia al deshacer</string>
+    <string name="undo_warning_message">Al deshacer un movimiento pierdes la posibilidad de que la partida produzca
+        logros
+    </string>
+    <string name="undo_anyway">Confirmar deshacer</string>
+    <string name="conversion_animation">Animación de conversión</string>
+    <string name="conversion_animation_transform">Transformación</string>
+    <string name="conversion_animation_flip">Volteo</string>
+    <string name="conversion_animation_surprise">Sorpresa</string>
+    <string name="search_games">Buscar partidas</string>
+    <string name="clear_search">Limpiar búsqueda</string>
+    <string name="no_results_for_query">No hay resultados para la consulta</string>
+    <string name="special_event_gift_icon_desc">Evento especial</string>
+    <string name="special_event_understood">Entendido</string>
+    <string name="special_event_first_light_title">La Primera Luz</string>
+    <string name="special_event_first_light_desc">Gana una partida jugando como Blanco hoy para descubrir la sorpresa
+        que te espera.
+    </string>
+    <string name="special_event_dark_side_title">El Lado Oscuro</string>
+    <string name="special_event_dark_side_desc">Gana una partida jugando como Negro hoy para descubrir la sorpresa que
+        te espera.
+    </string>
+    <string name="special_event_palette_aurora">Aurora</string>
+    <string name="special_event_palette_ember">Ember</string>
+    <string name="special_event_palette_unlocked_title">¡Nueva paleta desbloqueada!</string>
+    <string name="special_event_palette_unlocked_desc">La paleta %1$s ya está disponible.</string>
+    <string name="special_event_palette_available_in_settings">Siempre se puede seleccionar en Configuración → Tema.
+    </string>
+    <string name="special_event_celebrate_button">¡Genial!</string>
+    <string name="game_over_timeout">¡Juego terminado! %1$s gana por tiempo</string>
+    <string name="gameplay">Partida</string>
+    <string name="time_control_subtitle">Se aplica a las partidas nuevas</string>
+    <string name="pre_moves">Pre-movimientos</string>
+    <string name="time_control_unlimited">Sin límite</string>
+    <string name="time_control_sudden_death_label">%1$d min</string>
+    <string name="time_control_fischer_label">%1$d + %2$d (Fischer)</string>
+    <string name="time_control_bronstein_label">%1$d + %2$d (Bronstein)</string>
+    <string name="time_control_byoyomi_label">%1$d + %2$d × %3$d (Byoyomi)</string>
+    <string name="time_control_reset_warning_title">Cambiar control de tiempo</string>
+    <string name="time_control_reset_warning_message">Cambiar el control de tiempo reiniciará la partida actual.
+        ¿Continuar?
+    </string>
+    <string name="confirm">Confirmar</string>
+</resources>
