@@ -115,7 +115,7 @@ fun DrawScope.drawPolygonSelection(
     } else {
         // Segmento con wrap: de segStart hasta el final + de 0 hasta headDist
         val part1 = measure.getSegment(segStart, totalLength, startWithMoveTo = true)
-        val part2 = measure.getSegment(0f, headDist, startWithMoveTo = false)
+        val part2 = measure.getSegment(0f, headDist, startWithMoveTo = true)
 
         if (part1 != null && part2 != null) {
             Path().apply {
