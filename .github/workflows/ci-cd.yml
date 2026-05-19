@@ -119,7 +119,7 @@ jobs:
           echo ""
           echo "💻 Generating Desktop icons..."
           
-          DESKTOP_DIR="desktopApp/src/jvmMain/resources"
+          DESKTOP_DIR="desktopApp/src/main/resources"
           mkdir -p "$DESKTOP_DIR"
           
           # ── Windows .ico ──────────────────────────────────────────────────
@@ -219,7 +219,7 @@ jobs:
           
           find . \( \
             -path "*/mipmap-*/*.png" -o \
-            -path "*/desktopApp/src/jvmMain/resources/*.png" -o \
+            -path "*/desktopApp/src/main/resources/*.png" -o \
             -path "*/web/public/*.png" -o \
             -path "*/Assets.xcassets/AppIcon.appiconset/*.png" \
           \) -type f -exec optipng -quiet -o2 {} \;
@@ -241,7 +241,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add androidApp/src/main/res/mipmap-*/*.png \
-                 desktopApp/src/jvmMain/resources/*.{ico,icns,png} \
+                 desktopApp/src/main/resources/*.{ico,icns,png} \
                  web/public/*.{ico,png} \
                  iosApp/Assets.xcassets/AppIcon.appiconset/*.png || true
           git commit -m "ci: Auto-generate icons from logo.big.1024.png [skip ci]" || echo "No changes to commit"
