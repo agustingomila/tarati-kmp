@@ -28,11 +28,45 @@ import org.jetbrains.compose.resources.stringResource
 val LocalAppLanguage = compositionLocalOf { "en" }
 
 /**
+ * Normaliza espacios en blanco y procesa escapes XML en strings localizados.
+ *
+ * ## Uso
+ * Se aplica automáticamente en [LocalizedText] y [localizedString], por lo que
+ * no necesita ser llamada manualmente. Todos los strings localizados pasan por
+ * esta normalización de forma transparente.
+ *
+ * @return String con espacios normalizados y escapes procesados
+ */
+fun String.normalizeWhitespace(): String {
+    // 1. Preservar \n literales reemplazándolos temporalmente
+    val withPlaceholder = this.replace("\\n", "\uE000")
+
+    // 2. Colapsar TODOS los espacios en blanco en uno solo
+    val normalized = withPlaceholder.replace("\\s+".toRegex(), " ").trim()
+
+    // 3. Eliminar espacios alrededor del placeholder
+    val cleanedPlaceholder = normalized.replace("\\s*\uE000\\s*".toRegex(), "\uE000")
+
+    // 4. Restaurar \n literales como newlines reales
+    val withNewlines = cleanedPlaceholder.replace("\uE000", "\n")
+
+    // 5. Procesar escapes XML comunes (ORDEN CRÍTICO: backslash primero)
+    return withNewlines
+        .replace("\\\\", "\\")    // Backslash escapado (PRIMERO)
+        .replace("\\'", "'")      // Comilla simple escapada
+        .replace("\\\"", "\"")    // Comilla doble escapada
+}
+
+/**
  * Composable hoja que renderiza un string localizado como [Text].
  *
  * ## Recomposición reactiva al cambio de idioma
  * Usa `key(LocalAppLanguage.current)` para forzar la recomposición
  * cuando cambia el idioma en Settings.
+ *
+ * ## Normalización automática de espacios
+ * Los strings se normalizan automáticamente para colapsar múltiples espacios
+ * causados por el formateo del IDE en los archivos XML.
  */
 @NonRestartableComposable
 @Composable
@@ -47,12 +81,14 @@ fun LocalizedText(
     val currentLanguage = LocalAppLanguage.current
 
     key(currentLanguage) {
+        val rawText = if (args.isEmpty()) {
+            stringResource(resource)
+        } else {
+            stringResource(resource, *args)
+        }
+
         Text(
-            text = if (args.isEmpty()) {
-                stringResource(resource)
-            } else {
-                stringResource(resource, *args)
-            },
+            text = rawText.normalizeWhitespace(),
             modifier = modifier,
             style = style,
             color = color,
@@ -63,6 +99,10 @@ fun LocalizedText(
 
 /**
  * Resuelve un string localizado desde Compose Multiplatform Resources.
+ *
+ * ## Normalización automática de espacios
+ * Los strings se normalizan automáticamente para colapsar múltiples espacios
+ * causados por el formateo del IDE en los archivos XML.
  */
 @NonRestartableComposable
 @Composable
@@ -73,10 +113,11 @@ fun localizedString(
     val currentLanguage = LocalAppLanguage.current
 
     return key(currentLanguage) {
-        if (args.isEmpty()) {
+        val rawText = if (args.isEmpty()) {
             stringResource(resource)
         } else {
             stringResource(resource, *args)
         }
+        rawText.normalizeWhitespace()
     }
 }
