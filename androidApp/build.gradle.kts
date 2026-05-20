@@ -88,7 +88,7 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
@@ -104,6 +104,12 @@ android {
     }
 
     testOptions {
+        unitTests {
+            // Mockear automáticamente clases de Android framework
+            isReturnDefaultValues = true
+            // Incluir recursos de Android en tests
+            isIncludeAndroidResources = true
+        }
         unitTests.all {
             it.jvmArgs(
                 "-XX:+EnableDynamicAgentLoading",
@@ -268,7 +274,10 @@ dependencies {
 
 // Ktor
     implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.websockets)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.okhttp)
+
+// SLF4J provider para Android (elimina warning "No SLF4J providers were found")
+    implementation(libs.slf4j.android)
 }

@@ -1,5 +1,6 @@
 package com.agustin.tarati
 
+
 import android.app.Activity
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -13,6 +14,10 @@ import com.agustin.tarati.core.data.database.dao.GameDao
 import com.agustin.tarati.core.data.repositories.RoomGameRepository
 import com.agustin.tarati.core.domain.repository.GameRepository
 import com.agustin.tarati.di.sharedModules
+import com.agustin.tarati.features.game.AndroidGameViewModel
+import com.agustin.tarati.features.game.IGameModel
+import com.agustin.tarati.features.online.auth.AndroidAuthRepository
+import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.seasonal.ISpecialEventManager
 import com.agustin.tarati.features.seasonal.SpecialEventManager
 import com.agustin.tarati.features.seasonal.SpecialEventRepository
@@ -37,10 +42,19 @@ import com.agustin.tarati.services.sound.SoundManager
 import com.agustin.tarati.services.sound.SoundServiceImpl
 import com.google.android.gms.games.PlayGames
 import features.settings.AndroidSettingsViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import java.io.File
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 // ── Database ──────────────────────────────────────────────────────────────────
 
@@ -69,10 +83,11 @@ val dataStoreModule = module {
     }
 }
 
-// ── Settings ──────────────────────────────────────────────────────────────────
+// ── Settings + Auth ───────────────────────────────────────────────────────────
 
 val appStateModule = module {
     single<SettingsRepository> { AndroidSettingsRepository(get()) }
+    single<AuthRepository> { AndroidAuthRepository(get()) }
 }
 
 // ── Achievements ──────────────────────────────────────────────────────────────
@@ -133,6 +148,22 @@ val billingModule = module {
 // ── Services ──────────────────────────────────────────────────────────────────
 
 val androidServiceModule = module {
+    // HttpClient con engine Android (OkHttp) para WebSockets y REST
+    single {
+        HttpClient(OkHttp) {
+            install(WebSockets) {
+                pingInterval = 30.toDuration(DurationUnit.SECONDS)
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    encodeDefaults = true
+                    isLenient = true
+                })
+            }
+        }
+    }
+
     single<IClipboardService> { ClipboardServiceImpl(get()) }
     single { GameClipboardHelper(get()) }
 }
@@ -147,6 +178,9 @@ val soundModule = module {
 // ── ViewModels ────────────────────────────────────────────────────────────────
 
 val androidViewModelModule = module {
+    // GameViewModel con SavedStateHandle (Android-specific)
+    viewModel { params -> AndroidGameViewModel(params.get(), get(), get()) } bind IGameModel::class
+
     viewModel { AndroidSettingsViewModel(get(), get(), get()) }
 }
 
@@ -154,21 +188,24 @@ val androidViewModelModule = module {
 
 /**
  * Todos los módulos necesarios para Android.
- * Incluye [sharedModules] + módulos Android-specific.
+ *
+ * IMPORTANTE: androidServiceModule va PRIMERO porque crea HttpClient
+ * que es necesario para onlineModule (que está en sharedModules).
  *
  * Uso en TaratiApplication:
  * ```kotlin
  * startKoin { modules(androidModules) }
  * ```
  */
-val androidModules = sharedModules + listOf(
+val androidModules = listOf(
+    androidServiceModule,  // PRIMERO: Crear HttpClient
+) + sharedModules + listOf(
     databaseModule,
     dataStoreModule,
     appStateModule,
     achievementsModule,
     specialEventModule,
     billingModule,
-    androidServiceModule,
     soundModule,
     androidViewModelModule,
 )

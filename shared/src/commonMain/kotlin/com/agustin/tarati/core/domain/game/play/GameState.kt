@@ -1,5 +1,6 @@
 package com.agustin.tarati.core.domain.game.play
 
+
 import com.agustin.tarati.core.data.database.dto.GameDto
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.data.database.dto.PGNHeader.Companion.createPGNHeader
@@ -19,6 +20,7 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.pieces.PieceCounts
+import com.agustin.tarati.core.domain.game.pieces.cobColorByName
 import com.agustin.tarati.core.domain.game.pieces.flipAdjacentCobs
 import com.agustin.tarati.core.domain.game.pieces.getName
 import com.agustin.tarati.core.domain.game.pieces.opponent
@@ -54,12 +56,37 @@ data class GameState(
      *
      * Cuando es no-null:
      *  - [isGameOver] retorna `true`.
-     *  - [getMatchState] retorna [GameResult.TIMEOUT] con `winner = timedOutColor.opponent`.
+     *  - [getMatchState] retorna [GameEndReason.TIMEOUT] con `winner = timedOutColor.opponent`.
      *
      * No participa en [hashBoard] (que solo incluye cobs + currentTurn), por lo
      * que no afecta al transposition table de la IA ni al historial de posiciones.
      */
     val timedOutColor: CobColor? = null,
+    /**
+     * Color del bando que resignó, o `null` si la partida no terminó por resignación.
+     * Seteado desde [GameScreen] al recibir un [OnlineGameStatus.Finished] con
+     * `reason = RESIGNATION`.
+     *
+     * Cuando es no-null:
+     *  - [isGameOver] retorna `true`.
+     *  - [getMatchState] retorna [GameEndReason.RESIGNATION] con `winner = resignedColor.opponent`.
+     *
+     * No participa en [hashBoard]: es un evento externo que no describe la posición
+     * del tablero y no debe afectar la tabla de transposición ni el historial de posiciones.
+     */
+    val resignedColor: CobColor? = null,
+    /**
+     * True cuando la partida terminó por acuerdo de tablas entre los jugadores.
+     * Seteado desde [GameScreen] al recibir un [OnlineGameStatus.Finished] con
+     * `reason = DRAW_AGREEMENT`.
+     *
+     * Cuando es `true`:
+     *  - [isGameOver] retorna `true`.
+     *  - [getMatchState] retorna [GameEndReason.DRAW_AGREEMENT] con `winner = null`.
+     *
+     * No participa en [hashBoard]: evento externo sin reflejo en la posición del tablero.
+     */
+    val drawAgreed: Boolean = false,
 ) {
     // Función de extensión para modificar piezas
     fun modifyCob(
@@ -155,6 +182,8 @@ data class GameState(
 
     fun isGameOver(positionHistory: Map<String, Int> = emptyMap()): Boolean {
         if (timedOutColor != null) return true
+        if (resignedColor != null) return true
+        if (drawAgreed) return true
         if (claimedFiftyMoveDraw) return true
 
         val whiteCobs = this.cobs.values.count { it.color == WHITE }
@@ -178,7 +207,7 @@ data class GameState(
         var matchState =
             MatchState(
                 gameState = this,
-                gameResult = GameResult.PLAYING,
+                gameEndReason = GameEndReason.PLAYING,
                 winner = null,
                 moveHistory = positionHistory,
             )
@@ -191,8 +220,24 @@ data class GameState(
         this.timedOutColor?.let { loser ->
             matchState = matchState.copy(
                 winner = loser.opponent,
-                gameResult = GameResult.TIMEOUT,
+                gameEndReason = GameEndReason.TIMEOUT,
             )
+            return matchState
+        }
+
+        // RESIGNATION: evento externo sin cambio en el tablero.
+        // Tiene precedencia sobre cualquier condición derivada de la posición.
+        this.resignedColor?.let { loser ->
+            matchState = matchState.copy(
+                winner = loser.opponent,
+                gameEndReason = GameEndReason.RESIGNATION,
+            )
+            return matchState
+        }
+
+        // DRAW_AGREEMENT: tablas pactadas externamente, sin movimiento final.
+        if (this.drawAgreed) {
+            matchState = matchState.copy(winner = null, gameEndReason = GameEndReason.DRAW_AGREEMENT)
             return matchState
         }
 
@@ -200,31 +245,31 @@ data class GameState(
             // Draw — no winner. Must be checked before triple repetition since both
             // could technically be true; 50-move draw takes precedence as it was
             // established first in game time.
-            matchState = matchState.copy(winner = null, gameResult = GameResult.FIFTY_MOVES)
+            matchState = matchState.copy(winner = null, gameEndReason = GameEndReason.FIFTY_MOVES)
             return matchState
         }
 
         if (this.hasTripleRepetition(positionHistory)) {
-            matchState = matchState.copy(winner = this.currentTurn, gameResult = GameResult.TRIPLE)
+            matchState = matchState.copy(winner = this.currentTurn, gameEndReason = GameEndReason.TRIPLE)
             return matchState
         }
 
         matchState =
             when {
                 whiteCobs == 0 -> {
-                    matchState.copy(winner = BLACK, gameResult = GameResult.MIT)
+                    matchState.copy(winner = BLACK, gameEndReason = GameEndReason.MIT)
                 }
 
                 blackCobs == 0 -> {
-                    matchState.copy(winner = WHITE, gameResult = GameResult.MIT)
+                    matchState.copy(winner = WHITE, gameEndReason = GameEndReason.MIT)
                 }
 
                 this.allMovesForTurn().isEmpty() -> {
-                    matchState.copy(winner = this.currentTurn.opponent, gameResult = GameResult.STALEMIT)
+                    matchState.copy(winner = this.currentTurn.opponent, gameEndReason = GameEndReason.STALEMIT)
                 }
 
                 else -> {
-                    matchState.copy(winner = this.currentTurn, gameResult = GameResult.STALEMIT)
+                    matchState.copy(winner = this.currentTurn, gameEndReason = GameEndReason.STALEMIT)
                 }
             }
 
@@ -675,12 +720,8 @@ data class GameState(
                         vertices.find { it.name == positionStr }
                             ?: throw IllegalArgumentException("Posición inválida: $positionStr")
 
-                    val color =
-                        when (colorChar.lowercaseChar()) {
-                            WHITE.getName() -> WHITE
-                            BLACK.getName() -> BLACK
-                            else -> throw IllegalArgumentException("Color inválido: $colorChar")
-                        }
+                    val color = cobColorByName(colorChar.lowercaseChar())
+                        ?: throw IllegalArgumentException("Color inválido: $colorChar")
 
                     val isUpgraded = colorChar.isUpperCase()
 

@@ -29,7 +29,7 @@ Requisitos: Android 8.0+ (API 26)
 ### Desktop
 
 **Versión 1.0.0** — Windows · macOS · Linux  
-Requisitos: JVM 17+
+Requisitos: JVM 21+
 
 ### iOS
 
@@ -203,7 +203,7 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 **Requisitos:**
 
 - Windows 10+, macOS 11+, o Linux (Ubuntu 20.04+)
-- JVM 17 o superior
+- JVM 21 o superior
 - 50–100 MB de espacio libre
 
 ---
@@ -235,7 +235,8 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 | Almacenamiento local      | Room 2.8.4 (Android/Desktop), DataStore 1.2.1 (Android)                       |
 | Tests                     | JUnit 4.13.2, MockK 1.14.9, Coroutines Test 1.11.0                            |
 | Concurrencia              | Kotlin Coroutines 1.11.0                                                      |
-| Networking                | Ktor 3.4.3 (servidor, próximamente online)                                    |
+| Networking                | Ktor 3.4.3 (cliente/servidor, online en desarrollo)                           |
+| Cliente Redis             | Kreds 0.9.1 (Kotlin-nativo, coroutines-first)                                 |
 | Serialización             | kotlinx-serialization 1.11.0                                                  |
 | Tiempo                    | kotlinx-datetime 0.8.0                                                        |
 | IA                        | Minimax con poda Alpha-Beta, profundización iterativa, tabla de transposición |

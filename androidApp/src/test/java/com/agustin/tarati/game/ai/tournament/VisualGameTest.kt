@@ -9,6 +9,7 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 /**
@@ -95,7 +96,7 @@ class VisualGameTest {
         println(renderBoard(state))
 
         while (moveCount < maxMoves && !state.isGameOver(positionHistory)) {
-            val result = engine.getNextMove(state)
+            val result = runBlocking { engine.getNextMove(state) }
             val move = result.move ?: break
 
             val newState = state.applyMove(move)

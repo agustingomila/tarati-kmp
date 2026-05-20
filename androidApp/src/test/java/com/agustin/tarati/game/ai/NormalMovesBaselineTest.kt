@@ -22,6 +22,7 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.Move
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -142,13 +143,13 @@ class NormalMovesBaselineTest {
         // Warmup: lets JIT compile the hot path before measuring
         repeat(warmupRuns) {
             engine.clearHistory()
-            engine.getNextMove(position)
+            runBlocking { engine.getNextMove(position) }
         }
 
         // Measured run
         engine.clearHistory()
         val t0 = System.currentTimeMillis()
-        val result = engine.getNextMove(position)
+        val result = runBlocking { engine.getNextMove(position) }
         val elapsed = System.currentTimeMillis() - t0
 
         val diag = engine.getDiagnostics()
@@ -253,7 +254,7 @@ class NormalMovesBaselineTest {
         engine.clearHistory()
         engine.setConfig(EvaluationConfig.CHAMPION)
 
-        val result = engine.getNextMove(midGamePosition)
+        val result = runBlocking { engine.getNextMove(midGamePosition) }
         val diag = engine.getDiagnostics()
 
         val hitRate = if (diag.nodesEvaluated > 0)

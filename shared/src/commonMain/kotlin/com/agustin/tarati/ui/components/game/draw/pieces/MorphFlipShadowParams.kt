@@ -1,6 +1,7 @@
 package com.agustin.tarati.ui.components.game.draw.pieces
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import com.agustin.tarati.ui.components.game.draw.board.LightOfDay
@@ -108,7 +109,7 @@ fun computeMorphFlipShadowParams(
     // 0 cuando la pieza está plana (|scale|=1), 1 cuando está de canto (scale=0).
     val sinA = sqrt(max(0f, 1f - scale * scale))
 
-    val pathSize = androidx.compose.ui.geometry.Size(radius * 2f, radius * 2f)
+    val pathSize = Size(radius * 2f, radius * 2f)
 
     // ── Cálculo de la matriz de transformación ────────────────────────────────
     val distMulti = 1f + sinA * 2.8f

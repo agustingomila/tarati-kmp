@@ -1,6 +1,6 @@
 package com.agustin.tarati.ui.components.game.highlights.sequences
 
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.utils.logging.LoggingFactory
 import com.agustin.tarati.ui.components.game.highlights.HighlightAnimation
@@ -16,7 +16,7 @@ object GameOverSequenceProvider {
 
     fun getRandomSequence(matchState: MatchState): List<List<HighlightAnimation>> {
         // Tablas (50 movimientos, triple repetición, etc.): animación dedicada.
-        if (matchState.winner == null && matchState.gameResult != GameResult.PLAYING) {
+        if (matchState.winner == null && matchState.gameEndReason != GameEndReason.PLAYING) {
             val sequence = createDrawSequence(matchState)
             logger.debug("GameOverSequenceProvider - Draw sequence, size: ${sequence.size}")
             return sequence

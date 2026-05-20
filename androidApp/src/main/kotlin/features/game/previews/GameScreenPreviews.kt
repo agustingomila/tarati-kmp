@@ -782,6 +782,7 @@ private fun createPreviewSidebarEvents(
 
         override fun onRotateBoard() = println("Board rotation clicked")
         override fun onGamesLibrary() = println("Games library clicked")
+        override fun onOnlineLobby() = println("Online lobby clicked")
         override fun onSaveGame() = println("Save game clicked")
         override fun onAboutClick() = println("About clicked")
         override fun onCopyMoveHistory(moves: List<Move>) = println("History copied")

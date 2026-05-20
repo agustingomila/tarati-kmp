@@ -5,7 +5,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.agustin.tarati.desktop.di.desktopModules
 import com.agustin.tarati.desktop.services.localization.DesktopLanguageAwareApp
-import com.agustin.tarati.di.sharedModules
 import com.agustin.tarati.features.settings.DesktopSettingsViewModel
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.services.sound.ISoundService
@@ -22,7 +21,7 @@ fun main() = application {
         title = "Tarati",
     ) {
         KoinApplication(
-            configuration = koinConfiguration(declaration = { modules(sharedModules + desktopModules) }),
+            configuration = koinConfiguration(declaration = { modules(desktopModules) }),
             content = {
                 val settingsViewModel: ISettingsViewModel = koinViewModel<DesktopSettingsViewModel>()
 

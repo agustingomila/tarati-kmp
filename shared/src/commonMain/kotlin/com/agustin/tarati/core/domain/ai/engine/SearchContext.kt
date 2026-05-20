@@ -9,4 +9,8 @@ class SearchContext(
     val maxTimeMs: Long = 30_000,
 ) {
     var nodesEvaluated: Long = 0
+
+    // Tracks when the last animation yield occurred. Updated by MinimaxStrategy
+    // so that yieldForAnimation() is called at most once per YIELD_INTERVAL_MS.
+    var lastYieldTimeMs: Long = startTimeMs
 }

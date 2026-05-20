@@ -8,7 +8,7 @@ data class Edge(
 ) {
     val from get() = this.pair.first
     val to get() = this.pair.second
-    val name get() = "${from.name}→${to.name}"
+    val name get() = "${from.name}-${to.name}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

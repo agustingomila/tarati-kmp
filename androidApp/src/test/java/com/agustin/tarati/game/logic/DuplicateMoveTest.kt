@@ -14,12 +14,12 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.domain.game.play.Move
+import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.features.game.GameEvents
 import com.agustin.tarati.features.game.IGameService
 import com.agustin.tarati.services.achievements.IAchievementsManager
 import com.agustin.tarati.services.clock.IClockService
-import com.agustin.tarati.services.dialogs.IDialogViewModel
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.ui.components.game.animation.AnimationCoordinator
 import com.agustin.tarati.ui.components.tutorial.ITutorialService
@@ -33,29 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-/**
- * Tests for the duplicate-move guard in
- * [GameEvents.applyMove].
- *
- * ## The bug
- * On slow devices, Compose recomposition lags behind [GameManager.addMove].
- * The `pointerInput` coroutine holds a stale [GameState] (S0). After the first
- * tap applies the move (advancing the GameManager to S1), a second tap before
- * recompose still validates against S0, dispatching the same move again with a
- * now-superseded state.
- *
- * ## The fix
- * [GameEvents.applyMove] compares the received
- * [GameState] with `gameManager.gameState.value` (the live StateFlow,
- * not the Compose snapshot).
- * If they differ, the state has already advanced and the call is silently rejected.
- *
- * ## Why GameManager directly
- * [GameEvents] has many Android dependencies
- * (DrawerState, AnimationCoordinator, etc.) that are not unit-testable.
- * The guard is verified through [GameManager]'s history, which is the ground
- * truth for whether a move was recorded.
- */
+/** Verifies that [GameEvents.applyMove] rejects moves carrying a stale [GameState]. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DuplicateMoveTest {
 
@@ -80,7 +58,7 @@ class DuplicateMoveTest {
             GameManagerState(
                 gameState = initialState,
                 gameStatus = GameStatus.PLAYING,
-                history = com.agustin.tarati.core.domain.game.play.StableHistoryList(emptyList()),
+                history = StableHistoryList(emptyList()),
                 moveIndex = -1,
             )
         )
@@ -113,7 +91,6 @@ class DuplicateMoveTest {
             animationCoordinator = mockk<AnimationCoordinator>(relaxed = true),
             tutorialService = mockk<ITutorialService>(relaxed = true),
             soundService = mockk<ISoundService>(relaxed = true),
-            dialogService = mockk<IDialogViewModel>(relaxed = true),
             achievementsManager = mockk<IAchievementsManager>(relaxed = true),
             specialEventManager = mockk(relaxed = true),
             difficulty = { Difficulty.DEFAULT },

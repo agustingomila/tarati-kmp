@@ -5,7 +5,7 @@ import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.play.GameState
 
 interface IAIStrategy {
-    fun getNextMove(
+    suspend fun getNextMove(
         gameState: GameState,
         difficulty: Difficulty,
     ): MoveEval

@@ -28,6 +28,7 @@ import com.agustin.tarati.game.ai.tournament.engine.base.personalityEngine
 import com.agustin.tarati.game.ai.tournament.manager.TournamentConfig
 import com.agustin.tarati.game.ai.tournament.manager.TournamentResult
 import com.agustin.tarati.game.ai.tournament.manager.TournamentRunner
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -266,7 +267,7 @@ class RegressionTest {
 
         fixedSuite.forEach { pos ->
             engine.clearHistory()
-            val result = engine.getNextMove(pos.position)
+            val result = runBlocking { engine.getNextMove(pos.position) }
             val move = result.move
             val ok = move?.from == pos.expectedFrom && move.to == pos.expectedTo
             println(
@@ -321,7 +322,7 @@ class RegressionTest {
             Difficulty.entries.forEach { difficulty ->
                 engine.clearHistory()
                 engine.setConfig(EvaluationConfig.getByDifficulty(difficulty))
-                val result = engine.getNextMove(pos.position)
+                val result = runBlocking { engine.getNextMove(pos.position) }
                 val move = result.move
                 println(
                     "  %-12s | %-10s | %-12s | %.0f".format(
@@ -382,7 +383,7 @@ class RegressionTest {
 
         nodeBaselines.forEach { nb ->
             engine.clearHistory()
-            engine.getNextMove(nb.position)
+            runBlocking { engine.getNextMove(nb.position) }
             val actual = engine.getDiagnostics().nodesEvaluated
             val delta = actual - nb.maxNodesChampion
             val deltaPct = delta.toDouble() / nb.maxNodesChampion * 100

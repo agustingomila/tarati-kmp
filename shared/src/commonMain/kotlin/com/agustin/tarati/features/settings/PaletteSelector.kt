@@ -30,6 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.features.library.StaticBoardRenderer
 import com.agustin.tarati.services.billing.LockedPalettes
@@ -135,7 +136,7 @@ fun PaletteBoardTile(
     isSelected: Boolean,
     isLocked: Boolean = false,
     tileSize: Dp = 116.dp,
-    initialState: com.agustin.tarati.core.domain.game.play.GameState =
+    initialState: GameState =
         remember { initialGameState() },
     onClick: () -> Unit,
 ) {

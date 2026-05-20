@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
@@ -63,6 +65,9 @@ import com.agustin.tarati.shared.generated.resources.gameplay
 import com.agustin.tarati.shared.generated.resources.general
 import com.agustin.tarati.shared.generated.resources.language
 import com.agustin.tarati.shared.generated.resources.light_theme
+import com.agustin.tarati.shared.generated.resources.login_account
+import com.agustin.tarati.shared.generated.resources.login_logged_in_as
+import com.agustin.tarati.shared.generated.resources.login_logout
 import com.agustin.tarati.shared.generated.resources.piece_type
 import com.agustin.tarati.shared.generated.resources.pre_moves
 import com.agustin.tarati.shared.generated.resources.save
@@ -100,6 +105,8 @@ fun SettingsScreen(
     events: SettingsEvents,
     onNavigateBack: () -> Unit = {},
     isGameActive: Boolean = false,
+    onLogout: (() -> Unit)? = null,
+    loggedInUsername: String? = null,
 ) {
     val settingsState by viewModel.settingsState.collectAsState()
     // Los colores de tablero se leen desde el CompositionLocal activo, igual que
@@ -273,8 +280,68 @@ fun SettingsScreen(
                         events.onSoundVolumeChange(volume)
                     },
                 )
+
+                if (onLogout != null) {
+                    AccountSection(
+                        username = loggedInUsername,
+                        onLogout = onLogout,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun AccountSection(
+    username: String?,
+    onLogout: () -> Unit,
+) {
+    SettingsCategory(title = Res.string.login_account)
+
+    if (!username.isNullOrBlank()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = TaratiIcons.AccountCircle,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = localizedString(Res.string.login_logged_in_as).replace($$"%1$s", username),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onLogout)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = TaratiIcons.Logout,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(Modifier.width(16.dp))
+        Text(
+            text = localizedString(Res.string.login_logout),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error,
+        )
     }
 }
 

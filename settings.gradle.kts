@@ -30,4 +30,4 @@ rootProject.name = "Tarati"
 include(":shared")
 include(":androidApp")
 include(":desktopApp")
-include(":server")
+include(":webApp")

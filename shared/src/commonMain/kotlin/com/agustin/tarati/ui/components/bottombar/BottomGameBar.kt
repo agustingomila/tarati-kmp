@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.components.bottombar
 
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
@@ -109,6 +110,7 @@ fun BottomGameBar(
     onFabExpandedChange: (Boolean) -> Unit = {},
     onMoveClick: ((moveIndex: Int) -> Unit)? = null,
     initialHistoryExpanded: Boolean = false,
+    onlineContent: @Composable (() -> Unit)? = null,
 ) {
     val moves = history.getMoves()
     val canUndo = moveIndex >= 0
@@ -200,31 +202,45 @@ fun BottomGameBar(
             }
 
             // ── FAB ↔ strip horizontal ────────────────────────────────────────
-            // Extraído a composable propio para evitar el conflicto con
-            // ColumnScope.AnimatedVisibility que no acepta transiciones horizontales.
-            FabOrStrip(
-                isExpanded = isExpanded,
-                canUndo = canUndo,
-                canRedo = canRedo,
-                isHistoryOpen = isHistoryOpen,
-                onFabClick = {
-                    isExpanded = true
-                    onFabExpandedChange(true)
-                },
-                onUndoClick = onUndo,
-                onRedoClick = onRedo,
-                onHistoryToggle = {
-                    val next = !isHistoryOpen
-                    isHistoryOpen = next
-                    onHistoryOpenChange(isExpanded && next)
-                },
-                onClose = {
-                    isExpanded = false
-                    isHistoryOpen = false
-                    onHistoryOpenChange(false)
-                    onFabExpandedChange(false)
-                },
-            )
+            // onlineContent fills available space with weight(1f); FAB sits fixed
+            // on the right and is always visible. When the strip expands it overlaps
+            // onlineContent naturally since the strip is wider.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (!isExpanded && onlineContent != null) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        onlineContent()
+                    }
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+                FabOrStrip(
+                    isExpanded = isExpanded,
+                    canUndo = canUndo,
+                    canRedo = canRedo,
+                    isHistoryOpen = isHistoryOpen,
+                    onFabClick = {
+                        isExpanded = true
+                        onFabExpandedChange(true)
+                    },
+                    onUndoClick = onUndo,
+                    onRedoClick = onRedo,
+                    onHistoryToggle = {
+                        val next = !isHistoryOpen
+                        isHistoryOpen = next
+                        onHistoryOpenChange(isExpanded && next)
+                    },
+                    onClose = {
+                        isExpanded = false
+                        isHistoryOpen = false
+                        onHistoryOpenChange(false)
+                        onFabExpandedChange(false)
+                    },
+                )
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.agustin.tarati.services.dialogs
 
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,21 +31,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.agustin.tarati.core.domain.ai.api.IAIEngine
-import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.colorNameRes
-import com.agustin.tarati.core.domain.game.play.GameResult
-import com.agustin.tarati.core.domain.game.play.GameState
+import com.agustin.tarati.core.domain.game.play.GameEndReason
+import com.agustin.tarati.core.domain.game.play.GameResult.BLACK_WIN
+import com.agustin.tarati.core.domain.game.play.GameResult.WHITE_WIN
 import com.agustin.tarati.core.domain.game.play.MatchState
+import com.agustin.tarati.network.models.OnlineGameStatus
 import com.agustin.tarati.services.localization.LocalizedText
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.about_tarati
 import com.agustin.tarati.shared.generated.resources.are_you_sure_you_want_to_start_a_new_game
+import com.agustin.tarati.shared.generated.resources.black
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.close
 import com.agustin.tarati.shared.generated.resources.continue_
 import com.agustin.tarati.shared.generated.resources.credits
+import com.agustin.tarati.shared.generated.resources.draw
+import com.agustin.tarati.shared.generated.resources.draw_by_agreement
+import com.agustin.tarati.shared.generated.resources.draw_by_undetermined
 import com.agustin.tarati.shared.generated.resources.game_over
 import com.agustin.tarati.shared.generated.resources.game_over_fifty_moves
 import com.agustin.tarati.shared.generated.resources.game_over_stalemit
@@ -54,56 +59,15 @@ import com.agustin.tarati.shared.generated.resources.game_over_wins
 import com.agustin.tarati.shared.generated.resources.game_rules
 import com.agustin.tarati.shared.generated.resources.new_game
 import com.agustin.tarati.shared.generated.resources.original_concept_george_spencer_brown
+import com.agustin.tarati.shared.generated.resources.player_wins
 import com.agustin.tarati.shared.generated.resources.players_2_white_vs_black_objective_control_the_board
 import com.agustin.tarati.shared.generated.resources.show_tutorial
 import com.agustin.tarati.shared.generated.resources.tarati_is_a_strategic_board_game_created_by_george_spencer_brown
+import com.agustin.tarati.shared.generated.resources.white
+import com.agustin.tarati.shared.generated.resources.wins_by_resignation
 import com.agustin.tarati.shared.generated.resources.yes
 import com.agustin.tarati.ui.theme.TaratiIcons
-import org.koin.compose.koinInject
 
-@Composable
-fun GameDialogs(
-    gameState: GameState,
-    aiEngine: IAIEngine = koinInject(),
-    showGameOverDialog: Boolean,
-    onGameOverConfirmed: () -> Unit,
-    onGameOverDismissed: () -> Unit,
-    showNewGameDialog: Boolean,
-    onNewGameConfirmed: (color: CobColor) -> Unit,
-    onNewGameDismissed: () -> Unit,
-    newGameCobColor: CobColor,
-    showAboutDialog: Boolean,
-    onShowTutorial: () -> Unit,
-    onAboutDismissed: () -> Unit,
-) {
-    if (showGameOverDialog) {
-        val matchState = gameState.getMatchState(aiEngine.positionHistory)
-        val winner = matchState.winner
-
-        if (matchState.gameResult != GameResult.PLAYING &&
-            matchState.gameResult != GameResult.UNDETERMINED &&
-            (winner != null || matchState.gameResult == GameResult.FIFTY_MOVES)
-        ) {
-            val message = buildGameOverMessage(matchState)
-            GameOverDialog(
-                gameOverMessage = message,
-                onConfirmed = onGameOverConfirmed,
-                onDismissed = onGameOverDismissed,
-            )
-        }
-    }
-
-    if (showNewGameDialog) {
-        NewGameDialog(
-            onConfirmed = { onNewGameConfirmed(newGameCobColor) },
-            onDismissed = onNewGameDismissed,
-        )
-    }
-
-    if (showAboutDialog) {
-        AboutDialog(onDismiss = onAboutDismissed, onShowTutorial = onShowTutorial)
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -336,22 +300,48 @@ fun NewGameDialog(
 }
 
 @Composable
+fun buildOnlineGameOverMessage(finished: OnlineGameStatus.Finished): String {
+    val winnerName = when (finished.result) {
+        WHITE_WIN.key -> localizedString(Res.string.white)
+        BLACK_WIN.key -> localizedString(Res.string.black)
+        else -> null
+    }.orEmpty()
+    return when (finished.reason) {
+        GameEndReason.MIT.key -> localizedString(Res.string.game_over_wins).replace($$"%1$s", winnerName)
+        GameEndReason.STALEMIT.key -> localizedString(Res.string.game_over_stalemit).replace($$"%1$s", winnerName)
+        GameEndReason.TRIPLE.key -> localizedString(Res.string.game_over_triple_repetition).replace(
+            $$"%1$s",
+            winnerName
+        )
+
+        GameEndReason.FIFTY_MOVES.key -> localizedString(Res.string.game_over_fifty_moves)
+        GameEndReason.TIMEOUT.key -> localizedString(Res.string.game_over_timeout).replace($$"%1$s", winnerName)
+        GameEndReason.UNDETERMINED.key -> localizedString(Res.string.draw_by_undetermined)
+        GameEndReason.DRAW_AGREEMENT.key -> localizedString(Res.string.draw_by_agreement)
+        GameEndReason.RESIGNATION.key -> localizedString(Res.string.wins_by_resignation).replace($$"%1$s", winnerName)
+        else -> if (winnerName.isNotEmpty())
+            localizedString(Res.string.player_wins).replace($$"%1$s", winnerName)
+        else localizedString(Res.string.draw)
+    }
+}
+
+@Composable
 fun buildGameOverMessage(matchState: MatchState): String {
     val winnerColor = matchState.winner
         ?: return localizedString(Res.string.game_over_fifty_moves)
     val winnerName = localizedString(winnerColor.colorNameRes)
 
-    return when (matchState.gameResult) {
-        GameResult.FIFTY_MOVES ->
+    return when (matchState.gameEndReason) {
+        GameEndReason.FIFTY_MOVES ->
             localizedString(Res.string.game_over_fifty_moves)
 
-        GameResult.TRIPLE ->
+        GameEndReason.TRIPLE ->
             localizedString(Res.string.game_over_triple_repetition).replace($$"%1$s", winnerName)
 
-        GameResult.MIT ->
+        GameEndReason.MIT ->
             localizedString(Res.string.game_over_wins).replace($$"%1$s", winnerName)
 
-        GameResult.TIMEOUT ->
+        GameEndReason.TIMEOUT ->
             localizedString(Res.string.game_over_timeout).replace($$"%1$s", winnerName)
 
         else ->

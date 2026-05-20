@@ -93,6 +93,27 @@ interface SettingsRepository {
      */
     val preMovesEnabled: Flow<Boolean>
 
+    // ── Online matchmaking preferences ────────────────────────────────────────
+
+    /**
+     * Last time control selected in the matchmaking dialog.
+     * One of: "bullet", "blitz", "rapid", "classical". Default: "blitz".
+     * Persisted so the dialog reopens with the player's last choice.
+     */
+    val onlineTimeControl: Flow<String>
+
+    /**
+     * Whether the last matchmaking search was rated. Default: `true`.
+     * Persisted so the dialog reopens with the player's last choice.
+     */
+    val onlineRated: Flow<Boolean>
+
+    /**
+     * Whether spectators are allowed in the last matchmaking search. Default: `true`.
+     * Persisted so the dialog reopens with the player's last choice.
+     */
+    val onlineSpectatingAllowed: Flow<Boolean>
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     suspend fun setTutorialSeen(seen: Boolean)
@@ -133,4 +154,15 @@ interface SettingsRepository {
 
     /** Persiste el flag de pre-movimientos. */
     suspend fun setPreMovesEnabled(enabled: Boolean)
+
+    // ── Online matchmaking setters ─────────────────────────────────────────────
+
+    /** Persiste el último time control elegido en el diálogo de matchmaking. */
+    suspend fun setOnlineTimeControl(timeControl: String)
+
+    /** Persiste si la última búsqueda online fue rated. */
+    suspend fun setOnlineRated(rated: Boolean)
+
+    /** Persiste si la última búsqueda online permitió espectadores. */
+    suspend fun setOnlineSpectatingAllowed(allowed: Boolean)
 }

@@ -38,6 +38,7 @@ import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.createGameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.Move
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -121,7 +122,7 @@ class AITest {
         println("Movimientos posibles para BLACK en estado inicial: ${possibleMoves.size}")
         possibleMoves.forEach { println("${it.from} -> ${it.to}") }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
         assertNotNull("Result should not be null", result)
 
         // Si no hay movimientos posibles, el resultado puede ser null (juego terminado)
@@ -148,7 +149,7 @@ class AITest {
         println("Movimientos posibles para BLACK en estado inicial: ${possibleMoves.size}")
         possibleMoves.forEach { println("${it.from} -> ${it.to}") }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
         assertNotNull("Result should not be null", result)
 
         // Si no hay movimientos posibles, el resultado puede ser null (juego terminado)
@@ -480,7 +481,7 @@ class AITest {
                 currentTurn = WHITE,
             )
 
-        val result = engine.getNextMove(state, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(state, Difficulty.DEFAULT) }
 
         assertNotNull("AI should find a move", result.move)
         // IA debería preferir moverse a posición ventajosa
@@ -538,11 +539,11 @@ class AITest {
             )
 
         val startTime = System.currentTimeMillis()
-        engine.getNextMove(state, Difficulty.DEFAULT) // Profundidad fija para comparar
+        runBlocking { engine.getNextMove(state, Difficulty.DEFAULT) } // Profundidad fija para comparar
         val firstRunTime = System.currentTimeMillis() - startTime
 
         val startTime2 = System.currentTimeMillis()
-        engine.getNextMove(state, Difficulty.DEFAULT) // Misma profundidad
+        runBlocking { engine.getNextMove(state, Difficulty.DEFAULT) } // Misma profundidad
         val secondRunTime = System.currentTimeMillis() - startTime2
 
         println("First run: ${firstRunTime}ms, Second run: ${secondRunTime}ms")
@@ -879,7 +880,7 @@ class AITest {
             )
 
         // Con profundidad adaptativa (14 en endgame), debería ver el mit
-        val result = engine.getNextMove(state)
+        val result = runBlocking { engine.getNextMove(state) }
 
         assertNotNull("AI should find winning move", result.move)
         assertTrue("Should have high winning score", result.score == -evalConfig.winningScore)
@@ -906,7 +907,7 @@ class AITest {
             )
 
         // Con profundidad adaptativa (14 en endgame), debería ver el mit
-        val result = engine.getNextMove(state)
+        val result = runBlocking { engine.getNextMove(state) }
 
         assertNotNull("AI should find winning move", result.move)
         assertTrue("Should have high winning score", result.score == -evalConfig.winningScore)

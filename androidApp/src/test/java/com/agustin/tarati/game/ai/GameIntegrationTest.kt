@@ -10,6 +10,7 @@ import com.agustin.tarati.core.domain.game.pieces.Cob
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.game.ai.tournament.engine.base.newEngine
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -34,7 +35,7 @@ class GameIntegrationTest {
             )
 
         // White makes a move
-        val whiteMove = engine.getNextMove(state, Difficulty.MIN)
+        val whiteMove = runBlocking { engine.getNextMove(state, Difficulty.MIN) }
         assertNotNull("White should have a valid move", whiteMove.move)
 
         // Apply white move
@@ -42,7 +43,7 @@ class GameIntegrationTest {
         state = state.copy(currentTurn = CobColor.BLACK)
 
         // Black makes a move
-        val blackMove = engine.getNextMove(state, Difficulty.MIN)
+        val blackMove = runBlocking { engine.getNextMove(state, Difficulty.MIN) }
         assertNotNull("Black should have a valid move", blackMove.move)
 
         // Apply black move
@@ -74,7 +75,7 @@ class GameIntegrationTest {
 
         depths.forEach { depth ->
             val startTime = System.currentTimeMillis()
-            val result = engine.getNextMove(state, depth)
+            val result = runBlocking { engine.getNextMove(state, depth) }
             val endTime = System.currentTimeMillis()
 
             assertNotNull("AI should return a move at depth $depth", result.move)

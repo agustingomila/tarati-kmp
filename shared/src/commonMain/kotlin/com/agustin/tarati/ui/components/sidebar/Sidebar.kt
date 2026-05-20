@@ -2,6 +2,7 @@
 
 package com.agustin.tarati.ui.components.sidebar
 
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -70,12 +71,23 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.pieces.colorNameRes
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason.DRAW_AGREEMENT
+import com.agustin.tarati.core.domain.game.play.GameEndReason.FIFTY_MOVES
+import com.agustin.tarati.core.domain.game.play.GameEndReason.MIT
+import com.agustin.tarati.core.domain.game.play.GameEndReason.RESIGNATION
+import com.agustin.tarati.core.domain.game.play.GameEndReason.STALEMIT
+import com.agustin.tarati.core.domain.game.play.GameEndReason.TIMEOUT
+import com.agustin.tarati.core.domain.game.play.GameEndReason.TRIPLE
+import com.agustin.tarati.core.domain.game.play.GameEndReason.UNDETERMINED
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import com.agustin.tarati.features.game.GameEvents
 import com.agustin.tarati.features.game.IGameModel
+import com.agustin.tarati.features.online.game.SpectatingState
+import com.agustin.tarati.network.models.OnlineGame
+import com.agustin.tarati.network.models.OnlineGameStatus
+import com.agustin.tarati.network.protocol.PlayerInfo
 import com.agustin.tarati.services.localization.LocalizedText
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
@@ -89,16 +101,22 @@ import com.agustin.tarati.shared.generated.resources.jump_to_current_position
 import com.agustin.tarati.shared.generated.resources.move_controls
 import com.agustin.tarati.shared.generated.resources.move_history
 import com.agustin.tarati.shared.generated.resources.new_game
+import com.agustin.tarati.shared.generated.resources.online_lobby
 import com.agustin.tarati.shared.generated.resources.player_ai
 import com.agustin.tarati.shared.generated.resources.player_human
+import com.agustin.tarati.shared.generated.resources.player_wins
 import com.agustin.tarati.shared.generated.resources.redo
 import com.agustin.tarati.shared.generated.resources.save_game
 import com.agustin.tarati.shared.generated.resources.saved_games
 import com.agustin.tarati.shared.generated.resources.settings
+import com.agustin.tarati.shared.generated.resources.status_draw_agreement
 import com.agustin.tarati.shared.generated.resources.status_draw_fifty
 import com.agustin.tarati.shared.generated.resources.status_turn
+import com.agustin.tarati.shared.generated.resources.status_undetermined
 import com.agustin.tarati.shared.generated.resources.status_wins_mit
+import com.agustin.tarati.shared.generated.resources.status_wins_resignation
 import com.agustin.tarati.shared.generated.resources.status_wins_stalemit
+import com.agustin.tarati.shared.generated.resources.status_wins_timeout
 import com.agustin.tarati.shared.generated.resources.status_wins_triple
 import com.agustin.tarati.shared.generated.resources.tarati
 import com.agustin.tarati.shared.generated.resources.undo
@@ -135,6 +153,11 @@ fun SidebarContent(
     onUndo: () -> Unit,
     viewModel: IGameModel,
     aiEngine: IAIEngine,
+    /** Partida online activa, o null en modo local. */
+    onlineGame: OnlineGame? = null,
+    /** Estado de espectador activo. Mutuamente excluyente con [onlineGame]. */
+    spectatingState: SpectatingState? = null,
+    onOnlineLobby: () -> Unit = {},
 ) {
     var sidebarUIState by remember { mutableStateOf(SidebarUIState()) }
 
@@ -143,6 +166,7 @@ fun SidebarContent(
     val whiteIsAI by viewModel.whiteIsAI.collectAsState()
     val blackIsAI by viewModel.blackIsAI.collectAsState()
     val isEditing by viewModel.isEditing.collectAsState()
+    val localUserName by viewModel.userName.collectAsState()
 
     val sidebarEvents = createSidebarEvents(
         gameModel = viewModel,
@@ -150,6 +174,7 @@ fun SidebarContent(
         gameManagerState = gameManagerState,
         onNavigateToSettings = onNavigateToSettings,
         onUndo = onUndo,
+        onOnlineLobby = onOnlineLobby,
     )
 
     val sidebarGameState = SidebarGameState(
@@ -171,6 +196,9 @@ fun SidebarContent(
         uiState = sidebarUIState,
         events = sidebarEvents,
         onUIStateChange = { sidebarUIState = it },
+        onlineGame = onlineGame,
+        spectatingState = spectatingState,
+        localUserName = localUserName
     )
 }
 
@@ -180,6 +208,7 @@ fun createSidebarEvents(
     gameManagerState: GameManagerState,
     onNavigateToSettings: () -> Unit,
     onUndo: () -> Unit,
+    onOnlineLobby: () -> Unit = {},
 ): SidebarEvents {
     return object : SidebarEvents {
         override fun onMoveToCurrent() = gameModel.moveToCurrentState()
@@ -235,6 +264,7 @@ fun createSidebarEvents(
         override fun onEditBoard() = gameModel.toggleEditing()
         override fun onRotateBoard() = gameModel.rotateBoardManually()
         override fun onGamesLibrary() = gameEvents.showGamesLibrary()
+        override fun onOnlineLobby() = onOnlineLobby()
         override fun onSaveGame() = gameEvents.saveGame()
         override fun onAboutClick() = gameEvents.showAboutDialog()
         override fun onCopyMoveHistory(moves: List<Move>) = gameEvents.copyMovesToClipboard(moves)
@@ -264,6 +294,9 @@ fun Sidebar(
     uiState: SidebarUIState = SidebarUIState(),
     events: SidebarEvents,
     onUIStateChange: (SidebarUIState) -> Unit = {},
+    onlineGame: OnlineGame? = null,
+    spectatingState: SpectatingState? = null,
+    localUserName: String? = null,
 ) {
     val windowInfo = LocalWindowInfo.current
     val isLandscape = windowInfo.containerSize.width > windowInfo.containerSize.height
@@ -303,25 +336,46 @@ fun Sidebar(
             // opciones debe renderizarse encima de los siblings posteriores
             // (MoveHistorySection). Modifier.zIndex solo afecta el orden de dibujo
             // dentro del mismo padre — en producción el valor es 0f (sin cambio).
-            val anyDropdownExpanded = uiState.isDifficultyExpandedWhite ||
-                    uiState.isDifficultyExpandedBlack
-            Box(
-                modifier = if (LocalInspectionMode.current && anyDropdownExpanded)
-                    Modifier.zIndex(1f) else Modifier,
-            ) {
-                PlayerConfigSection(
-                    whiteIsAI = sidebarState.whiteIsAI,
-                    blackIsAI = sidebarState.blackIsAI,
-                    difficultyWhite = sidebarState.difficultyWhite,
-                    difficultyBlack = sidebarState.difficultyBlack,
-                    onDifficultyChangeWhite = events::onDifficultyChangeWhite,
-                    onDifficultyChangeBlack = events::onDifficultyChangeBlack,
-                    onSetPlayerIsAI = events::onSetPlayerIsAI,
-                    isDifficultyExpandedWhite = uiState.isDifficultyExpandedWhite,
-                    isDifficultyExpandedBlack = uiState.isDifficultyExpandedBlack,
-                    onExpandWhite = { onUIStateChange(uiState.copy(isDifficultyExpandedWhite = it)) },
-                    onExpandBlack = { onUIStateChange(uiState.copy(isDifficultyExpandedBlack = it)) },
-                )
+            when {
+                onlineGame != null && onlineGame.status == OnlineGameStatus.InProgress -> {
+                    // Partida online activa: banner de identidad fija (yo vs oponente).
+                    OnlinePlayerBanner(
+                        onlineGame = onlineGame,
+                        localName = localUserName.orEmpty(),
+                    )
+                }
+
+                spectatingState != null -> {
+                    // Modo espectador: banner con ambos jugadores de la partida observada.
+                    SpectatingPlayerBanner(
+                        whitePlayer = spectatingState.whitePlayer,
+                        blackPlayer = spectatingState.blackPlayer,
+                    )
+                }
+
+                else -> {
+                    // Modo local: selector de tipo y dificultad por banda.
+                    val anyDropdownExpanded = uiState.isDifficultyExpandedWhite ||
+                            uiState.isDifficultyExpandedBlack
+                    Box(
+                        modifier = if (LocalInspectionMode.current && anyDropdownExpanded)
+                            Modifier.zIndex(1f) else Modifier,
+                    ) {
+                        PlayerConfigSection(
+                            whiteIsAI = sidebarState.whiteIsAI,
+                            blackIsAI = sidebarState.blackIsAI,
+                            difficultyWhite = sidebarState.difficultyWhite,
+                            difficultyBlack = sidebarState.difficultyBlack,
+                            onDifficultyChangeWhite = events::onDifficultyChangeWhite,
+                            onDifficultyChangeBlack = events::onDifficultyChangeBlack,
+                            onSetPlayerIsAI = events::onSetPlayerIsAI,
+                            isDifficultyExpandedWhite = uiState.isDifficultyExpandedWhite,
+                            isDifficultyExpandedBlack = uiState.isDifficultyExpandedBlack,
+                            onExpandWhite = { onUIStateChange(uiState.copy(isDifficultyExpandedWhite = it)) },
+                            onExpandBlack = { onUIStateChange(uiState.copy(isDifficultyExpandedBlack = it)) },
+                        )
+                    }
+                }
             }
 
             MoveHistorySection(
@@ -334,6 +388,7 @@ fun Sidebar(
                 onMoveToCurrent = events::onMoveToCurrent,
                 onCopyMoveHistory = events::onCopyMoveHistory,
                 onGamesLibrary = events::onGamesLibrary,
+                onOnlineLobby = events::onOnlineLobby,
                 onSaveGame = events::onSaveGame,
             )
 
@@ -577,11 +632,70 @@ private fun PlayerBandRow(
     }
 }
 
+// ── Spectating player banner ──────────────────────────────────────────────────
+
+/**
+ * Banner de identidad para modo espectador. Muestra ambos jugadores remotos
+ * con sus nombres y ratings, sin ningún control de configuración.
+ */
+@Composable
+private fun SpectatingPlayerBanner(
+    whitePlayer: PlayerInfo,
+    blackPlayer: PlayerInfo,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        SpectatingPlayerRow(cobColor = WHITE, player = whitePlayer)
+        SpectatingPlayerRow(cobColor = BLACK, player = blackPlayer)
+    }
+}
+
+@Composable
+private fun SpectatingPlayerRow(cobColor: CobColor, player: PlayerInfo) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        BandIndicator(cobColor)
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(
+                imageVector = TaratiIcons.AccountCircle,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Column {
+                Text(
+                    text = player.username,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+                Text(
+                    text = player.rating.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                )
+            }
+        }
+    }
+}
+
 /**
  * Small filled cob disc — identifies the color band at a glance.
  */
 @Composable
-private fun BandIndicator(color: CobColor) {
+internal fun BandIndicator(color: CobColor) {
     val bc = getBoardColors()
     Canvas(Modifier.size(22.dp)) {
         val r = size.minDimension / 2f
@@ -779,6 +893,7 @@ private fun MoveHistorySection(
     onMoveToIndex: ((Int) -> Unit)? = null,
     onCopyMoveHistory: (moves: List<Move>) -> Unit,
     onGamesLibrary: () -> Unit,
+    onOnlineLobby: () -> Unit,
     onSaveGame: () -> Unit,
 ) {
     var isCopying by remember { mutableStateOf(false) }
@@ -790,7 +905,9 @@ private fun MoveHistorySection(
         modifier = modifier.fillMaxHeight(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        val matchState = gameManagerState.gameState.getMatchState(sidebarState.positionHistory)
+        val matchState = remember(gameManagerState.gameState, sidebarState.positionHistory) {
+            gameManagerState.gameState.getMatchState(sidebarState.positionHistory)
+        }
         GameStatusRow(matchState)
 
         Row(
@@ -842,6 +959,15 @@ private fun MoveHistorySection(
                     modifier = Modifier.size(18.dp)
                 )
             }
+
+            IconButton(onOnlineLobby, Modifier.size(32.dp)) {
+                Icon(
+                    TaratiIcons.Public,
+                    localizedString(Res.string.online_lobby),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
 
         NavigableHistoryList(
@@ -859,9 +985,9 @@ private fun GameStatusRow(
     matchState: MatchState,
 ) {
     val winner = matchState.winner
-    val result = matchState.gameResult
+    val result = matchState.gameEndReason
     val gameState = matchState.gameState
-    val isOver = winner != null || result == GameResult.FIFTY_MOVES
+    val isOver = winner != null || result in listOf(FIFTY_MOVES, DRAW_AGREEMENT)
     val side = winner ?: gameState.currentTurn
 
     val bgColor = when (side) {
@@ -874,14 +1000,18 @@ private fun GameStatusRow(
     }
 
     val text = when {
-        result == GameResult.FIFTY_MOVES -> localizedString(Res.string.status_draw_fifty)
+        result == FIFTY_MOVES -> localizedString(Res.string.status_draw_fifty)
+        result == UNDETERMINED -> localizedString(Res.string.status_undetermined)
+        result == DRAW_AGREEMENT -> localizedString(Res.string.status_draw_agreement)
         winner != null -> {
             val n = localizedString(winner.colorNameRes)
             when (result) {
-                GameResult.MIT -> localizedString(Res.string.status_wins_mit, n)
-                GameResult.STALEMIT -> localizedString(Res.string.status_wins_stalemit, n)
-                GameResult.TRIPLE -> localizedString(Res.string.status_wins_triple, n)
-                else -> localizedString(Res.string.status_wins_mit, n)
+                MIT -> localizedString(Res.string.status_wins_mit, n)
+                STALEMIT -> localizedString(Res.string.status_wins_stalemit, n)
+                TRIPLE -> localizedString(Res.string.status_wins_triple, n)
+                TIMEOUT -> localizedString(Res.string.status_wins_timeout, n)
+                RESIGNATION -> localizedString(Res.string.status_wins_resignation, n)
+                else -> localizedString(Res.string.player_wins, n)
             }
         }
 

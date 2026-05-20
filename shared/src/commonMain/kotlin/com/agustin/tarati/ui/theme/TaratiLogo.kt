@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -103,7 +104,7 @@ fun TaratiLogo(
                 val b0 = bridgeOffsets[i]
                 val b1 = bridgeOffsets[(i + 1) % 6]
 
-                val path = androidx.compose.ui.graphics.Path().apply {
+                val path = Path().apply {
                     moveTo(center.x, center.y)
                     lineTo(b0.x, b0.y)
                     lineTo(b1.x, b1.y)
@@ -173,15 +174,18 @@ private fun DrawScope.drawLetter(
     // +90° was 180° off — letters appeared inverted with base toward periphery.
     val angleDeg = (atan2(dy, dx) * (180.0 / PI)).toFloat() - 90f
 
+    // topLeft is provided explicitly to drawText rather than relying on a
+    // translate() inside withTransform — drawText ignores canvas translate on WASM.
     withTransform({
         // 1. Orient the letter toward A1
         rotate(degrees = angleDeg, pivot = regionCenter)
         // 2. Compress vertically around the letter centre.
         //    scaleX = 1f preserves width; scaleY < 1f squeezes height.
         scale(scaleX = 1f, scaleY = verticalScale, pivot = regionCenter)
-        // 3. Position top-left of the text bounding box
-        translate(regionCenter.x - tw / 2f, regionCenter.y - th / 2f)
     }) {
-        drawText(textLayoutResult = measured)
+        drawText(
+            textLayoutResult = measured,
+            topLeft = Offset(regionCenter.x - tw / 2f, regionCenter.y - th / 2f),
+        )
     }
 }

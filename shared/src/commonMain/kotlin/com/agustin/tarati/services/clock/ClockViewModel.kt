@@ -1,5 +1,6 @@
 package com.agustin.tarati.services.clock
 
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.domain.game.pieces.CobColor
@@ -126,6 +127,55 @@ class ClockViewModel : ViewModel(), IClockService {
                     "${before.whiteRemainingMs}/${before.blackRemainingMs} → " +
                     "${_clockState.value.whiteRemainingMs}/${_clockState.value.blackRemainingMs}"
         )
+    }
+
+    /**
+     * Sincroniza los tiempos internos con los valores autoritativos del servidor,
+     * recibidos en cada GameStateUpdate.
+     *
+     * Si el modo actual es [TimeControlMode.Unlimited] y se provee [fallbackMode],
+     * primero reinicia el reloj con ese modo para habilitar las cápsulas de tiempo.
+     * Esto cubre el caso donde el usuario no tiene configurado un control de tiempo
+     * local pero sí juega una partida online con tiempo.
+     *
+     * Luego reemplaza los milisegundos restantes con los valores exactos del servidor
+     * y garantiza que el tick loop esté corriendo para [activeTurn].
+     *
+     * @param whiteMs      Tiempo restante de blancas en ms según el servidor.
+     * @param blackMs      Tiempo restante de negras en ms según el servidor.
+     * @param activeTurn   Color del jugador que tiene el turno tras el update.
+     * @param fallbackMode Modo a usar si el reloj está en Unlimited. Opcional.
+     */
+    override fun syncFromServer(
+        whiteMs: Long,
+        blackMs: Long,
+        activeTurn: CobColor,
+        fallbackMode: TimeControlMode?,
+    ) {
+        val current = _clockState.value
+
+        // Si el reloj está en Unlimited y tenemos un modo válido, inicializarlo primero.
+        val effective = if (current.mode is TimeControlMode.Unlimited && fallbackMode != null) {
+            resetClock(fallbackMode)
+            _clockState.value
+        } else {
+            current
+        }
+
+        // No-op si seguimos en Unlimited (sin fallbackMode provisto).
+        if (effective.mode is TimeControlMode.Unlimited) return
+
+        val now = Clock.System.now().toEpochMilliseconds()
+        _clockState.value = effective.copy(
+            whiteRemainingMs = whiteMs,
+            blackRemainingMs = blackMs,
+            activeColor = activeTurn,
+            running = true,
+            lastTickEpochMs = now,
+            activeMoveStartEpochMs = now,
+        )
+        ensureTickLoop()
+        logger.debug("syncFromServer: white=${whiteMs}ms black=${blackMs}ms active=$activeTurn")
     }
 
     // ── Tick loop ─────────────────────────────────────────────────────────────

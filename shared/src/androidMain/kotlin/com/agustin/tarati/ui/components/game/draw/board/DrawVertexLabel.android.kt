@@ -11,7 +11,7 @@ actual fun DrawScope.drawVertexLabel(
     label: String,
     position: Offset,
     textSize: Float,
-    color: Color
+    color: Color,
 ) {
     drawContext.canvas.nativeCanvas.drawText(
         label,

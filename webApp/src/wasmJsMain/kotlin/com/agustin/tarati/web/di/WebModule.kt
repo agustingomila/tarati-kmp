@@ -1,0 +1,65 @@
+package com.agustin.tarati.web.di
+
+import com.agustin.tarati.core.domain.repository.GameRepository
+import com.agustin.tarati.di.sharedModules
+import com.agustin.tarati.features.game.IGameModel
+import com.agustin.tarati.features.game.WasmGameViewModel
+import com.agustin.tarati.features.online.auth.AuthRepository
+import com.agustin.tarati.features.seasonal.ISpecialEventManager
+import com.agustin.tarati.features.seasonal.NoOpSpecialEventManager
+import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.IAchievementsManager
+import com.agustin.tarati.services.achievements.NoOpAchievementsManager
+import com.agustin.tarati.services.clipboard.GameClipboardHelper
+import com.agustin.tarati.services.clipboard.IClipboardService
+import com.agustin.tarati.services.sound.ISoundService
+import com.agustin.tarati.services.sound.NoOpSoundService
+import com.agustin.tarati.web.NoOpGameRepository
+import com.agustin.tarati.web.WasmAuthRepository
+import com.agustin.tarati.web.WasmClipboardService
+import com.agustin.tarati.web.WasmSettingsRepository
+import com.agustin.tarati.web.WasmSettingsViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.js.Js
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+
+val webServiceModule = module {
+    single {
+        HttpClient(Js) {
+            install(WebSockets) {
+                pingInterval = 30.toDuration(DurationUnit.SECONDS)
+            }
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true; encodeDefaults = true })
+            }
+        }
+    }
+
+    single<IClipboardService> { WasmClipboardService() }
+    single { GameClipboardHelper(get()) }
+    single<ISoundService> { NoOpSoundService() }
+    single<ISpecialEventManager> { NoOpSpecialEventManager() }
+    single<IAchievementsManager> { NoOpAchievementsManager() }
+}
+
+val webDataModule = module {
+    single<SettingsRepository> { WasmSettingsRepository() }
+    single<AuthRepository> { WasmAuthRepository() }
+    single<GameRepository> { NoOpGameRepository() }
+}
+
+val webViewModelModule = module {
+    viewModel { WasmSettingsViewModel(get()) }
+    viewModel { WasmGameViewModel(get(), get()) } bind IGameModel::class
+}
+
+val webModules = listOf(webServiceModule) + sharedModules + listOf(webDataModule, webViewModelModule)

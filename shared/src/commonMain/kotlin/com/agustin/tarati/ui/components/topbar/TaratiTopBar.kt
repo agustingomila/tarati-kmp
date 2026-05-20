@@ -40,9 +40,10 @@ fun TaratiTopBar(
     val scope = rememberCoroutineScope()
 
     val navigationIcon: @Composable (() -> Unit) =
-        when (navigationType) {
-            TopBarNavigationType.Menu -> {
-                {
+        {
+            when (navigationType) {
+                TopBarNavigationType.None -> {}
+                TopBarNavigationType.Menu -> {
                     IconButton(
                         onClick = {
                             drawerState?.let {
@@ -58,10 +59,8 @@ fun TaratiTopBar(
                         )
                     }
                 }
-            }
 
-            TopBarNavigationType.Back -> {
-                {
+                TopBarNavigationType.Back -> {
                     IconButton(onClick = { onNavigationClick?.invoke() }) {
                         Icon(
                             imageVector = TaratiIcons.ArrowBack,
@@ -69,10 +68,8 @@ fun TaratiTopBar(
                         )
                     }
                 }
-            }
 
-            TopBarNavigationType.Close -> {
-                {
+                TopBarNavigationType.Close -> {
                     IconButton(onClick = { onNavigationClick?.invoke() }) {
                         Icon(
                             imageVector = TaratiIcons.Cancel,
@@ -107,9 +104,9 @@ fun TaratiTopBar(
 }
 
 sealed class TopBarNavigationType {
+    /** Sin ícono de navegación — el título ocupa todo el ancho izquierdo. */
+    object None : TopBarNavigationType()
     object Menu : TopBarNavigationType()
-
     object Back : TopBarNavigationType()
-
     object Close : TopBarNavigationType()
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>Tarati — The Game</title>
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+    <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+    <link href="/manifest.json" rel="manifest">
+    <meta content="#1a1a2e" name="theme-color">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<!-- URL del servidor Ktor. En producción se elimina — usa window.location.host.
+<script>globalThis.__TARATI_SERVER__ = "localhost:8080";</script>
+ -->
+<script src="tarati.js"></script>
+</body>
+</html>

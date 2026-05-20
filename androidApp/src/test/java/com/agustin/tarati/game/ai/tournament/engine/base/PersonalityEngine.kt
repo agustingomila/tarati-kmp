@@ -36,7 +36,7 @@ class PersonalityEngine(
         private set
 
     override val positionHistory: MutableMap<String, Int> get() = engine.positionHistory
-    override fun getNextMove(gameState: GameState): MoveEval = engine.getNextMove(gameState)
+    override suspend fun getNextMove(gameState: GameState): MoveEval = engine.getNextMove(gameState)
     override fun clearHistory() = engine.clearHistory()
     override fun putState(gameState: GameState, moveBy: CobColor): CobColor? = engine.putState(gameState, moveBy)
     override fun removeState(gameState: GameState) = engine.removeState(gameState)
@@ -79,7 +79,7 @@ val randomMoveEngine: IAIEngine =
         override val name: String = "random"
         override val positionHistory: MutableMap<String, Int> = mutableMapOf()
 
-        override fun getNextMove(gameState: GameState): MoveEval {
+        override suspend fun getNextMove(gameState: GameState): MoveEval {
             val move = gameState.allMovesForTurn().randomOrNull()
             return MoveEval(move = move, score = 0.0)
         }

@@ -38,6 +38,7 @@ import com.agustin.tarati.core.domain.game.play.Move
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 
@@ -130,7 +131,7 @@ class AIForceTest {
                 setCob(C8, WHITE, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
         var newState = gameState.applyMove(result.move!!)
         newState = newState.copy(currentTurn = WHITE)
 
@@ -207,7 +208,7 @@ class AIForceTest {
                 setCob(B1, WHITE, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         // Debería identificar el camino hacia el ahogado
         assertTrue(result.score >= 460)
@@ -231,7 +232,7 @@ class AIForceTest {
                 setCob(A1, WHITE, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.CHAMPION)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.CHAMPION) }
 
         // At depth 7 (CHAMPION) the engine sees the forced mate-in-2 and returns a
         // winning score. DEFAULT (depth 3) cannot look far enough ahead to confirm it.
@@ -256,7 +257,7 @@ class AIForceTest {
                 setCob(C5, WHITE, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         println(result)
 
@@ -286,7 +287,7 @@ class AIForceTest {
                 setCob(C5, BLACK, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         println(result)
 
@@ -316,7 +317,7 @@ class AIForceTest {
                 setCob(C3, BLACK, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         println(result)
 
@@ -346,7 +347,7 @@ class AIForceTest {
                 setCob(C3, BLACK, false)
             }
 
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         println(result)
 
@@ -454,7 +455,7 @@ class AIForceTest {
             }
 
         // Movimiento 1: Negro juega (debe encontrar C6 -> B3)
-        val blackMove1 = engine.getNextMove(initialState, Difficulty.DEFAULT)
+        val blackMove1 = runBlocking { engine.getNextMove(initialState, Difficulty.DEFAULT) }
 
         println("Black move 1: ${blackMove1.move} with score: ${blackMove1.score}")
 
@@ -469,7 +470,7 @@ class AIForceTest {
                 .copy(currentTurn = WHITE)
 
         // Movimiento 2: Blanco está forzado (debe jugar C10 -> C9 o perder inmediatamente)
-        val whiteMove = engine.getNextMove(stateAfterBlack1, Difficulty.DEFAULT)
+        val whiteMove = runBlocking { engine.getNextMove(stateAfterBlack1, Difficulty.DEFAULT) }
 
         println("White move (forced): ${whiteMove.move} with score: ${whiteMove.score}")
 
@@ -488,7 +489,7 @@ class AIForceTest {
                 .copy(currentTurn = BLACK)
 
         // Movimiento 3: Negro da mit
-        val blackMove2 = engine.getNextMove(stateAfterWhite, Difficulty.DEFAULT)
+        val blackMove2 = runBlocking { engine.getNextMove(stateAfterWhite, Difficulty.DEFAULT) }
 
         assertNotNull("Black should find a move", blackMove2.move)
         assertTrue("Black should move from A1 or B4", blackMove2.move?.from == A1 || blackMove2.move?.from == B4)
@@ -539,7 +540,7 @@ class AIForceTest {
         assertEquals("Black should have no legal moves", 0, blackMoves.size)
 
         assertTrue("Game should be over", initialState.isGameOver(emptyMap()))
-        assertEquals("White should win by stalemate", WHITE, initialState.getWinner(emptyMap()))
+        assertEquals("White should win by stalemit", WHITE, initialState.getWinner(emptyMap()))
     }
 
     @Test
@@ -564,7 +565,7 @@ class AIForceTest {
         assertEquals("Black should have no legal moves", 0, whiteMoves.size)
 
         assertTrue("Game should be over", initialState.isGameOver(emptyMap()))
-        assertEquals("White should win by stalemate", WHITE, initialState.getWinner(emptyMap()))
+        assertEquals("White should win by stalemit", WHITE, initialState.getWinner(emptyMap()))
     }
 
     @Test
@@ -585,7 +586,7 @@ class AIForceTest {
                 setCob(B4, BLACK, true)
             }
 
-        val blackMove = engine.getNextMove(initialState, Difficulty.DEFAULT)
+        val blackMove = runBlocking { engine.getNextMove(initialState, Difficulty.DEFAULT) }
 
         assertNotNull("Black should find a winning move", blackMove.move)
 
@@ -621,7 +622,7 @@ class AIForceTest {
                 setCob(C4, BLACK, false)
             }
 
-        val whiteMove = engine.getNextMove(initialState, Difficulty.DEFAULT)
+        val whiteMove = runBlocking { engine.getNextMove(initialState, Difficulty.DEFAULT) }
 
         assertNotNull("White should find a strategic move", whiteMove.move)
 
@@ -642,7 +643,7 @@ class AIForceTest {
                 setCob(C7, BLACK, true) // Pieza mejorada
             }
 
-        val whiteMove = engine.getNextMove(initialState, Difficulty.DEFAULT)
+        val whiteMove = runBlocking { engine.getNextMove(initialState, Difficulty.DEFAULT) }
 
         assertNotNull("White should find a survival move", whiteMove.move)
 
@@ -670,7 +671,7 @@ class AIForceTest {
                 setCob(C9, BLACK, false)
             }
 
-        val blackMove = engine.getNextMove(initialState, Difficulty.HARD)
+        val blackMove = runBlocking { engine.getNextMove(initialState, Difficulty.HARD) }
 
         assertNotNull("Black should find a tactical move", blackMove.move)
 

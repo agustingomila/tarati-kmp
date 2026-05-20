@@ -30,11 +30,28 @@ dependencies {
     // SQLite driver for Room on Desktop
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.sqlite)
+
+    // Ktor CIO engine for Desktop WebSocket/HTTP
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+    // SLF4J provider para Desktop (elimina warning "No SLF4J providers were found")
+    implementation(libs.logback)
 }
 
 compose.desktop {
     application {
         mainClass = "com.agustin.tarati.desktop.MainKt"
+
+        // JVM args para el run de desarrollo (./gradlew run)
+        // Incluye --enable-native-access para silenciar warning de Skiko
+        jvmArgs += listOf(
+            "--enable-native-access=ALL-UNNAMED",
+            "-Xmx2G",
+            "-Dfile.encoding=UTF-8"
+        )
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
@@ -86,8 +103,9 @@ compose.desktop {
                 appRelease = "1"
             }
 
-            // Argumentos JVM
+            // Argumentos JVM para el instalable empaquetado
             jvmArgs += listOf(
+                "--enable-native-access=ALL-UNNAMED",
                 "-Xmx2G",
                 "-Dfile.encoding=UTF-8"
             )

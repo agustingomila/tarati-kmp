@@ -10,6 +10,7 @@ import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameS
 import com.agustin.tarati.game.ai.tournament.engine.base.cloneForMatch
 import com.agustin.tarati.game.ai.tournament.helpers.EnginePerformance
 import com.agustin.tarati.game.ai.tournament.helpers.PerformanceMetrics
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorCompletionService
 import java.util.concurrent.Executors
@@ -326,7 +327,7 @@ class TournamentRunner(
             currentConfig?.let { currentEngine.setConfig(it) }
 
             val startTime = System.currentTimeMillis()
-            val result = currentEngine.getNextMove(gameState)
+            val result = runBlocking { currentEngine.getNextMove(gameState) }
             val endTime = System.currentTimeMillis()
 
             if (result.move == null) break
