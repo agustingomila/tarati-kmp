@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.data.repositories.SavedGame
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
+import com.agustin.tarati.core.utils.runSync
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.cancel
@@ -86,7 +87,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -589,7 +589,7 @@ fun GameThumbnail(
 
     val matchDto by if (inPreview) {
         val syncDto = remember(gameId) {
-            runBlocking { loadGame(gameId).firstOrNull() }
+            runSync { loadGame(gameId).firstOrNull() }
         }
         remember(syncDto) { mutableStateOf(syncDto) }
     } else {

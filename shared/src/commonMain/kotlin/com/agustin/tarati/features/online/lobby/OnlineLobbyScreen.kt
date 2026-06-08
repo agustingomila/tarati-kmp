@@ -1,0 +1,1298 @@
+package com.agustin.tarati.features.online.lobby
+
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.agustin.tarati.core.domain.game.pieces.CobColor
+import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
+import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
+import com.agustin.tarati.core.domain.game.time.TimeControl
+import com.agustin.tarati.features.library.StaticBoardRenderer
+import com.agustin.tarati.features.online.auth.IAuthViewModel
+import com.agustin.tarati.features.online.auth.UserInfo
+import com.agustin.tarati.features.online.connection.ConnectionState
+import com.agustin.tarati.features.online.connection.IConnectionViewModel
+import com.agustin.tarati.features.online.devServerUrl
+import com.agustin.tarati.features.online.game.IOnlineGameViewModel
+import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.network.models.GameHistoryDto
+import com.agustin.tarati.network.models.GameTimeControl
+import com.agustin.tarati.network.models.LiveGameDto
+import com.agustin.tarati.network.models.MatchmakingState
+import com.agustin.tarati.network.models.MatchmakingTicket
+import com.agustin.tarati.network.models.OnlineGameStatus
+import com.agustin.tarati.network.models.OpenSearchDto
+import com.agustin.tarati.services.localization.LocalizedText
+import com.agustin.tarati.services.localization.localizedString
+import com.agustin.tarati.shared.generated.resources.Res
+import com.agustin.tarati.shared.generated.resources.allow_spectators
+import com.agustin.tarati.shared.generated.resources.cancel
+import com.agustin.tarati.shared.generated.resources.casual_info_card
+import com.agustin.tarati.shared.generated.resources.connect_to_server_first
+import com.agustin.tarati.shared.generated.resources.could_not_connect
+import com.agustin.tarati.shared.generated.resources.draw
+import com.agustin.tarati.shared.generated.resources.error
+import com.agustin.tarati.shared.generated.resources.feed
+import com.agustin.tarati.shared.generated.resources.feed_player_context
+import com.agustin.tarati.shared.generated.resources.filter_live_games
+import com.agustin.tarati.shared.generated.resources.filter_open_searches
+import com.agustin.tarati.shared.generated.resources.in_live
+import com.agustin.tarati.shared.generated.resources.join
+import com.agustin.tarati.shared.generated.resources.leaderboard
+import com.agustin.tarati.shared.generated.resources.loss
+import com.agustin.tarati.shared.generated.resources.move
+import com.agustin.tarati.shared.generated.resources.moves
+import com.agustin.tarati.shared.generated.resources.my_games
+import com.agustin.tarati.shared.generated.resources.new_search
+import com.agustin.tarati.shared.generated.resources.no_feed_games
+import com.agustin.tarati.shared.generated.resources.no_games_found
+import com.agustin.tarati.shared.generated.resources.not_connected_to_server
+import com.agustin.tarati.shared.generated.resources.online_lobby
+import com.agustin.tarati.shared.generated.resources.rated
+import com.agustin.tarati.shared.generated.resources.rated_info_card
+import com.agustin.tarati.shared.generated.resources.rating
+import com.agustin.tarati.shared.generated.resources.result
+import com.agustin.tarati.shared.generated.resources.search_no_longer_available
+import com.agustin.tarati.shared.generated.resources.sort
+import com.agustin.tarati.shared.generated.resources.sort_newest
+import com.agustin.tarati.shared.generated.resources.sort_oldest
+import com.agustin.tarati.shared.generated.resources.sort_rating
+import com.agustin.tarati.shared.generated.resources.there_are_no_games_in_progress
+import com.agustin.tarati.shared.generated.resources.turn
+import com.agustin.tarati.shared.generated.resources.waiting_time
+import com.agustin.tarati.shared.generated.resources.watch_game
+import com.agustin.tarati.shared.generated.resources.win
+import com.agustin.tarati.ui.components.carditem.GameCardItem
+import com.agustin.tarati.ui.components.game.CobColorIndicator
+import com.agustin.tarati.ui.components.topbar.TaratiTopBar
+import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
+import com.agustin.tarati.ui.layout.CompanionPanelHeader
+import com.agustin.tarati.ui.layout.DisplayMode
+import com.agustin.tarati.ui.theme.TaratiBackground
+import com.agustin.tarati.ui.theme.TaratiIcons
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
+
+/**
+ * Pantalla de lobby online.
+ *
+ * ## Tabs
+ *
+ * ### En Vivo
+ * Lista intercalada de partidas en curso y búsquedas abiertas, refrescada cada 5 s.
+ * Filtros (chips): "En Vivo" / "Buscando". Ordenamiento: Más recientes / Más antiguos / Rating.
+ * Botón 🔍 en la TopBar abre el [NewSearchSheet] para crear una búsqueda propia.
+ *
+ * ### Mis Partidas
+ * Historial paginado con filtros por time control, resultado y tipo.
+ *
+ * @param onBack          Navega hacia atrás. También usado para ir al GameScreen cuando la partida se forma.
+ * @param viewModel       ViewModel inyectado via Koin.
+ * @param connectionViewModel    Singleton de conexión inyectado via Koin.
+ * @param onlineGameViewModel    Singleton de juego online inyectado via Koin.
+ * @param authViewModel          ViewModel de autenticación inyectado via Koin.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OnlineLobbyScreen(
+    onBack: () -> Unit,
+    displayMode: DisplayMode = DisplayMode.FullScreen,
+    /**
+     * Llamado cuando se forma una partida propia. Por defecto usa [onBack].
+     * En [DisplayMode.CompanionPanel] se puede pasar un no-op para que el panel
+     * permanezca abierto — el tablero ya muestra la partida en el panel primario.
+     */
+    onMatchFound: (() -> Unit)? = null,
+    /** Callback al tocar "Ver" en una partida en vivo. Null = feature no disponible en este contexto. */
+    onSpectateGame: ((gameId: String) -> Unit)? = null,
+    onLeaderboard: (() -> Unit)? = null,
+    /** Callback al tocar una partida en el historial. Null = sin navegación al detalle. */
+    onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+    viewModel: IOnlineLobbyViewModel = koinViewModel<OnlineLobbyViewModel>(),
+    connectionViewModel: IConnectionViewModel = koinInject(),
+    onlineGameViewModel: IOnlineGameViewModel = koinInject(),
+    authViewModel: IAuthViewModel = koinInject(),
+) {
+    val connectionState by connectionViewModel.connectionState.collectAsState()
+    val matchmakingState by onlineGameViewModel.matchmakingState.collectAsState()
+    val currentGame by onlineGameViewModel.currentGame.collectAsState()
+    val hasActiveGame = currentGame?.status == OnlineGameStatus.InProgress
+    val scope = rememberCoroutineScope()
+    var selectedTab by remember { mutableIntStateOf(0) }
+    var showMatchmakingSheet by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    // True mientras el usuario inició una búsqueda desde este lobby (nueva o uniéndose a otra).
+    // Evita que el LaunchedEffect de MatchFound dispare si el estado viene de una partida anterior.
+    var searchStartedInLobby by remember { mutableStateOf(false) }
+
+    val connectToServerFirstMsg = localizedString(Res.string.connect_to_server_first)
+    val couldNotConnectMsg = localizedString(Res.string.could_not_connect)
+    val searchNoLongerAvailableMsg = localizedString(Res.string.search_no_longer_available)
+
+    /**
+     * Garantiza conexión WS activa antes de intentar matchmaking.
+     * Espera hasta 5 s si hay una conexión en progreso.
+     */
+    val ensureConnected: suspend () -> Result<Unit> = {
+        when {
+            connectionViewModel.isConnected -> Result.success(Unit)
+            connectionViewModel.isConnecting -> {
+                try {
+                    withTimeout(5_000L.milliseconds) {
+                        connectionViewModel.connectionState
+                            .first {
+                                it is ConnectionState.Online ||
+                                        it is ConnectionState.Error ||
+                                        it is ConnectionState.Offline
+                            }
+                    }
+                    if (connectionViewModel.isConnected) Result.success(Unit)
+                    else Result.failure(Exception(couldNotConnectMsg))
+                } catch (e: Exception) {
+                    Result.failure(Exception(couldNotConnectMsg))
+                }
+            }
+
+            else -> {
+                if (authViewModel.isTokenExpiringSoon()) authViewModel.refreshToken()
+                val token = authViewModel.getStoredToken()
+                if (token == null) Result.failure(Exception(connectToServerFirstMsg))
+                else connectionViewModel.connectToServer(devServerUrl, token).map { }
+            }
+        }
+    }
+
+    /**
+     * Navegar al GameScreen cuando la partida está formada.
+     * Unifica los dos caminos: nueva búsqueda propia y unirse a búsqueda ajena.
+     */
+    LaunchedEffect(matchmakingState) {
+        if (matchmakingState is MatchmakingState.MatchFound && searchStartedInLobby) {
+            searchStartedInLobby = false
+            (onMatchFound ?: onBack).invoke()
+        }
+    }
+
+    // Volver atrás si el lobby falla al cargar por primera vez (sin datos previos).
+    // Un error con lista vacía indica un problema de conexión o configuración que
+    // impide usar el lobby — no tiene sentido mostrar una pantalla vacía con error.
+    val liveGamesError by viewModel.liveGames.collectAsState()
+    LaunchedEffect(liveGamesError.error) {
+        if (liveGamesError.error != null && liveGamesError.games.isEmpty()) {
+            onBack()
+        }
+    }
+
+    /**
+     * Intento de unirse a una búsqueda existente.
+     *
+     * 1. Garantiza conexión WS.
+     * 2. Inicia matchmaking con el TC y rated del anfitrión.
+     * 3. Si tiene éxito → marca [searchStartedInLobby] y espera [MatchmakingState.MatchFound].
+     * 4. Si falla → muestra snackbar y refresca la lista (la búsqueda ya no existe).
+     */
+    val handleJoinExistingSearch: (String, Boolean) -> Unit = { tc, rated ->
+        scope.launch {
+            val connResult = ensureConnected()
+            if (connResult.isFailure) {
+                snackbarHostState.showSnackbar(
+                    message = connResult.exceptionOrNull()?.message ?: couldNotConnectMsg,
+                    duration = SnackbarDuration.Long,
+                )
+                return@launch
+            }
+            // Marcar ANTES del suspend: MatchFound puede llegar durante la espera de
+            // MatchmakingStarted, y el LaunchedEffect necesita la flag ya activa.
+            searchStartedInLobby = true
+            val matchResult = onlineGameViewModel.startMatchmaking(tc, rated)
+            if (matchResult.isFailure) {
+                searchStartedInLobby = false
+                snackbarHostState.showSnackbar(
+                    message = searchNoLongerAvailableMsg,
+                    duration = SnackbarDuration.Short,
+                )
+                viewModel.refreshOpenSearches()
+            }
+        }
+    }
+
+    TaratiBackground {
+        // Acciones compartidas entre TopBar (FullScreen) y CompanionPanelHeader (CompanionPanel).
+        val topBarActions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {
+            if (onLeaderboard != null) {
+                IconButton(onClick = onLeaderboard) {
+                    Icon(
+                        imageVector = TaratiIcons.Leaderboard,
+                        contentDescription = localizedString(Res.string.leaderboard),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            // Botón 🔍 — visible en el tab de lobby salvo partida online en curso.
+            if (selectedTab == 0 && !hasActiveGame) {
+                IconButton(onClick = { showMatchmakingSheet = true }) {
+                    Icon(
+                        imageVector = TaratiIcons.Search,
+                        contentDescription = localizedString(Res.string.new_search),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                when (displayMode) {
+                    DisplayMode.FullScreen -> TaratiTopBar(
+                        title = localizedString(Res.string.online_lobby),
+                        navigationType = TopBarNavigationType.Back,
+                        onNavigationClick = onBack,
+                        actions = topBarActions,
+                    )
+
+                    DisplayMode.CompanionPanel -> CompanionPanelHeader(
+                        title = localizedString(Res.string.online_lobby),
+                        onClose = onBack,
+                        actions = topBarActions,
+                    )
+                }
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            ) {
+                when (val state = connectionState) {
+                    is ConnectionState.Offline -> {
+                        CenteredMessage(text = localizedString(Res.string.not_connected_to_server))
+                        return@Scaffold
+                    }
+
+                    is ConnectionState.Connecting -> {
+                        CenteredLoader()
+                        return@Scaffold
+                    }
+
+                    is ConnectionState.Error -> {
+                        CenteredMessage(
+                            text = state.message,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        return@Scaffold
+                    }
+
+                    is ConnectionState.Reconnecting -> {
+                        CenteredLoader()
+                        return@Scaffold
+                    }
+
+                    is ConnectionState.Online -> Unit
+                }
+
+                PrimaryTabRow(selectedTabIndex = selectedTab) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = { LocalizedText(Res.string.in_live) },
+                        icon = {
+                            Icon(
+                                TaratiIcons.Public,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = { LocalizedText(Res.string.my_games) },
+                        icon = {
+                            Icon(
+                                TaratiIcons.MenuBook,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
+                    Tab(
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        text = { LocalizedText(Res.string.feed) },
+                        icon = {
+                            Icon(
+                                TaratiIcons.Group,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
+                }
+
+                when (selectedTab) {
+                    0 -> LobbyTab(
+                        viewModel = viewModel,
+                        onJoinSearch = handleJoinExistingSearch,
+                        matchmakingState = matchmakingState,
+                        currentUser = authViewModel.currentUser,
+                        onCancelMatchmaking = {
+                            scope.launch { onlineGameViewModel.cancelMatchmaking() }
+                            searchStartedInLobby = false
+                        },
+                        onSpectateGame = if (onSpectateGame != null) { gameId ->
+                            scope.launch { onlineGameViewModel.spectateGame(gameId) }
+                            onSpectateGame(gameId)
+                        } else null,
+                    )
+
+                    1 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                    2 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                }
+            }
+        }
+    }
+
+    // Modal de creación de búsqueda — inicia matchmaking en el lobby y muestra OwnSearchCard
+    if (showMatchmakingSheet) {
+        NewSearchSheet(
+            onStartSearch = { tc, rated, spectatingAllowed ->
+                showMatchmakingSheet = false
+                scope.launch {
+                    // Cancelar búsqueda previa si la hay, antes de iniciar la nueva.
+                    if (matchmakingState is MatchmakingState.Searching) {
+                        onlineGameViewModel.cancelMatchmaking()
+                        searchStartedInLobby = false
+                    }
+                    val connResult = ensureConnected()
+                    if (connResult.isFailure) {
+                        snackbarHostState.showSnackbar(
+                            message = connResult.exceptionOrNull()?.message ?: couldNotConnectMsg,
+                            duration = SnackbarDuration.Long,
+                        )
+                        return@launch
+                    }
+                    searchStartedInLobby = true
+                    val result = onlineGameViewModel.startMatchmaking(tc, rated, spectatingAllowed)
+                    if (result.isFailure) {
+                        searchStartedInLobby = false
+                        snackbarHostState.showSnackbar(
+                            message = couldNotConnectMsg,
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
+                }
+            },
+            onDismiss = { showMatchmakingSheet = false },
+        )
+    }
+}
+
+// ── Tab: Lobby (En Vivo + Búsquedas) ──────────────────────────────────────────
+
+private sealed class LobbyItem {
+    data class Game(val dto: LiveGameDto) : LobbyItem()
+    data class Search(val dto: OpenSearchDto) : LobbyItem()
+
+    /** Búsqueda propia del usuario en curso — se muestra sin botón Unirse y con botón Cancelar. */
+    data class OwnSearch(val ticket: MatchmakingTicket) : LobbyItem()
+}
+
+@Composable
+private fun LobbyTab(
+    viewModel: IOnlineLobbyViewModel,
+    onJoinSearch: (timeControl: String, rated: Boolean) -> Unit,
+    matchmakingState: MatchmakingState,
+    currentUser: UserInfo?,
+    onCancelMatchmaking: () -> Unit,
+    onSpectateGame: ((String) -> Unit)? = null,
+) {
+    val gamesState by viewModel.liveGames.collectAsState()
+    val searchesState by viewModel.openSearches.collectAsState()
+    val filters by viewModel.lobbyFilters.collectAsState()
+
+    DisposableEffect(Unit) {
+        viewModel.startLivePolling()
+        onDispose { viewModel.stopLivePolling() }
+    }
+
+    val ownTicket = (matchmakingState as? MatchmakingState.Searching)?.ticket
+
+    // Lista intercalada ordenada según filtros
+    val combinedItems = remember(gamesState.games, searchesState.searches, filters, ownTicket) {
+        buildList {
+            if (filters.showLiveGames) gamesState.games.forEach { add(LobbyItem.Game(it)) }
+            if (filters.showOpenSearches) {
+                searchesState.searches.forEach { add(LobbyItem.Search(it)) }
+                if (ownTicket != null) add(LobbyItem.OwnSearch(ownTicket))
+            }
+        }.sortedWith(
+            when (filters.sort) {
+                LobbySort.NEWEST -> compareByDescending {
+                    when (it) {
+                        is LobbyItem.Game -> it.dto.startedAtMs
+                        is LobbyItem.Search -> it.dto.waitingSinceMs
+                        is LobbyItem.OwnSearch -> it.ticket.joinedAt
+                    }
+                }
+
+                LobbySort.OLDEST -> compareBy {
+                    when (it) {
+                        is LobbyItem.Game -> it.dto.startedAtMs
+                        is LobbyItem.Search -> it.dto.waitingSinceMs
+                        is LobbyItem.OwnSearch -> it.ticket.joinedAt
+                    }
+                }
+
+                LobbySort.RATING_DESC -> compareByDescending {
+                    when (it) {
+                        is LobbyItem.Game -> maxOf(it.dto.whiteRating, it.dto.blackRating)
+                        is LobbyItem.Search -> it.dto.playerRating
+                        is LobbyItem.OwnSearch -> currentUser?.rating ?: 0
+                    }
+                }
+            }
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        LobbyFilterBar(filters = filters, viewModel = viewModel)
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                gamesState.isLoading && combinedItems.isEmpty() -> CenteredLoader()
+                combinedItems.isEmpty() -> CenteredMessage(
+                    text = localizedString(Res.string.there_are_no_games_in_progress),
+                )
+
+                else -> LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
+                    items(combinedItems, key = { item ->
+                        when (item) {
+                            is LobbyItem.Game -> "game_${item.dto.gameId}"
+                            // searchId ya es compuesto (userId:tc:rated), pero agregamos
+                            // el prefijo para evitar colisión si gameId y searchId coincidieran.
+                            is LobbyItem.Search -> "search_${item.dto.searchId}"
+                            is LobbyItem.OwnSearch -> "own_search"
+                        }
+                    }) { item ->
+                        when (item) {
+                            is LobbyItem.Game -> LiveGameCard(
+                                game = item.dto,
+                                onSpectate = if (item.dto.spectatingAllowed && onSpectateGame != null) {
+                                    { onSpectateGame(item.dto.gameId) }
+                                } else null,
+                            )
+
+                            is LobbyItem.Search -> OpenSearchCard(
+                                search = item.dto,
+                                onJoin = { onJoinSearch(item.dto.timeControl.type.key, item.dto.rated) },
+                            )
+
+                            is LobbyItem.OwnSearch -> OwnSearchCard(
+                                ticket = item.ticket,
+                                currentUser = currentUser,
+                                onCancel = onCancelMatchmaking,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ── Filter / sort bar ──────────────────────────────────────────────────────────
+
+@Composable
+private fun LobbyFilterBar(filters: LobbyFilters, viewModel: IOnlineLobbyViewModel) {
+    var showSortMenu by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FilterChip(
+            selected = filters.showLiveGames,
+            onClick = { viewModel.setShowLiveGames(!filters.showLiveGames) },
+            label = { LocalizedText(Res.string.filter_live_games) },
+            leadingIcon = { Icon(TaratiIcons.Timer, null, Modifier.size(14.dp)) },
+        )
+        FilterChip(
+            selected = filters.showOpenSearches,
+            onClick = { viewModel.setShowOpenSearches(!filters.showOpenSearches) },
+            label = { LocalizedText(Res.string.filter_open_searches) },
+            leadingIcon = { Icon(TaratiIcons.Search, null, Modifier.size(14.dp)) },
+        )
+        Spacer(Modifier.weight(1f))
+        Box {
+            IconButton(onClick = { showSortMenu = true }, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    TaratiIcons.Sort,
+                    contentDescription = localizedString(Res.string.sort),
+                    modifier = Modifier.size(18.dp),
+                    tint = if (filters.sort != LobbySort.NEWEST)
+                        MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
+                listOf(
+                    LobbySort.NEWEST to Res.string.sort_newest,
+                    LobbySort.OLDEST to Res.string.sort_oldest,
+                    LobbySort.RATING_DESC to Res.string.sort_rating,
+                ).forEach { (sort, stringRes) ->
+                    DropdownMenuItem(
+                        text = { LocalizedText(stringRes) },
+                        onClick = { viewModel.setLobbySort(sort); showSortMenu = false },
+                        leadingIcon = if (filters.sort == sort) ({
+                            Icon(TaratiIcons.Check, null, Modifier.size(16.dp))
+                        }) else null,
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ── Cards ──────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun LiveGameCard(game: LiveGameDto, onSpectate: (() -> Unit)? = null) {
+    val whiteTimeFmt = formatMs(game.whiteTimeMs)
+    val blackTimeFmt = formatMs(game.blackTimeMs)
+    val activeSide = cobColorByDescription(game.currentTurn)
+
+    // Parsear la notación de posición para renderizar una miniatura del tablero.
+    // Fallback al ícono Timer si la notación está vacía o es inválida.
+    val boardState = remember(game.positionNotation) {
+        if (game.positionNotation.isNotEmpty())
+            runCatching { parseBoardNotation(game.positionNotation) }.getOrNull()
+        else null
+    }
+
+    GameCardItem(
+        title = "${game.whiteUsername} (${game.whiteRating}) vs ${game.blackUsername} (${game.blackRating})",
+        subtitle = "${game.timeControl.toDisplayString()} · ${
+            if (game.rated) localizedString(Res.string.rated_info_card)
+            else localizedString(Res.string.casual_info_card)
+        }",
+        leadingContent = boardState?.let { state ->
+            { StaticBoardRenderer(modifier = Modifier.fillMaxSize(), gameState = state) }
+        },
+        leadingIcon = if (boardState == null) TaratiIcons.Timer else null,
+        badge = localizedString(Res.string.in_live),
+        badgeColor = MaterialTheme.colorScheme.error,
+        badgeTrailingContent = if (onSpectate != null) {
+            {
+                TextButton(
+                    onClick = onSpectate,
+                    contentPadding = PaddingValues(
+                        horizontal = 6.dp, vertical = 0.dp,
+                    ),
+                ) {
+                    Icon(
+                        TaratiIcons.Visibility,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                    )
+                    Spacer(Modifier.width(2.dp))
+                    LocalizedText(
+                        Res.string.watch_game,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+        } else null,
+        rows = listOf(
+            localizedString(Res.string.move) to "${game.moveCount}",
+        ),
+        customRows = {
+            LiveGameTurnRow(
+                activeSide = activeSide,
+                whiteTimeFmt = whiteTimeFmt,
+                blackTimeFmt = blackTimeFmt,
+            )
+        },
+    )
+}
+
+@Composable
+private fun LiveGameTurnRow(
+    activeSide: CobColor?,
+    whiteTimeFmt: String,
+    blackTimeFmt: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "${localizedString(Res.string.turn)}:",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            // Blancas
+            CobColorIndicator(
+                color = CobColor.WHITE,
+                size = if (activeSide == CobColor.WHITE) 14.dp else 10.dp,
+            )
+            Text(
+                text = whiteTimeFmt,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = if (activeSide == CobColor.WHITE) FontWeight.Bold else FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(4.dp))
+            // Negras
+            CobColorIndicator(
+                color = CobColor.BLACK,
+                size = if (activeSide == CobColor.BLACK) 14.dp else 10.dp,
+            )
+            Text(
+                text = blackTimeFmt,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = if (activeSide == CobColor.BLACK) FontWeight.Bold else FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/**
+ * Card de búsqueda abierta.
+ *
+ * Visualmente distinta de [LiveGameCard]: usa [MaterialTheme.colorScheme.tertiaryContainer]
+ * como fondo (vs. [surfaceVariant] de las partidas en vivo) y tiene un botón [Unirse].
+ *
+ * @param search   DTO de la búsqueda.
+ * @param onJoin   Callback al tocar [Unirse]. Null = botón deshabilitado (propia búsqueda).
+ */
+@Composable
+private fun OpenSearchCard(search: OpenSearchDto, onJoin: (() -> Unit)?) {
+    val waitingSecs = (Clock.System.now().toEpochMilliseconds() - search.waitingSinceMs) / 1000
+    val waitingFmt = when {
+        waitingSecs < 60 -> "${waitingSecs}s"
+        else -> "${waitingSecs / 60}m ${waitingSecs % 60}s"
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = TaratiIcons.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(24.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "${search.playerUsername} (${search.playerRating})",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+                Text(
+                    text = "${search.timeControl.toDisplayString()} · ${
+                        if (search.rated) localizedString(Res.string.rated_info_card)
+                        else localizedString(Res.string.casual_info_card)
+                    }",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
+                )
+                Text(
+                    text = localizedString(Res.string.waiting_time).replace($$"%1$s", waitingFmt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.6f),
+                )
+            }
+            if (onJoin != null) {
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = onJoin,
+                    modifier = Modifier.height(32.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                ) {
+                    LocalizedText(
+                        Res.string.join,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Card de la búsqueda propia del usuario.
+ *
+ * Visualmente distinta de [OpenSearchCard]: usa [MaterialTheme.colorScheme.primaryContainer]
+ * como fondo y tiene un botón [Cancelar] en lugar de [Unirse].
+ *
+ * @param ticket     Ticket de matchmaking activo.
+ * @param currentUser Información del usuario autenticado (nombre y rating).
+ * @param onCancel   Callback al tocar [Cancelar].
+ */
+@Composable
+private fun OwnSearchCard(
+    ticket: MatchmakingTicket,
+    currentUser: UserInfo?,
+    onCancel: () -> Unit,
+) {
+    val waitingSecs = (Clock.System.now().toEpochMilliseconds() - ticket.joinedAt) / 1000
+    val waitingFmt = when {
+        waitingSecs < 60 -> "${waitingSecs}s"
+        else -> "${waitingSecs / 60}m ${waitingSecs % 60}s"
+    }
+
+    val tcDisplay = remember(ticket.timeControl) {
+        runCatching {
+            val tc = TimeControl.fromKey(ticket.timeControl)
+            val (initial, increment) = tc.timeControl()
+            GameTimeControl(type = tc, initialTime = initial, increment = increment).toDisplayString()
+        }.getOrElse { ticket.timeControl }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.5.dp,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "${currentUser?.displayName ?: "–"} (${currentUser?.rating ?: "–"})",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Text(
+                    text = "$tcDisplay · ${
+                        if (ticket.rated) localizedString(Res.string.rated_info_card)
+                        else localizedString(Res.string.casual_info_card)
+                    }",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                )
+                Text(
+                    text = localizedString(Res.string.waiting_time).replace($$"%1$s", waitingFmt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Button(
+                onClick = onCancel,
+                modifier = Modifier.height(32.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+            ) {
+                LocalizedText(
+                    Res.string.cancel,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    }
+}
+
+// ── Modal de nueva búsqueda ────────────────────────────────────────────────────
+
+/**
+ * Dialog simplificado para crear una nueva búsqueda desde el lobby.
+ * Persiste las preferencias de time control y rated/casual en [SettingsRepository],
+ * compartiendo el mismo almacenamiento que el modal de GameScreen.
+ */
+@Composable
+private fun NewSearchSheet(
+    onStartSearch: (timeControl: String, rated: Boolean, spectatingAllowed: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+    settings: SettingsRepository = koinInject(),
+) {
+    val scope = rememberCoroutineScope()
+    val timeControls = TimeControl.list()
+
+    val savedTc by settings.onlineTimeControl.collectAsState(TimeControl.BLITZ.key)
+    val savedRated by settings.onlineRated.collectAsState(true)
+    val savedSpectatingAllowed by settings.onlineSpectatingAllowed.collectAsState(true)
+
+    var selectedTc by remember(savedTc) { mutableStateOf(savedTc) }
+    var isRated by remember(savedRated) { mutableStateOf(savedRated) }
+    var spectatingAllowed by remember(savedSpectatingAllowed) { mutableStateOf(savedSpectatingAllowed) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { LocalizedText(Res.string.new_search, style = MaterialTheme.typography.titleMedium) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Time control chips
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(timeControls) { tc ->
+                        FilterChip(
+                            selected = selectedTc == tc,
+                            onClick = {
+                                selectedTc = tc
+                                scope.launch { settings.setOnlineTimeControl(tc) }
+                            },
+                            label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                        )
+                    }
+                }
+                // Rated / casual row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    LocalizedText(
+                        Res.string.rated,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Switch(
+                        checked = isRated,
+                        onCheckedChange = {
+                            isRated = it
+                            scope.launch { settings.setOnlineRated(it) }
+                        },
+                    )
+                }
+                // Allow spectators row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    LocalizedText(
+                        Res.string.allow_spectators,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Switch(
+                        checked = spectatingAllowed,
+                        onCheckedChange = {
+                            spectatingAllowed = it
+                            scope.launch { settings.setOnlineSpectatingAllowed(it) }
+                        },
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onStartSearch(selectedTc, isRated, spectatingAllowed) }) {
+                LocalizedText(Res.string.new_search)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                LocalizedText(Res.string.cancel)
+            }
+        },
+    )
+}
+
+@Composable
+private fun GameHistoryTab(
+    viewModel: IOnlineLobbyViewModel,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+) {
+    val state by viewModel.history.collectAsState()
+    val listState = rememberLazyListState()
+
+    // Cargar al entrar en el tab (solo si no hay datos ya).
+    LaunchedEffect(Unit) {
+        if (state.games.isEmpty() && !state.isLoading) {
+            viewModel.loadHistory()
+        }
+    }
+
+    // Paginación automática: cuando faltan 3 ítems para el final, cargar más.
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = listState.layoutInfo.totalItemsCount
+            total > 0 && lastVisible >= total - 3
+        }
+    }
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) viewModel.loadMoreHistory()
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // ── Filtros ────────────────────────────────────────────────────────────
+        HistoryFilterRow(state = state, viewModel = viewModel)
+
+        // ── Contenido ─────────────────────────────────────────────────────────
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                state.isLoading -> CenteredLoader()
+
+                state.error != null -> CenteredMessage(
+                    text = localizedString(Res.string.error)
+                        .replace($$"%1$s", state.error.orEmpty()),
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+                state.games.isEmpty() -> CenteredMessage(
+                    text = localizedString(Res.string.no_games_found),
+                )
+
+                else -> LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                ) {
+                    itemsIndexed(state.games, key = { _, g -> g.gameId }) { _, game ->
+                        HistoryGameCard(
+                            game = game,
+                            onClick = onNavigateToGameDetails?.let { cb -> { cb(game.gameId) } },
+                        )
+                    }
+                    if (state.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryFilterRow(
+    state: GameHistoryUiState,
+    viewModel: IOnlineLobbyViewModel,
+) {
+    val filters = state.filters
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // Time control chips
+        item {
+            TimeControl.list().forEach { tc ->
+                FilterChip(
+                    selected = filters.timeControl == tc,
+                    onClick = { viewModel.setTimeControlFilter(if (filters.timeControl == tc) null else tc) },
+                    label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                )
+            }
+        }
+
+        // Result chips
+        item {
+            listOf(
+                "win" to localizedString(Res.string.win),
+                "loss" to localizedString(Res.string.loss),
+                "draw" to localizedString(Res.string.draw)
+            ).forEach { (key, label) ->
+                FilterChip(
+                    selected = filters.result == key,
+                    onClick = { viewModel.setResultFilter(if (filters.result == key) null else key) },
+                    label = { Text(label) },
+                )
+            }
+        }
+
+        // Rated chip
+        item {
+            FilterChip(
+                selected = filters.rated == true,
+                onClick = { viewModel.setRatedFilter(if (filters.rated == true) null else true) },
+                label = { LocalizedText(Res.string.rated) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun HistoryGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null) {
+    val myColor = cobColorByDescription(game.myColor) ?: CobColor.WHITE
+    val (resultText, resultColor) = when (game.result) {
+        "win" -> localizedString(Res.string.win) to Color(0xFF4CAF50)
+        "loss" -> localizedString(Res.string.loss) to MaterialTheme.colorScheme.error
+        else -> localizedString(Res.string.draw) to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    val ratingChangeFmt = when {
+        game.ratingChange > 0 -> "+${game.ratingChange}"
+        else -> "${game.ratingChange}"
+    }
+
+    val ratingChangeColor = when {
+        game.ratingChange > 0 -> Color(0xFF4CAF50)
+        game.ratingChange < 0 -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    val dateFmt = remember(game.endedAtMs) {
+        // 1. Obtener el LocalDate en la zona horaria del sistema
+        val localDate = Instant.fromEpochMilliseconds(game.endedAtMs)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+
+        // 2. Aplicar un formato personalizado con el DSL
+        val customFormat = LocalDate.Format {
+            this@Format.day(padding = Padding.ZERO)
+            char('/')
+            monthNumber()
+            char('/')
+            year()
+        }
+
+        // 3. Obtener la fecha formateada como String
+        localDate.format(customFormat)
+    }
+
+    GameCardItem(
+        title = "vs ${game.opponentUsername} (${game.opponentRating})",
+        subtitle = "${game.timeControl.toDisplayString()} · ${
+            if (game.rated) localizedString(Res.string.rated_info_card)
+            else localizedString(Res.string.casual_info_card)
+        } · $dateFmt",
+        leadingContent = { CobColorIndicator(myColor, size = 28.dp) },
+        badge = "$resultText  $ratingChangeFmt",
+        badgeColor = ratingChangeColor,
+        rows = listOf(
+            localizedString(Res.string.result) to resultText,
+            localizedString(Res.string.moves) to "${game.moveCount}",
+            localizedString(Res.string.rating) to "${game.ratingAfter} ($ratingChangeFmt)",
+        ),
+        onClick = onClick,
+    )
+}
+
+// ── Tab: Feed de seguidos ──────────────────────────────────────────────────────
+
+@Composable
+private fun FeedTab(
+    viewModel: IOnlineLobbyViewModel,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+) {
+    val state by viewModel.feedState.collectAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        if (state.games.isEmpty() && !state.isLoading) viewModel.loadFeed()
+    }
+
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = listState.layoutInfo.totalItemsCount
+            total > 0 && lastVisible >= total - 3
+        }
+    }
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) viewModel.loadMoreFeed()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            state.isLoading -> CenteredLoader()
+            state.error != null -> CenteredMessage(
+                text = localizedString(Res.string.error).replace($$"%1$s", state.error.orEmpty()),
+                color = MaterialTheme.colorScheme.error,
+            )
+
+            state.games.isEmpty() -> CenteredMessage(
+                text = localizedString(Res.string.no_feed_games),
+            )
+
+            else -> LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(vertical = 8.dp),
+            ) {
+                itemsIndexed(state.games, key = { _, g -> g.gameId }) { _, game ->
+                    FeedGameCard(
+                        game = game,
+                        onClick = onNavigateToGameDetails?.let { cb -> { cb(game.gameId) } },
+                    )
+                }
+                if (state.isLoadingMore) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeedGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null) {
+    val (resultText, resultColor) = when (game.result) {
+        "win" -> localizedString(Res.string.win) to Color(0xFF4CAF50)
+        "loss" -> localizedString(Res.string.loss) to MaterialTheme.colorScheme.error
+        else -> localizedString(Res.string.draw) to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val ratingChangeFmt = if (game.ratingChange > 0) "+${game.ratingChange}" else "${game.ratingChange}"
+    val ratingChangeColor = when {
+        game.ratingChange > 0 -> Color(0xFF4CAF50)
+        game.ratingChange < 0 -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val dateFmt = remember(game.endedAtMs) {
+        val localDate = Instant.fromEpochMilliseconds(game.endedAtMs)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        localDate.format(LocalDate.Format {
+            day(Padding.ZERO)
+            char('/')
+            monthNumber()
+            char('/')
+            year()
+        })
+    }
+    val feedColor = cobColorByDescription(game.myColor) ?: CobColor.WHITE
+    val playerLabel = game.playerUsername ?: "?"
+
+    GameCardItem(
+        title = localizedString(Res.string.feed_player_context).replace($$"%1$s", playerLabel) +
+                " vs ${game.opponentUsername} (${game.opponentRating})",
+        subtitle = "${game.timeControl.toDisplayString()} · ${
+            if (game.rated) localizedString(Res.string.rated_info_card)
+            else localizedString(Res.string.casual_info_card)
+        } · $dateFmt",
+        leadingContent = { CobColorIndicator(feedColor, size = 28.dp) },
+        badge = "$resultText  $ratingChangeFmt",
+        badgeColor = ratingChangeColor,
+        rows = listOf(
+            localizedString(Res.string.result) to resultText,
+            localizedString(Res.string.moves) to "${game.moveCount}",
+            localizedString(Res.string.rating) to "${game.ratingAfter} ($ratingChangeFmt)",
+        ),
+        onClick = onClick,
+    )
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun CenteredLoader() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun CenteredMessage(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = text, color = color, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+private fun formatMs(ms: Long): String {
+    val totalSec = ms / 1000
+    val min = totalSec / 60
+    val sec = totalSec % 60
+    return "$min:${sec.toString().padStart(2, '0')}"
+}

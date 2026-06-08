@@ -51,7 +51,6 @@ import com.agustin.tarati.shared.generated.resources.special_event_palette_unloc
 import com.agustin.tarati.shared.generated.resources.special_event_understood
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -87,7 +86,7 @@ fun SpecialEventOverlay(
     // Refrescar al entrar en composición: cubre el caso donde la fecha cambió
     // sin reiniciar la app (ej. unlock del día anterior dejó activeEvents vacío).
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) { manager.refreshIfNeeded() }
+        withContext(Dispatchers.Default) { manager.refreshIfNeeded() }
     }
 
     Column(
@@ -105,7 +104,7 @@ fun SpecialEventOverlay(
                 // el hilo principal y devolvía true de sesiones anteriores.
                 var isSeen by remember(event.id) { mutableStateOf(false) }
                 LaunchedEffect(event.id) {
-                    isSeen = withContext(Dispatchers.IO) { manager.isGiftSeen(event) }
+                    isSeen = withContext(Dispatchers.Default) { manager.isGiftSeen(event) }
                 }
 
                 val isExpanded = expandedEventId == event.id
@@ -114,7 +113,7 @@ fun SpecialEventOverlay(
                     isPulsing = !isSeen,
                     onClick = {
                         if (!isSeen) {
-                            scope.launch(Dispatchers.IO) { manager.markGiftSeen(event) }
+                            scope.launch(Dispatchers.Default) { manager.markGiftSeen(event) }
                             isSeen = true
                         }
                         expandedEventId = if (isExpanded) null else event.id

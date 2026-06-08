@@ -22,6 +22,26 @@ fun CobColor.getName(): Char =
         else -> 'b'
     }
 
+val CobColor.description: String
+    get() = when (this) {
+        WHITE -> "white"
+        BLACK -> "black"
+    }
+
+fun cobColorByDescription(description: String): CobColor? =
+    when (description.lowercase()) {
+        "white" -> WHITE
+        "black" -> BLACK
+        else -> null
+    }
+
+fun cobColorByName(name: Char): CobColor? =
+    when (name) {
+        'w' -> WHITE
+        'b' -> BLACK
+        else -> null
+    }
+
 fun CobColor.isMaximizingPlayer(): Boolean = this == WHITE
 
 /**

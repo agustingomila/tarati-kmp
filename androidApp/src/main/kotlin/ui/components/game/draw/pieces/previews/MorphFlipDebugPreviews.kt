@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,7 +70,7 @@ private fun DebugValueLabel(text: String) {
         fontSize = 8.sp,
         color = Color(0xFF6366F1),
         textAlign = TextAlign.Center,
-        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+        fontFamily = FontFamily.Monospace,
         modifier = Modifier.fillMaxWidth(),
     )
 }

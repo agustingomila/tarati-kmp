@@ -45,7 +45,7 @@ internal class LegacyMinimaxStrategy(
     private var cutoffs = 0
     private val timeLimitMs = 10_000L
 
-    override fun getNextMove(
+    override suspend fun getNextMove(
         gameState: GameState,
         difficulty: Difficulty,
     ): MoveEval {

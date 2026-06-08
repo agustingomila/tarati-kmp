@@ -5,7 +5,7 @@ import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameS
 
 data class MatchState(
     val gameState: GameState,
-    val gameResult: GameResult,
+    val gameEndReason: GameEndReason,
     val winner: CobColor?,
     val moveHistory: Map<String, Int>,
 ) {
@@ -13,7 +13,7 @@ data class MatchState(
         fun createInitialMatchState(): MatchState =
             MatchState(
                 gameState = initialGameState(),
-                gameResult = GameResult.UNDETERMINED,
+                gameEndReason = GameEndReason.UNDETERMINED,
                 winner = null,
                 moveHistory = mapOf(),
             )

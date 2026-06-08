@@ -27,11 +27,12 @@ import com.agustin.tarati.core.domain.game.board.GameBoard.D3
 import com.agustin.tarati.core.domain.game.board.GameBoard.D4
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
 import com.agustin.tarati.core.domain.game.play.Move
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -225,7 +226,7 @@ class ForcedPromotionTurnTest {
     fun aiEngine_selectsForcedPromotion_whenItIsTheOnlyLegalMove() {
         val prePromotion = parseBoardNotation("A1b/B1b/B2b/B3w/B4b/C6b/C7b/D1B w")
 
-        val result = engine.getNextMove(prePromotion)
+        val result = runBlocking { engine.getNextMove(prePromotion) }
 
         assertNotNull("AI must return a non-null move", result.move)
         assertEquals(
@@ -375,7 +376,7 @@ class ForcedPromotionTurnTest {
         // Post-promotion: White has only a Rok at B3 (B3W), Black has 5 Cobs + 1 Rok.
         val postPromotion = parseBoardNotation("A1b/B1b/B2b/B3W/B4b/C6b/C7b/D1B w")
 
-        val result = engine.getNextMove(postPromotion)
+        val result = runBlocking { engine.getNextMove(postPromotion) }
 
         assertNotNull(
             "AI must return a non-null move from the post-promotion position",
@@ -425,7 +426,7 @@ class ForcedPromotionTurnTest {
             legalMoves,
         )
 
-        val result = engine.getNextMove(postPromotion)
+        val result = runBlocking { engine.getNextMove(postPromotion) }
 
         assertNotNull(
             "AI must return a non-null move from the D1 post-promotion position",
@@ -574,7 +575,7 @@ class ForcedPromotionTurnTest {
     fun aiEngine_continuesPlayingFromC10Rok_regressionTest() {
         val postPromotion = parseBoardNotation("B1B/B5b/B6b/C4b/C5b/C6b/C8b/C10W w")
 
-        val result = engine.getNextMove(postPromotion)
+        val result = runBlocking { engine.getNextMove(postPromotion) }
 
         assertNotNull(
             "AI must return a non-null move from the C10 post-promotion position",
@@ -673,8 +674,8 @@ class ForcedPromotionTurnTest {
         val matchState = state.getMatchState()
         assertEquals(
             "Black must win (MIT) after flipping White's last Rok",
-            GameResult.MIT,
-            matchState.gameResult,
+            GameEndReason.MIT,
+            matchState.gameEndReason,
         )
         assertEquals("Winner must be Black", BLACK, matchState.winner)
     }

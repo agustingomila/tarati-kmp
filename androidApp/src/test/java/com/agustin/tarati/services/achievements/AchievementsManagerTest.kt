@@ -12,7 +12,7 @@ import com.agustin.tarati.core.domain.game.board.GameBoard.C7
 import com.agustin.tarati.core.domain.game.board.GameBoard.D3
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.domain.game.play.Move
@@ -147,7 +147,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWins_unlocksFirstVictory() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -161,7 +161,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanLoses_doesNotUnlockFirstVictory() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = BLACK,
             moveHistory = emptyMap(),
         )
@@ -175,7 +175,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsByMit_unlocksMit() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -189,7 +189,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsByStalemit_unlocksStalemit() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.STALEMIT,
+            gameEndReason = GameEndReason.STALEMIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -203,7 +203,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsByTriple_unlocksEternalLoop() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.TRIPLE,
+            gameEndReason = GameEndReason.TRIPLE,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -217,7 +217,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnChampion_unlocksChampion() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -231,7 +231,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnNonChampion_doesNotUnlockChampion() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -245,7 +245,7 @@ class AchievementsManagerTest {
     fun onGameOver_draw_doesNotUnlockVictoryAchievements() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.FIFTY_MOVES,
+            gameEndReason = GameEndReason.FIFTY_MOVES,
             winner = null,
             moveHistory = emptyMap(),
         )
@@ -260,7 +260,7 @@ class AchievementsManagerTest {
     fun onGameOver_fiftyMoveDraw_unlocksFiftyMoveRule() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.FIFTY_MOVES,
+            gameEndReason = GameEndReason.FIFTY_MOVES,
             winner = null,
             moveHistory = emptyMap(),
         )
@@ -274,7 +274,7 @@ class AchievementsManagerTest {
     fun onGameOver_doesNotUnlockPlay10GamesBeforeReaching10() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = BLACK,
             moveHistory = emptyMap(),
         )
@@ -291,7 +291,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnEasy_unlocksApprentice() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -305,7 +305,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnMedium_unlocksStrategist() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -319,7 +319,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnHard_unlocksTactician() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -333,7 +333,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnEasy_doesNotUnlockStrategistOrTactician() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -348,7 +348,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanWinsOnMedium_doesNotUnlockApprenticeOrTactician() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = WHITE,
             moveHistory = emptyMap(),
         )
@@ -363,7 +363,7 @@ class AchievementsManagerTest {
     fun onGameOver_humanLoses_doesNotUnlockDifficultyAchievements() = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
-            gameResult = GameResult.MIT,
+            gameEndReason = GameEndReason.MIT,
             winner = BLACK,
             moveHistory = emptyMap(),
         )

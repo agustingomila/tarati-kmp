@@ -14,6 +14,7 @@ import com.agustin.tarati.core.domain.game.pieces.opponent
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.createGameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.Move
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -279,7 +280,7 @@ class TripleRepetitionTest {
         engine.putState(gameState, BLACK)
 
         // La IA blanca debería evitar movimientos que lleven a esta posición
-        val result = engine.getNextMove(gameState, Difficulty.DEFAULT)
+        val result = runBlocking { engine.getNextMove(gameState, Difficulty.DEFAULT) }
 
         assertNotNull("AI should find a move", result.move)
 
@@ -354,7 +355,7 @@ class TripleRepetitionTest {
 
         // Jugar hasta detectar triple repetición o llegar al límite
         while (moves < maxMoves && !gameState.isGameOver(engine.positionHistory)) {
-            val result = engine.getNextMove(gameState, Difficulty.MIN)
+            val result = runBlocking { engine.getNextMove(gameState, Difficulty.MIN) }
 
             if (result.move == null) break
 

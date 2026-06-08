@@ -1,29 +1,20 @@
 package com.agustin.tarati.features.game
 
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,8 +34,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
@@ -58,15 +47,18 @@ import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import com.agustin.tarati.core.domain.tutorial.TutorialState
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
+import com.agustin.tarati.features.online.connection.ConnectionState
+import com.agustin.tarati.features.online.game.SpectatingState
+import com.agustin.tarati.features.online.ui.OnlineSearchBar
+import com.agustin.tarati.features.online.ui.SpectatingPill
 import com.agustin.tarati.features.seasonal.ISpecialEventManager
 import com.agustin.tarati.features.seasonal.SpecialEventOverlay
 import com.agustin.tarati.features.settings.BoardVisualState
+import com.agustin.tarati.network.models.MatchmakingState
 import com.agustin.tarati.services.clock.ClockViewModel
 import com.agustin.tarati.services.clock.IClockService
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
-import com.agustin.tarati.shared.generated.resources.a_board_game_by_george_spencer_brown
-import com.agustin.tarati.shared.generated.resources.copy_position
 import com.agustin.tarati.shared.generated.resources.tarati
 import com.agustin.tarati.ui.components.bottombar.BottomGameBar
 import com.agustin.tarati.ui.components.editor.DistributionState
@@ -86,22 +78,24 @@ import com.agustin.tarati.ui.components.game.behaviors.BoardSelectionViewModel
 import com.agustin.tarati.ui.components.game.behaviors.IBoardSelectionViewModel
 import com.agustin.tarati.ui.components.game.behaviors.TapEvents
 import com.agustin.tarati.ui.components.game.draw.board.BoardRenderData
+import com.agustin.tarati.ui.components.game.draw.board.BoardRenderEvents
 import com.agustin.tarati.ui.components.game.highlights.HighlightAnimation
 import com.agustin.tarati.ui.components.game.highlights.createSelectionCaptureHighlights
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
+import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.components.turnIndicator.FiftyMoveClaimBadge
 import com.agustin.tarati.ui.components.turnIndicator.IndicatorEvents
-import com.agustin.tarati.ui.components.turnIndicator.TurnIndicator
+import com.agustin.tarati.ui.components.turnIndicator.NotationTurnControl
 import com.agustin.tarati.ui.components.turnIndicator.TurnIndicatorState
 import com.agustin.tarati.ui.components.tutorial.ITutorialViewModel
 import com.agustin.tarati.ui.components.tutorial.TutorialEvents
 import com.agustin.tarati.ui.components.tutorial.TutorialOverlay
 import com.agustin.tarati.ui.components.tutorial.TutorialViewModel
-import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.layout.LocalScreenLayout
+import com.agustin.tarati.ui.layout.ScreenLayout
 import com.agustin.tarati.ui.theme.TaratiLogo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.milliseconds
@@ -126,15 +120,16 @@ fun GameEffects(
         }
     }
 
-    // Automatic orientation: only runs when the screen rotates or the manual flag
-    // is cleared (e.g. new game). Intentionally does NOT react to whiteIsAI/blackIsAI
-    // changes — toggling Human/AI mid-game must not rotate the board.
-    LaunchedEffect(isLandscape, isManuallyRotated) {
+    // Automatic orientation: only runs when the screen rotates or the assigned player
+    // side changes (online game). Intentionally does NOT react to whiteIsAI/blackIsAI
+    // changes — toggling Human/AI mid-game must not rotate the board. isManuallyRotated
+    // is intentionally NOT reset on new game — the Sidebar orientation choice persists.
+    LaunchedEffect(isLandscape, isManuallyRotated, aiThinkingDependencies.orientationSide) {
         if (!isManuallyRotated) {
-            val orientationSide = when {
+            val orientationSide = aiThinkingDependencies.orientationSide ?: when {
                 !aiThinkingDependencies.whiteIsAI -> CobColor.WHITE
                 !aiThinkingDependencies.blackIsAI -> CobColor.BLACK
-                else -> CobColor.WHITE  // AI vs AI — default to WHITE perspective
+                else -> CobColor.WHITE
             }
             onBoardOrientationChanged(toBoardOrientation(isLandscape, orientationSide))
         }
@@ -158,6 +153,13 @@ fun GameEffects(
         // requesting a move calculation — this is how per-side difficulty works
         // in AI vs AI: each time the turn changes the engine is reconfigured.
         aiEngine.setConfig(aiThinkingDependencies.currentTurnConfig)
+
+        // WASM: give the animation system time to render the previous move before
+        // the AI search occupies the main thread. AiThinkingDependencies does not
+        // include isAIThinking, so this delay is not cancelled by the mid-think
+        // state changes. On Android/Desktop AI_MOVE_DELAY_MS = 0 (background thread).
+        if (AI_MOVE_DELAY_MS > 0L) delay(AI_MOVE_DELAY_MS.milliseconds)
+
         onAITurn(gameState)
     }
 
@@ -179,9 +181,9 @@ fun GameEffects(
  *       ├── topBar : TaratiTopBar
  *       └── content
  *             └── Box (fillMaxSize)
- *                   ├── Column                  ← board + notation label
- *                   │     ├── PositionNotationLabel
+ *                   ├── Column                  ← board
  *                   │     └── CreateBoard (weight=1f)
+ *                   ├── NotationTurnControl     ← overlay TopEnd: notación + indicador
  *                   └── BottomGameBar           ← overlay, último hijo del Box
  *                         (sin edición, sin tutorial)
  * ```
@@ -198,6 +200,8 @@ fun GameEffects(
  * @param onRedo          Lambda que ejecuta redo sincronizando el historial del engine.
  * @param onMoveToCurrent Lambda que salta al último movimiento de la partida.
  * @param onMoveToIndex   Lambda invocada al hacer clic en un movimiento de la lista del FAB.
+ * @param showNotation      Si false, el panel de notación y su chevron no se renderizan.
+ * @param showTurnIndicator Si false, el círculo indicador de turno no se renderiza.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -236,12 +240,21 @@ fun MainContent(
     selectViewModel: IBoardSelectionViewModel = koinViewModel<BoardSelectionViewModel>(),
     tutorialViewModel: ITutorialViewModel = koinViewModel<TutorialViewModel>(),
     specialEventManager: ISpecialEventManager = koinInject(),
+    /** Compact online indicator rendered to the left of the FAB. */
+    onlineContent: (@Composable () -> Unit)? = null,
+    /** Null while a game is in progress — hides the search bar. */
+    connectionState: ConnectionState? = null,
+    matchmakingState: MatchmakingState = MatchmakingState.Idle,
+    onCreateSearch: () -> Unit = {},
+    onCancelSearch: () -> Unit = {},
+    spectatingState: SpectatingState? = null,
+    onStopSpectating: () -> Unit = {},
+    showNotation: Boolean = true,
+    showTurnIndicator: Boolean = true,
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    // Estado del texto superior con la notación de la partida
-    var showGameState by rememberSaveable { mutableStateOf(true) }
     // Landscape: track history panel open to animate board shift
     var isHistoryPanelOpen by remember { mutableStateOf(false) }
     // Portrait: track FAB and history panel for inertial tilt
@@ -393,6 +406,16 @@ fun MainContent(
             }
     }
 
+    // toPositionNotation() se ejecuta en un LaunchedEffect (async) para no bloquear
+    // los composition passes durante partidas de IA vs IA con movimientos rápidos.
+    // Cuando gameState cambia N veces entre frames, solo el último LaunchedEffect
+    // completa (los anteriores se cancelan), reduciendo el cómputo a una llamada
+    // por frame en lugar de una por movimiento.
+    var positionNotation by remember { mutableStateOf(gameState.toPositionNotation()) }
+    LaunchedEffect(gameState) {
+        positionNotation = gameState.toPositionNotation()
+    }
+
     val boardRenderData = BoardRenderData(
         gameState = gameState,
         selectedVertex = selectedVertex,
@@ -415,19 +438,43 @@ fun MainContent(
             TaratiTopBar(
                 drawerState = drawerState,
                 title = localizedString(Res.string.tarati),
+                navigationType = if (LocalScreenLayout.current == ScreenLayout.Expanded)
+                    TopBarNavigationType.None
+                else
+                    TopBarNavigationType.Menu,
                 isEditing = isEditing,
+                actions = {
+                    // Pill espectador — visible cuando se está observando una partida
+                    if (spectatingState != null) {
+                        SpectatingPill(
+                            state = spectatingState,
+                            onStop = onStopSpectating,
+                        )
+                    }
+                    // Search bar — oculta durante partida propia activa
+                    val state = connectionState
+                    if (state != null) {
+                        OnlineSearchBar(
+                            connectionState = state,
+                            matchmakingState = matchmakingState,
+                            onCreateSearch = onCreateSearch,
+                            onCancelSearch = onCancelSearch,
+                        )
+                    }
+                },
             )
         },
+        bottomBar = {},
     ) { innerPadding ->
 
-        // ── Box principal: tablero + overlay flotante ─────────────────────────
+        // ── Box principal: tablero + overlay flotante ────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             contentAlignment = Alignment.Center,
         ) {
-            // ── Contenido del tablero (no se ve afectado por BottomGameBar) ───
+            // ── Contenido del tablero ────────────────────────────────────────────
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -435,16 +482,6 @@ fun MainContent(
                     .padding(16.dp)
                     .padding(end = boardEndPadding),
             ) {
-                PositionNotationLabel(
-                    isLandscape = isLandscape,
-                    isEditing = isEditing,
-                    gameState = gameState,
-                    moveIndex = moveIndex,
-                    showGameState = showGameState,
-                    onShowGameState = { showGameState = it },
-                    onCopyPositionToClipboard = onCopyPositionToClipboard,
-                )
-
                 CreateBoard(
                     modifier = Modifier
                         .weight(1f)
@@ -472,7 +509,11 @@ fun MainContent(
                     tapEvents = remember(selectViewModel, boardEvents) {
                         createTapEvents(selectViewModel, boardEvents)
                     },
-                    boardRenderEvents = createBoardRenderEvents(selectViewModel, animationViewModel, geometryViewModel),
+                    boardRenderEvents = createBoardRenderEvents(
+                        selectViewModel,
+                        animationViewModel,
+                        geometryViewModel
+                    ),
                     boardVisualState = boardVisualState,
                     tutorial = {
                         if (isTutorialActive) {
@@ -530,13 +571,9 @@ fun MainContent(
                 )
             }
 
-            // ── BottomGameBar: overlay flotante sobre el tablero ──────────────
-            // Se muestra en cualquier orientación, fuera de modo edición y tutorial.
-            // Al ser el último hijo de este Box, se renderiza sobre el tablero
-            // sin afectar su tamaño ni su layout.
-            // ── TurnIndicator: fixed overlay ─ not affected by board translation ────
-            // Extracted from CreateBoard so it stays anchored to TopEnd of the
-            // screen even when the board shifts left in landscape + history open.
+            // ── NotationTurnControl + FiftyMoveClaimBadge: overlays TopEnd ──────
+            // Se muestran fuera de modo edición y tutorial. Al ser hijos de este Box,
+            // se renderizan sobre el tablero sin afectar su tamaño ni layout.
             if (!isEditing && !isTutorialActive) {
                 Column(
                     modifier = Modifier
@@ -548,20 +585,30 @@ fun MainContent(
                     if (canClaimDraw) {
                         FiftyMoveClaimBadge(onClick = onClaimFiftyMoveDraw)
                     }
-                    TurnIndicator(
+                    NotationTurnControl(
+                        isLandscape = isLandscape,
+                        positionNotation = positionNotation,
+                        moveIndex = moveIndex,
                         currentTurn = gameState.currentTurn,
-                        state = turnState,
+                        turnState = turnState,
                         logoVisible = transitionDone,
-                        onCirclePositioned = { centre ->
-                            indicatorCentreWindow = centre
-                        },
                         indicatorEvents = object : IndicatorEvents {
                             override fun onTouch() = onTouchIndicator()
+                        },
+                        onCopyPositionToClipboard = onCopyPositionToClipboard,
+                        showNotation = showNotation,
+                        showTurnIndicator = showTurnIndicator,
+                        onCirclePositioned = { centre ->
+                            indicatorCentreWindow = centre
                         },
                     )
                 }
             }
 
+            // ── BottomGameBar: overlay flotante sobre el tablero ──────────────
+            // Se muestra en cualquier orientación, fuera de modo edición y tutorial.
+            // Al ser el último hijo de este Box, se renderiza sobre el tablero
+            // sin afectar su tamaño ni su layout.
             if (!isEditing && !isTutorialActive) {
                 BottomGameBar(
                     history = history,
@@ -574,6 +621,7 @@ fun MainContent(
                     isLandscape = isLandscape,
                     onHistoryOpenChange = { isHistoryPanelOpen = it },
                     onFabExpandedChange = { isFabExpanded = it },
+                    onlineContent = onlineContent?.let { { it() } },
                 )
             }
         }
@@ -623,72 +671,12 @@ fun MainContent(
     }
 }
 
-@Composable
-private fun PositionNotationLabel(
-    isLandscape: Boolean,
-    isEditing: Boolean,
-    gameState: GameState,
-    moveIndex: Int,
-    showGameState: Boolean,
-    onCopyPositionToClipboard: () -> Unit,
-    onShowGameState: (Boolean) -> Unit,
-) {
-    if (isLandscape || isEditing) return
-
-    // Move number: moveIndex is 0-based index of the last recorded entry,
-    // so the current move number is moveIndex + 1 (or 0 before any moves).
-    val moveNumber = (moveIndex + 1).coerceAtLeast(0)
-
-    if (showGameState) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-        ) {
-            Text(
-                text = "$moveNumber",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Text(
-                text = gameState.toPositionNotation(),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.clickable { onShowGameState(false) },
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                onClick = onCopyPositionToClipboard,
-                modifier = Modifier.size(16.dp),
-            ) {
-                Icon(
-                    imageVector = TaratiIcons.ContentCopy,
-                    contentDescription = stringResource(Res.string.copy_position),
-                )
-            }
-        }
-    } else {
-        Text(
-            text = localizedString(Res.string.a_board_game_by_george_spencer_brown),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .clickable { onShowGameState(true) },
-        )
-    }
-}
-
 private fun createBoardRenderEvents(
     selectViewModel: IBoardSelectionViewModel,
     animationViewModel: IBoardAnimationViewModel,
     geometryViewModel: IBoardGeometryViewModel,
-): com.agustin.tarati.ui.components.game.draw.board.BoardRenderEvents = object :
-    com.agustin.tarati.ui.components.game.draw.board.BoardRenderEvents {
+): BoardRenderEvents = object :
+    BoardRenderEvents {
     override fun onReset() {
         selectViewModel.resetSelection()
         animationViewModel.reset()

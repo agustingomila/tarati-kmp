@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -86,24 +85,24 @@ fun GameDetailsContent(
     matchDto: MatchDto,
     onMatchDtoChange: (MatchDto) -> Unit = {},
 ) {
-    val windowInfo = LocalWindowInfo.current
-    val isLandscape = windowInfo.containerSize.width > windowInfo.containerSize.height
-
-    if (isLandscape) {
-        // En landscape, siempre usar diseño horizontal (tanto en edición como en visualización)
-        LandscapeLayout(
-            modifier = modifier,
-            isEditing = isEditing,
-            matchDto = matchDto,
-            onMatchDtoChange = onMatchDtoChange,
-        )
-    } else {
-        PortraitLayout(
-            modifier = modifier,
-            isEditing = isEditing,
-            matchDto = matchDto,
-            onMatchDtoChange = onMatchDtoChange,
-        )
+    BoxWithConstraints {
+        val isLandscape = maxWidth > maxHeight
+        if (isLandscape) {
+            // En landscape, siempre usar diseño horizontal (tanto en edición como en visualización)
+            LandscapeLayout(
+                modifier = modifier,
+                isEditing = isEditing,
+                matchDto = matchDto,
+                onMatchDtoChange = onMatchDtoChange,
+            )
+        } else {
+            PortraitLayout(
+                modifier = modifier,
+                isEditing = isEditing,
+                matchDto = matchDto,
+                onMatchDtoChange = onMatchDtoChange,
+            )
+        }
     }
 }
 

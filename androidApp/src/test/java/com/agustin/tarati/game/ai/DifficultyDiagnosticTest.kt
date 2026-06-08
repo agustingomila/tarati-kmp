@@ -41,6 +41,7 @@ import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.game.ai.tournament.engine.base.standardEngine
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -76,7 +77,7 @@ class DifficultyDiagnosticTest {
         difficulty: Difficulty,
     ): MoveEval {
         engine.setConfig(EvaluationConfig.getByDifficulty(difficulty))
-        return engine.getNextMove(gameState)
+        return runBlocking { engine.getNextMove(gameState) }
     }
 
     /**

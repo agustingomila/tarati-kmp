@@ -16,6 +16,7 @@ import com.agustin.tarati.core.domain.game.helpers.GameStateBuilder
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.createGameState
 import com.agustin.tarati.game.ai.tournament.engine.base.newEngine
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -40,7 +41,7 @@ class GameStateBuilderIntegrationTest {
             }
 
         // AI should be able to analyze this state
-        val result = engine.getNextMove(state, Difficulty.MIN)
+        val result = runBlocking { engine.getNextMove(state, Difficulty.MIN) }
 
         assertNotNull("AI should return a result", result)
         // The move might be null if no valid moves, but the result should not be null

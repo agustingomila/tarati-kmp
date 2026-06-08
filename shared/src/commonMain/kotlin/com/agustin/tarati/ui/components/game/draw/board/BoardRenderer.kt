@@ -55,10 +55,6 @@ import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 
-/** Interpolación lineal entre [start] y [stop] por fracción [fraction] ∈ [0,1]. */
-private fun lerp(start: Float, stop: Float, fraction: Float): Float =
-    start + (stop - start) * fraction
-
 @Composable
 fun BoardRenderer(
     modifier: Modifier = Modifier,
@@ -473,6 +469,16 @@ fun BoardRenderer(
                 colors = boardColors,
             )
         }
+
+        VertexLabelsOverlay(
+            occupiedVertex = VertexListWrapper(boardState.gameState.cobs.map { it.key }),
+            labelsVisible = boardState.boardVisualState.labelsVisibles &&
+                    boardState.boardVisualState.verticesVisibles,
+            boardOrientation = boardState.boardOrientation,
+            containerSize = containerSize,
+            textSize = visualWidth / 4,
+            textColor = boardColors.textColor,
+        )
     }
 }
 

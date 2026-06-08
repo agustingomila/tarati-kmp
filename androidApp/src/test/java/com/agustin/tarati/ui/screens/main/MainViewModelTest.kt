@@ -24,7 +24,7 @@ import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.domain.game.play.HistoryEntry
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
-import com.agustin.tarati.features.game.GameViewModel
+import com.agustin.tarati.features.game.AndroidGameViewModel
 import com.agustin.tarati.features.game.IGameModel
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.ui.components.game.KEY_AI_ENABLED
@@ -123,7 +123,7 @@ class MainViewModelTest {
                 },
             )
         }
-        viewModel = GameViewModel(
+        viewModel = AndroidGameViewModel(
             savedStateHandle,
             mockSettingsRepository,
             mockk<IAIEngine>(relaxed = true),

@@ -135,7 +135,7 @@ class AchievementsRepositoryImpl(
             achievementsClient.unlock(achievementId)
 
             // Actualizar estado local inmediatamente
-            _achievements.value = _achievements.value + (achievementId to 1.0f)
+            _achievements.value += (achievementId to 1.0f)
 
         } catch (e: Exception) {
             // Log error pero continuar
@@ -153,7 +153,7 @@ class AchievementsRepositoryImpl(
             achievementsClient.setSteps(achievementId, steps)
 
             // Actualizar estado local inmediatamente
-            _achievements.value = _achievements.value + (achievementId to progress)
+            _achievements.value += (achievementId to progress)
 
         } catch (e: Exception) {
             // Log error pero continuar

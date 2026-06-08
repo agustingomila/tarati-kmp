@@ -1,5 +1,6 @@
 package com.agustin.tarati.services.clock
 
+
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.time.ClockState
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
@@ -92,4 +93,27 @@ interface IClockService {
      * (llamará [startClockFor] con el color opuesto después de este método).
      */
     fun applyIncrementAfterMove(colorWhoMoved: CobColor)
+
+    /**
+     * Sincroniza los tiempos con los valores autoritativos del servidor (online play).
+     *
+     * Si el reloj está en [TimeControlMode.Unlimited] y se provee [fallbackMode],
+     * primero reinicia el reloj con ese modo — necesario cuando el usuario no tiene
+     * configurado un control de tiempo local pero juega una partida online con tiempo.
+     *
+     * Luego escribe los milisegundos exactos del servidor y garantiza que el tick
+     * loop esté corriendo para [activeTurn]. Si sigue en Unlimited tras el intento
+     * de fallback, es no-op.
+     *
+     * @param whiteMs      Tiempo restante de blancas en ms según el servidor.
+     * @param blackMs      Tiempo restante de negras en ms según el servidor.
+     * @param activeTurn   Color del jugador con el turno tras el update.
+     * @param fallbackMode Modo con el que reiniciar el reloj si está en Unlimited.
+     */
+    fun syncFromServer(
+        whiteMs: Long,
+        blackMs: Long,
+        activeTurn: CobColor,
+        fallbackMode: TimeControlMode? = null,
+    )
 }

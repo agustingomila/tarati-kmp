@@ -1,5 +1,6 @@
 package com.agustin.tarati.features.settings
 
+
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
@@ -60,17 +61,17 @@ class DesktopSettingsRepository : SettingsRepository {
     // ── Difficulty ─────────────────────────────────────────────────────────────
 
     private val _difficulty = MutableStateFlow(
-        Difficulty.values().find { it.name == prefs.get(KEY_DIFFICULTY, null) } ?: Difficulty.DEFAULT
+        Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY, null) } ?: Difficulty.DEFAULT
     )
     override val difficulty = _difficulty.asStateFlow()
 
     private val _difficultyBlack = MutableStateFlow(
-        Difficulty.values().find { it.name == prefs.get(KEY_DIFFICULTY_BLACK, null) } ?: Difficulty.DEFAULT
+        Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY_BLACK, null) } ?: Difficulty.DEFAULT
     )
     override val difficultyBlack = _difficultyBlack.asStateFlow()
 
     private val _difficultyWhite = MutableStateFlow(
-        Difficulty.values().find { it.name == prefs.get(KEY_DIFFICULTY_WHITE, null) } ?: Difficulty.DEFAULT
+        Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY_WHITE, null) } ?: Difficulty.DEFAULT
     )
     override val difficultyWhite = _difficultyWhite.asStateFlow()
 
@@ -80,7 +81,7 @@ class DesktopSettingsRepository : SettingsRepository {
     override val userName = _userName.asStateFlow()
 
     private val _language = MutableStateFlow(
-        AppLanguage.values().find { it.name == prefs.get(KEY_LANGUAGE, null) } ?: AppLanguage.SPANISH
+        AppLanguage.entries.find { it.name == prefs.get(KEY_LANGUAGE, null) } ?: AppLanguage.SPANISH
     )
     override val language = _language.asStateFlow()
 
@@ -90,7 +91,7 @@ class DesktopSettingsRepository : SettingsRepository {
     override val palette = _palette.asStateFlow()
 
     private val _conversionAnimationStyle = MutableStateFlow(
-        ConversionAnimationStyle.values().find { it.name == prefs.get(KEY_CONVERSION_STYLE, null) }
+        ConversionAnimationStyle.entries.find { it.name == prefs.get(KEY_CONVERSION_STYLE, null) }
             ?: ConversionAnimationStyle.SURPRISE
     )
     override val conversionAnimationStyle = _conversionAnimationStyle.asStateFlow()
@@ -143,6 +144,15 @@ class DesktopSettingsRepository : SettingsRepository {
 
     private val _preMovesEnabled = MutableStateFlow(prefs.getBoolean(KEY_PRE_MOVES_ENABLED, true))
     override val preMovesEnabled = _preMovesEnabled.asStateFlow()
+
+    private val _onlineTimeControl = MutableStateFlow(prefs.get(KEY_ONLINE_TIME_CONTROL, "blitz"))
+    override val onlineTimeControl = _onlineTimeControl.asStateFlow()
+
+    private val _onlineRated = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_RATED, true))
+    override val onlineRated = _onlineRated.asStateFlow()
+
+    private val _onlineSpectatingAllowed = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_SPECTATING_ALLOWED, true))
+    override val onlineSpectatingAllowed = _onlineSpectatingAllowed.asStateFlow()
 
     // ── Setters ────────────────────────────────────────────────────────────────
 
@@ -308,6 +318,24 @@ class DesktopSettingsRepository : SettingsRepository {
         flush()
     }
 
+    override suspend fun setOnlineTimeControl(timeControl: String) {
+        _onlineTimeControl.value = timeControl
+        prefs.put(KEY_ONLINE_TIME_CONTROL, timeControl)
+        flush()
+    }
+
+    override suspend fun setOnlineRated(rated: Boolean) {
+        _onlineRated.value = rated
+        prefs.putBoolean(KEY_ONLINE_RATED, rated)
+        flush()
+    }
+
+    override suspend fun setOnlineSpectatingAllowed(allowed: Boolean) {
+        _onlineSpectatingAllowed.value = allowed
+        prefs.putBoolean(KEY_ONLINE_SPECTATING_ALLOWED, allowed)
+        flush()
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     /**
@@ -355,5 +383,8 @@ class DesktopSettingsRepository : SettingsRepository {
         private const val KEY_MANUALLY_ROTATED = "manually_rotated"
         private const val KEY_TIME_CONTROL = "time_control"
         private const val KEY_PRE_MOVES_ENABLED = "pre_moves_enabled"
+        private const val KEY_ONLINE_TIME_CONTROL = "online_time_control"
+        private const val KEY_ONLINE_RATED = "online_rated"
+        private const val KEY_ONLINE_SPECTATING_ALLOWED = "online_spectating_allowed"
     }
 }

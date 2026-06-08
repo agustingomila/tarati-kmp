@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.components.sidebar
 
+
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.Move
@@ -28,6 +29,8 @@ interface SidebarEvents {
     fun onRotateBoard()
 
     fun onGamesLibrary()
+
+    fun onOnlineLobby()
 
     fun onSaveGame()
 

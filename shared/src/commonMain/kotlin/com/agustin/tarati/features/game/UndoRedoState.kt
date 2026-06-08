@@ -1,5 +1,6 @@
 package com.agustin.tarati.features.game
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +54,8 @@ fun rememberUndoRedoState(
     screenState: GameScreenState,
     events: GameEvents,
     viewModel: IGameModel,
+    /** Deshabilita undo, redo y navegación de historial durante una partida online. */
+    isOnlineGame: Boolean = false,
     onGameOverDialogReset: () -> Unit,
 ): UndoRedoState {
     var hasWarnedAboutUndo by rememberSaveable { mutableStateOf(false) }
@@ -86,17 +89,21 @@ fun rememberUndoRedoState(
     }
 
     val handleUndo: () -> Unit = {
-        if (achievementsPossible && !hasWarnedAboutUndo) {
-            pendingAction = performUndo
-            showUndoWarning = true
-        } else {
-            performUndo()
+        if (!isOnlineGame) {
+            if (achievementsPossible && !hasWarnedAboutUndo) {
+                pendingAction = performUndo
+                showUndoWarning = true
+            } else {
+                performUndo()
+            }
         }
     }
 
     val handleRedo: () -> Unit = {
-        events.putAIHistoryState(gameManagerState.gameState) {
-            viewModel.redoMove()
+        if (!isOnlineGame) {
+            events.putAIHistoryState(gameManagerState.gameState) {
+                viewModel.redoMove()
+            }
         }
     }
 
@@ -105,14 +112,16 @@ fun rememberUndoRedoState(
     }
 
     val handleMoveToIndex: (Int) -> Unit = { index ->
-        // Show the same one-time warning as undo: navigating to a non-last
-        // move puts achievements at risk (moveIndex < size - 1 disables them).
-        val isMovingBack = index < gameManagerState.history.size - 1
-        if (isMovingBack && achievementsPossible && !hasWarnedAboutUndo) {
-            pendingAction = { viewModel.moveToIndex(index) }
-            showUndoWarning = true
-        } else {
-            viewModel.moveToIndex(index)
+        if (!isOnlineGame) {
+            // Show the same one-time warning as undo: navigating to a non-last
+            // move puts achievements at risk (moveIndex < size - 1 disables them).
+            val isMovingBack = index < gameManagerState.history.size - 1
+            if (isMovingBack && achievementsPossible && !hasWarnedAboutUndo) {
+                pendingAction = { viewModel.moveToIndex(index) }
+                showUndoWarning = true
+            } else {
+                viewModel.moveToIndex(index)
+            }
         }
     }
 

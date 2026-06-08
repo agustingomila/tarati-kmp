@@ -1,5 +1,6 @@
 package com.agustin.tarati.features.settings
 
+
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -118,6 +119,15 @@ class AndroidSettingsRepository(
     override val preMovesEnabled: Flow<Boolean> =
         dataStore.data.map { prefs -> prefs[PRE_MOVES_ENABLED_KEY] ?: PRE_MOVES_ENABLED_DEFAULT }
 
+    override val onlineTimeControl: Flow<String> =
+        dataStore.data.map { prefs -> prefs[ONLINE_TIME_CONTROL_KEY] ?: ONLINE_TIME_CONTROL_DEFAULT }
+
+    override val onlineRated: Flow<Boolean> =
+        dataStore.data.map { prefs -> prefs[ONLINE_RATED_KEY] ?: ONLINE_RATED_DEFAULT }
+
+    override val onlineSpectatingAllowed: Flow<Boolean> =
+        dataStore.data.map { prefs -> prefs[ONLINE_SPECTATING_ALLOWED_KEY] ?: ONLINE_SPECTATING_ALLOWED_DEFAULT }
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     override suspend fun setDarkTheme(enabled: Boolean) {
@@ -228,6 +238,18 @@ class AndroidSettingsRepository(
         dataStore.edit { it[PRE_MOVES_ENABLED_KEY] = enabled }
     }
 
+    override suspend fun setOnlineTimeControl(timeControl: String) {
+        dataStore.edit { it[ONLINE_TIME_CONTROL_KEY] = timeControl }
+    }
+
+    override suspend fun setOnlineRated(rated: Boolean) {
+        dataStore.edit { it[ONLINE_RATED_KEY] = rated }
+    }
+
+    override suspend fun setOnlineSpectatingAllowed(allowed: Boolean) {
+        dataStore.edit { it[ONLINE_SPECTATING_ALLOWED_KEY] = allowed }
+    }
+
     // ── Keys ───────────────────────────────────────────────────────────────────
 
     companion object {
@@ -262,6 +284,11 @@ class AndroidSettingsRepository(
         val TIME_CONTROL_KEY = stringPreferencesKey("time_control")
         val PRE_MOVES_ENABLED_KEY = booleanPreferencesKey("pre_moves_enabled")
 
+        // Online matchmaking
+        val ONLINE_TIME_CONTROL_KEY = stringPreferencesKey("online_time_control")
+        val ONLINE_RATED_KEY = booleanPreferencesKey("online_rated")
+        val ONLINE_SPECTATING_ALLOWED_KEY = booleanPreferencesKey("online_spectating_allowed")
+
         private const val DARK_THEME_DEFAULT = true
         private const val LABELS_VISIBILITY_DEFAULT = false
         private const val VERTICES_VISIBILITY_DEFAULT = true
@@ -279,5 +306,10 @@ class AndroidSettingsRepository(
 
         // Time control & pre-moves defaults
         const val PRE_MOVES_ENABLED_DEFAULT = true
+
+        // Online matchmaking defaults
+        const val ONLINE_TIME_CONTROL_DEFAULT = "blitz"
+        const val ONLINE_RATED_DEFAULT = true
+        const val ONLINE_SPECTATING_ALLOWED_DEFAULT = true
     }
 }

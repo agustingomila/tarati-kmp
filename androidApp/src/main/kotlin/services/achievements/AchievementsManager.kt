@@ -9,7 +9,7 @@ import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.board.GameBoard.deadVertices
 import com.agustin.tarati.core.domain.game.pieces.CobColor
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.domain.game.play.Move
@@ -221,10 +221,10 @@ class AchievementsManager(
         if (humanWon) {
             unlock(R.string.achievement_first_victory)
 
-            when (matchState.gameResult) {
-                GameResult.MIT -> unlock(R.string.achievement_mit)
-                GameResult.STALEMIT -> unlock(R.string.achievement_stalemit)
-                GameResult.TRIPLE -> unlock(R.string.achievement_eternal_loop)
+            when (matchState.gameEndReason) {
+                GameEndReason.MIT -> unlock(R.string.achievement_mit)
+                GameEndReason.STALEMIT -> unlock(R.string.achievement_stalemit)
+                GameEndReason.TRIPLE -> unlock(R.string.achievement_eternal_loop)
                 else -> Unit
             }
 
@@ -244,7 +244,7 @@ class AchievementsManager(
             setSteps(R.string.achievement_grandmaster, totalWins, maxSteps = 50)
         }
 
-        if (matchState.gameResult == GameResult.FIFTY_MOVES) {
+        if (matchState.gameEndReason == GameEndReason.FIFTY_MOVES) {
             unlock(R.string.achievement_fifty_move_rule)
         }
 

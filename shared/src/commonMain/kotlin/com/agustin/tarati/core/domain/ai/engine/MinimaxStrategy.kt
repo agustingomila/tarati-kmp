@@ -62,6 +62,12 @@ import kotlin.time.Clock
  * Si el resultado supera alpha se re-busca a profundidad completa. Esta técnica preserva la calidad
  * táctica (nunca se reduce el primer movimiento, capturas ni victorias inmediatas)
  * mientras reduce drásticamente los nodos en posiciones de alta movilidad.
+ *
+ * ## Cooperative scheduling (WASM)
+ * [searchBestMove] calls [yieldForAnimation] after each root-level move when
+ * [YIELD_INTERVAL_MS] has elapsed. In WASM this dispatches a macrotask via
+ * setTimeout, allowing requestAnimationFrame to fire between root moves and
+ * keeping the animation smooth during deep searches.
  */
 class MinimaxStrategy(
     private val boardEvaluator: BoardEvaluator,
@@ -76,7 +82,10 @@ class MinimaxStrategy(
     private var cutoffs = 0
     private val timeLimitMs = 10_000L
 
-    override fun getNextMove(
+    // Minimum elapsed time (ms) between animation yields at the root search level.
+    private val YIELD_INTERVAL_MS = 12L
+
+    override suspend fun getNextMove(
         gameState: GameState,
         difficulty: Difficulty,
     ): MoveEval {
@@ -84,7 +93,7 @@ class MinimaxStrategy(
         return iterativeDeepening(gameState, difficulty)
     }
 
-    private fun iterativeDeepening(
+    private suspend fun iterativeDeepening(
         gameState: GameState,
         difficulty: Difficulty,
     ): MoveEval {
@@ -104,6 +113,7 @@ class MinimaxStrategy(
                     beta = Double.POSITIVE_INFINITY,
                     config = config,
                     context = context,
+                    isRoot = true,
                 )
 
             bestResult = currentResult
@@ -115,13 +125,14 @@ class MinimaxStrategy(
         return bestResult
     }
 
-    private fun minimax(
+    private suspend fun minimax(
         gameState: GameState,
         depth: Int,
         alpha: Double,
         beta: Double,
         config: EvaluationConfig,
         context: SearchContext,
+        isRoot: Boolean = false,
     ): MoveEval {
         context.nodesEvaluated++
 
@@ -146,13 +157,13 @@ class MinimaxStrategy(
         // Winning-move detection is handled inside searchBestMove: the first
         // move that satisfies isGameOver() && winner == currentTurn triggers
         // an early return, avoiding a separate O(N) applyMove pass here.
-        return searchBestMove(gameState, sortedMoves, depth, alpha, beta, config, context)
+        return searchBestMove(gameState, sortedMoves, depth, alpha, beta, config, context, isRoot)
             .also { result ->
                 transpositionTable.put(boardHash, depth, result)
             }
     }
 
-    private fun searchBestMove(
+    private suspend fun searchBestMove(
         gameState: GameState,
         moves: List<Move>,
         depth: Int,
@@ -160,6 +171,7 @@ class MinimaxStrategy(
         betaInit: Double,
         config: EvaluationConfig,
         context: SearchContext,
+        isRoot: Boolean = false,
     ): MoveEval {
         val isMaximizing = gameState.currentTurn.isMaximizingPlayer()
         var bestMove: Move? = null
@@ -250,6 +262,18 @@ class MinimaxStrategy(
             if (causesCutoff) {
                 cutoffs++
                 break
+            }
+
+            // Cooperative scheduling: yield to the browser/OS event loop after
+            // each root-level move if enough time has elapsed. This allows
+            // requestAnimationFrame to fire between subtree evaluations,
+            // preventing animation freeze during deep searches.
+            if (isRoot) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                if (now - context.lastYieldTimeMs >= YIELD_INTERVAL_MS) {
+                    yieldForAnimation()
+                    context.lastYieldTimeMs = Clock.System.now().toEpochMilliseconds()
+                }
             }
         }
 

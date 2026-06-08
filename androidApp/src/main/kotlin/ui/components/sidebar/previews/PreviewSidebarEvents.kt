@@ -30,6 +30,8 @@ class PreviewSidebarEvents : SidebarEvents {
 
     override fun onGamesLibrary() {}
 
+    override fun onOnlineLobby() {}
+
     override fun onSaveGame() {}
 
     override fun onAboutClick() {}

@@ -42,7 +42,7 @@ data class Move(
 
     /**
      * Human-readable notation for this move.
-     * - Normal move:               "B6→B1"
+     * - Normal move:               "B6-B1"
      * - Forced in-place promotion: "C12=R"  (Cob promoted to Rok in place)
      */
     val name get() = if (isPromotion()) "${from.name}=R" else "${from.name}$MOVE_SEPARATOR${to.name}"
@@ -114,13 +114,17 @@ data class Move(
     }
 
     companion object {
-        const val MOVE_SEPARATOR = "→"
+        const val MOVE_SEPARATOR = "-"
+
+        /** Separador usado en partidas guardadas antes del cambio a ASCII. */
+        const val LEGACY_SEPARATOR = "→"
 
         fun parseMoveHistory(moveHistory: String): List<Move> =
             if (moveHistory.isNotEmpty()) {
                 moveHistory.split(",").map { moveStr ->
-                    val parts = moveStr.split(MOVE_SEPARATOR)
-                    if (parts.size != 2) throw IllegalArgumentException("Invalid move format")
+                    // Acepta tanto "-" (actual) como "→" (partidas previas en BD)
+                    val parts = moveStr.split(MOVE_SEPARATOR, LEGACY_SEPARATOR)
+                    if (parts.size != 2) throw IllegalArgumentException("Invalid move format: $moveStr")
                     val fromVertex = parseVertex(parts[0])
                     val toVertex = parseVertex(parts[1])
                     Move(fromVertex to toVertex)

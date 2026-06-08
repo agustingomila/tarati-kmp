@@ -1,0 +1,628 @@
+package com.agustin.tarati.features.online.social
+
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.agustin.tarati.core.domain.game.pieces.CobColor
+import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
+import com.agustin.tarati.core.domain.game.time.TimeControl
+import com.agustin.tarati.features.online.lobby.GameHistoryUiState
+import com.agustin.tarati.network.models.GameHistoryDto
+import com.agustin.tarati.network.models.ProfileRatingsDto
+import com.agustin.tarati.network.models.ProfileStatsDto
+import com.agustin.tarati.network.models.ProfileTimeControlStatsDto
+import com.agustin.tarati.network.models.PublicProfileDto
+import com.agustin.tarati.services.localization.localizedString
+import com.agustin.tarati.shared.generated.resources.Res
+import com.agustin.tarati.shared.generated.resources.cancel
+import com.agustin.tarati.shared.generated.resources.casual_info_card
+import com.agustin.tarati.shared.generated.resources.challenge
+import com.agustin.tarati.shared.generated.resources.challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.draw
+import com.agustin.tarati.shared.generated.resources.error
+import com.agustin.tarati.shared.generated.resources.follow
+import com.agustin.tarati.shared.generated.resources.followers
+import com.agustin.tarati.shared.generated.resources.following
+import com.agustin.tarati.shared.generated.resources.games_played
+import com.agustin.tarati.shared.generated.resources.history_section
+import com.agustin.tarati.shared.generated.resources.loss
+import com.agustin.tarati.shared.generated.resources.member_since
+import com.agustin.tarati.shared.generated.resources.moves
+import com.agustin.tarati.shared.generated.resources.no_games_found
+import com.agustin.tarati.shared.generated.resources.peak_rating
+import com.agustin.tarati.shared.generated.resources.profile
+import com.agustin.tarati.shared.generated.resources.rated
+import com.agustin.tarati.shared.generated.resources.rated_info_card
+import com.agustin.tarati.shared.generated.resources.rating
+import com.agustin.tarati.shared.generated.resources.ratings_section
+import com.agustin.tarati.shared.generated.resources.result
+import com.agustin.tarati.shared.generated.resources.unfollow
+import com.agustin.tarati.shared.generated.resources.win
+import com.agustin.tarati.ui.components.carditem.GameCardItem
+import com.agustin.tarati.ui.components.game.CobColorIndicator
+import com.agustin.tarati.ui.components.topbar.TaratiTopBar
+import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
+import com.agustin.tarati.ui.theme.TaratiBackground
+import com.agustin.tarati.ui.theme.TaratiIcons
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import kotlin.time.Instant
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PublicProfileScreen(
+    userId: String,
+    onBack: () -> Unit,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+    viewModel: IPublicProfileViewModel = koinViewModel<PublicProfileViewModel> {
+        parametersOf(userId)
+    },
+) {
+    val profileState by viewModel.profileState.collectAsState()
+    val historyState by viewModel.historyState.collectAsState()
+    val followStatusState by viewModel.followStatusState.collectAsState()
+
+    TaratiBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TaratiTopBar(
+                    title = profileState.profile?.username
+                        ?: localizedString(Res.string.profile),
+                    navigationType = TopBarNavigationType.Back,
+                    onNavigationClick = onBack,
+                )
+            },
+        ) { padding ->
+            when {
+                profileState.isLoading -> Box(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+
+                profileState.error != null -> Box(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = localizedString(Res.string.error)
+                            .replace($$"%1$s", profileState.error.orEmpty()),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+
+                profileState.profile != null -> ProfileContent(
+                    profile = profileState.profile!!,
+                    historyState = historyState,
+                    followStatusState = followStatusState,
+                    isOwnProfile = viewModel.isOwnProfile,
+                    onToggleFollow = viewModel::toggleFollow,
+                    onSendChallenge = { tc, rated -> viewModel.sendChallenge(tc, rated) },
+                    onNavigateToGameDetails = onNavigateToGameDetails,
+                    viewModel = viewModel,
+                    modifier = Modifier.padding(padding),
+                )
+            }
+        }
+    }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+@Composable
+private fun ProfileContent(
+    profile: PublicProfileDto,
+    historyState: GameHistoryUiState,
+    followStatusState: FollowStatusUiState,
+    isOwnProfile: Boolean,
+    onToggleFollow: () -> Unit,
+    onSendChallenge: (timeControl: String, rated: Boolean) -> Unit,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+    viewModel: IPublicProfileViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val listState = rememberLazyListState()
+    var showChallengeDialog by remember { mutableStateOf(false) }
+
+    if (showChallengeDialog) {
+        ChallengeDialog(
+            targetName = profile.displayName?.takeIf { it.isNotBlank() } ?: profile.username,
+            onConfirm = { tc: String, rated: Boolean ->
+                showChallengeDialog = false
+                onSendChallenge(tc, rated)
+            },
+            onDismiss = { showChallengeDialog = false },
+        )
+    }
+
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = listState.layoutInfo.totalItemsCount
+            total > 0 && lastVisible >= total - 3
+        }
+    }
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) viewModel.loadMoreHistory()
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 16.dp),
+    ) {
+        // Header
+        item {
+            ProfileHeader(
+                profile = profile,
+                followStatusState = followStatusState,
+                isOwnProfile = isOwnProfile,
+                onToggleFollow = onToggleFollow,
+                onChallenge = { showChallengeDialog = true },
+            )
+        }
+
+        // Ratings
+        item {
+            SectionHeader(text = localizedString(Res.string.ratings_section))
+            RatingsGrid(ratings = profile.ratings, stats = profile.stats)
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // History header + filters
+        item {
+            SectionHeader(text = localizedString(Res.string.history_section))
+            ProfileHistoryFilters(state = historyState, viewModel = viewModel)
+        }
+
+        // History items
+        when {
+            historyState.isLoading && historyState.games.isEmpty() -> item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center,
+                ) { CircularProgressIndicator() }
+            }
+
+            historyState.error != null -> item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = localizedString(Res.string.error)
+                            .replace($$"%1$s", historyState.error),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+
+            historyState.games.isEmpty() -> item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = localizedString(Res.string.no_games_found),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+
+            else -> {
+                itemsIndexed(historyState.games, key = { _, g -> g.gameId }) { _, game ->
+                    ProfileHistoryCard(
+                        game = game,
+                        onClick = onNavigateToGameDetails?.let { cb -> { cb(game.gameId) } },
+                    )
+                }
+                if (historyState.isLoadingMore) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun ProfileHeader(
+    profile: PublicProfileDto,
+    followStatusState: FollowStatusUiState,
+    isOwnProfile: Boolean,
+    onToggleFollow: () -> Unit,
+    onChallenge: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                imageVector = TaratiIcons.AccountCircle,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = profile.displayName?.takeIf { it.isNotBlank() } ?: profile.username,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                if (!profile.displayName.isNullOrBlank()) {
+                    Text(
+                        text = "@${profile.username}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (!profile.country.isNullOrBlank()) {
+                    Text(
+                        text = profile.country,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+        if (!profile.bio.isNullOrBlank()) {
+            Text(
+                text = profile.bio,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        val joinDate = remember(profile.createdAt) { formatJoinDate(profile.createdAt) }
+        Text(
+            text = localizedString(Res.string.member_since).replace($$"%1$s", joinDate),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        // Contadores de seguidores / seguidos
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                text = "${followStatusState.followersCount} ${localizedString(Res.string.followers)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "${followStatusState.followingCount} ${localizedString(Res.string.following)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        // Botones Follow + Desafiar (solo si no es el propio perfil)
+        if (!isOwnProfile) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (followStatusState.isFollowing) {
+                    OutlinedButton(onClick = onToggleFollow) {
+                        Icon(TaratiIcons.Check, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text(localizedString(Res.string.unfollow), style = MaterialTheme.typography.labelMedium)
+                    }
+                } else {
+                    Button(onClick = onToggleFollow) {
+                        Text(localizedString(Res.string.follow), style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                OutlinedButton(onClick = onChallenge) {
+                    Text(localizedString(Res.string.challenge), style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+        HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+    }
+}
+
+// ── Ratings grid ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun RatingsGrid(ratings: ProfileRatingsDto, stats: ProfileStatsDto) {
+    val entries = listOf(
+        TimeControl.BULLET to Pair(ratings.bullet.rating, ratings.bullet.peak),
+        TimeControl.BLITZ to Pair(ratings.blitz.rating, ratings.blitz.peak),
+        TimeControl.RAPID to Pair(ratings.rapid.rating, ratings.rapid.peak),
+        TimeControl.CLASSICAL to Pair(ratings.classical.rating, ratings.classical.peak),
+    )
+    val statEntries = listOf(
+        TimeControl.BULLET to stats.bullet,
+        TimeControl.BLITZ to stats.blitz,
+        TimeControl.RAPID to stats.rapid,
+        TimeControl.CLASSICAL to stats.classical,
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        entries.forEachIndexed { index, (tc, ratingPair) ->
+            val (current, peak) = ratingPair
+            val tcStats = statEntries[index].second
+            RatingCard(
+                tcLabel = tc.key.replaceFirstChar { it.titlecase() },
+                rating = current,
+                peak = peak,
+                stats = tcStats,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RatingCard(
+    tcLabel: String,
+    rating: Int,
+    peak: Int,
+    stats: ProfileTimeControlStatsDto,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text(
+                text = tcLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "$rating",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = localizedString(Res.string.peak_rating).replace($$"%1$s", "$peak"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = localizedString(Res.string.games_played)
+                    .replace($$"%1$s", "${stats.games}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+// ── History filters ───────────────────────────────────────────────────────────
+
+@Composable
+private fun ProfileHistoryFilters(
+    state: GameHistoryUiState,
+    viewModel: IPublicProfileViewModel,
+) {
+    val filters = state.filters
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        item {
+            TimeControl.list().forEach { tc ->
+                FilterChip(
+                    selected = filters.timeControl == tc,
+                    onClick = {
+                        viewModel.setTimeControlFilter(if (filters.timeControl == tc) null else tc)
+                    },
+                    label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                )
+            }
+        }
+        item {
+            listOf(
+                "win" to localizedString(Res.string.win),
+                "loss" to localizedString(Res.string.loss),
+                "draw" to localizedString(Res.string.draw),
+            ).forEach { (key, label) ->
+                FilterChip(
+                    selected = filters.result == key,
+                    onClick = {
+                        viewModel.setResultFilter(if (filters.result == key) null else key)
+                    },
+                    label = { Text(label) },
+                )
+            }
+        }
+        item {
+            FilterChip(
+                selected = filters.rated == true,
+                onClick = { viewModel.setRatedFilter(if (filters.rated == true) null else true) },
+                label = { Text(localizedString(Res.string.rated)) },
+            )
+        }
+    }
+}
+
+// ── History card ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun ProfileHistoryCard(game: GameHistoryDto, onClick: (() -> Unit)? = null) {
+    val (resultText, resultColor) = when (game.result) {
+        "win" -> localizedString(Res.string.win) to Color(0xFF4CAF50)
+        "loss" -> localizedString(Res.string.loss) to MaterialTheme.colorScheme.error
+        else -> localizedString(Res.string.draw) to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val ratingChangeFmt = if (game.ratingChange > 0) "+${game.ratingChange}" else "${game.ratingChange}"
+    val ratingChangeColor = when {
+        game.ratingChange > 0 -> Color(0xFF4CAF50)
+        game.ratingChange < 0 -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val dateFmt = remember(game.endedAtMs) {
+        val localDate = Instant.fromEpochMilliseconds(game.endedAtMs)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        localDate.format(LocalDate.Format {
+            day(padding = Padding.ZERO); char('/'); monthNumber(); char('/'); year()
+        })
+    }
+    val myColor = cobColorByDescription(game.myColor) ?: CobColor.WHITE
+
+    GameCardItem(
+        title = "vs ${game.opponentUsername} (${game.opponentRating})",
+        leadingContent = { CobColorIndicator(myColor, size = 28.dp) },
+        subtitle = "${game.timeControl.toDisplayString()} · ${
+            if (game.rated) localizedString(Res.string.rated_info_card)
+            else localizedString(Res.string.casual_info_card)
+        } · $dateFmt",
+        badge = "$resultText  $ratingChangeFmt",
+        badgeColor = ratingChangeColor,
+        rows = listOf(
+            localizedString(Res.string.result) to resultText,
+            localizedString(Res.string.moves) to "${game.moveCount}",
+            localizedString(Res.string.rating) to "${game.ratingAfter} ($ratingChangeFmt)",
+        ),
+        onClick = onClick,
+    )
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+@Composable
+private fun SectionHeader(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+}
+
+@Composable
+private fun ChallengeDialog(
+    targetName: String,
+    onConfirm: (timeControl: String, rated: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val timeControls = TimeControl.list()
+    var selectedTc by remember { mutableStateOf(TimeControl.BLITZ.key) }
+    var isRated by remember { mutableStateOf(true) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                localizedString(Res.string.challenge_dialog_title).replace("%1\$s", targetName),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(timeControls) { tc ->
+                        FilterChip(
+                            selected = selectedTc == tc,
+                            onClick = { selectedTc = tc },
+                            label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(localizedString(Res.string.rated), style = MaterialTheme.typography.bodyMedium)
+                    Switch(checked = isRated, onCheckedChange = { isRated = it })
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(selectedTc, isRated) }) {
+                Text(localizedString(Res.string.challenge))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(localizedString(Res.string.cancel))
+            }
+        },
+    )
+}
+
+private fun formatJoinDate(instant: Instant): String {
+    val date = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return date.format(LocalDate.Format {
+        day(padding = Padding.ZERO); char('/'); monthNumber(); char('/'); year()
+    })
+}

@@ -11,7 +11,7 @@ import com.agustin.tarati.core.domain.game.board.GameBoard.C8
 import com.agustin.tarati.core.domain.game.pieces.Cob
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.Move
 import org.junit.Assert.assertEquals
@@ -188,7 +188,7 @@ class FiftyMoveRuleTest {
             claimedFiftyMoveDraw = true,
         )
         val matchState = state.getMatchState(emptyMap())
-        assertEquals("Game result should be FIFTY_MOVES", GameResult.FIFTY_MOVES, matchState.gameResult)
+        assertEquals("Game result should be FIFTY_MOVES", GameEndReason.FIFTY_MOVES, matchState.gameEndReason)
         assertEquals("Winner should be null for a draw", null, matchState.winner)
     }
 
@@ -207,7 +207,7 @@ class FiftyMoveRuleTest {
             halfMoveClock = 100,
             claimedFiftyMoveDraw = true,
         )
-        assertEquals(GameResult.FIFTY_MOVES, state.getMatchState(emptyMap()).gameResult)
+        assertEquals(GameEndReason.FIFTY_MOVES, state.getMatchState(emptyMap()).gameEndReason)
     }
 
     // ==================== Accumulation over a game sequence ====================

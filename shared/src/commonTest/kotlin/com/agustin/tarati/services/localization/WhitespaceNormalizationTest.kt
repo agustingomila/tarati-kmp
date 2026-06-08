@@ -164,8 +164,8 @@ class WhitespaceNormalizationTest {
     @Test
     fun `normalizeWhitespace maneja formato con parametros y doble salto de linea`() {
         // Caso específico del proyecto: perform_the_indicated_move
-        val input = "%1\$s\\n\\nMake the indicated move."
-        val expected = "%1\$s\n\nMake the indicated move."
+        val input = $$"%1$s\\n\\nMake the indicated move."
+        val expected = $$"%1$s\n\nMake the indicated move."
         assertEquals(expected, input.normalizeWhitespace())
     }
 

@@ -118,7 +118,7 @@ fun TurnIndicator(
         targetValue = rotationTarget,
         animationSpec =
             infiniteRepeatable(
-                animation = tween(1000, easing = LinearEasing),
+                animation = tween(400, easing = LinearEasing),
             ),
         label = "TurnIndicatorRotation",
     )

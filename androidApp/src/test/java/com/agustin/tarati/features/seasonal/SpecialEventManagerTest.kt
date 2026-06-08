@@ -1,7 +1,7 @@
 package com.agustin.tarati.features.seasonal
 
 import com.agustin.tarati.core.domain.game.pieces.CobColor
-import com.agustin.tarati.core.domain.game.play.GameResult
+import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.services.achievements.AchievementsRepository
@@ -133,14 +133,14 @@ class SpecialEventManagerTest {
 
     private fun winBy(color: CobColor) = MatchState(
         gameState = mockk(relaxed = true),
-        gameResult = GameResult.MIT,
+        gameEndReason = GameEndReason.MIT,
         winner = color,
         moveHistory = emptyMap(),
     )
 
     private val draw = MatchState(
         gameState = mockk(relaxed = true),
-        gameResult = GameResult.FIFTY_MOVES,
+        gameEndReason = GameEndReason.FIFTY_MOVES,
         winner = null,
         moveHistory = emptyMap(),
     )

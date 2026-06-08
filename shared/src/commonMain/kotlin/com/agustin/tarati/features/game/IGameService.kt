@@ -68,6 +68,15 @@ interface IGameService :
     fun moveToCurrentState()
 
     /**
+     * Reconstruye el historial completo de la partida a partir de [moves].
+     * Limpia el historial previo y deja [moveIndex] apuntando al último estado.
+     * Llamar [moveToCurrentState] a continuación para sincronizar [gameState].
+     *
+     * @param initialState Posición inicial (por defecto: tablero estándar).
+     */
+    fun updateHistory(moves: List<Move>, initialState: GameState = GameState.initialGameState())
+
+    /**
      * Navega directamente al estado [index] del historial.
      * [index] = -1 restaura la posición inicial.
      * @see com.agustin.tarati.core.domain.game.manager.GameManager.moveToIndex

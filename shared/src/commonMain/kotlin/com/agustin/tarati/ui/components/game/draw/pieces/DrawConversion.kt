@@ -3,6 +3,8 @@ package com.agustin.tarati.ui.components.game.draw.pieces
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.agustin.tarati.core.domain.game.pieces.Cob
 import com.agustin.tarati.core.domain.game.pieces.CobColor
@@ -40,7 +42,7 @@ internal fun DrawScope.drawConversionFromCenter(
 
         data class CircleSpec(
             val color: Color,
-            val style: androidx.compose.ui.graphics.drawscope.DrawStyle = androidx.compose.ui.graphics.drawscope.Fill
+            val style: DrawStyle = Fill
         )
 
         listOf(

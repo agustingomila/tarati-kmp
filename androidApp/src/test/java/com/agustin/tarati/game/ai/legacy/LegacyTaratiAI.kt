@@ -57,7 +57,7 @@ internal class LegacyTaratiAI : IAIEngine {
 
     override val name: String get() = "Legacy"
 
-    override fun getNextMove(gameState: GameState): MoveEval {
+    override suspend fun getNextMove(gameState: GameState): MoveEval {
         val config = evalConfig
         if (config.randomMoveChance > 0.0 && Random.nextDouble() < config.randomMoveChance) {
             val randomMove = gameState.allMovesForTurn().randomOrNull()
@@ -116,7 +116,7 @@ internal class LegacyTaratiAI : IAIEngine {
         return count
     }
 
-    fun getNextMove(gameState: GameState, difficulty: Difficulty): MoveEval =
+    suspend fun getNextMove(gameState: GameState, difficulty: Difficulty): MoveEval =
         aiStrategy.getNextMove(gameState, difficulty)
 }
 

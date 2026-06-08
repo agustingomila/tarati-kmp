@@ -1,6 +1,5 @@
 package com.agustin.tarati.core.data.database.dto
 
-import com.agustin.tarati.core.data.database.entities.GameEntity
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.MatchResult
@@ -142,20 +141,5 @@ data class PGNHeader(
             )
         }
 
-        fun parsePGNHeader(entity: GameEntity): PGNHeader =
-            PGNHeader(
-                event = entity.event,
-                site = entity.site,
-                date = entity.date,
-                round = entity.round,
-                white = entity.white,
-                black = entity.black,
-                result = entity.result,
-                gameType = entity.gameType,
-                rules = entity.rules,
-                timeControl = entity.timeControl,
-                termination = entity.termination,
-                observations = entity.observations,
-            )
     }
 }

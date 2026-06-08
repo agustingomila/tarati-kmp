@@ -1,3 +1,8 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
@@ -11,7 +16,7 @@ plugins {
 kotlin {
     androidTarget {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
@@ -28,6 +33,16 @@ kotlin {
         }
     }
 
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+
+    // Aplicar el template de jerarquía por defecto ANTES de los dependsOn custom.
+    // Sin esta llamada explícita, Kotlin 2.x detecta los .dependsOn() manuales
+    // y omite el template → iosMain queda desconectado.
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         commonMain.dependencies {
             // Kotlin
@@ -35,9 +50,6 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.atomicfu)
-
-            // Room Runtime (solo runtime en common)
-            implementation(libs.androidx.room.runtime)
 
             // Koin
             implementation(libs.koin.core)
@@ -47,13 +59,16 @@ kotlin {
             // UUID
             implementation(libs.uuid)
 
-            // Compose Multiplatform — usando libs en lugar de compose accessor
+            // Compose Multiplatform
             implementation(libs.androidx.compose.runtime)
             implementation(libs.androidx.compose.foundation)
             implementation(libs.androidx.compose.material3)
             implementation(libs.androidx.compose.ui)
             implementation(libs.androidx.compose.components.resources)
             implementation(libs.androidx.compose.navigation)
+
+            // Ktor client WebSocket (multiplataforma — Android, Desktop, WASM)
+            implementation(libs.ktor.client.websockets)
         }
 
         commonTest.dependencies {
@@ -61,35 +76,58 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
 
+        // roomMain: Room runtime para Android / iOS / JVM (sin wasmJs — no tiene artifact).
+        // Fuentes Room en src/roomMain/kotlin/.
+        val roomMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.androidx.room.runtime)
+            }
+        }
+
+        androidMain.get().dependsOn(roomMain)
+        iosMain.get().dependsOn(roomMain)
+        jvmMain.get().dependsOn(roomMain)
+
         androidMain.dependencies {
-            // Room KTX (solo en Android, tiene dependencias Android-specific)
+            // Room KTX (solo en Android)
             implementation(libs.androidx.room.ktx)
-            // UI Tooling para previews en Android
+            // UI Tooling para previews
             implementation(libs.androidx.compose.uiTooling)
         }
 
-        iosMain.dependencies {
-            // iOS-specific dependencies si son necesarias
+        // JVM (Desktop + Server)
+        jvmMain.dependencies {
+            // Ktor server — solo JVM
+            implementation(libs.ktor.server.core)
+            implementation(libs.ktor.server.websockets)
         }
 
-        // Logger para JVM (Desktop + Server)
-        jvmMain.dependencies {
-            // Sin dependencias extra — JVM tiene todo
+        // WASM (browser) — sin Room
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
     }
 }
 
 android {
     namespace = "com.agustin.tarati.shared"
-    compileSdk = 36
+    compileSdk =
+        libs.versions.compileSdk
+            .get()
+            .toInt()
+    ndkVersion = libs.versions.ndk.get()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.minSdk
+            .get()
+            .toInt()
     }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmCompatibility.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmCompatibility.get())
     }
 
     compose.resources {
@@ -119,4 +157,5 @@ dependencies {
 
     // Room KSP para Desktop/JVM
     add("kspJvm", libs.androidx.room.compiler)
+
 }

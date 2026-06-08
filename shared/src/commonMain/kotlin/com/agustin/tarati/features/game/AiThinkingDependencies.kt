@@ -1,5 +1,6 @@
 package com.agustin.tarati.features.game
 
+
 import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.GameStatus
@@ -25,6 +26,13 @@ data class AiThinkingDependencies(
      * to receive a new calculateAIMove call for the post-promotion state.
      */
     val boardHash: String,
+    /**
+     * When non-null, overrides the AI-flag-based board orientation calculation
+     * in [GameEffects]. Used for online games where [whiteIsAI] and [blackIsAI]
+     * are both suppressed to false (to prevent local AI from moving), but the
+     * board still needs to be oriented for the human player's assigned color.
+     */
+    val orientationSide: CobColor? = null,
 ) {
     /** True when the current turn belongs to the AI engine. */
     val isAITurn: Boolean

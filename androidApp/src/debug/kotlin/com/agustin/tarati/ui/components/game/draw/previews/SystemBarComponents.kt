@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -151,7 +152,7 @@ fun DrawScope.drawBatteryIcon(
         color = color.copy(alpha = alpha),
         topLeft = Offset(bodyLeft, bodyY),
         size = Size(bodyW, bodyH),
-        cornerRadius = androidx.compose.ui.geometry.CornerRadius(2.dp.toPx() * scale),
+        cornerRadius = CornerRadius(2.dp.toPx() * scale),
         style = Stroke(width = strokeWidth)
     )
 
@@ -163,7 +164,7 @@ fun DrawScope.drawBatteryIcon(
             color = color.copy(alpha = alpha),
             topLeft = Offset(bodyLeft + fillPad, bodyY + fillPad),
             size = Size(fillWidth, bodyH - fillPad * 2),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.dp.toPx() * scale)
+            cornerRadius = CornerRadius(1.dp.toPx() * scale)
         )
     }
 }

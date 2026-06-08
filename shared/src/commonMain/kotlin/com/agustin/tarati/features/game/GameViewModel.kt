@@ -2,7 +2,6 @@ package com.agustin.tarati.features.game
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.data.database.dto.GameDto
@@ -24,14 +23,8 @@ import com.agustin.tarati.core.domain.game.play.MatchResult
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import com.agustin.tarati.core.domain.game.play.getValue
-import com.agustin.tarati.core.utils.putSerializable
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.ui.components.editor.EditBoardManager
-import com.agustin.tarati.ui.components.game.KEY_GAME_HISTORY
-import com.agustin.tarati.ui.components.game.KEY_GAME_STATE
-import com.agustin.tarati.ui.components.game.KEY_GAME_STATUS
-import com.agustin.tarati.ui.components.game.KEY_IS_EDITING
-import com.agustin.tarati.ui.components.game.KEY_MOVE_INDEX
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,10 +32,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class GameViewModel(
-    private val savedStateHandle: SavedStateHandle,
-    private val sr: SettingsRepository,
-    private val aiEngine: IAIEngine,
+/**
+ * Shared game ViewModel. Platform-specific surface: [saveGameState], [persistEditingState],
+ * [playerSettings] — overridden by [AndroidGameViewModel] and [DesktopGameViewModel].
+ */
+abstract class GameViewModel(
+    protected val sr: SettingsRepository,
+    protected val aiEngine: IAIEngine,
 ) : ViewModel(),
     IGameModel {
 
@@ -73,27 +69,12 @@ class GameViewModel(
 
     // ── Board orientation ─────────────────────────────────────────────────────
 
-    /**
-     * Board orientation loaded exclusively from DataStore, which survives both
-     * configuration changes and app restarts.
-     * [SavedStateHandle] is intentionally NOT used for this field: its bundle value
-     * always shadows the DataStore value, breaking cross-session persistence.
-     *
-     * Starts with the compile-time default and updates asynchronously from DataStore
-     * in [init] — avoids blocking the ViewModel construction thread.
-     */
+    // Loaded from DataStore, not SavedStateHandle — the bundle would shadow the DataStore
+    // value on config change, breaking cross-session persistence.
     private val _boardOrientation = MutableStateFlow(BoardOrientation.PORTRAIT_WHITE)
     override val boardOrientation: StateFlow<BoardOrientation> = _boardOrientation.asStateFlow()
 
-    /**
-     * True when the user has manually rotated the board via the sidebar button.
-     * While true, [GameEffects] skips the automatic orientation recalculation on
-     * screen rotation, preserving the user's chosen perspective.
-     *
-     * Loaded from DataStore (survives app restarts). [SavedStateHandle] is NOT used
-     * for this field — the same reason as [_boardOrientation]: its bundle value would
-     * shadow the DataStore value, breaking cross-session persistence.
-     */
+    /** While true, [GameEffects] skips automatic orientation recalculation on screen rotation. */
     private val _isManuallyRotated = MutableStateFlow(false)
     override val isManuallyRotated: StateFlow<Boolean> = _isManuallyRotated.asStateFlow()
 
@@ -128,47 +109,20 @@ class GameViewModel(
     private val _userName = MutableStateFlow("")
     override val userName: StateFlow<String> = _userName.asStateFlow()
 
+    // ── Player settings (platform-specific) ──────────────────────────────────
+
+    protected abstract val playerSettings: IPlayerSettingsHolder
+
     // ── IGameService ──────────────────────────────────────────────────────────
 
     override fun updateAIEnabled(newAIEnabled: Boolean) =
         playerSettings.updateAIEnabled(newAIEnabled)
 
-    // ── Player settings ───────────────────────────────────────────────────────
-
-    private val playerSettings by lazy {
-        PlayerSettingsHolder(savedStateHandle, sr, viewModelScope)
-    }
-
-    init {
-        viewModelScope.launch {
-            _boardOrientation.value = BoardOrientation.valueOf(sr.boardOrientation.first())
-            _isManuallyRotated.value = sr.isManuallyRotated.first()
-        }
-        playerSettings.loadFromDataStore()
-    }
-
-    override fun saveGameState() {
-        val currentState = gameManager.getCurrentState()
-
-        // putSerializable serializa a JSON automáticamente
-        savedStateHandle.putSerializable(KEY_GAME_STATE, currentState.gameState)
-        savedStateHandle.putSerializable(KEY_GAME_HISTORY, currentState.history)
-        savedStateHandle.putSerializable(KEY_GAME_STATUS, currentState.gameStatus)
-
-        // Tipos primitivos van directo
-        savedStateHandle[KEY_MOVE_INDEX] = currentState.moveIndex
-    }
-
     override fun boardPositionCopied() {
         _boardPosition.update { "" }
     }
 
-    /**
-     * Updates the board orientation in memory only.
-     * Called automatically by [GameEffects] on screen rotation — must NOT write to
-     * DataStore or [SavedStateHandle] to avoid overwriting the user's manual preference.
-     * Only [rotateBoardManually] persists the orientation.
-     */
+    /** In-memory update only — does not persist; only [rotateBoardManually] does. */
     override fun updateBoardOrientation(newOrientation: BoardOrientation) {
         _boardOrientation.update { newOrientation }
     }
@@ -177,18 +131,15 @@ class GameViewModel(
         _userName.update { name }
     }
 
+    // ── IPlayerManager ────────────────────────────────────────────────────────
 
-    /**
-     * Sets the Human/AI assignment for [color] without restarting the game.
-     * Updates the per-band flow, [aIEnabled], and persists to both
-     * [SavedStateHandle] (session) and DataStore (cross-session).
-     */
     override fun updatePlayerType(color: CobColor, isAI: Boolean) =
         playerSettings.updatePlayerType(color, isAI)
 
-
     override fun updateDifficulty(color: CobColor, difficulty: Difficulty) =
         playerSettings.updateDifficulty(color, difficulty)
+
+    // ── Board moves ───────────────────────────────────────────────────────────
 
     override fun addMove(
         move: Move,
@@ -204,14 +155,12 @@ class GameViewModel(
 
     override fun moveToIndex(index: Int) = gameManager.moveToIndex(index)
 
-    // ── IEditBoard ────────────────────────────────────────────────────────────
-
-    private val editBoardManager by lazy { EditBoardManager() }
+    // ── History helpers ───────────────────────────────────────────────────────
 
     private fun clearHistory() = gameManager.clearHistory()
 
-    private fun updateHistory(history: List<Move>, initialState: GameState = GameState.initialGameState()) =
-        gameManager.updateHistory(history, initialState)
+    override fun updateHistory(moves: List<Move>, initialState: GameState) =
+        gameManager.updateHistory(moves, initialState)
 
     override fun setGame(gameState: GameState) {
         clearHistory()
@@ -219,12 +168,23 @@ class GameViewModel(
         gameManager.updateGameState(gameState)
     }
 
+    // ── Edit Board ────────────────────────────────────────────────────────────
+
+    private val editBoardManager by lazy { EditBoardManager() }
+
+    /**
+     * Persists the editing mode flag to the platform-specific session store.
+     * Android: saves to SavedStateHandle so the flag survives screen rotation.
+     * Desktop: no-op.
+     */
+    protected abstract fun persistEditingState(isEditing: Boolean)
+
     override fun toggleEditing() {
         editBoardManager.toggleEditing(
             currentTurn = gameManager.gameState.value.currentTurn,
             boardOrientation = _boardOrientation.value,
         )
-        savedStateHandle[KEY_IS_EDITING] = editBoardManager.isEditing.value
+        persistEditingState(editBoardManager.isEditing.value)
     }
 
     override fun toggleEditColor() = editBoardManager.toggleEditColor()
@@ -273,16 +233,14 @@ class GameViewModel(
     override fun gameOver() = gameManager.updateGameStatus(GameStatus.GAME_OVER)
 
     override fun stopGame() {
-        if (gameManager.gameStatus.value != GameStatus.GAME_OVER) {
-            gameManager.updateGameStatus(GameStatus.NO_PLAYING)
-        }
+        gameManager.updateGameStatus(GameStatus.NO_PLAYING)
     }
 
     override fun resumeGame() = gameManager.updateGameStatus(GameStatus.PLAYING)
 
     override fun endEditing() {
         editBoardManager.endEditing()
-        savedStateHandle[KEY_IS_EDITING] = false
+        persistEditingState(false)
     }
 
     override fun updateGameState(gameState: GameState) = gameManager.updateGameState(gameState)
@@ -291,10 +249,10 @@ class GameViewModel(
         _showLogoTransition.update { true }
         endEditing()
         playerSettings.updatePlayerSide(playerSide)
+        aiEngine.clearHistory()
         setGame(GameState.initialGameState())
         _startedFromEditedBoard.update { false }
         _startedFromImportedGame.update { false }
-        resetManualRotation()
         resumeGame()
         saveGameState()
     }
@@ -324,23 +282,10 @@ class GameViewModel(
         val initialState = runCatching { GameState.parseBoardNotation(matchDto.game.initialBoardPosition) }
             .getOrElse { GameState.initialGameState() }
 
-        // 1. Fix the initial game state BEFORE rebuilding history.
-        //    setGame() was wrong here: it overwrites initialGameState with boardPosition
-        //    (the mid-game save point), breaking undo past the first move.
-        //    We only need to set the true initial state and clear history.
         gameManager.clearHistory(initialState)
         gameManager.setInitialGameState(initialState)
-
-        // 2. Rebuild the full move history from the true initial position.
-        //    updateHistory() always sets moveIndex = lastIndex, so the list
-        //    shows the last move — regardless of where the game was saved.
         updateHistory(matchDto.game.moveHistory, initialState)
 
-        // 3. Restore the save point: find the history entry whose board state
-        //    matches boardPosition, then seek to it so both the board display
-        //    and the move list agree on the same position.
-        //    Falls back to the last entry if no match is found (safety net for
-        //    games saved at the final move or with legacy boardPosition data).
         val savedBoardPosition = matchDto.game.boardPosition
         val targetIndex = gameManager.history.value.toList()
             .indexOfLast { it.gameState.toPositionNotation() == savedBoardPosition }
@@ -350,17 +295,6 @@ class GameViewModel(
         resumeGame()
     }
 
-    /**
-     * Exporta el estado actual a un [MatchDto] usando los labels de jugador
-     * provistos por el caller.
-     *
-     * El cálculo de [whiteLabel] y [blackLabel] es responsabilidad de [GameScreen],
-     * que tiene acceso al contexto de localización y al estado de configuración
-     * de cada banda (IA/Humano, dificultad, nombre de usuario).
-     *
-     * @param whiteLabel Etiqueta del jugador blanco (ej. `"Agustín"`, `"IA (Fácil)"`).
-     * @param blackLabel Etiqueta del jugador negro (ej. `"Humano"`, `"IA (Campeón)"`).
-     */
     override fun exportGameToMatchDto(whiteLabel: String, blackLabel: String): MatchDto {
         val gameState = gameManager.gameState.value
         val moveHistory = gameManager.history.value
@@ -372,9 +306,6 @@ class GameViewModel(
                 ?: MatchResult.UNDEFINED.getValue(),
         )
 
-        // Estado antes del primer movimiento, fijado en setGame().
-        // Para partidas normales coincide con initialGameState();
-        // para partidas desde tablero editado refleja esa posición personalizada.
         val initialState = gameManager.initialGameState
 
         return MatchDto(
@@ -389,7 +320,7 @@ class GameViewModel(
         )
     }
 
-    // ── startedFromEditedBoard ────────────────────────────────────────────────
+    // ── startedFromEditedBoard / startedFromImportedGame ──────────────────────
 
     private val _startedFromEditedBoard = MutableStateFlow(false)
 
@@ -400,4 +331,18 @@ class GameViewModel(
 
     /** True when this game was loaded from a previously saved game. */
     override val startedFromImportedGame: StateFlow<Boolean> = _startedFromImportedGame.asStateFlow()
+
+    // ── Platform-specific session state ───────────────────────────────────────
+
+    /** Android: serializes to SavedStateHandle. Desktop: no-op. */
+    abstract override fun saveGameState()
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+
+    init {
+        viewModelScope.launch {
+            _boardOrientation.value = BoardOrientation.valueOf(sr.boardOrientation.first())
+            _isManuallyRotated.value = sr.isManuallyRotated.first()
+        }
+    }
 }

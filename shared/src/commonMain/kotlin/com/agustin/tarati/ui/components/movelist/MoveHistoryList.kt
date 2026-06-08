@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -57,19 +58,37 @@ fun MoveHistoryList(
     moveIndex: Int,
     onMoveClick: ((moveIndex: Int) -> Unit)? = null,
 ) {
-    val moves = history.getMoves()
-    val groups = moves.groupByTurns().chunked(2)
-    val currentGroupIndex = moves.moveIndexToGroupIndex(moveIndex)
+    // Memoized to avoid O(N) recomputation on every recomposition.
+    val moves = remember(history) { history.getMoves() }
+    val groups = remember(history) { moves.groupByTurns().chunked(2) }
+    val currentGroupIndex = remember(history, moveIndex) { moves.moveIndexToGroupIndex(moveIndex) }
+
+    // Pre-compute flat start indices per row to avoid O(N²) work inside itemsIndexed.
+    val flatStartIndices = remember(groups) {
+        groups.runningFold(0) { acc, pair -> acc + pair.sumOf { it.moves.size } }
+    }
+
     val listState = rememberLazyListState()
 
-    // Auto-scroll al movimiento activo. Patrón compartido con los tres callers
-    // anteriores: se calcula la fila destino y se anima suavemente hasta ella.
+    // Track previous groups.size to distinguish "new move added" from "user navigated".
+    // Uses a plain array ref so writes don't trigger recomposition.
+    val prevGroupsSizeRef = remember { intArrayOf(0) }
+
     LaunchedEffect(currentGroupIndex, groups.size) {
         if (groups.isEmpty()) return@LaunchedEffect
         val targetRow = (currentGroupIndex / 2)
             .coerceAtLeast(0)
             .coerceAtMost(groups.lastIndex)
-        listState.animateScrollToItem(targetRow)
+        // Instant scroll when a new move was added (AI or player): avoids launching
+        // a frame-by-frame scroll animation on every move during rapid AI play.
+        // Animated scroll when the user navigates through existing history.
+        val newMoveAdded = groups.size > prevGroupsSizeRef[0]
+        prevGroupsSizeRef[0] = groups.size
+        if (newMoveAdded) {
+            listState.scrollToItem(targetRow)
+        } else {
+            listState.animateScrollToItem(targetRow)
+        }
     }
 
     LazyColumn(
@@ -77,15 +96,7 @@ fun MoveHistoryList(
         modifier = modifier,
     ) {
         itemsIndexed(groups) { rowIndex, pair ->
-            // Calcular el índice plano del primer movimiento de esta fila.
-            // Cada fila contiene hasta dos TurnGroups (blancas + negras).
-            // Un TurnGroup con promoción forzada ocupa dos índices planos,
-            // por eso se recalcula acumulando el tamaño de los grupos anteriores.
-            val flatIndexWhite = groups
-                .take(rowIndex)
-                .flatten()
-                .sumOf { it.moves.size }
-
+            val flatIndexWhite = flatStartIndices[rowIndex]
             val white = pair.firstOrNull()
             val black = pair.getOrNull(1)
             val flatIndexBlack = flatIndexWhite + (white?.moves?.size ?: 0)

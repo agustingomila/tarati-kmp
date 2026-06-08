@@ -5,23 +5,35 @@ import com.agustin.tarati.core.data.database.dao.GameDao
 import com.agustin.tarati.core.data.repositories.RoomGameRepository
 import com.agustin.tarati.core.domain.repository.GameRepository
 import com.agustin.tarati.desktop.data.createDesktopDatabase
-import com.agustin.tarati.desktop.features.game.DesktopGameViewModel
-import com.agustin.tarati.desktop.services.achievements.NoOpAchievementsManager
-import com.agustin.tarati.features.detail.GameDetailsViewModel
-import com.agustin.tarati.features.library.GamesLibraryViewModel
+import com.agustin.tarati.di.sharedModules
+import com.agustin.tarati.features.game.DesktopGameViewModel
+import com.agustin.tarati.features.game.IGameModel
+import com.agustin.tarati.features.online.auth.AuthRepository
+import com.agustin.tarati.features.online.auth.DesktopAuthRepository
 import com.agustin.tarati.features.seasonal.ISpecialEventManager
 import com.agustin.tarati.features.seasonal.NoOpSpecialEventManager
 import com.agustin.tarati.features.settings.DesktopSettingsRepository
 import com.agustin.tarati.features.settings.DesktopSettingsViewModel
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.services.achievements.IAchievementsManager
+import com.agustin.tarati.services.achievements.NoOpAchievementsManager
 import com.agustin.tarati.services.clipboard.DesktopClipboardService
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.clipboard.IClipboardService
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.services.sound.NoOpSoundService
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Koin module for Desktop (JVM).
@@ -50,6 +62,21 @@ import org.koin.dsl.module
  * - Achievements: consider local achievement system with SQLite + system notifications
  */
 val desktopServiceModule = module {
+    // HttpClient con engine CIO (JVM/Desktop) para WebSockets y REST
+    single {
+        HttpClient(CIO) {
+            install(WebSockets) {
+                pingInterval = 30.toDuration(DurationUnit.SECONDS)
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    encodeDefaults = true
+                })
+            }
+        }
+    }
+
     // Clipboard — java.awt.Toolkit
     single<IClipboardService> { DesktopClipboardService() }
     single { GameClipboardHelper(get()) }
@@ -83,6 +110,7 @@ val desktopServiceModule = module {
 val desktopDataModule = module {
     // Settings — Preferences persistence
     single<SettingsRepository> { DesktopSettingsRepository() }
+    single<AuthRepository> { DesktopAuthRepository() }
 
     // Room Database — creates instance with SQLite persistence
     single<TaratiDatabase> { createDesktopDatabase() }
@@ -98,17 +126,14 @@ val desktopViewModelModule = module {
     // Settings ViewModel
     viewModel { DesktopSettingsViewModel(get()) }
 
-    // Game ViewModel — CRITICAL: register with IGameModel interface
-    // so NavGraph can resolve it correctly with koinViewModel<GameViewModel>()
-    viewModel { DesktopGameViewModel(get(), get()) }
-
-    // Library and Details ViewModels (already in shared, just need registration)
-    viewModel { GamesLibraryViewModel(get()) }
-    viewModel { GameDetailsViewModel(get()) }
+    // GameViewModel — CRITICAL: register with IGameModel interface
+    // so OnlineGameViewModel can resolve it correctly
+    viewModel { DesktopGameViewModel(get(), get()) } bind IGameModel::class
 }
 
 val desktopModules = listOf(
-    desktopServiceModule,
+    desktopServiceModule
+) + sharedModules + listOf(
     desktopDataModule,
-    desktopViewModelModule,
+    desktopViewModelModule
 )
