@@ -7,6 +7,7 @@ import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
+import com.agustin.tarati.ui.theme.AppTheme
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,6 +73,16 @@ class WasmSettingsRepository : SettingsRepository {
         Difficulty.entries.find { it.name == str(K_DIFF_WHITE) } ?: Difficulty.DEFAULT
     )
     override val difficultyWhite = _difficultyWhite.asStateFlow()
+
+    // ── Theme (tri-state) ──────────────────────────────────────────────────────
+
+    private val _appTheme = MutableStateFlow(
+        // Prefer the explicit tri-state key; fall back to the legacy boolean for
+        // localStorage entries written before this field existed.
+        AppTheme.entries.find { it.name == str(K_APP_THEME) }
+            ?: if (bool(K_DARK_THEME, false)) AppTheme.MODE_NIGHT else AppTheme.MODE_AUTO
+    )
+    override val appTheme = _appTheme.asStateFlow()
 
     // ── User & Localization ────────────────────────────────────────────────────
 
@@ -158,6 +169,14 @@ class WasmSettingsRepository : SettingsRepository {
 
     override suspend fun setDarkTheme(enabled: Boolean) {
         _isDarkTheme.value = enabled; set(K_DARK_THEME, enabled)
+    }
+
+    override suspend fun setAppTheme(theme: AppTheme) {
+        _appTheme.value = theme
+        set(K_APP_THEME, theme.name)
+        val isDark = theme == AppTheme.MODE_NIGHT
+        _isDarkTheme.value = isDark
+        set(K_DARK_THEME, isDark)
     }
 
     override suspend fun setDifficulty(difficulty: Difficulty) {
@@ -302,5 +321,6 @@ class WasmSettingsRepository : SettingsRepository {
         private const val K_ONLINE_TC = "w_online_tc"
         private const val K_ONLINE_RATED = "w_online_rated"
         private const val K_ONLINE_SPECTATING = "w_online_spectating"
+        private const val K_APP_THEME = "w_app_theme"
     }
 }

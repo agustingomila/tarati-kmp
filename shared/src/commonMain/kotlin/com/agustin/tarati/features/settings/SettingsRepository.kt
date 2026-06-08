@@ -6,7 +6,9 @@ import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
+import com.agustin.tarati.ui.theme.AppTheme
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * Interfaz multiplataforma para persistencia de settings.
@@ -17,6 +19,17 @@ import kotlinx.coroutines.flow.Flow
  */
 interface SettingsRepository {
     val isDarkTheme: Flow<Boolean>
+
+    /**
+     * Tema de la aplicación como tri-estado (Auto / Light / Dark).
+     *
+     * Implementación por defecto: derivado de [isDarkTheme] para compatibilidad con
+     * implementaciones existentes que solo almacenan un booleano.
+     * Sobreescribir en implementaciones que soporten persistencia tri-estado real
+     * (p. ej. [WasmSettingsRepository]).
+     */
+    val appTheme: Flow<AppTheme>
+        get() = isDarkTheme.map { if (it) AppTheme.MODE_NIGHT else AppTheme.MODE_AUTO }
     val difficulty: Flow<Difficulty>
 
     /** Difficulty for the Black side. */
@@ -118,6 +131,16 @@ interface SettingsRepository {
 
     suspend fun setTutorialSeen(seen: Boolean)
     suspend fun setDarkTheme(enabled: Boolean)
+
+    /**
+     * Persiste el tema completo. Implementación por defecto: delega a [setDarkTheme]
+     * y pierde la distinción [AppTheme.MODE_DAY]. Sobreescribir donde se necesite
+     * almacenamiento tri-estado real.
+     */
+    suspend fun setAppTheme(theme: AppTheme) {
+        setDarkTheme(theme == AppTheme.MODE_NIGHT)
+    }
+
     suspend fun setDifficulty(difficulty: Difficulty)
     suspend fun setDifficultyBlack(difficulty: Difficulty)
     suspend fun setDifficultyWhite(difficulty: Difficulty)

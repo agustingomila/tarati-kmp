@@ -5,11 +5,18 @@ import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
+import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteList
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISettingsViewModel {
     fun toggleDarkTheme(enabled: Boolean)
+
+    /** Persiste el tema completo (Auto / Light / Dark). */
+    fun setAppTheme(theme: AppTheme) {
+        toggleDarkTheme(theme == AppTheme.MODE_NIGHT)
+    }
+
     fun setUserName(name: String)
     fun setLanguage(language: AppLanguage)
     fun setPalette(paletteName: String)

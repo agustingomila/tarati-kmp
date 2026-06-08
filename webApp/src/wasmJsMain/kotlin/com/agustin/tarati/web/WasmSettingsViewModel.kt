@@ -67,8 +67,8 @@ class WasmSettingsViewModel(
     ) { tc, preMoves -> tc to preMoves }
 
     override val settingsState: StateFlow<SettingsState> = combine(
-        combine(repository.isDarkTheme, repository.difficulty, repository.difficultyBlack) { dark, diff, diffBlack ->
-            Triple(dark, diff, diffBlack)
+        combine(repository.appTheme, repository.difficulty, repository.difficultyBlack) { theme, diff, diffBlack ->
+            Triple(theme, diff, diffBlack)
         },
         combine(repository.userName, repository.language, repository.palette) { user, lang, palette ->
             Triple(user, lang, palette)
@@ -77,10 +77,10 @@ class WasmSettingsViewModel(
         combine(repository.pieceTypeId, timeSettingsFlow) { pieceTypeId, timeSettings ->
             pieceTypeId to timeSettings
         },
-    ) { (dark, diff, diffBlack), (user, lang, palette), (board, sound), (pieceTypeId, timeSettings) ->
+    ) { (theme, diff, diffBlack), (user, lang, palette), (board, sound), (pieceTypeId, timeSettings) ->
         val (timeControl, preMovesEnabled) = timeSettings
         SettingsState(
-            appTheme = if (dark) AppTheme.MODE_NIGHT else AppTheme.MODE_AUTO,
+            appTheme = theme,
             difficulty = diff,
             difficultyBlack = diffBlack,
             userName = user,
@@ -112,6 +112,10 @@ class WasmSettingsViewModel(
 
     override fun toggleDarkTheme(enabled: Boolean) {
         viewModelScope.launch { repository.setDarkTheme(enabled) }
+    }
+
+    override fun setAppTheme(theme: AppTheme) {
+        viewModelScope.launch { repository.setAppTheme(theme) }
     }
 
     override fun setUserName(name: String) {

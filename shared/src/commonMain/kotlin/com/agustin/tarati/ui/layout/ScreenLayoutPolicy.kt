@@ -34,8 +34,8 @@ object ScreenLayoutBreakpoints {
 /** Derivación pura: ancho → categoría de layout. */
 fun screenLayoutFor(width: Dp): ScreenLayout = when {
     width >= ScreenLayoutBreakpoints.Expanded -> ScreenLayout.Expanded
-    width >= ScreenLayoutBreakpoints.Medium -> ScreenLayout.Medium
-    else -> ScreenLayout.Compact
+    width >= ScreenLayoutBreakpoints.Medium   -> ScreenLayout.Medium
+    else                                      -> ScreenLayout.Compact
 }
 
 /**

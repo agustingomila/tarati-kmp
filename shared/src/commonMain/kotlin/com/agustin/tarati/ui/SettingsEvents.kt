@@ -8,7 +8,7 @@ import com.agustin.tarati.ui.theme.AppTheme
 
 fun settingsEvents(viewModel: ISettingsViewModel): SettingsEvents =
     object : SettingsEvents {
-        override fun onThemeChange(theme: AppTheme) = viewModel.toggleDarkTheme(theme == AppTheme.MODE_NIGHT)
+        override fun onThemeChange(theme: AppTheme) = viewModel.setAppTheme(theme)
 
         override fun onUserNameChange(userName: String) = viewModel.setUserName(userName)
 
