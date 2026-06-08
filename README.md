@@ -9,17 +9,23 @@
 [![Room](https://img.shields.io/badge/Room-2.8.4-red.svg)](https://developer.android.com/jetpack/androidx/releases/room)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://www.android.com)
 [![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-orange.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![Web](https://img.shields.io/badge/Web-tarati.tech-blue.svg)](https://tarati.tech)
 [![es](https://flagcdn.com/w20/es.png)](README_es.md)
 
-**Multiplatform implementation (Android · Desktop · iOS) of the strategy game Tarati**
+**Multiplatform implementation (Android · Desktop · Web) of the strategy game Tarati**
 
-[Google Play](#download) · [Core Rules](#core-rules) · [Technologies](#technologies) · [Download Desktop](#desktop)
+[Play Online](https://tarati.tech) · [Google Play](#download) · [Core Rules](#core-rules) · [Technologies](#technologies) · [Download Desktop](#desktop)
 
 </div>
 
 ---
 
 ## Available Platforms
+
+### Web
+
+Play directly at **[tarati.tech](https://tarati.tech)** — no installation required. Online matchmaking, ranked games and
+social features.
 
 ### Android
 
@@ -215,7 +221,9 @@ Intuitive interface built with Jetpack Compose / Compose Multiplatform.
 - **Interactive tutorial** — guide bubbles overlaid on the board
 - **Achievements** — Google Play Games integration (Android)
 - **Bilingual support** — Spanish and English with in-app selector
-- **Multiplatform** — same shared codebase across Android and Desktop
+- **Online multiplayer** — matchmaking, Glicko-2 rating, leaderboard, follows, challenges and spectator mode
+  at [tarati.tech](https://tarati.tech)
+- **Multiplatform** — same shared codebase across Android, Desktop and Web
 
 ---
 
@@ -230,7 +238,7 @@ Intuitive interface built with Jetpack Compose / Compose Multiplatform.
 | Local storage        | Room 2.8.4 (Android/Desktop), DataStore 1.2.1 (Android)                   |
 | Testing              | JUnit 4.13.2, MockK 1.14.9, Coroutines Test 1.11.0                        |
 | Concurrency          | Kotlin Coroutines 1.11.0                                                  |
-| Networking           | Ktor 3.4.3 (client/server, online play in development)                    |
+| Networking           | Ktor 3.5.0 (client + server, online play at tarati.tech)                  |
 | Redis client         | Kreds 0.9.1 (Kotlin-native, coroutines-first)                             |
 | Serialization        | kotlinx-serialization 1.11.0                                              |
 | Time                 | kotlinx-datetime 0.8.0                                                    |
@@ -244,11 +252,10 @@ Tarati/
 │   ├── commonMain/     # Common code (UI, logic, AI, ViewModels)
 │   ├── androidMain/    # Android-specific (graphics APIs)
 │   ├── jvmMain/        # Desktop-specific (Skia, java.util)
-│   └── iosMain/        # iOS (in development)
+│   └── wasmJsMain/     # Web (Compose WASM)
 ├── androidApp/         # Android app (MainActivity, Services)
 ├── desktopApp/         # Desktop app (Main.kt, window)
-├── iosApp/             # iOS app (pending)
-└── server/             # Ktor server (online play, in development)
+└── webApp/             # Web app (Compose for Web / Kotlin WASM)
 ```
 
 ### Project Structure
