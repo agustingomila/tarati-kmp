@@ -27,7 +27,7 @@ import io.ktor.client.request.post
 class SocialRepository(
     private val httpClient: HttpClient,
 ) {
-    private val baseUrl = "http://$devServerUrl"
+    private val baseUrl = devServerUrl
 
     suspend fun getUserProfile(token: String, userId: String): Result<PublicProfileDto> = runCatching {
         httpClient.get("$baseUrl/api/users/$userId") {
