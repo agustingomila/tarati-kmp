@@ -1,8 +1,8 @@
-name: CI/CD Pipeline - Android + Desktop
+name: CI/CD — Plataformas (Android · Desktop · Web)
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ main ]
     paths-ignore:
       - 'README*.md'
       - '**.md'
@@ -11,7 +11,7 @@ on:
       - 'achievements/**'
       - '.gitignore'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'README*.md'
       - '**.md'
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             ./gradlew :androidApp:test --info -PreleaseBuild=true
           else
             ./gradlew :androidApp:test --info
@@ -88,7 +88,7 @@ jobs:
       (
         github.event_name == 'workflow_dispatch'
       ) || (
-        github.ref == 'refs/heads/master' &&
+        github.ref == 'refs/heads/main' &&
         !contains(github.event.head_commit.message, '[skip release]') &&
         !contains(github.event.head_commit.message, '[no release]') &&
         !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
@@ -186,7 +186,7 @@ jobs:
             androidApp/build/outputs/apk/release/*.apk
             androidApp/build/outputs/bundle/release/*.aab
             androidApp/build/outputs/native-debug-symbols/**/*.zip
-          retention-days: 90
+          retention-days: 7
 
       # ═══════════════════════════════════════════════════════════
       # Limpiar keystore
@@ -204,7 +204,7 @@ jobs:
       (
         github.event_name == 'workflow_dispatch'
       ) || (
-        github.ref == 'refs/heads/master' &&
+        github.ref == 'refs/heads/main' &&
         !contains(github.event.head_commit.message, '[skip release]') &&
         !contains(github.event.head_commit.message, '[no release]') &&
         !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
@@ -302,7 +302,84 @@ jobs:
         with:
           name: desktop-${{ matrix.platform }}-v${{ steps.version.outputs.version_name }}
           path: ${{ matrix.artifact_pattern }}
-          retention-days: 90
+          retention-days: 7
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Build Web (Compose WASM) + Deploy a tarati.tech
+  # Corre en paralelo con Android/Desktop. No bloquea create-release.
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: test
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch'
+      ) || (
+        github.ref == 'refs/heads/main' &&
+        !contains(github.event.head_commit.message, '[skip release]') &&
+        !contains(github.event.head_commit.message, '[no release]') &&
+        !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
+      )
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # ═══════════════════════════════════════════════════════════
+      # Build WASM
+      # ═══════════════════════════════════════════════════════════
+      - name: Build Web WASM
+        run: ./gradlew :webApp:wasmJsBrowserDistribution --stacktrace
+
+      - name: Verify WASM output
+        run: |
+          OUTPUT_DIR="webApp/build/dist/wasmJs/productionExecutable"
+          if [ ! -d "$OUTPUT_DIR" ] || [ -z "$(ls -A "$OUTPUT_DIR")" ]; then
+            echo "❌ WASM output no encontrado en $OUTPUT_DIR"
+            exit 1
+          fi
+          echo "✅ WASM build OK — archivos generados:"
+          ls -lh "$OUTPUT_DIR"
+
+      # ═══════════════════════════════════════════════════════════
+      # Deploy al VPS
+      # ═══════════════════════════════════════════════════════════
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Copiar archivos web al VPS
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            webApp/build/dist/wasmJs/productionExecutable/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/tarati/web/
+
+      - name: Recargar nginx
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "docker exec tarati-nginx nginx -s reload && echo '✅ nginx recargado'"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Crear Release con TODOS los artifacts
@@ -314,7 +391,7 @@ jobs:
       (
         github.event_name == 'workflow_dispatch'
       ) || (
-        github.ref == 'refs/heads/master' &&
+        github.ref == 'refs/heads/main' &&
         !contains(github.event.head_commit.message, '[skip release]') &&
         !contains(github.event.head_commit.message, '[no release]') &&
         !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
@@ -471,7 +548,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ build-android ]
     if: >-
-      github.ref == 'refs/heads/master' &&
+      github.ref == 'refs/heads/main' &&
       github.event_name != 'pull_request' &&
       github.event_name != 'schedule'
 
