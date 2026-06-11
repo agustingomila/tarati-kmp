@@ -553,6 +553,56 @@ sealed class ServerMessage {
     data class ChallengeExpired(
         val challengeId: String,
     ) : ServerMessage()
+
+    // ── Torneos ───────────────────────────────────────────────────────────────
+
+    /**
+     * El servidor asignó al jugador una partida dentro de un torneo.
+     * Enviado antes de [MatchFound] para que el cliente muestre el contexto del torneo.
+     *
+     * @param tournamentId ID del torneo
+     * @param gameId       ID de la partida asignada (igual al gameId de [MatchFound])
+     * @param round        Número de ronda actual
+     * @param totalRounds  Total de rondas del torneo
+     */
+    @Serializable
+    data class TournamentGameAssigned(
+        val tournamentId: String,
+        val gameId: String,
+        val round: Int,
+        val totalRounds: Int,
+    ) : ServerMessage()
+
+    /**
+     * Una nueva ronda del torneo ha comenzado.
+     * Enviado a todos los participantes al iniciar cada ronda.
+     */
+    @Serializable
+    data class TournamentRoundStarted(
+        val tournamentId: String,
+        val round: Int,
+        val totalRounds: Int,
+    ) : ServerMessage()
+
+    /**
+     * Los standings del torneo se actualizaron (partida terminada).
+     * Enviado a todos los participantes al terminar cada partida del torneo.
+     */
+    @Serializable
+    data class TournamentStandingsUpdated(
+        val tournamentId: String,
+        val standings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
+    ) : ServerMessage()
+
+    /**
+     * El torneo ha finalizado. Incluye la clasificación final.
+     * Enviado a todos los participantes.
+     */
+    @Serializable
+    data class TournamentFinished(
+        val tournamentId: String,
+        val finalStandings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
+    ) : ServerMessage()
 }
 
 /**

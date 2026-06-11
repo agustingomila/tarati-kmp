@@ -42,6 +42,8 @@
     <string name="enable_ai">Activar IA</string>
     <string name="back">Atrás</string>
     <string name="about">Acerca de</string>
+    <string name="app_version">v%1$s</string>
+    <string name="source_code">Código fuente</string>
     <string name="settings">Configuración</string>
     <string name="language">Idioma</string>
     <string name="spanish">Español</string>

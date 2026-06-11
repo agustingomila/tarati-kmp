@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.layout
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,29 +30,34 @@ sealed interface CompanionPanelDestination {
  * Controla la navegación dentro del panel lateral.
  *
  * Creado una sola vez en [AppContent] y propagado vía [LocalCompanionPanelController].
- * Implementa un back-stack mínimo de un nivel: [navigate] recuerda el destino anterior
- * para que los sub-destinos (Profile desde Leaderboard) puedan volver con [back].
+ * Implementa un back-stack completo: [navigate] apila el destino actual; [back] vuelve
+ * al destino anterior; [close] vacía la pila.
+ *
+ * Ejemplo: Lobby → Leaderboard → Profile → back() → Leaderboard → back() → Lobby.
+ *
+ * @Stable: [destination] usa mutableStateOf — Compose trackea cada cambio,
+ * por lo que se cumple el contrato de estabilidad.
  */
+@Stable
 class CompanionPanelController {
     var destination: CompanionPanelDestination by mutableStateOf(CompanionPanelDestination.None)
         private set
 
-    private var previous: CompanionPanelDestination = CompanionPanelDestination.None
+    private val backStack = ArrayDeque<CompanionPanelDestination>()
 
     val isOpen: Boolean get() = destination !is CompanionPanelDestination.None
 
     fun navigate(dest: CompanionPanelDestination) {
-        previous = destination
+        backStack.addLast(destination)
         destination = dest
     }
 
     fun back() {
-        destination = previous
-        previous = CompanionPanelDestination.None
+        destination = backStack.removeLastOrNull() ?: CompanionPanelDestination.None
     }
 
     fun close() {
-        previous = CompanionPanelDestination.None
+        backStack.clear()
         destination = CompanionPanelDestination.None
     }
 }

@@ -47,6 +47,7 @@ import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
 import com.agustin.tarati.core.domain.game.play.HistoryEntry
+import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.move_history
@@ -377,7 +378,7 @@ fun CollapsibleMoveHistoryCard(
                 ),
             ) {
                 val history = remember(gameDto) {
-                    com.agustin.tarati.core.domain.game.play.StableHistoryList(buildMoveHistoryEntries(gameDto))
+                    StableHistoryList(buildMoveHistoryEntries(gameDto))
                 }
 
                 MoveHistoryList(

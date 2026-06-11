@@ -9,6 +9,8 @@ import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.features.settings.SettingsState
 import com.agustin.tarati.features.settings.SoundState
+import com.agustin.tarati.services.achievements.AchievementId
+import com.agustin.tarati.services.achievements.IAchievementsManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
@@ -17,16 +19,19 @@ import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteList
 import com.agustin.tarati.ui.theme.PaletteManager
+import com.agustin.tarati.ui.theme.SeasonalThemeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
 
 class WasmSettingsViewModel(
     private val repository: SettingsRepository,
+    private val achievementsManager: IAchievementsManager,
 ) : ViewModel(), ISettingsViewModel {
 
     private val _hasTutorialBeenSeen = MutableStateFlow(false)
@@ -94,12 +99,24 @@ class WasmSettingsViewModel(
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = SettingsState())
 
+    // ── Paletas — filtradas por logros desbloqueados ──────────────────────────
+
     override val availablePalettes: StateFlow<PaletteList> = MutableStateFlow(PaletteList(items = allAvailablePalettes))
+
     override val allPalettesForSelector: StateFlow<PaletteList> =
-        MutableStateFlow(PaletteList(items = allAvailablePalettes))
+        achievementsManager.unlockedPaletteAchievements
+            .map { unlocked -> buildPaletteList(unlocked) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = buildPaletteList(emptySet()),
+            )
+
     override val lockedPalettes: StateFlow<LockedPalettes> = MutableStateFlow(LockedPalettes.None)
 
     init {
+        viewModelScope.launch { achievementsManager.syncFromServer() }
+
         viewModelScope.launch {
             repository.palette.collect {
                 PaletteManager.setPalette(allAvailablePalettes.find { p -> p.name == it }
@@ -183,11 +200,24 @@ class WasmSettingsViewModel(
     }
 
     override fun launchPurchaseFlow(productId: String) = Unit
+
     override fun setTimeControl(mode: TimeControlMode) {
         viewModelScope.launch { repository.setTimeControl(mode) }
     }
 
     override fun setPreMovesEnabled(enabled: Boolean) {
         viewModelScope.launch { repository.setPreMovesEnabled(enabled) }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun buildPaletteList(unlocked: Set<AchievementId>): PaletteList {
+        val halloween = AchievementId.HALLOWEEN_THEME in unlocked
+        val christmas = AchievementId.CHRISTMAS_THEME in unlocked
+        val aurora = AchievementId.THE_FIRST_LIGHT in unlocked
+        val ember = AchievementId.THE_DARK_SIDE in unlocked
+        return PaletteList(items = allAvailablePalettes.filter { palette ->
+            SeasonalThemeManager.isPaletteAvailable(palette.name, halloween, christmas, aurora, ember)
+        })
     }
 }

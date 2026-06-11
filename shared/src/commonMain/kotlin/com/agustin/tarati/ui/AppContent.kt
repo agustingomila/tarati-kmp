@@ -20,6 +20,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,6 +38,7 @@ import com.agustin.tarati.features.online.auth.AuthState
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.game.ChallengeEvent
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
+import com.agustin.tarati.features.online.game.TournamentEvent
 import com.agustin.tarati.features.online.lobby.IOnlineLobbyViewModel
 import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
@@ -104,6 +106,20 @@ fun AppContent(
 
     val companion = remember { CompanionPanelController() }
 
+    val authViewModel: IAuthViewModel = koinInject()
+    val authState by authViewModel.authState.collectAsState()
+
+    // Al autenticarse, precarga el nombre local con el displayName de la cuenta.
+    // El usuario puede cambiarlo después sin afectar su cuenta online.
+    LaunchedEffect(authState) {
+        val state = authState
+        if (state is AuthState.Authenticated && !state.userInfo.isGuest) {
+            val name = state.userInfo.displayName.takeIf { it.isNotBlank() }
+                ?: state.userInfo.username
+            settingsViewModel.setUserName(name)
+        }
+    }
+
     TaratiTheme(darkTheme = useDarkTheme) {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -142,6 +158,7 @@ fun AppContent(
                         )
                         AlertHost()
                         ChallengeNotificationEffect()
+                        TournamentNotificationEffect()
                     }
                 }
             }
@@ -204,19 +221,21 @@ private fun CompanionPane(
             },
         )
 
-        is CompanionPanelDestination.Profile -> PublicProfileScreen(
-            userId = dest.userId,
-            onBack = controller::back,
-            onNavigateToGameDetails = { gameId ->
-                scope.launch {
-                    val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
-                    if (matchDto != null) {
-                        gameDetailsViewModel.updateCurrentMatchDto(matchDto)
-                        controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+        is CompanionPanelDestination.Profile -> key(dest.userId) {
+            PublicProfileScreen(
+                userId = dest.userId,
+                onBack = controller::back,
+                onNavigateToGameDetails = { gameId ->
+                    scope.launch {
+                        val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
+                        if (matchDto != null) {
+                            gameDetailsViewModel.updateCurrentMatchDto(matchDto)
+                            controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
 
         CompanionPanelDestination.Settings -> LanguageAwareSettingsScreen(
             viewModel = settingsViewModel,
@@ -294,16 +313,16 @@ private fun ChallengeNotificationEffect(
                         ) {
                             Text(
                                 text = localizedString(Res.string.challenge_from)
-                                    .replace("%1\$s", event.challengerInfo.username),
+                                    .replace($$"%1$s", event.challengerInfo.username),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
                                 text = localizedString(Res.string.challenge_invite)
-                                    .replace("%1\$s", event.challengerInfo.username)
-                                    .replace("%2\$s", "$tcDisplay $ratedDisplay"),
+                                    .replace($$"%1$s", event.challengerInfo.username)
+                                    .replace($$"%2$s", "$tcDisplay $ratedDisplay"),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
-                            androidx.compose.foundation.layout.Row(
+                            Row(
                                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
                             ) {
                                 Button(onClick = {
@@ -334,6 +353,35 @@ private fun ChallengeNotificationEffect(
                 is ChallengeEvent.Expired -> bus.toast(
                     UIMessage.Toast(challengeExpiredMsg)
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Collector global de eventos de torneo.
+ *
+ * Corre en la raíz de la composición para que las notificaciones de torneo
+ * sean visibles desde cualquier pantalla.
+ */
+@Composable
+private fun TournamentNotificationEffect(
+    onlineGameViewModel: IOnlineGameViewModel = koinInject(),
+    bus: UIMessageBus = koinInject(),
+) {
+    LaunchedEffect(Unit) {
+        onlineGameViewModel.tournamentEvents.collect { event ->
+            when (event) {
+                is TournamentEvent.GameAssigned -> bus.toast(
+                    UIMessage.Toast("Torneo · Ronda ${event.round}/${event.totalRounds}: tu partida está lista")
+                )
+
+                is TournamentEvent.Finished -> bus.toast(
+                    UIMessage.Toast("El torneo finalizó — ver la clasificación final")
+                )
+
+                is TournamentEvent.RoundStarted -> Unit
+                is TournamentEvent.StandingsUpdated -> Unit
             }
         }
     }

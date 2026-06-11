@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
+import com.agustin.tarati.services.achievements.AchievementId
+import com.agustin.tarati.services.achievements.IAchievementsManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
@@ -12,10 +14,12 @@ import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteList
 import com.agustin.tarati.ui.theme.PaletteManager
+import com.agustin.tarati.ui.theme.SeasonalThemeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
@@ -28,13 +32,15 @@ import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
  * - [IBillingManager] (Google Play Billing — Android only)
  *
  * En Desktop:
- * - Todas las paletas están disponibles sin restricciones
- * - No hay paletas bloqueadas
- * - launchPurchaseFlow es no-op
- * - purchasedProductIds es un StateFlow vacío
+ * - Las paletas de logros (Halloween, Christmas, Aurora, Ember) se filtran
+ *   según el estado del servidor de Tarati vía [IAchievementsManager.unlockedPaletteAchievements].
+ * - No hay paletas bloqueadas por IAP.
+ * - launchPurchaseFlow es no-op.
+ * - purchasedProductIds es un StateFlow vacío.
  */
 class DesktopSettingsViewModel(
     private val repository: SettingsRepository,
+    private val achievementsManager: IAchievementsManager,
 ) : ViewModel(), ISettingsViewModel {
 
     private val _hasTutorialBeenSeen = MutableStateFlow(false)
@@ -111,21 +117,28 @@ class DesktopSettingsViewModel(
         initialValue = SettingsState(),
     )
 
-    // ── Paletas — todas disponibles en Desktop ────────────────────────────────
+    // ── Paletas — filtradas por logros desbloqueados ──────────────────────────
 
     override val availablePalettes: StateFlow<PaletteList> = MutableStateFlow(
         PaletteList(items = allAvailablePalettes)
     )
 
-    override val allPalettesForSelector: StateFlow<PaletteList> = MutableStateFlow(
-        PaletteList(items = allAvailablePalettes)
-    )
+    override val allPalettesForSelector: StateFlow<PaletteList> =
+        achievementsManager.unlockedPaletteAchievements
+            .map { unlocked -> buildPaletteList(unlocked) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = buildPaletteList(emptySet()),
+            )
 
     override val lockedPalettes: StateFlow<LockedPalettes> = MutableStateFlow(LockedPalettes.None)
 
     // ── Init ──────────────────────────────────────────────────────────────────
 
     init {
+        viewModelScope.launch { achievementsManager.syncFromServer() }
+
         viewModelScope.launch {
             repository.palette.collect { paletteName ->
                 val palette = allAvailablePalettes.find { it.name == paletteName }
@@ -226,5 +239,17 @@ class DesktopSettingsViewModel(
 
     override fun setPreMovesEnabled(enabled: Boolean) {
         viewModelScope.launch { repository.setPreMovesEnabled(enabled) }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun buildPaletteList(unlocked: Set<AchievementId>): PaletteList {
+        val halloween = AchievementId.HALLOWEEN_THEME in unlocked
+        val christmas = AchievementId.CHRISTMAS_THEME in unlocked
+        val aurora = AchievementId.THE_FIRST_LIGHT in unlocked
+        val ember = AchievementId.THE_DARK_SIDE in unlocked
+        return PaletteList(items = allAvailablePalettes.filter { palette ->
+            SeasonalThemeManager.isPaletteAvailable(palette.name, halloween, christmas, aurora, ember)
+        })
     }
 }

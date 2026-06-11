@@ -45,6 +45,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.GlobalContext.stopKoin
 import org.koin.dsl.module
@@ -64,12 +65,18 @@ class SettingsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        // Limpia cualquier instancia Koin dejada por una clase de test anterior en el mismo JVM.
+        // Sin esto, si MainViewModelTest (u otra clase) deja Koin levantado, startKoin falla
+        // en cascade para todos los tests de esta clase.
+        if (GlobalContext.getOrNull() != null) stopKoin()
+
         mockSettingsRepository = mockk()
         mockAchievementsRepository = mockk()
         mockBillingManager = mockk(relaxed = true)
 
         // ── SettingsRepository flows ───────────────────────────────────────────
         coEvery { mockSettingsRepository.isDarkTheme } returns MutableStateFlow(false)
+        every { mockSettingsRepository.appTheme } returns MutableStateFlow(AppTheme.MODE_AUTO)
         coEvery { mockSettingsRepository.difficulty } returns MutableStateFlow(Difficulty.DEFAULT)
         coEvery { mockSettingsRepository.difficultyBlack } returns MutableStateFlow(Difficulty.DEFAULT)
         coEvery { mockSettingsRepository.difficultyWhite } returns MutableStateFlow(Difficulty.DEFAULT)
@@ -130,10 +137,12 @@ class SettingsViewModelTest {
 
     @After
     fun tearDown() {
-        // Cancel viewModelScope before resetMain so active collectors
-        // (combine/collect in init) don't dispatch on the reset main
-        // dispatcher and leak exceptions into subsequent tests.
-        (viewModel as ViewModel).viewModelScope.cancel()
+        // Guard with isInitialized: if setUp() failed, viewModel was never assigned and
+        // calling .viewModelScope would throw UninitializedPropertyAccessException,
+        // preventing stopKoin() from running and poisoning all subsequent tests.
+        if (::viewModel.isInitialized) {
+            (viewModel as ViewModel).viewModelScope.cancel()
+        }
         stopKoin()
         Dispatchers.resetMain()
     }
@@ -528,6 +537,43 @@ class SettingsViewModelTest {
             "true should convert to NIGHT",
             AppTheme.MODE_NIGHT,
             convertDarkThemeToAppTheme(true),
+        )
+    }
+
+    // ── setAppTheme ───────────────────────────────────────────────────────────
+
+    @Test
+    fun setAppTheme_night_callsRepositorySetAppTheme() = runTest {
+        coEvery { mockSettingsRepository.setAppTheme(any()) } returns Unit
+
+        viewModel.setAppTheme(AppTheme.MODE_NIGHT)
+        advanceUntilIdle()
+
+        coVerify { mockSettingsRepository.setAppTheme(AppTheme.MODE_NIGHT) }
+    }
+
+    @Test
+    fun setAppTheme_auto_callsRepositorySetAppTheme() = runTest {
+        coEvery { mockSettingsRepository.setAppTheme(any()) } returns Unit
+
+        viewModel.setAppTheme(AppTheme.MODE_AUTO)
+        advanceUntilIdle()
+
+        coVerify { mockSettingsRepository.setAppTheme(AppTheme.MODE_AUTO) }
+    }
+
+    @Test
+    fun settingsState_appTheme_reflectsRepositoryAppThemeFlow() = runTest {
+        every { mockSettingsRepository.appTheme } returns MutableStateFlow(AppTheme.MODE_NIGHT)
+
+        val testViewModel =
+            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+        advanceUntilIdle()
+
+        assertEquals(
+            "settingsState.appTheme should reflect MODE_NIGHT from repository",
+            AppTheme.MODE_NIGHT,
+            testViewModel.settingsState.value.appTheme,
         )
     }
 
@@ -972,6 +1018,145 @@ class SettingsViewModelTest {
         advanceUntilIdle()
         coVerify { mockSettingsRepository.setPreMovesEnabled(false) }
     }
+
+    // ── allPalettesForSelector — achievement unlocks ───────────────────────────
+
+    @Test
+    fun allPalettesForSelector_includesHalloweenWhenUnlocked() =
+        runTest {
+            val halloweenFlow = MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.halloweenUnlocked } returns halloweenFlow
+            coEvery { mockAchievementsRepository.christmasUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.auroraUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
+
+            val testViewModel =
+                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+
+            halloweenFlow.value = true
+            advanceUntilIdle()
+
+            val names = testViewModel.allPalettesForSelector.value.items.map { it.name }
+            assertTrue(
+                "allPalettesForSelector should include Halloween when unlocked",
+                names.contains(SeasonalThemeManager.HALLOWEEN_PALETTE),
+            )
+        }
+
+    @Test
+    fun allPalettesForSelector_includesAuroraWhenUnlocked() =
+        runTest {
+            val auroraFlow = MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.christmasUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.auroraUnlocked } returns auroraFlow
+            coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
+
+            val testViewModel =
+                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+
+            auroraFlow.value = true
+            advanceUntilIdle()
+
+            val names = testViewModel.allPalettesForSelector.value.items.map { it.name }
+            assertTrue(
+                "allPalettesForSelector should include Aurora when unlocked",
+                names.contains(SeasonalThemeManager.AURORA_PALETTE),
+            )
+        }
+
+    @Test
+    fun allPalettesForSelector_includesEmberWhenUnlocked() =
+        runTest {
+            val emberFlow = MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.christmasUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.auroraUnlocked } returns MutableStateFlow(false)
+            coEvery { mockAchievementsRepository.emberUnlocked } returns emberFlow
+
+            val testViewModel =
+                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+
+            emberFlow.value = true
+            advanceUntilIdle()
+
+            val names = testViewModel.allPalettesForSelector.value.items.map { it.name }
+            assertTrue(
+                "allPalettesForSelector should include Ember when unlocked",
+                names.contains(SeasonalThemeManager.EMBER_PALETTE),
+            )
+        }
+
+    // ── applySeasonalThemeIfNeeded ────────────────────────────────────────────
+
+    @Test
+    fun applySeasonalThemeIfNeeded_appliesThemeWhenSeasonalAndNeverApplied() =
+        runTest {
+            coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
+            coEvery { mockSettingsRepository.setSeasonalAutoAppliedDate(any()) } returns Unit
+            coEvery { mockSettingsRepository.setPreSeasonalPalette(any()) } returns Unit
+
+            val seasonalPalette = SeasonalThemeManager.getSeasonalPaletteForToday()
+            if (seasonalPalette == null) return@runTest  // no es día estacional, skip
+
+            (viewModel as AndroidSettingsViewModel).applySeasonalThemeIfNeeded(
+                repository = mockSettingsRepository,
+                currentPaletteName = "Classic",
+                lastAppliedDate = "",            // nunca aplicado
+                preSeasonalPalette = "",
+            )
+            advanceUntilIdle()
+
+            coVerify { mockSettingsRepository.setPalette(seasonalPalette) }
+        }
+
+    @Test
+    fun applySeasonalThemeIfNeeded_skipsIfAlreadyAppliedToday() =
+        runTest {
+            coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
+
+            val todayKey = SeasonalThemeManager.todayKey()
+
+            (viewModel as AndroidSettingsViewModel).applySeasonalThemeIfNeeded(
+                repository = mockSettingsRepository,
+                currentPaletteName = "Classic",
+                lastAppliedDate = todayKey,      // ya aplicado hoy
+                preSeasonalPalette = "",
+            )
+            advanceUntilIdle()
+
+            coVerify(exactly = 0) { mockSettingsRepository.setPalette(any()) }
+        }
+
+    @Test
+    fun restorePreSeasonalPalette_doesNothingWhenNoPreSeasonal() =
+        runTest {
+            coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
+
+            (viewModel as AndroidSettingsViewModel).restorePreSeasonalPaletteIfNeeded(
+                repository = mockSettingsRepository,
+                currentPaletteName = SeasonalThemeManager.HALLOWEEN_PALETTE,
+                preSeasonalPalette = "",         // sin paleta guardada
+            )
+            advanceUntilIdle()
+
+            coVerify(exactly = 0) { mockSettingsRepository.setPalette(any()) }
+        }
+
+    @Test
+    fun restorePreSeasonalPalette_doesNothingWhenCurrentIsNotSeasonal() =
+        runTest {
+            coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
+
+            (viewModel as AndroidSettingsViewModel).restorePreSeasonalPaletteIfNeeded(
+                repository = mockSettingsRepository,
+                currentPaletteName = "Classic",  // no es estacional
+                preSeasonalPalette = "Nature",
+            )
+            advanceUntilIdle()
+
+            coVerify(exactly = 0) { mockSettingsRepository.setPalette(any()) }
+        }
 }
 
 // Helper para testear la lógica de conversión directamente

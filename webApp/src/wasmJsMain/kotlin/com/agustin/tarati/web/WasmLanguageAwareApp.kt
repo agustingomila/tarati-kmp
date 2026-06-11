@@ -59,6 +59,7 @@ fun WasmLanguageAwareApp(
  * own property without touching the prototype, which always succeeds.
  * Subsequent calls re-define the (already configurable) own property.
  */
+@OptIn(ExperimentalWasmJsInterop::class)
 internal fun overrideNavigatorLanguages(lang: String) {
     js("try { Object.defineProperty(window.navigator, 'languages', { value: [lang], configurable: true, writable: true }) } catch(e) { console.warn('[Tarati] navigator.languages override failed:', e) }")
 }

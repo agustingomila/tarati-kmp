@@ -8,17 +8,20 @@ import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.seasonal.ISpecialEventManager
 import com.agustin.tarati.features.seasonal.NoOpSpecialEventManager
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.AchievementSyncService
 import com.agustin.tarati.services.achievements.IAchievementsManager
-import com.agustin.tarati.services.achievements.NoOpAchievementsManager
+import com.agustin.tarati.services.achievements.ServerAchievementsManager
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.clipboard.IClipboardService
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.services.sound.NoOpSoundService
+import com.agustin.tarati.services.url.IUrlLauncher
 import com.agustin.tarati.web.NoOpGameRepository
 import com.agustin.tarati.web.WasmAuthRepository
 import com.agustin.tarati.web.WasmClipboardService
 import com.agustin.tarati.web.WasmSettingsRepository
 import com.agustin.tarati.web.WasmSettingsViewModel
+import com.agustin.tarati.web.WasmUrlLauncher
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.js.Js
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -47,8 +50,12 @@ val webServiceModule = module {
     single<IClipboardService> { WasmClipboardService() }
     single { GameClipboardHelper(get()) }
     single<ISoundService> { NoOpSoundService() }
+    single<IUrlLauncher> { WasmUrlLauncher() }
     single<ISpecialEventManager> { NoOpSpecialEventManager() }
-    single<IAchievementsManager> { NoOpAchievementsManager() }
+
+    // Achievements — syncs to server when authenticated
+    single { AchievementSyncService(get()) }
+    single<IAchievementsManager> { ServerAchievementsManager(get(), get(), get()) }
 }
 
 val webDataModule = module {
@@ -58,7 +65,7 @@ val webDataModule = module {
 }
 
 val webViewModelModule = module {
-    viewModel { WasmSettingsViewModel(get()) }
+    viewModel { WasmSettingsViewModel(get(), get()) }
     viewModel { WasmGameViewModel(get(), get()) } bind IGameModel::class
 }
 

@@ -254,6 +254,14 @@ interface IOnlineGameViewModel {
 
     /** Cancela un desafío previamente enviado. */
     suspend fun cancelChallenge(challengeId: String)
+
+    // ── Torneos ───────────────────────────────────────────────────────────────
+
+    /**
+     * Eventos del sistema de torneos recibidos por WebSocket.
+     * La UI los usa para mostrar notificaciones y actualizar pantallas de torneo.
+     */
+    val tournamentEvents: SharedFlow<TournamentEvent>
 }
 
 // ── Server error types ───────────────────────────────────────────────────────
@@ -321,6 +329,42 @@ sealed class ChallengeEvent {
 
     /** El desafío expiró sin respuesta (30s) o fue cancelado. */
     data class Expired(val challengeId: String) : ChallengeEvent()
+}
+
+// ── Tournament types ──────────────────────────────────────────────────────────
+
+/** Eventos del sistema de torneos propagados desde el servidor vía WebSocket. */
+sealed class TournamentEvent {
+    /**
+     * El servidor asignó una partida de torneo a este jugador.
+     * Llega justo antes de [ServerMessage.MatchFound] para el mismo [gameId],
+     * de modo que el cliente puede mostrar el contexto del torneo antes de navegar al tablero.
+     */
+    data class GameAssigned(
+        val tournamentId: String,
+        val gameId: String,
+        val round: Int,
+        val totalRounds: Int,
+    ) : TournamentEvent()
+
+    /** Una nueva ronda del torneo ha comenzado. */
+    data class RoundStarted(
+        val tournamentId: String,
+        val round: Int,
+        val totalRounds: Int,
+    ) : TournamentEvent()
+
+    /** Los standings del torneo se actualizaron tras finalizar una partida. */
+    data class StandingsUpdated(
+        val tournamentId: String,
+        val standings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
+    ) : TournamentEvent()
+
+    /** El torneo ha finalizado. Incluye la clasificación final. */
+    data class Finished(
+        val tournamentId: String,
+        val finalStandings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
+    ) : TournamentEvent()
 }
 
 data class SpectatingState(

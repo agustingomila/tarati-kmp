@@ -16,6 +16,9 @@ import com.agustin.tarati.features.online.social.IPublicProfileViewModel
 import com.agustin.tarati.features.online.social.LeaderboardViewModel
 import com.agustin.tarati.features.online.social.PublicProfileViewModel
 import com.agustin.tarati.features.online.social.SocialRepository
+import com.agustin.tarati.features.online.tournament.ITournamentViewModel
+import com.agustin.tarati.features.online.tournament.TournamentRepository
+import com.agustin.tarati.features.online.tournament.TournamentViewModel
 import com.agustin.tarati.network.client.OnlineGameClient
 import com.agustin.tarati.network.client.TaratiWebSocketClient
 import org.koin.core.module.dsl.viewModel
@@ -211,6 +214,18 @@ val onlineModule = module {
             authViewModel = get(),
         )
     } bind IOnlineLobbyViewModel::class
+
+    // ============ Torneos ============
+
+    single { TournamentRepository(httpClient = get()) }
+
+    viewModel {
+        TournamentViewModel(
+            repository = get(),
+            authViewModel = get(),
+            onlineGameViewModel = get(),
+        )
+    } bind ITournamentViewModel::class
 
     // ============ Social (Leaderboard + Perfil público) ============
 

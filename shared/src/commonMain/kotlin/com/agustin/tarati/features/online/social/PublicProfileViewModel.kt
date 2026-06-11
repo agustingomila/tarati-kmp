@@ -30,7 +30,8 @@ class PublicProfileViewModel(
     private val _followStatusState = MutableStateFlow(FollowStatusUiState())
     override val followStatusState: StateFlow<FollowStatusUiState> = _followStatusState.asStateFlow()
 
-    override val isOwnProfile: Boolean = authViewModel.currentUser?.userId == userId
+    override val isOwnProfile: Boolean
+        get() = authViewModel.currentUser?.userId == userId
 
     init {
         loadProfile()

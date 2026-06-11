@@ -4,7 +4,10 @@ package com.agustin.tarati.features.seasonal
 import com.agustin.tarati.R
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.MatchState
+import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.AchievementId
+import com.agustin.tarati.services.achievements.AchievementSyncService
 import com.agustin.tarati.services.achievements.AchievementsRepository
 import com.agustin.tarati.services.achievements.IAchievementsReporter
 import com.agustin.tarati.ui.theme.AuroraPalette
@@ -56,6 +59,8 @@ class SpecialEventManager(
     private val achievementsRepository: AchievementsRepository,
     private val settingsRepository: SettingsRepository,
     private val reporter: IAchievementsReporter,
+    private val syncService: AchievementSyncService,
+    private val authRepository: AuthRepository,
     /**
      * Coroutine scope for async DataStore operations and the init refresh.
      * Defaults to a long-lived IO scope for production.
@@ -237,13 +242,17 @@ class SpecialEventManager(
             "Ember" -> achievementsRepository.unlockEmber()
         }
 
-        // 1b. Report to Play Games
-        val achievementResId = when (event.reward.paletteName) {
-            "Aurora" -> R.string.achievement_the_first_light
-            "Ember" -> R.string.achievement_the_dark_side
-            else -> null
+        // 1b. Report to Play Games + servidor
+        val (achievementResId, achievementId) = when (event.reward.paletteName) {
+            "Aurora" -> R.string.achievement_the_first_light to AchievementId.THE_FIRST_LIGHT
+            "Ember" -> R.string.achievement_the_dark_side to AchievementId.THE_DARK_SIDE
+            else -> null to null
         }
         achievementResId?.let { reporter.unlock(it) }
+        achievementId?.let { id ->
+            val token = authRepository.getToken()
+            if (token != null) scope.launch { syncService.unlock(token, id) }
+        }
 
         // 2. Aplicar paleta inmediatamente
         val palette = when (event.reward.paletteName) {

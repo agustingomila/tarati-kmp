@@ -3,7 +3,9 @@ package com.agustin.tarati.features.seasonal
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.MatchState
+import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.AchievementSyncService
 import com.agustin.tarati.services.achievements.AchievementsRepository
 import com.agustin.tarati.services.achievements.IAchievementsReporter
 import com.agustin.tarati.shared.generated.resources.Res
@@ -123,6 +125,8 @@ class SpecialEventManagerTest {
         achievementsRepository = achievementsRepository,
         settingsRepository = settingsRepository,
         reporter = reporter,
+        syncService = mockk<AchievementSyncService>(relaxed = true),
+        authRepository = mockk<AuthRepository>(relaxed = true),
         scope = CoroutineScope(UnconfinedTestDispatcher()),
         specialEvents = testEvents,
         dateProvider = { fakeDate },

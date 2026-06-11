@@ -16,6 +16,7 @@ import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.domain.game.play.Move
+import com.agustin.tarati.features.online.auth.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -76,6 +77,8 @@ class AchievementsManagerTest {
             activityProvider = mockk(relaxed = true),
             reporter = reporter,
             aiEngine = mockk<IAIEngine>(relaxed = true),
+            syncService = mockk(relaxed = true),
+            authRepository = mockk<AuthRepository>(relaxed = true),
         )
     }
 

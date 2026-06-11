@@ -27,6 +27,7 @@ import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
 import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
+import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
 import com.agustin.tarati.features.settings.SettingsViewModel
@@ -43,6 +44,7 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.LoginScree
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.TournamentDetailDest
 import com.agustin.tarati.ui.layout.CompanionPanelDestination
 import com.agustin.tarati.ui.layout.LocalCompanionPanelController
 import com.agustin.tarati.ui.layout.LocalScreenLayout
@@ -228,6 +230,9 @@ fun NavGraph(
                         }
                     }
                 },
+                onNavigateToTournament = { tournamentId ->
+                    navController.navigate(TournamentDetailDest.createRoute(tournamentId))
+                },
                 viewModel = onlineLobbyViewModel,
             )
         }
@@ -255,6 +260,16 @@ fun NavGraph(
                         }
                     }
                 },
+            )
+        }
+
+        composable(TournamentDetailDest.route) { backStackEntry ->
+            val tournamentId = backStackEntry.arguments?.read {
+                getString("tournamentId")
+            } ?: return@composable
+            TournamentDetailScreen(
+                tournamentId = tournamentId,
+                onBack = { navController.popBackStack() },
             )
         }
     }

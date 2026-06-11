@@ -3,6 +3,7 @@ package com.agustin.tarati.features.settings
 
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
+import com.agustin.tarati.core.domain.game.time.TimeControl
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
@@ -145,7 +146,7 @@ class DesktopSettingsRepository : SettingsRepository {
     private val _preMovesEnabled = MutableStateFlow(prefs.getBoolean(KEY_PRE_MOVES_ENABLED, true))
     override val preMovesEnabled = _preMovesEnabled.asStateFlow()
 
-    private val _onlineTimeControl = MutableStateFlow(prefs.get(KEY_ONLINE_TIME_CONTROL, "blitz"))
+    private val _onlineTimeControl = MutableStateFlow(prefs.get(KEY_ONLINE_TIME_CONTROL, TimeControl.BLITZ.key))
     override val onlineTimeControl = _onlineTimeControl.asStateFlow()
 
     private val _onlineRated = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_RATED, true))

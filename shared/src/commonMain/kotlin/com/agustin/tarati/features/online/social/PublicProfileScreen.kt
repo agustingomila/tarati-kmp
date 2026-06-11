@@ -103,7 +103,7 @@ fun PublicProfileScreen(
     userId: String,
     onBack: () -> Unit,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
-    viewModel: IPublicProfileViewModel = koinViewModel<PublicProfileViewModel> {
+    viewModel: IPublicProfileViewModel = koinViewModel<PublicProfileViewModel>(key = userId) {
         parametersOf(userId)
     },
 ) {
@@ -582,7 +582,7 @@ private fun ChallengeDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                localizedString(Res.string.challenge_dialog_title).replace("%1\$s", targetName),
+                localizedString(Res.string.challenge_dialog_title).replace($$"%1$s", targetName),
                 style = MaterialTheme.typography.titleMedium,
             )
         },

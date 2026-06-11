@@ -111,7 +111,7 @@ fun LeaderboardScreen(
                     ) {
                         Text(
                             text = localizedString(Res.string.error)
-                                .replace("%1\$s", state.error.orEmpty()),
+                                .replace($$"%1$s", state.error.orEmpty()),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium,
                         )

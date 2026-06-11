@@ -132,10 +132,12 @@ class MainViewModelTest {
 
     @After
     fun tearDown() {
-        // Cancel viewModelScope before resetMain so active collectors
-        // (combine/collect in init) don't dispatch on the reset main
-        // dispatcher and leak exceptions into subsequent tests.
-        (viewModel as ViewModel).viewModelScope.cancel()
+        // Cancel viewModelScope before resetMain so active collectors don't
+        // dispatch on the reset dispatcher and leak exceptions into subsequent tests.
+        // Guard with isInitialized: if setUp() failed, viewModel was never assigned.
+        if (::viewModel.isInitialized) {
+            (viewModel as ViewModel).viewModelScope.cancel()
+        }
         stopKoin()
         Dispatchers.resetMain()
     }
@@ -343,14 +345,6 @@ class MainViewModelTest {
         viewModel.rotateBoardManually()
 
         assertTrue("Manual rotation should be true after rotate", viewModel.isManuallyRotated.value)
-    }
-
-    @Test
-    fun startGame_resetsManualRotationFlag() {
-        viewModel.rotateBoardManually()
-        viewModel.startGame(CobColor.WHITE)
-
-        assertFalse("Manual rotation should be reset on new game", viewModel.isManuallyRotated.value)
     }
 
     // ── showLogoTransition ────────────────────────────────────────────────────

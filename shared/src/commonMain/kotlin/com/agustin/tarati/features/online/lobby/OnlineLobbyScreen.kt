@@ -1,11 +1,15 @@
 package com.agustin.tarati.features.online.lobby
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,7 +35,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -66,7 +72,10 @@ import com.agustin.tarati.features.online.connection.ConnectionState
 import com.agustin.tarati.features.online.connection.IConnectionViewModel
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
+import com.agustin.tarati.features.online.tournament.ITournamentViewModel
+import com.agustin.tarati.features.online.tournament.TournamentViewModel
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.network.models.CreateTournamentRequest
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.GameTimeControl
 import com.agustin.tarati.network.models.LiveGameDto
@@ -74,6 +83,9 @@ import com.agustin.tarati.network.models.MatchmakingState
 import com.agustin.tarati.network.models.MatchmakingTicket
 import com.agustin.tarati.network.models.OnlineGameStatus
 import com.agustin.tarati.network.models.OpenSearchDto
+import com.agustin.tarati.network.models.TournamentStatus
+import com.agustin.tarati.network.models.TournamentSummaryDto
+import com.agustin.tarati.network.models.TournamentType
 import com.agustin.tarati.services.localization.LocalizedText
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
@@ -172,6 +184,8 @@ fun OnlineLobbyScreen(
     onLeaderboard: (() -> Unit)? = null,
     /** Callback al tocar una partida en el historial. Null = sin navegación al detalle. */
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+    /** Callback al tocar un torneo en el tab Torneos. Null = sin navegación al detalle. */
+    onNavigateToTournament: ((tournamentId: String) -> Unit)? = null,
     viewModel: IOnlineLobbyViewModel = koinViewModel<OnlineLobbyViewModel>(),
     connectionViewModel: IConnectionViewModel = koinInject(),
     onlineGameViewModel: IOnlineGameViewModel = koinInject(),
@@ -282,7 +296,7 @@ fun OnlineLobbyScreen(
 
     TaratiBackground {
         // Acciones compartidas entre TopBar (FullScreen) y CompanionPanelHeader (CompanionPanel).
-        val topBarActions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {
+        val topBarActions: @Composable RowScope.() -> Unit = {
             if (onLeaderboard != null) {
                 IconButton(onClick = onLeaderboard) {
                     Icon(
@@ -356,7 +370,7 @@ fun OnlineLobbyScreen(
                     is ConnectionState.Online -> Unit
                 }
 
-                PrimaryTabRow(selectedTabIndex = selectedTab) {
+                PrimaryScrollableTabRow(selectedTabIndex = selectedTab) {
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
@@ -393,6 +407,18 @@ fun OnlineLobbyScreen(
                             )
                         },
                     )
+                    Tab(
+                        selected = selectedTab == 3,
+                        onClick = { selectedTab = 3 },
+                        text = { Text("Torneos") },
+                        icon = {
+                            Icon(
+                                TaratiIcons.EmojiEvents,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
                 }
 
                 when (selectedTab) {
@@ -413,6 +439,7 @@ fun OnlineLobbyScreen(
 
                     1 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
                     2 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                    3 -> TournamentsTab(onNavigateToTournament = onNavigateToTournament)
                 }
             }
         }
@@ -1295,4 +1322,297 @@ private fun formatMs(ms: Long): String {
     val min = totalSec / 60
     val sec = totalSec % 60
     return "$min:${sec.toString().padStart(2, '0')}"
+}
+
+// ── Tab: Torneos ───────────────────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TournamentsTab(
+    onNavigateToTournament: ((tournamentId: String) -> Unit)? = null,
+    authViewModel: IAuthViewModel = koinInject(),
+    viewModel: ITournamentViewModel = koinViewModel<TournamentViewModel>(),
+) {
+    val state by viewModel.listState.collectAsState()
+    val scope = rememberCoroutineScope()
+    val token = authViewModel.getStoredToken()
+    var showCreateDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (token != null) viewModel.loadTournaments(token)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+
+            state.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        state.error ?: "Error",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { if (token != null) viewModel.loadTournaments(token) }) {
+                        Text("Reintentar")
+                    }
+                }
+            }
+
+            state.isEmpty -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "No hay torneos disponibles",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = { showCreateDialog = true }) {
+                        Text("Crear torneo")
+                    }
+                }
+            }
+
+            else -> {
+                LazyColumn(contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)) {
+                    if (state.registering.isNotEmpty()) {
+                        item {
+                            Text(
+                                "Inscripciones abiertas",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                            )
+                        }
+                        items(state.registering, key = { it.id }) { t ->
+                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                        }
+                    }
+                    if (state.active.isNotEmpty()) {
+                        item {
+                            Text(
+                                "En curso",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
+                            )
+                        }
+                        items(state.active, key = { it.id }) { t ->
+                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                        }
+                    }
+                    if (state.finished.isNotEmpty()) {
+                        item {
+                            Text(
+                                "Finalizados",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
+                            )
+                        }
+                        items(state.finished, key = { it.id }) { t ->
+                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                        }
+                    }
+                    item { Spacer(Modifier.height(80.dp)) }
+                }
+
+                // FAB crear torneo
+                androidx.compose.material3.FloatingActionButton(
+                    onClick = { showCreateDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                ) {
+                    Icon(TaratiIcons.EmojiEvents, contentDescription = "Crear torneo")
+                }
+            }
+        }
+    }
+
+    if (showCreateDialog) {
+        CreateTournamentDialog(
+            onDismiss = { showCreateDialog = false },
+            onCreate = { request ->
+                if (token != null) scope.launch {
+                    viewModel.createTournament(token, request)
+                    showCreateDialog = false
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun TournamentCard(
+    tournament: TournamentSummaryDto,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+    ) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    tournament.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                )
+                val statusColor = when (tournament.status) {
+                    TournamentStatus.REGISTERING -> Color(0xFFFFC107)
+                    TournamentStatus.ACTIVE -> Color(0xFF4CAF50)
+                    TournamentStatus.FINISHED -> MaterialTheme.colorScheme.onSurfaceVariant
+                    TournamentStatus.CANCELLED -> MaterialTheme.colorScheme.error
+                }
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .background(statusColor, CircleShape)
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    tournament.type.name.replace('_', ' '),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    tournament.timeControl.replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    "${tournament.participantCount}/${tournament.maxPlayers} jugadores",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+private fun CreateTournamentDialog(
+    onDismiss: () -> Unit,
+    onCreate: (CreateTournamentRequest) -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    var selectedType by remember {
+        mutableStateOf(TournamentType.ROUND_ROBIN)
+    }
+    var selectedTc by remember { mutableStateOf("blitz") }
+    var isRated by remember { mutableStateOf(true) }
+    var minPlayers by remember { mutableStateOf("4") }
+    var maxPlayers by remember { mutableStateOf("16") }
+
+    // Presets de tiempo control
+    val tcPresets = mapOf(
+        "bullet" to (60 to 0),
+        "blitz" to (180 to 2),
+        "rapid" to (600 to 5),
+        "classical" to (1800 to 20),
+    )
+    val (initialTime, increment) = tcPresets[selectedTc] ?: (180 to 2)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Crear torneo") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nombre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                // Tipo
+                Text("Formato", style = MaterialTheme.typography.labelMedium)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    TournamentType.entries.forEach { type ->
+                        FilterChip(
+                            selected = selectedType == type,
+                            onClick = { selectedType = type },
+                            label = { Text(type.name.replace('_', ' ')) },
+                        )
+                    }
+                }
+                // Time control
+                Text("Control de tiempo", style = MaterialTheme.typography.labelMedium)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    TimeControl.list().forEach { tc ->
+                        FilterChip(
+                            selected = selectedTc == tc,
+                            onClick = { selectedTc = tc },
+                            label = { Text(tc.replaceFirstChar { it.uppercase() }) },
+                        )
+                    }
+                }
+                // Rated toggle
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Rated")
+                    Switch(checked = isRated, onCheckedChange = { isRated = it })
+                }
+                // Jugadores
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = minPlayers,
+                        onValueChange = { minPlayers = it },
+                        label = { Text("Mín. jugadores") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedTextField(
+                        value = maxPlayers,
+                        onValueChange = { maxPlayers = it },
+                        label = { Text("Máx. jugadores") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val request = CreateTournamentRequest(
+                        name = name.trim(),
+                        type = selectedType,
+                        timeControl = selectedTc,
+                        initialTime = initialTime,
+                        increment = increment,
+                        isRated = isRated,
+                        minPlayers = minPlayers.toIntOrNull() ?: 4,
+                        maxPlayers = maxPlayers.toIntOrNull() ?: 16,
+                    )
+                    onCreate(request)
+                },
+                enabled = name.isNotBlank(),
+            ) { Text("Crear") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        },
+    )
 }

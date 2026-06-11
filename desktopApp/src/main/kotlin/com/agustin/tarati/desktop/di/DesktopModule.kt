@@ -15,13 +15,16 @@ import com.agustin.tarati.features.seasonal.NoOpSpecialEventManager
 import com.agustin.tarati.features.settings.DesktopSettingsRepository
 import com.agustin.tarati.features.settings.DesktopSettingsViewModel
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.AchievementSyncService
 import com.agustin.tarati.services.achievements.IAchievementsManager
-import com.agustin.tarati.services.achievements.NoOpAchievementsManager
+import com.agustin.tarati.services.achievements.ServerAchievementsManager
 import com.agustin.tarati.services.clipboard.DesktopClipboardService
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.clipboard.IClipboardService
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.services.sound.NoOpSoundService
+import com.agustin.tarati.services.url.DesktopUrlLauncher
+import com.agustin.tarati.services.url.IUrlLauncher
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -41,7 +44,7 @@ import kotlin.time.toDuration
  * Provides Desktop-specific implementations:
  * - [DesktopClipboardService] → uses java.awt.Toolkit
  * - [NoOpSoundService] → no audio in Desktop (for now)
- * - [NoOpAchievementsManager] → no achievements system in Desktop
+ * - [ServerAchievementsManager] → syncs achievements to Tarati server when logged in
  * - [DesktopSettingsRepository] → **java.util.prefs.Preferences persistence** ✅
  * - [RoomGameRepository] → **Room with SQLite persistence** ✅
  *
@@ -59,7 +62,6 @@ import kotlin.time.toDuration
  *
  * ## Expected evolution
  * - Sound: add support with javax.sound.sampled
- * - Achievements: consider local achievement system with SQLite + system notifications
  */
 val desktopServiceModule = module {
     // HttpClient con engine CIO (JVM/Desktop) para WebSockets y REST
@@ -80,6 +82,7 @@ val desktopServiceModule = module {
     // Clipboard — java.awt.Toolkit
     single<IClipboardService> { DesktopClipboardService() }
     single { GameClipboardHelper(get()) }
+    single<IUrlLauncher> { DesktopUrlLauncher() }
 
     // Sound — no-op in Desktop for now
     single<ISoundService> { NoOpSoundService() }
@@ -87,8 +90,9 @@ val desktopServiceModule = module {
     // Special Events — no-op in Desktop
     single<ISpecialEventManager> { NoOpSpecialEventManager() }
 
-    // Achievements — no-op in Desktop (no Google Play Games)
-    single<IAchievementsManager> { NoOpAchievementsManager() }
+    // Achievements — syncs to server when authenticated
+    single { AchievementSyncService(get()) }
+    single<IAchievementsManager> { ServerAchievementsManager(get(), get(), get()) }
 }
 
 /**
@@ -124,7 +128,7 @@ val desktopDataModule = module {
 
 val desktopViewModelModule = module {
     // Settings ViewModel
-    viewModel { DesktopSettingsViewModel(get()) }
+    viewModel { DesktopSettingsViewModel(get(), get()) }
 
     // GameViewModel — CRITICAL: register with IGameModel interface
     // so OnlineGameViewModel can resolve it correctly

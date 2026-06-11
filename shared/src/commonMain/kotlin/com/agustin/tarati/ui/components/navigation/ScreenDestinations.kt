@@ -22,4 +22,8 @@ sealed class ScreenDestinations(
     object PublicProfileDest : ScreenDestinations(route = "public_profile/{userId}") {
         fun createRoute(userId: String) = "public_profile/$userId"
     }
+
+    object TournamentDetailDest : ScreenDestinations(route = "tournament/{tournamentId}") {
+        fun createRoute(tournamentId: String) = "tournament/$tournamentId"
+    }
 }

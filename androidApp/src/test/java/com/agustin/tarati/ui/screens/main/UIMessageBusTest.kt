@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.screens.main
 
+import com.agustin.tarati.services.notifications.MessageAction
 import com.agustin.tarati.services.notifications.UIMessage
 import com.agustin.tarati.services.notifications.UIMessageBus
 import kotlinx.coroutines.test.runTest
@@ -63,7 +64,7 @@ class UIMessageBusTest {
         val toast = UIMessage.Toast(
             message = "Rematch?",
             actions = listOf(
-                com.agustin.tarati.services.notifications.MessageAction(
+                MessageAction(
                     label = "Accept",
                     onClick = { clicked = true },
                 )

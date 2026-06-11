@@ -6,16 +6,25 @@ import com.agustin.tarati.core.domain.game.time.TimeControl
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.online.game.ChallengeEvent
+import com.agustin.tarati.features.online.game.ChallengeEvent.Declined
+import com.agustin.tarati.features.online.game.ChallengeEvent.Expired
+import com.agustin.tarati.features.online.game.ChallengeEvent.Received
 import com.agustin.tarati.features.online.game.DrawOfferEvent
 import com.agustin.tarati.features.online.game.RematchEvent
 import com.agustin.tarati.features.online.game.ServerErrorEvent
+import com.agustin.tarati.features.online.game.ServerErrorEvent.GenericError
+import com.agustin.tarati.features.online.game.ServerErrorEvent.InvalidMove
 import com.agustin.tarati.features.online.game.SpectatingGameEndedEvent
 import com.agustin.tarati.features.online.game.SpectatingState
+import com.agustin.tarati.features.online.game.TournamentEvent
 import com.agustin.tarati.network.client.TaratiWebSocketClient.ConnectionState
 import com.agustin.tarati.network.models.MatchmakingState
+import com.agustin.tarati.network.models.MatchmakingState.MatchFound
+import com.agustin.tarati.network.models.MatchmakingState.Searching
 import com.agustin.tarati.network.models.MatchmakingTicket
 import com.agustin.tarati.network.models.OnlineGame
 import com.agustin.tarati.network.models.OnlineGameStatus
+import com.agustin.tarati.network.models.OnlineGameStatus.Finished
 import com.agustin.tarati.network.protocol.ClientMessage
 import com.agustin.tarati.network.protocol.ServerMessage
 import kotlinx.coroutines.CoroutineScope
@@ -110,6 +119,22 @@ class OnlineGameClient(
     /** Eventos de desafío directo: recibido, rechazado, expirado. */
     private val _challengeEvents = MutableSharedFlow<ChallengeEvent>(extraBufferCapacity = 4)
     val challengeEvents: SharedFlow<ChallengeEvent> = _challengeEvents.asSharedFlow()
+
+    // ── Tournament ────────────────────────────────────────────────────────────
+
+    /** Contexto de torneo pendiente de asociar al próximo MatchFound con el mismo gameId. */
+    private var pendingTournamentContext: PendingTournamentCtx? = null
+
+    private data class PendingTournamentCtx(
+        val gameId: String,
+        val tournamentId: String,
+        val round: Int,
+        val totalRounds: Int,
+    )
+
+    /** Eventos del sistema de torneos: asignación de partida, nueva ronda, standings, cierre. */
+    private val _tournamentEvents = MutableSharedFlow<TournamentEvent>(extraBufferCapacity = 8)
+    val tournamentEvents: SharedFlow<TournamentEvent> = _tournamentEvents.asSharedFlow()
 
     /**
      * Estado actual de la partida online (null si no hay partida activa)
@@ -302,11 +327,14 @@ class OnlineGameClient(
                     estimatedWaitTime = message.estimatedWaitTime,
                     joinedAt = Clock.System.now().toEpochMilliseconds()
                 )
-                _matchmakingState.value = MatchmakingState.Searching(ticket)
+                _matchmakingState.value = Searching(ticket)
                 logger.info("Matchmaking started: ${message.ticketId}")
             }
 
             is ServerMessage.MatchFound -> {
+                // Consumir contexto de torneo si TournamentGameAssigned llegó antes para este gameId
+                val tournamentCtx = pendingTournamentContext?.takeIf { it.gameId == message.gameId }
+                pendingTournamentContext = null
                 val game = OnlineGame(
                     gameId = message.gameId,
                     opponentInfo = message.opponentInfo,
@@ -315,10 +343,16 @@ class OnlineGameClient(
                     status = OnlineGameStatus.Starting,
                     timeControl = message.timeControl,
                     isRated = message.rated,
+                    tournamentId = tournamentCtx?.tournamentId,
+                    tournamentRound = tournamentCtx?.round,
+                    tournamentTotalRounds = tournamentCtx?.totalRounds,
                 )
                 _currentGame.value = game
-                _matchmakingState.value = MatchmakingState.MatchFound(game)
-                logger.info("Match found: ${message.gameId}")
+                _matchmakingState.value = MatchFound(game)
+                logger.info(
+                    "Match found: ${message.gameId}" +
+                            if (tournamentCtx != null) " [tournament=${tournamentCtx.tournamentId} round=${tournamentCtx.round}]" else ""
+                )
             }
 
             // Game lifecycle
@@ -385,7 +419,7 @@ class OnlineGameClient(
                 _drawOffer.value = null
                 _pendingDrawSent.value = false
                 _currentGame.value = _currentGame.value?.copy(
-                    status = OnlineGameStatus.Finished(
+                    status = Finished(
                         result = message.result,
                         reason = message.reason,
                         ratingUpdate = message.newRatings
@@ -440,12 +474,12 @@ class OnlineGameClient(
             // Errors
             is ServerMessage.InvalidMove -> {
                 logger.warn("Invalid move: ${message.reason}")
-                _serverErrors.tryEmit(ServerErrorEvent.InvalidMove(message.reason))
+                _serverErrors.tryEmit(InvalidMove(message.reason))
             }
 
             is ServerMessage.Error -> {
                 logger.error("Server error: ${message.code} - ${message.message}")
-                _serverErrors.tryEmit(ServerErrorEvent.GenericError(message.code, message.message))
+                _serverErrors.tryEmit(GenericError(message.code, message.message))
             }
 
             // Heartbeat
@@ -531,7 +565,7 @@ class OnlineGameClient(
             // ── Challenge ────────────────────────────────────────────────────
             is ServerMessage.ChallengeReceived -> {
                 _challengeEvents.tryEmit(
-                    ChallengeEvent.Received(
+                    Received(
                         challengeId = message.challengeId,
                         challengerInfo = message.challengerInfo,
                         timeControl = message.timeControl,
@@ -542,13 +576,64 @@ class OnlineGameClient(
             }
 
             is ServerMessage.ChallengeDeclined -> {
-                _challengeEvents.tryEmit(ChallengeEvent.Declined(message.challengeId))
+                _challengeEvents.tryEmit(Declined(message.challengeId))
                 logger.info("Challenge declined: ${message.challengeId}")
             }
 
             is ServerMessage.ChallengeExpired -> {
-                _challengeEvents.tryEmit(ChallengeEvent.Expired(message.challengeId))
+                _challengeEvents.tryEmit(Expired(message.challengeId))
                 logger.info("Challenge expired: ${message.challengeId}")
+            }
+
+            // ── Torneos ──────────────────────────────────────────────────────
+            is ServerMessage.TournamentGameAssigned -> {
+                // Almacenar contexto para enriquecer el MatchFound que llegará a continuación
+                pendingTournamentContext = PendingTournamentCtx(
+                    gameId = message.gameId,
+                    tournamentId = message.tournamentId,
+                    round = message.round,
+                    totalRounds = message.totalRounds,
+                )
+                _tournamentEvents.tryEmit(
+                    TournamentEvent.GameAssigned(
+                        tournamentId = message.tournamentId,
+                        gameId = message.gameId,
+                        round = message.round,
+                        totalRounds = message.totalRounds,
+                    )
+                )
+                logger.info("Tournament game assigned: ${message.gameId} (round ${message.round}/${message.totalRounds})")
+            }
+
+            is ServerMessage.TournamentRoundStarted -> {
+                _tournamentEvents.tryEmit(
+                    TournamentEvent.RoundStarted(
+                        tournamentId = message.tournamentId,
+                        round = message.round,
+                        totalRounds = message.totalRounds,
+                    )
+                )
+                logger.info("Tournament round started: ${message.round}/${message.totalRounds} in ${message.tournamentId}")
+            }
+
+            is ServerMessage.TournamentStandingsUpdated -> {
+                _tournamentEvents.tryEmit(
+                    TournamentEvent.StandingsUpdated(
+                        tournamentId = message.tournamentId,
+                        standings = message.standings,
+                    )
+                )
+                logger.info("Tournament standings updated: ${message.tournamentId} (${message.standings.size} players)")
+            }
+
+            is ServerMessage.TournamentFinished -> {
+                _tournamentEvents.tryEmit(
+                    TournamentEvent.Finished(
+                        tournamentId = message.tournamentId,
+                        finalStandings = message.finalStandings,
+                    )
+                )
+                logger.info("Tournament finished: ${message.tournamentId} — winner: ${message.finalStandings.firstOrNull()?.username}")
             }
         }
     }

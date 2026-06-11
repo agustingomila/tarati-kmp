@@ -2,6 +2,7 @@ package com.agustin.tarati.web
 
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
+import com.agustin.tarati.core.domain.game.time.TimeControl
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.services.localization.AppLanguage
@@ -152,7 +153,7 @@ class WasmSettingsRepository : SettingsRepository {
     private val _preMoves = MutableStateFlow(bool(K_PRE_MOVES, true))
     override val preMovesEnabled = _preMoves.asStateFlow()
 
-    private val _onlineTc = MutableStateFlow(str(K_ONLINE_TC, "blitz") ?: "blitz")
+    private val _onlineTc = MutableStateFlow(str(K_ONLINE_TC, TimeControl.BLITZ.key) ?: TimeControl.BLITZ.key)
     override val onlineTimeControl = _onlineTc.asStateFlow()
 
     private val _onlineRated = MutableStateFlow(bool(K_ONLINE_RATED, true))

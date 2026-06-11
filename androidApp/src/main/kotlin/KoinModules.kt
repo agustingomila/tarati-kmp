@@ -23,6 +23,7 @@ import com.agustin.tarati.features.seasonal.SpecialEventManager
 import com.agustin.tarati.features.seasonal.SpecialEventRepository
 import com.agustin.tarati.features.settings.AndroidSettingsRepository
 import com.agustin.tarati.features.settings.SettingsRepository
+import com.agustin.tarati.services.achievements.AchievementSyncService
 import com.agustin.tarati.services.achievements.AchievementsManager
 import com.agustin.tarati.services.achievements.AchievementsRepository
 import com.agustin.tarati.services.achievements.AchievementsRepositoryImpl
@@ -40,6 +41,8 @@ import com.agustin.tarati.services.clipboard.IClipboardService
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.services.sound.SoundManager
 import com.agustin.tarati.services.sound.SoundServiceImpl
+import com.agustin.tarati.services.url.AndroidUrlLauncher
+import com.agustin.tarati.services.url.IUrlLauncher
 import com.google.android.gms.games.PlayGames
 import features.settings.AndroidSettingsViewModel
 import io.ktor.client.HttpClient
@@ -96,7 +99,8 @@ val achievementsModule = module {
     single { ActivityProvider() }
     single { AchievementsRepository(get()) }
     single<IAchievementsReporter> { PlayGamesAchievementsReporter(get(), get()) }
-    single { AchievementsManager(get(), get(), get(), get(), get()) } bind IAchievementsManager::class
+    single { AchievementSyncService(get()) }
+    single { AchievementsManager(get(), get(), get(), get(), get(), get(), get()) } bind IAchievementsManager::class
 
     /**
      * Activity - Inyectada desde ActivityProvider.
@@ -136,7 +140,16 @@ val achievementsModule = module {
 
 val specialEventModule = module {
     single { SpecialEventRepository(get()) }
-    single<ISpecialEventManager> { SpecialEventManager(get(), get(), get(), get()) }
+    single<ISpecialEventManager> {
+        SpecialEventManager(
+            specialEventRepository = get(),
+            achievementsRepository = get(),
+            settingsRepository = get(),
+            reporter = get(),
+            syncService = get(),
+            authRepository = get(),
+        )
+    }
 }
 
 // ── Billing ───────────────────────────────────────────────────────────────────
@@ -166,6 +179,7 @@ val androidServiceModule = module {
 
     single<IClipboardService> { ClipboardServiceImpl(get()) }
     single { GameClipboardHelper(get()) }
+    single<IUrlLauncher> { AndroidUrlLauncher(get()) }
 }
 
 // ── Sound ─────────────────────────────────────────────────────────────────────

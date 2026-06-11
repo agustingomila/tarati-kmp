@@ -78,6 +78,10 @@ class OnlineGameViewModel(
 
     override val challengeEvents: SharedFlow<ChallengeEvent> = onlineClient.challengeEvents
 
+    // ── Torneos ───────────────────────────────────────────────────────────────
+
+    override val tournamentEvents: SharedFlow<TournamentEvent> = onlineClient.tournamentEvents
+
     init {
         observeGameStatusTransitions()
     }
