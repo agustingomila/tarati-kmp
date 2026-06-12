@@ -11,6 +11,7 @@ import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LiveGameDto
 import com.agustin.tarati.network.models.OnlineUserDto
 import com.agustin.tarati.network.models.OpenSearchDto
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -181,6 +182,7 @@ class OnlineLobbyViewModel(
                 _liveGames.update { it.copy(games = games, isLoading = false) }
             }
             .onFailure { e ->
+                if (e is CancellationException) throw e
                 logger.error("fetchLiveGames error: ${e::class.simpleName} — ${e.message}")
                 _liveGames.update { it.copy(isLoading = false, error = e.message) }
             }
@@ -196,6 +198,7 @@ class OnlineLobbyViewModel(
                 _openSearches.update { it.copy(searches = searches, isLoading = false) }
             }
             .onFailure { e ->
+                if (e is CancellationException) throw e
                 logger.error("fetchOpenSearches error: ${e::class.simpleName} — ${e.message}")
                 _openSearches.update { it.copy(isLoading = false, error = e.message) }
             }
@@ -243,6 +246,7 @@ class OnlineLobbyViewModel(
                     )
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _history.update { it.copy(isLoading = false, error = e.message) }
             }
         }
@@ -275,6 +279,7 @@ class OnlineLobbyViewModel(
                     )
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _history.update { it.copy(isLoadingMore = false, error = e.message) }
             }
         }
@@ -330,6 +335,7 @@ class OnlineLobbyViewModel(
                     }
                 }
                 .onFailure { e ->
+                    if (e is CancellationException) throw e
                     _feedState.update { it.copy(isLoading = false, error = e.message) }
                 }
         }
@@ -355,6 +361,7 @@ class OnlineLobbyViewModel(
                     }
                 }
                 .onFailure { e ->
+                    if (e is CancellationException) throw e
                     _feedState.update { it.copy(isLoadingMore = false, error = e.message) }
                 }
         }

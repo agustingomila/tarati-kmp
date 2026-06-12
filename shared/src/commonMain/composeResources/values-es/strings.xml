@@ -345,8 +345,10 @@
     <string name="sort_newest">Más recientes</string>
     <string name="sort_oldest">Más antiguos primero</string>
     <string name="sort_rating">Por rating</string>
+    <string name="filter_all">Todos</string>
     <string name="filter_live_games">En vivo</string>
     <string name="filter_open_searches">Buscando</string>
+    <string name="filter_registered_only">Solo registrados</string>
     <string name="no_open_searches">Nadie está buscando partida ahora</string>
     <string name="new_search">Nueva búsqueda</string>
     <string name="seeking_rival">Buscando rival</string>
@@ -459,6 +461,11 @@
     <string name="tournament_round_n">Ronda %1$d</string>
     <string name="tournament_game_assigned">Torneo · Ronda %1$d/%2$d: tu partida está lista</string>
     <string name="tournament_finished_notification">El torneo finalizó — ver la clasificación final</string>
+    <string name="tournament_filter_all">Todos</string>
+    <string name="tournament_recent_only">Recientes</string>
+    <string name="sort_most_players">Más participantes</string>
+    <string name="no_tournaments_match_filters">Sin torneos con estos filtros</string>
+    <string name="clear_filters">Borrar filtros</string>
 
     <!-- ── Login invitado ───────────────────────────────────────────────────── -->
     <string name="guest_login">Continuar como invitado</string>

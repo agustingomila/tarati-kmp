@@ -2,7 +2,6 @@ package com.agustin.tarati.features.online.tournament
 
 import com.agustin.tarati.network.models.CreateTournamentRequest
 import com.agustin.tarati.network.models.TournamentDetailDto
-import com.agustin.tarati.network.models.TournamentStatus
 import com.agustin.tarati.network.models.TournamentSummaryDto
 import kotlinx.coroutines.flow.StateFlow
 

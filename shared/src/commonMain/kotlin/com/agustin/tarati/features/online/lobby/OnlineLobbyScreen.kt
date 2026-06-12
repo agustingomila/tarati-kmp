@@ -98,6 +98,7 @@ import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
 import com.agustin.tarati.shared.generated.resources.challenge
 import com.agustin.tarati.shared.generated.resources.challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.clear_filters
 import com.agustin.tarati.shared.generated.resources.confirm
 import com.agustin.tarati.shared.generated.resources.connect_to_server_first
 import com.agustin.tarati.shared.generated.resources.connected_tab
@@ -108,8 +109,10 @@ import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
 import com.agustin.tarati.shared.generated.resources.feed
 import com.agustin.tarati.shared.generated.resources.feed_player_context
+import com.agustin.tarati.shared.generated.resources.filter_all
 import com.agustin.tarati.shared.generated.resources.filter_live_games
 import com.agustin.tarati.shared.generated.resources.filter_open_searches
+import com.agustin.tarati.shared.generated.resources.filter_registered_only
 import com.agustin.tarati.shared.generated.resources.guest_banner_title
 import com.agustin.tarati.shared.generated.resources.guest_login_description
 import com.agustin.tarati.shared.generated.resources.in_live
@@ -127,6 +130,7 @@ import com.agustin.tarati.shared.generated.resources.new_search
 import com.agustin.tarati.shared.generated.resources.no_feed_games
 import com.agustin.tarati.shared.generated.resources.no_games_found
 import com.agustin.tarati.shared.generated.resources.no_tournaments_available
+import com.agustin.tarati.shared.generated.resources.no_tournaments_match_filters
 import com.agustin.tarati.shared.generated.resources.not_connected_to_server
 import com.agustin.tarati.shared.generated.resources.online_lobby
 import com.agustin.tarati.shared.generated.resources.online_users_section
@@ -138,6 +142,7 @@ import com.agustin.tarati.shared.generated.resources.retry
 import com.agustin.tarati.shared.generated.resources.search_no_longer_available
 import com.agustin.tarati.shared.generated.resources.sign_in
 import com.agustin.tarati.shared.generated.resources.sort
+import com.agustin.tarati.shared.generated.resources.sort_most_players
 import com.agustin.tarati.shared.generated.resources.sort_newest
 import com.agustin.tarati.shared.generated.resources.sort_oldest
 import com.agustin.tarati.shared.generated.resources.sort_rating
@@ -146,10 +151,15 @@ import com.agustin.tarati.shared.generated.resources.status_playing
 import com.agustin.tarati.shared.generated.resources.there_are_no_games_in_progress
 import com.agustin.tarati.shared.generated.resources.time_control
 import com.agustin.tarati.shared.generated.resources.tournament
+import com.agustin.tarati.shared.generated.resources.tournament_filter_all
 import com.agustin.tarati.shared.generated.resources.tournament_format
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
+import com.agustin.tarati.shared.generated.resources.tournament_recent_only
 import com.agustin.tarati.shared.generated.resources.tournament_registering_section
 import com.agustin.tarati.shared.generated.resources.tournament_status_active
+import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
+import com.agustin.tarati.shared.generated.resources.tournament_status_finished
+import com.agustin.tarati.shared.generated.resources.tournament_status_registering
 import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
 import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
 import com.agustin.tarati.shared.generated.resources.tournaments
@@ -363,7 +373,7 @@ fun OnlineLobbyScreen(
     val isAuthenticated = authState is com.agustin.tarati.features.online.auth.AuthState.Authenticated
 
     if (showLogoutConfirm) {
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
             title = { Text(localizedString(Res.string.login_logout)) },
             text = { Text(localizedString(Res.string.logout_confirm_body)) },
@@ -377,7 +387,7 @@ fun OnlineLobbyScreen(
                 }) { Text(localizedString(Res.string.confirm)) }
             },
             dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { showLogoutConfirm = false }) {
+                TextButton(onClick = { showLogoutConfirm = false }) {
                     Text(localizedString(Res.string.cancel))
                 }
             },
@@ -1033,7 +1043,7 @@ private fun OwnSearchCard(
     val tcDisplay = remember(ticket.timeControl) {
         runCatching {
             val tc = TimeControl.fromKey(ticket.timeControl)
-            val (initial, increment) = tc.timeControl()
+            val (initial, increment) = tc.timeControl
             GameTimeControl(type = tc, initialTime = initial, increment = increment).toDisplayString()
         }.getOrElse { ticket.timeControl }
     }
@@ -1378,6 +1388,7 @@ private fun HistoryGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null)
 
 // ── Tab: Feed de seguidos ──────────────────────────────────────────────────────
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FeedTab(
     viewModel: IOnlineLobbyViewModel,
@@ -1385,6 +1396,16 @@ private fun FeedTab(
 ) {
     val state by viewModel.feedState.collectAsState()
     val listState = rememberLazyListState()
+
+    // ── Filtros locales ────────────────────────────────────────────────────────
+    var resultFilter by remember { mutableStateOf<String?>(null) }
+    var tcFilter by remember { mutableStateOf<TimeControl?>(null) }
+
+    val displayGames = state.games
+        .let { if (resultFilter != null) it.filter { g -> g.result == resultFilter } else it }
+        .let { if (tcFilter != null) it.filter { g -> g.timeControl.type == tcFilter } else it }
+
+    val filtersActive = resultFilter != null || tcFilter != null
 
     LaunchedEffect(Unit) {
         if (state.games.isEmpty() && !state.isLoading) viewModel.loadFeed()
@@ -1401,37 +1422,138 @@ private fun FeedTab(
         if (shouldLoadMore) viewModel.loadMoreFeed()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            state.isLoading -> CenteredLoader()
-            state.error != null -> CenteredMessage(
-                text = localizedString(Res.string.error).replace($$"%1$s", state.error.orEmpty()),
-                color = MaterialTheme.colorScheme.error,
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        FeedFilterBar(
+            resultFilter = resultFilter,
+            onResultFilter = { resultFilter = it },
+            tcFilter = tcFilter,
+            onTcFilter = { tcFilter = it },
+        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                state.isLoading -> CenteredLoader()
 
-            state.games.isEmpty() -> CenteredMessage(
-                text = localizedString(Res.string.no_feed_games),
-            )
+                state.error != null -> CenteredMessage(
+                    text = localizedString(Res.string.error).replace($$"%1$s", state.error.orEmpty()),
+                    color = MaterialTheme.colorScheme.error,
+                )
 
-            else -> LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(vertical = 8.dp),
-            ) {
-                itemsIndexed(state.games, key = { _, g -> g.gameId }) { _, game ->
-                    FeedGameCard(
-                        game = game,
-                        onClick = onNavigateToGameDetails?.let { cb -> { cb(game.gameId) } },
-                    )
-                }
-                if (state.isLoadingMore) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                state.games.isEmpty() -> CenteredMessage(
+                    text = localizedString(Res.string.no_feed_games),
+                )
+
+                displayGames.isEmpty() -> Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CenteredMessage(text = localizedString(Res.string.no_tournaments_match_filters))
+                    if (filtersActive) {
+                        Spacer(Modifier.height(8.dp))
+                        TextButton(onClick = {
+                            resultFilter = null
+                            tcFilter = null
+                        }) {
+                            Text(localizedString(Res.string.clear_filters))
                         }
                     }
+                }
+
+                else -> LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                ) {
+                    itemsIndexed(displayGames, key = { _, g -> g.gameId }) { _, game ->
+                        FeedGameCard(
+                            game = game,
+                            onClick = onNavigateToGameDetails?.let { cb -> { cb(game.gameId) } },
+                        )
+                    }
+                    if (state.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FeedFilterBar(
+    resultFilter: String?,
+    onResultFilter: (String?) -> Unit,
+    tcFilter: TimeControl?,
+    onTcFilter: (TimeControl?) -> Unit,
+) {
+    var showTcMenu by remember { mutableStateOf(false) }
+    val tcLabel = when (tcFilter) {
+        null -> localizedString(Res.string.time_control)
+        else -> tcFilter.description
+    }
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp)) {
+        // Fila 1: chips de resultado (ancho completo)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            listOf<String?>(null, "win", "loss", "draw").forEach { result ->
+                FilterChip(
+                    selected = resultFilter == result,
+                    onClick = {
+                        onResultFilter(if (resultFilter == result && result != null) null else result)
+                    },
+                    label = {
+                        Text(
+                            when (result) {
+                                null -> localizedString(Res.string.filter_all)
+                                "win" -> localizedString(Res.string.win)
+                                "loss" -> localizedString(Res.string.loss)
+                                else -> localizedString(Res.string.draw)
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                )
+            }
+        }
+        // Fila 2: control de tiempo alineado a la derecha
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box {
+                FilterChip(
+                    selected = tcFilter != null,
+                    onClick = { showTcMenu = true },
+                    label = { Text(tcLabel, style = MaterialTheme.typography.labelSmall) },
+                    leadingIcon = { Icon(TaratiIcons.Timer, null, Modifier.size(14.dp)) },
+                    trailingIcon = { Icon(TaratiIcons.ArrowDropDown, null, Modifier.size(14.dp)) },
+                )
+                DropdownMenu(expanded = showTcMenu, onDismissRequest = { showTcMenu = false }) {
+                    listOf<TimeControl?>(
+                        null,
+                        TimeControl.BULLET,
+                        TimeControl.BLITZ,
+                        TimeControl.RAPID,
+                        TimeControl.CLASSICAL
+                    )
+                        .forEach { tc ->
+                            DropdownMenuItem(
+                                text = { Text(if (tc == null) localizedString(Res.string.filter_all) else tc.description) },
+                                onClick = { onTcFilter(tc); showTcMenu = false },
+                                leadingIcon = if (tcFilter == tc) ({
+                                    Icon(TaratiIcons.Check, null, Modifier.size(16.dp))
+                                }) else null,
+                            )
+                        }
                 }
             }
         }
@@ -1510,6 +1632,8 @@ private fun formatMs(ms: Long): String {
 
 // ── Tab: Torneos ───────────────────────────────────────────────────────────────
 
+private enum class TournamentSort { NEWEST, MOST_PLAYERS }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TournamentsTab(
@@ -1522,9 +1646,39 @@ private fun TournamentsTab(
     val token = authViewModel.accessToken ?: authViewModel.getStoredToken()
     var showCreateDialog by remember { mutableStateOf(false) }
 
+    // ── Filtros locales ────────────────────────────────────────────────────────
+    var statusFilter by remember { mutableStateOf<TournamentStatus?>(null) }
+    var recentOnly by remember { mutableStateOf(true) }
+    var sortBy by remember { mutableStateOf(TournamentSort.NEWEST) }
+
     LaunchedEffect(Unit) {
         if (token != null) viewModel.loadTournaments(token)
     }
+
+    // ── Aplicar filtros ────────────────────────────────────────────────────────
+    val nowMs = Clock.System.now().toEpochMilliseconds()
+    val cutoffMs = nowMs - 7L * 24 * 60 * 60 * 1000
+
+    fun List<TournamentSummaryDto>.sorted() = when (sortBy) {
+        TournamentSort.NEWEST -> sortedByDescending { it.createdAt.toEpochMilliseconds() }
+        TournamentSort.MOST_PLAYERS -> sortedByDescending { it.participantCount }
+    }
+
+    val displayRegistering = state.registering
+        .takeIf { statusFilter == null || statusFilter == TournamentStatus.REGISTERING }
+        ?.sorted() ?: emptyList()
+
+    val displayActive = state.active
+        .takeIf { statusFilter == null || statusFilter == TournamentStatus.ACTIVE }
+        ?.sorted() ?: emptyList()
+
+    val displayFinished = state.finished
+        .let { if (recentOnly) it.filter { t -> (t.finishedAt?.toEpochMilliseconds() ?: nowMs) > cutoffMs } else it }
+        .takeIf { statusFilter == null || statusFilter == TournamentStatus.FINISHED }
+        ?.sorted() ?: emptyList()
+
+    val filtersActive = statusFilter != null || !recentOnly || sortBy != TournamentSort.NEWEST
+    val isEmptyAfterFilter = displayRegistering.isEmpty() && displayActive.isEmpty() && displayFinished.isEmpty()
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -1561,57 +1715,94 @@ private fun TournamentsTab(
             }
 
             else -> {
-                LazyColumn(contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)) {
-                    if (state.registering.isNotEmpty()) {
-                        item {
-                            Text(
-                                localizedString(Res.string.tournament_registering_section),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(vertical = 8.dp),
+                Column(modifier = Modifier.fillMaxSize()) {
+                    TournamentFilterBar(
+                        statusFilter = statusFilter,
+                        onStatusFilter = { statusFilter = it },
+                        recentOnly = recentOnly,
+                        onRecentOnlyToggle = { recentOnly = !recentOnly },
+                        sortBy = sortBy,
+                        onSortChange = { sortBy = it },
+                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if (isEmptyAfterFilter) {
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text(
+                                    localizedString(Res.string.no_tournaments_match_filters),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                if (filtersActive) {
+                                    Spacer(Modifier.height(12.dp))
+                                    TextButton(onClick = {
+                                        statusFilter = null
+                                        recentOnly = true
+                                        sortBy = TournamentSort.NEWEST
+                                    }) {
+                                        Text(localizedString(Res.string.clear_filters))
+                                    }
+                                }
+                            }
+                        } else {
+                            LazyColumn(contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)) {
+                                if (displayRegistering.isNotEmpty()) {
+                                    item {
+                                        Text(
+                                            localizedString(Res.string.tournament_registering_section),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                        )
+                                    }
+                                    items(displayRegistering, key = { it.id }) { t ->
+                                        TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                                    }
+                                }
+                                if (displayActive.isNotEmpty()) {
+                                    item {
+                                        Text(
+                                            localizedString(Res.string.tournament_status_active),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
+                                        )
+                                    }
+                                    items(displayActive, key = { it.id }) { t ->
+                                        TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                                    }
+                                }
+                                if (displayFinished.isNotEmpty()) {
+                                    item {
+                                        Text(
+                                            localizedString(Res.string.tournaments_finished_section),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
+                                        )
+                                    }
+                                    items(displayFinished, key = { it.id }) { t ->
+                                        TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
+                                    }
+                                }
+                                item { Spacer(Modifier.height(80.dp)) }
+                            }
+                        }
+                        // FAB siempre visible cuando hay datos
+                        androidx.compose.material3.FloatingActionButton(
+                            onClick = { showCreateDialog = true },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp),
+                        ) {
+                            Icon(
+                                TaratiIcons.EmojiEvents,
+                                contentDescription = localizedString(Res.string.create_tournament)
                             )
                         }
-                        items(state.registering, key = { it.id }) { t ->
-                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
-                        }
                     }
-                    if (state.active.isNotEmpty()) {
-                        item {
-                            Text(
-                                localizedString(Res.string.tournament_status_active),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
-                            )
-                        }
-                        items(state.active, key = { it.id }) { t ->
-                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
-                        }
-                    }
-                    if (state.finished.isNotEmpty()) {
-                        item {
-                            Text(
-                                localizedString(Res.string.tournaments_finished_section),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
-                            )
-                        }
-                        items(state.finished, key = { it.id }) { t ->
-                            TournamentCard(t, onClick = { onNavigateToTournament?.invoke(t.id) })
-                        }
-                    }
-                    item { Spacer(Modifier.height(80.dp)) }
-                }
-
-                // FAB crear torneo
-                androidx.compose.material3.FloatingActionButton(
-                    onClick = { showCreateDialog = true },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
-                ) {
-                    Icon(TaratiIcons.EmojiEvents, contentDescription = localizedString(Res.string.create_tournament))
                 }
             }
         }
@@ -1627,6 +1818,92 @@ private fun TournamentsTab(
                 }
             },
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TournamentFilterBar(
+    statusFilter: TournamentStatus?,
+    onStatusFilter: (TournamentStatus?) -> Unit,
+    recentOnly: Boolean,
+    onRecentOnlyToggle: () -> Unit,
+    sortBy: TournamentSort,
+    onSortChange: (TournamentSort) -> Unit,
+) {
+    var showSortMenu by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp)) {
+        // Fila 1: chips de estado (ancho completo)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            listOf<TournamentStatus?>(
+                null,
+                TournamentStatus.REGISTERING,
+                TournamentStatus.ACTIVE,
+                TournamentStatus.FINISHED
+            )
+                .forEach { status ->
+                    FilterChip(
+                        selected = statusFilter == status,
+                        onClick = {
+                            onStatusFilter(if (statusFilter == status && status != null) null else status)
+                        },
+                        label = {
+                            Text(
+                                when (status) {
+                                    null -> localizedString(Res.string.tournament_filter_all)
+                                    TournamentStatus.REGISTERING -> localizedString(Res.string.tournament_status_registering)
+                                    TournamentStatus.ACTIVE -> localizedString(Res.string.tournament_status_active)
+                                    TournamentStatus.FINISHED -> localizedString(Res.string.tournament_status_finished)
+                                    TournamentStatus.CANCELLED -> localizedString(Res.string.tournament_status_cancelled)
+                                },
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+        }
+        // Fila 2: Recientes + ordenamiento alineados a la derecha
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FilterChip(
+                selected = recentOnly,
+                onClick = onRecentOnlyToggle,
+                label = { LocalizedText(Res.string.tournament_recent_only) },
+                leadingIcon = { Icon(TaratiIcons.Timer, null, Modifier.size(14.dp)) },
+            )
+            Box {
+                IconButton(onClick = { showSortMenu = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        TaratiIcons.Sort,
+                        contentDescription = localizedString(Res.string.sort),
+                        modifier = Modifier.size(18.dp),
+                        tint = if (sortBy != TournamentSort.NEWEST)
+                            MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
+                    listOf(
+                        TournamentSort.NEWEST to Res.string.sort_newest,
+                        TournamentSort.MOST_PLAYERS to Res.string.sort_most_players,
+                    ).forEach { (sort, stringRes) ->
+                        DropdownMenuItem(
+                            text = { LocalizedText(stringRes) },
+                            onClick = { onSortChange(sort); showSortMenu = false },
+                            leadingIcon = if (sortBy == sort) ({
+                                Icon(TaratiIcons.Check, null, Modifier.size(16.dp))
+                            }) else null,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1836,6 +2113,7 @@ private fun CreateTournamentDialog(
 
 // ── Tab: Conectados ───────────────────────────────────────────────────────────
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ConnectedUsersTab(
     viewModel: IOnlineLobbyViewModel,
@@ -1847,6 +2125,14 @@ private fun ConnectedUsersTab(
     val users by viewModel.onlineUsers.collectAsState()
     var challengeTarget by remember { mutableStateOf<OnlineUserDto?>(null) }
     val scope = rememberCoroutineScope()
+
+    // ── Filtros locales ────────────────────────────────────────────────────────
+    var statusFilter by remember { mutableStateOf<OnlineUserStatus?>(null) }
+    var registeredOnly by remember { mutableStateOf(false) }
+
+    val displayUsers = users
+        .let { if (statusFilter != null) it.filter { u -> u.status == statusFilter } else it }
+        .let { if (registeredOnly) it.filter { u -> !u.isGuest } else it }
 
     challengeTarget?.let { target ->
         ConnectedUserChallengeDialog(
@@ -1860,27 +2146,90 @@ private fun ConnectedUsersTab(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (users.isEmpty()) {
-            CenteredMessage(text = localizedString(Res.string.online_users_section))
-        } else {
-            LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-                items(users, key = { it.userId }) { user ->
-                    ConnectedUserRow(
-                        user = user,
-                        isSelf = user.userId == currentUserId,
-                        onClick = if (!user.isGuest && onNavigateToProfile != null) {
-                            { onNavigateToProfile(user.userId) }
-                        } else null,
-                        onChallenge = if (!user.isGuest && user.userId != currentUserId) {
-                            { challengeTarget = user }
-                        } else null,
-                    )
-                    androidx.compose.material3.HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
+    Column(modifier = Modifier.fillMaxSize()) {
+        ConnectedUsersFilterBar(
+            statusFilter = statusFilter,
+            onStatusFilter = { statusFilter = it },
+            registeredOnly = registeredOnly,
+            onRegisteredOnlyToggle = { registeredOnly = !registeredOnly },
+        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                users.isEmpty() ->
+                    CenteredMessage(text = localizedString(Res.string.online_users_section))
+
+                displayUsers.isEmpty() -> CenteredMessage(
+                    text = localizedString(Res.string.no_tournaments_match_filters),
+                )
+
+                else -> LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
+                    items(displayUsers, key = { it.userId }) { user ->
+                        ConnectedUserRow(
+                            user = user,
+                            isSelf = user.userId == currentUserId,
+                            onClick = if (!user.isGuest && onNavigateToProfile != null) {
+                                { onNavigateToProfile(user.userId) }
+                            } else null,
+                            onChallenge = if (!user.isGuest && user.userId != currentUserId) {
+                                { challengeTarget = user }
+                            } else null,
+                        )
+                        androidx.compose.material3.HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ConnectedUsersFilterBar(
+    statusFilter: OnlineUserStatus?,
+    onStatusFilter: (OnlineUserStatus?) -> Unit,
+    registeredOnly: Boolean,
+    onRegisteredOnlyToggle: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp)) {
+        // Fila 1: chips de estado (ancho completo)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            listOf<OnlineUserStatus?>(null, OnlineUserStatus.PLAYING, OnlineUserStatus.IN_LOBBY)
+                .forEach { status ->
+                    FilterChip(
+                        selected = statusFilter == status,
+                        onClick = {
+                            onStatusFilter(if (statusFilter == status && status != null) null else status)
+                        },
+                        label = {
+                            Text(
+                                when (status) {
+                                    null -> localizedString(Res.string.filter_all)
+                                    OnlineUserStatus.PLAYING -> localizedString(Res.string.status_playing)
+                                    OnlineUserStatus.IN_LOBBY -> localizedString(Res.string.status_in_lobby)
+                                },
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+        }
+        // Fila 2: filtro secundario alineado a la derecha
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FilterChip(
+                selected = registeredOnly,
+                onClick = onRegisteredOnlyToggle,
+                label = { LocalizedText(Res.string.filter_registered_only) },
+                leadingIcon = { Icon(TaratiIcons.Person, null, Modifier.size(14.dp)) },
+            )
         }
     }
 }
@@ -1905,7 +2254,7 @@ private fun ConnectedUserRow(
         Box(
             Modifier
                 .size(8.dp)
-                .background(statusColor, androidx.compose.foundation.shape.CircleShape)
+                .background(statusColor, CircleShape)
         )
         Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -2035,7 +2384,7 @@ private fun GuestSessionBanner(onSignIn: () -> Unit) {
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f),
                 )
             }
-            androidx.compose.material3.TextButton(onClick = onSignIn) {
+            TextButton(onClick = onSignIn) {
                 Text(
                     localizedString(Res.string.sign_in),
                     color = MaterialTheme.colorScheme.tertiary,

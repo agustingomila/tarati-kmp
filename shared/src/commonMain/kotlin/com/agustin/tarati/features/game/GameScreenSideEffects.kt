@@ -174,6 +174,8 @@ fun GameScreenSideEffects(
 
     val latestScreenState by rememberUpdatedState(screenState)
     val latestIsEditing by rememberUpdatedState(isEditing)
+    val latestIsOnlineGame by rememberUpdatedState(isOnlineGame)
+    val latestIsSpectating by rememberUpdatedState(isSpectating)
 
     // gameStatus is read from the StateFlow (not Compose snapshot) to avoid a premature
     // return when NotifyGameOver fires synchronously before recomposition.
@@ -182,6 +184,10 @@ fun GameScreenSideEffects(
             val status = viewModel.gameStatus.value
             if (status != GameStatus.GAME_OVER) return@collect
             if (latestScreenState.isTutorialActive || latestIsEditing) return@collect
+            // En partidas online y espectado el servidor es la autoridad del fin de partida.
+            // Ambos usan rememberUpdatedState para leer el valor actual dentro del coroutine
+            // de larga vida — sin esto, los valores se congelan en la primera composición.
+            if (latestIsOnlineGame || latestIsSpectating) return@collect
             val gameState = viewModel.gameState.value
             animationViewModel.animateGameOver(gameState.getMatchState(aiEngine.positionHistory))
             events.gameOver(scope)

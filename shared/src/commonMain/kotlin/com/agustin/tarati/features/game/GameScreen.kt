@@ -392,6 +392,7 @@ fun GameScreen(
         settingsViewModel = settingsViewModel,
         animationViewModel = animationViewModel,
         onMoveHandled = handleMove,
+        isOnlineGame = currentOnlineGame != null,
         isSpectating = spectatingState != null,
     )
 
@@ -450,7 +451,10 @@ fun GameScreen(
         events.dialogRequest.collect { request ->
             when (request) {
                 is DialogRequest.GameOver -> {
-                    // Online game over already showed a toast — no dialog needed.
+                    // En partidas online el servidor es la autoridad del fin de partida.
+                    // GameScreenSideEffects ya bloquea el evento en la fuente (isOnlineGame guard).
+                    // Este check cubre la ruta de OnlineGameSideEffects donde onlineFinishedResult
+                    // se asigna antes de emitir el evento.
                     if (onlineFinishedResult != null) return@collect
                     bus.alert { dismiss ->
                         val matchState = latestGameManagerState.gameState

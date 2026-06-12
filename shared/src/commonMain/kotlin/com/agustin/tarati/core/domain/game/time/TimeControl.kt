@@ -27,12 +27,16 @@ enum class TimeControl {
     /**
      * Control de tiempo predefinido
      */
-    fun timeControl(): Pair<Int, Int> = when (this) {
-        BULLET -> 60 to 0 // 1+0
-        BLITZ -> 180 to 2 // 3+2
-        RAPID -> 600 to 0 // 10+0
-        CLASSICAL -> 1800 to 30 // 30+30
-    }
+    val timeControl: Pair<Int, Int>
+        get() = when (this) {
+            BULLET -> 60 to 0 // 1+0
+            BLITZ -> 180 to 2 // 3+2
+            RAPID -> 600 to 0 // 10+0
+            CLASSICAL -> 1800 to 30 // 30+30
+        }
+
+    val description: String
+        get() = key.replaceFirstChar(Char::titlecase)
 
     companion object {
         /**

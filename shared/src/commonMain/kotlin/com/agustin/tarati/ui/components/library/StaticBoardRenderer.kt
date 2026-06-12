@@ -33,7 +33,7 @@ fun StaticBoardRenderer(
     val boardState =
         BoardState(
             gameState = gameState,
-            boardVisualState = BoardVisualState().copy(animateEffects = false),
+            boardVisualState = BoardVisualState().copy(animateEffects = false, perimeterVisible = false),
             aiEnabled = false,
         )
 

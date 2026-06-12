@@ -1,5 +1,6 @@
 package com.agustin.tarati.network.models
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -54,6 +55,7 @@ data class CreateTournamentRequest(
  * Resumen de torneo para listas.
  * Respuesta de GET /api/tournaments.
  */
+@Immutable
 @Serializable
 data class TournamentSummaryDto(
     val id: String,
@@ -79,6 +81,7 @@ data class TournamentSummaryDto(
  * Detalle completo de un torneo, incluyendo standings y rondas.
  * Respuesta de GET /api/tournaments/:id.
  */
+@Immutable
 @Serializable
 data class TournamentDetailDto(
     val id: String,
@@ -109,6 +112,7 @@ data class TournamentDetailDto(
  * score: sistema 2-1-0 (victoria=2, empate=1, derrota=0).
  * buchholz: suma de scores de todos los oponentes enfrentados (desempate en Swiss).
  */
+@Immutable
 @Serializable
 data class TournamentStandingDto(
     val rank: Int,
@@ -127,6 +131,7 @@ data class TournamentStandingDto(
 /**
  * Una ronda del torneo con todos sus enfrentamientos.
  */
+@Immutable
 @Serializable
 data class TournamentRoundDto(
     val roundNumber: Int,
@@ -140,6 +145,7 @@ data class TournamentRoundDto(
  * result es null hasta que la partida termina: "white_wins" | "black_wins" | "draw".
  * status: "pending" | "active" | "completed"
  */
+@Immutable
 @Serializable
 data class TournamentPairingDto(
     val pairingId: String,

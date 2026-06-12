@@ -335,8 +335,10 @@
     <string name="sort_newest">Newest</string>
     <string name="sort_oldest">Oldest first</string>
     <string name="sort_rating">By rating</string>
+    <string name="filter_all">All</string>
     <string name="filter_live_games">Live</string>
     <string name="filter_open_searches">Seeking</string>
+    <string name="filter_registered_only">Registered only</string>
     <string name="no_open_searches">Nobody is searching right now</string>
     <string name="new_search">New search</string>
     <string name="seeking_rival">Seeking rival</string>
@@ -449,6 +451,11 @@
     <string name="tournament_round_n">Round %1$d</string>
     <string name="tournament_game_assigned">Tournament · Round %1$d/%2$d: your game is ready</string>
     <string name="tournament_finished_notification">The tournament ended — see the final standings</string>
+    <string name="tournament_filter_all">All</string>
+    <string name="tournament_recent_only">Recent</string>
+    <string name="sort_most_players">Most players</string>
+    <string name="no_tournaments_match_filters">No tournaments match the current filters</string>
+    <string name="clear_filters">Clear filters</string>
 
     <!-- ── Guest login ───────────────────────────────────────────────────── -->
     <string name="guest_login">Continue as guest</string>
