@@ -416,4 +416,58 @@
     <string name="feed">Following</string>
     <string name="no_feed_games">Games from players you follow will appear here</string>
     <string name="feed_player_context">%1$s played</string>
+
+    <!-- ── Tournaments ──────────────────────────────────────────────────── -->
+    <string name="tournament">Tournament</string>
+    <string name="tournaments">Tournaments</string>
+    <string name="standings">Standings</string>
+    <string name="fixture">Fixture</string>
+    <string name="casual">Casual</string>
+    <string name="create">Create</string>
+    <string name="tournament_format">Format</string>
+    <string name="min_players">Min. players</string>
+    <string name="max_players">Max. players</string>
+    <string name="no_tournaments_available">No tournaments available</string>
+    <string name="create_tournament">Create tournament</string>
+    <string name="tournament_registering_section">Open registrations</string>
+    <string name="tournaments_finished_section">Finished</string>
+    <string name="tournament_round_progress">Round %1$d of %2$d</string>
+    <string name="tournament_created_by">Created by %1$s</string>
+    <string name="tournament_players_of">%1$d/%2$d players</string>
+    <string name="tournament_start">Start tournament</string>
+    <string name="tournament_register">Register</string>
+    <string name="tournament_unregister">Unregister</string>
+    <string name="tournament_active_status">Tournament in progress</string>
+    <string name="tournament_finished_status">Tournament finished</string>
+    <string name="tournament_cancelled_status">Tournament cancelled</string>
+    <string name="tournament_status_registering">Registrations</string>
+    <string name="tournament_status_active">In progress</string>
+    <string name="tournament_status_finished">Finished</string>
+    <string name="tournament_status_cancelled">Cancelled</string>
+    <string name="tournament_type_round_robin">Round Robin</string>
+    <string name="tournament_type_swiss">Swiss</string>
+    <string name="tournament_round_n">Round %1$d</string>
+    <string name="tournament_game_assigned">Tournament · Round %1$d/%2$d: your game is ready</string>
+    <string name="tournament_finished_notification">The tournament ended — see the final standings</string>
+
+    <!-- ── Guest login ───────────────────────────────────────────────────── -->
+    <string name="guest_login">Continue as guest</string>
+    <string name="guest_login_description">No tournaments · Non-rated only</string>
+    <string name="or_separator">or</string>
+    <string name="guest_username_label">Username (optional)</string>
+    <string name="guest_username_hint">Enter a username, or leave blank for a random one</string>
+    <string name="guest_username_invalid">3–20 characters: letters, numbers and underscores only</string>
+    <string name="guest_terms_prefix">By joining, you agree to our</string>
+    <string name="guest_terms_link_terms">Terms of Use</string>
+    <string name="guest_terms_link_privacy">Privacy Policy</string>
+    <string name="guest_terms_link_rules">Rules</string>
+    <string name="connected_tab">Connected</string>
+    <string name="sign_in">Sign in</string>
+    <string name="guest_banner_title">Guest session</string>
+    <string name="online_users_section">Online now</string>
+    <string name="status_playing">Playing</string>
+    <string name="status_in_lobby">In lobby</string>
+    <string name="logout_confirm_body">Are you sure you want to log out?</string>
+    <string name="visibility_online">Show online presence</string>
+    <string name="visibility_online_description">Appear in the online users list</string>
 </resources>

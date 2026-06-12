@@ -137,6 +137,19 @@ interface IAuthViewModel {
     fun clearError()
 
     /**
+     * Inicia sesión como invitado sin necesidad de registro.
+     *
+     * Llama POST /auth/guest y autentica con el token recibido.
+     * El token dura 4 horas y no se renueva automáticamente.
+     * Los guests no pueden crear torneos ni jugar partidas rated.
+     *
+     * @param desiredUsername Nombre de usuario preferido. Si es null o blank, el servidor
+     *                        genera uno aleatorio del tipo `guest_XXXXXX`.
+     * @return Result.success con el accessToken, o failure con el error.
+     */
+    suspend fun loginAsGuest(desiredUsername: String? = null): Result<String>
+
+    /**
      * Registra un nuevo usuario y autentica directamente.
      *
      * Hace POST /auth/register, guarda accessToken + refreshToken y

@@ -59,7 +59,7 @@ class TournamentViewModel(
                             is TournamentEvent.Finished -> event.tournamentId
                         }
                         if (eventId != targetId) return@onEach
-                        val token = authViewModel.getStoredToken() ?: return@onEach
+                        val token = authViewModel.accessToken ?: authViewModel.getStoredToken() ?: return@onEach
                         loadTournament(token, targetId)
                     }
 

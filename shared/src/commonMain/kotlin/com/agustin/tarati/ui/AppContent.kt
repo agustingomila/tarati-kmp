@@ -21,8 +21,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,9 @@ import com.agustin.tarati.features.library.GamesLibraryViewModel
 import com.agustin.tarati.features.library.IGamesLibraryViewModel
 import com.agustin.tarati.features.online.auth.AuthState
 import com.agustin.tarati.features.online.auth.IAuthViewModel
+import com.agustin.tarati.features.online.auth.LoginSheet
+import com.agustin.tarati.features.online.connection.IConnectionViewModel
+import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.features.online.game.ChallengeEvent
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
 import com.agustin.tarati.features.online.game.TournamentEvent
@@ -44,6 +49,7 @@ import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
 import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
+import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
 import com.agustin.tarati.features.settings.SettingsViewModel
@@ -60,6 +66,8 @@ import com.agustin.tarati.shared.generated.resources.challenge_declined_msg
 import com.agustin.tarati.shared.generated.resources.challenge_expired_msg
 import com.agustin.tarati.shared.generated.resources.challenge_from
 import com.agustin.tarati.shared.generated.resources.challenge_invite
+import com.agustin.tarati.shared.generated.resources.tournament_finished_notification
+import com.agustin.tarati.shared.generated.resources.tournament_game_assigned
 import com.agustin.tarati.ui.components.navigation.NavGraph
 import com.agustin.tarati.ui.components.navigation.injectGameViewModel
 import com.agustin.tarati.ui.layout.CompanionPanelController
@@ -107,7 +115,17 @@ fun AppContent(
     val companion = remember { CompanionPanelController() }
 
     val authViewModel: IAuthViewModel = koinInject()
+    val connectionViewModel: IConnectionViewModel = koinInject()
     val authState by authViewModel.authState.collectAsState()
+
+    var showLoginModal by remember { mutableStateOf(false) }
+    var pendingLoginAction by remember { mutableStateOf<(suspend () -> Unit)?>(null) }
+    val loginScope = rememberCoroutineScope()
+
+    val onShowLogin: ((suspend () -> Unit)?) -> Unit = { action ->
+        pendingLoginAction = action
+        showLoginModal = true
+    }
 
     // Al autenticarse, precarga el nombre local con el displayName de la cuenta.
     // El usuario puede cambiarlo después sin afectar su cuenta online.
@@ -135,7 +153,10 @@ fun AppContent(
                         if (layout == ScreenLayout.Expanded) {
                             Row(modifier = Modifier.fillMaxSize()) {
                                 Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                                    NavGraph(settingsViewModel = settingsViewModel)
+                                    NavGraph(
+                                        settingsViewModel = settingsViewModel,
+                                        onShowLogin = onShowLogin,
+                                    )
                                 }
                                 if (companion.isOpen) {
                                     VerticalDivider()
@@ -143,12 +164,16 @@ fun AppContent(
                                         CompanionPane(
                                             controller = companion,
                                             settingsViewModel = settingsViewModel,
+                                            onShowLogin = onShowLogin,
                                         )
                                     }
                                 }
                             }
                         } else {
-                            NavGraph(settingsViewModel = settingsViewModel)
+                            NavGraph(
+                                settingsViewModel = settingsViewModel,
+                                onShowLogin = onShowLogin,
+                            )
                         }
                         ToastHost(
                             modifier = Modifier
@@ -159,6 +184,29 @@ fun AppContent(
                         AlertHost()
                         ChallengeNotificationEffect()
                         TournamentNotificationEffect()
+                        if (showLoginModal) {
+                            LoginSheet(
+                                onLoginSuccess = {
+                                    showLoginModal = false
+                                    // Re-conectar con las nuevas credenciales (upgrade desde invitado)
+                                    val newToken = authViewModel.accessToken
+                                    if (newToken != null) {
+                                        loginScope.launch {
+                                            if (connectionViewModel.isConnected) connectionViewModel.disconnect()
+                                            connectionViewModel.connectToServer(devServerUrl, newToken)
+                                        }
+                                    }
+                                    val action = pendingLoginAction
+                                    pendingLoginAction = null
+                                    if (action != null) loginScope.launch { action() }
+                                },
+                                onDismiss = {
+                                    showLoginModal = false
+                                    pendingLoginAction = null
+                                },
+                                authViewModel = authViewModel,
+                            )
+                        }
                     }
                 }
             }
@@ -182,6 +230,7 @@ fun AppContent(
 private fun CompanionPane(
     controller: CompanionPanelController,
     settingsViewModel: ISettingsViewModel,
+    onShowLogin: ((suspend () -> Unit)?) -> Unit = {},
     gameViewModel: IGameModel = injectGameViewModel(),
     authViewModel: IAuthViewModel = koinInject(),
     gamesLibraryViewModel: IGamesLibraryViewModel = koinViewModel<GamesLibraryViewModel>(),
@@ -200,9 +249,13 @@ private fun CompanionPane(
         CompanionPanelDestination.Lobby -> OnlineLobbyScreen(
             displayMode = DisplayMode.CompanionPanel,
             onBack = controller::close,
+            onShowLogin = { onShowLogin(null) },
             onMatchFound = { /* no-op: el tablero en el panel primario ya muestra la partida */ },
             onSpectateGame = { /* no-op: el tablero en el panel primario ya muestra el espectado */ },
             onLeaderboard = { controller.navigate(CompanionPanelDestination.Leaderboard) },
+            onNavigateToProfile = { userId ->
+                controller.navigate(CompanionPanelDestination.Profile(userId))
+            },
             onNavigateToGameDetails = { gameId ->
                 scope.launch {
                     val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
@@ -211,6 +264,9 @@ private fun CompanionPane(
                         controller.navigate(CompanionPanelDestination.GameDetails(gameId))
                     }
                 }
+            },
+            onNavigateToTournament = { tournamentId ->
+                controller.navigate(CompanionPanelDestination.TournamentDetail(tournamentId))
             },
         )
 
@@ -260,6 +316,23 @@ private fun CompanionPane(
             onBack = controller::close,
             viewModel = gamesLibraryViewModel,
         )
+
+        is CompanionPanelDestination.TournamentDetail -> key(dest.tournamentId) {
+            TournamentDetailScreen(
+                tournamentId = dest.tournamentId,
+                onBack = controller::back,
+                displayMode = DisplayMode.CompanionPanel,
+                onNavigateToGameDetails = { gameId ->
+                    scope.launch {
+                        val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
+                        if (matchDto != null) {
+                            gameDetailsViewModel.updateCurrentMatchDto(matchDto)
+                            controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                        }
+                    }
+                },
+            )
+        }
 
         is CompanionPanelDestination.GameDetails -> GameDetailsScreen(
             gameId = dest.gameId,
@@ -369,15 +442,22 @@ private fun TournamentNotificationEffect(
     onlineGameViewModel: IOnlineGameViewModel = koinInject(),
     bus: UIMessageBus = koinInject(),
 ) {
+    val gameAssignedTemplate = localizedString(Res.string.tournament_game_assigned)
+    val tournamentFinishedMsg = localizedString(Res.string.tournament_finished_notification)
+
     LaunchedEffect(Unit) {
         onlineGameViewModel.tournamentEvents.collect { event ->
             when (event) {
                 is TournamentEvent.GameAssigned -> bus.toast(
-                    UIMessage.Toast("Torneo · Ronda ${event.round}/${event.totalRounds}: tu partida está lista")
+                    UIMessage.Toast(
+                        gameAssignedTemplate
+                            .replace($$"%1$d", "${event.round}")
+                            .replace($$"%2$d", "${event.totalRounds}")
+                    )
                 )
 
                 is TournamentEvent.Finished -> bus.toast(
-                    UIMessage.Toast("El torneo finalizó — ver la clasificación final")
+                    UIMessage.Toast(tournamentFinishedMsg)
                 )
 
                 is TournamentEvent.RoundStarted -> Unit

@@ -327,6 +327,40 @@ class AuthViewModel(
         _authState.value = AuthState.Unauthenticated
     }
 
+    override suspend fun loginAsGuest(desiredUsername: String?): Result<String> {
+        logger.debug("loginAsGuest desiredUsername=$desiredUsername")
+        _authState.value = AuthState.Authenticating
+
+        return try {
+            val body = desiredUsername?.trim()?.takeIf { it.isNotBlank() }
+                ?.let { """{"desiredUsername":"$it"}""" }
+                ?: "{}"
+            val response = httpClient.post("$devServerUrl/auth/guest") {
+                contentType(Application.Json)
+                setBody(body)
+            }
+
+            if (response.status.value == 200) {
+                val body = response.bodyAsText()
+                val accessToken = Regex(""""accessToken"\s*:\s*"([^"]+)"""").find(body)
+                    ?.groupValues?.get(1)
+                    ?: return Result.failure(Exception("Missing accessToken in guest response"))
+
+                // Guest sessions are not persisted — in-memory only for the current session.
+                _accessToken = accessToken
+                authenticateWithToken(accessToken).map { accessToken }
+            } else {
+                val msg = parseServerError(response.bodyAsText()) ?: "Guest login failed: HTTP ${response.status.value}"
+                _authState.value = AuthState.Error(message = msg, canRetry = true)
+                Result.failure(Exception(msg))
+            }
+        } catch (e: Exception) {
+            logger.debug("loginAsGuest error: ${e.message}")
+            _authState.value = AuthState.Error(message = e.message ?: "Guest login failed", canRetry = true)
+            Result.failure(e)
+        }
+    }
+
     override fun clearError() {
         if (_authState.value is AuthState.Error) {
             _authState.value = AuthState.Unauthenticated

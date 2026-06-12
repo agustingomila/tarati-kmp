@@ -111,14 +111,12 @@ class TaratiWebSocketClient(
     }
 
     /**
-     * Establece conexión con el servidor
+     * Establece conexión con el servidor.
      *
-     * Esta función retorna inmediatamente después de establecer la conexión.
-     * La escucha de mensajes y heartbeat continúan en background.
-     *
-     * @throws Exception si la conexión falla o no hay token disponible
+     * @param token Token JWT explícito (sesiones guest en memoria). Si es null, se lee del repositorio.
+     * @throws Exception si la conexión falla o no hay token disponible.
      */
-    suspend fun connect() {
+    suspend fun connect(token: String? = null) {
         if (_connectionState.value == ConnectionState.Connected) {
             logger.debug("Already connected, skipping")
             return
@@ -127,9 +125,8 @@ class TaratiWebSocketClient(
         _connectionState.value = ConnectionState.Connecting
         logger.debug("Connecting to $serverUrl...")
 
-        // Obtener token actual de AuthRepository
-        val authToken =
-            authRepository.getToken() ?: throw IllegalStateException("No auth token available. Please login first.")
+        val authToken = token ?: authRepository.getToken()
+        ?: throw IllegalStateException("No auth token available. Please login first.")
 
         try {
             // Lanzar conexión en background job

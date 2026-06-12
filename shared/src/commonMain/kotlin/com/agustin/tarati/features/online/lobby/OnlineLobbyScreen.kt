@@ -2,6 +2,7 @@ package com.agustin.tarati.features.online.lobby
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
@@ -82,6 +84,8 @@ import com.agustin.tarati.network.models.LiveGameDto
 import com.agustin.tarati.network.models.MatchmakingState
 import com.agustin.tarati.network.models.MatchmakingTicket
 import com.agustin.tarati.network.models.OnlineGameStatus
+import com.agustin.tarati.network.models.OnlineUserDto
+import com.agustin.tarati.network.models.OnlineUserStatus
 import com.agustin.tarati.network.models.OpenSearchDto
 import com.agustin.tarati.network.models.TournamentStatus
 import com.agustin.tarati.network.models.TournamentSummaryDto
@@ -92,40 +96,70 @@ import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.allow_spectators
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
+import com.agustin.tarati.shared.generated.resources.challenge
+import com.agustin.tarati.shared.generated.resources.challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.confirm
 import com.agustin.tarati.shared.generated.resources.connect_to_server_first
+import com.agustin.tarati.shared.generated.resources.connected_tab
 import com.agustin.tarati.shared.generated.resources.could_not_connect
+import com.agustin.tarati.shared.generated.resources.create
+import com.agustin.tarati.shared.generated.resources.create_tournament
 import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
 import com.agustin.tarati.shared.generated.resources.feed
 import com.agustin.tarati.shared.generated.resources.feed_player_context
 import com.agustin.tarati.shared.generated.resources.filter_live_games
 import com.agustin.tarati.shared.generated.resources.filter_open_searches
+import com.agustin.tarati.shared.generated.resources.guest_banner_title
+import com.agustin.tarati.shared.generated.resources.guest_login_description
 import com.agustin.tarati.shared.generated.resources.in_live
 import com.agustin.tarati.shared.generated.resources.join
 import com.agustin.tarati.shared.generated.resources.leaderboard
+import com.agustin.tarati.shared.generated.resources.login_logout
+import com.agustin.tarati.shared.generated.resources.logout_confirm_body
 import com.agustin.tarati.shared.generated.resources.loss
+import com.agustin.tarati.shared.generated.resources.max_players
+import com.agustin.tarati.shared.generated.resources.min_players
 import com.agustin.tarati.shared.generated.resources.move
 import com.agustin.tarati.shared.generated.resources.moves
 import com.agustin.tarati.shared.generated.resources.my_games
 import com.agustin.tarati.shared.generated.resources.new_search
 import com.agustin.tarati.shared.generated.resources.no_feed_games
 import com.agustin.tarati.shared.generated.resources.no_games_found
+import com.agustin.tarati.shared.generated.resources.no_tournaments_available
 import com.agustin.tarati.shared.generated.resources.not_connected_to_server
 import com.agustin.tarati.shared.generated.resources.online_lobby
+import com.agustin.tarati.shared.generated.resources.online_users_section
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.rated_info_card
 import com.agustin.tarati.shared.generated.resources.rating
 import com.agustin.tarati.shared.generated.resources.result
+import com.agustin.tarati.shared.generated.resources.retry
 import com.agustin.tarati.shared.generated.resources.search_no_longer_available
+import com.agustin.tarati.shared.generated.resources.sign_in
 import com.agustin.tarati.shared.generated.resources.sort
 import com.agustin.tarati.shared.generated.resources.sort_newest
 import com.agustin.tarati.shared.generated.resources.sort_oldest
 import com.agustin.tarati.shared.generated.resources.sort_rating
+import com.agustin.tarati.shared.generated.resources.status_in_lobby
+import com.agustin.tarati.shared.generated.resources.status_playing
 import com.agustin.tarati.shared.generated.resources.there_are_no_games_in_progress
+import com.agustin.tarati.shared.generated.resources.time_control
+import com.agustin.tarati.shared.generated.resources.tournament
+import com.agustin.tarati.shared.generated.resources.tournament_format
+import com.agustin.tarati.shared.generated.resources.tournament_players_of
+import com.agustin.tarati.shared.generated.resources.tournament_registering_section
+import com.agustin.tarati.shared.generated.resources.tournament_status_active
+import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
+import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
+import com.agustin.tarati.shared.generated.resources.tournaments
+import com.agustin.tarati.shared.generated.resources.tournaments_finished_section
 import com.agustin.tarati.shared.generated.resources.turn
+import com.agustin.tarati.shared.generated.resources.user_name
 import com.agustin.tarati.shared.generated.resources.waiting_time
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.shared.generated.resources.win
+import com.agustin.tarati.shared.generated.resources.you
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -173,6 +207,8 @@ import kotlin.time.Instant
 fun OnlineLobbyScreen(
     onBack: () -> Unit,
     displayMode: DisplayMode = DisplayMode.FullScreen,
+    /** Abre el modal de login/registro. */
+    onShowLogin: () -> Unit = {},
     /**
      * Llamado cuando se forma una partida propia. Por defecto usa [onBack].
      * En [DisplayMode.CompanionPanel] se puede pasar un no-op para que el panel
@@ -182,6 +218,8 @@ fun OnlineLobbyScreen(
     /** Callback al tocar "Ver" en una partida en vivo. Null = feature no disponible en este contexto. */
     onSpectateGame: ((gameId: String) -> Unit)? = null,
     onLeaderboard: (() -> Unit)? = null,
+    /** Callback al tocar un perfil de usuario en línea. Null = sin navegación al perfil. */
+    onNavigateToProfile: ((userId: String) -> Unit)? = null,
     /** Callback al tocar una partida en el historial. Null = sin navegación al detalle. */
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
     /** Callback al tocar un torneo en el tab Torneos. Null = sin navegación al detalle. */
@@ -190,7 +228,9 @@ fun OnlineLobbyScreen(
     connectionViewModel: IConnectionViewModel = koinInject(),
     onlineGameViewModel: IOnlineGameViewModel = koinInject(),
     authViewModel: IAuthViewModel = koinInject(),
+    settings: SettingsRepository = koinInject(),
 ) {
+    val authState by authViewModel.authState.collectAsState()
     val connectionState by connectionViewModel.connectionState.collectAsState()
     val matchmakingState by onlineGameViewModel.matchmakingState.collectAsState()
     val currentGame by onlineGameViewModel.currentGame.collectAsState()
@@ -199,9 +239,34 @@ fun OnlineLobbyScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var showMatchmakingSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var showLogoutConfirm by remember { mutableStateOf(false) }
     // True mientras el usuario inició una búsqueda desde este lobby (nueva o uniéndose a otra).
     // Evita que el LaunchedEffect de MatchFound dispare si el estado viene de una partida anterior.
     var searchStartedInLobby by remember { mutableStateOf(false) }
+
+    // Inicializa en true si no hay sesión activa — evita flashear el mensaje "no conectado"
+    // mientras el auto-connect está en progreso en el primer frame.
+    var isAutoConnecting by remember {
+        mutableStateOf(authState !is com.agustin.tarati.features.online.auth.AuthState.Authenticated)
+    }
+
+    // Auto-conexión como invitado al primer acceso al Lobby.
+    LaunchedEffect(Unit) {
+        if (authViewModel.authState.value !is com.agustin.tarati.features.online.auth.AuthState.Authenticated) {
+            val settingsName = settings.userName.first().trim()
+                .takeIf { n -> n.length in 3..20 && n.matches(Regex("[A-Za-z0-9_]+")) }
+            val result = authViewModel.loginAsGuest(settingsName)
+            if (result.isFailure && settingsName != null) {
+                // Nombre tomado o inválido — reintentar con nombre aleatorio
+                authViewModel.loginAsGuest(null)
+            }
+        }
+        val token = authViewModel.accessToken
+        if (token != null && !connectionViewModel.isConnected && !connectionViewModel.isConnecting) {
+            connectionViewModel.connectToServer(devServerUrl, token)
+        }
+        isAutoConnecting = false
+    }
 
     val connectToServerFirstMsg = localizedString(Res.string.connect_to_server_first)
     val couldNotConnectMsg = localizedString(Res.string.could_not_connect)
@@ -233,7 +298,7 @@ fun OnlineLobbyScreen(
 
             else -> {
                 if (authViewModel.isTokenExpiringSoon()) authViewModel.refreshToken()
-                val token = authViewModel.getStoredToken()
+                val token = authViewModel.accessToken ?: authViewModel.getStoredToken()
                 if (token == null) Result.failure(Exception(connectToServerFirstMsg))
                 else connectionViewModel.connectToServer(devServerUrl, token).map { }
             }
@@ -294,6 +359,31 @@ fun OnlineLobbyScreen(
         }
     }
 
+    val isGuest = authViewModel.currentUser?.isGuest == true
+    val isAuthenticated = authState is com.agustin.tarati.features.online.auth.AuthState.Authenticated
+
+    if (showLogoutConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showLogoutConfirm = false },
+            title = { Text(localizedString(Res.string.login_logout)) },
+            text = { Text(localizedString(Res.string.logout_confirm_body)) },
+            confirmButton = {
+                Button(onClick = {
+                    showLogoutConfirm = false
+                    scope.launch {
+                        authViewModel.logout()
+                        connectionViewModel.disconnect()
+                    }
+                }) { Text(localizedString(Res.string.confirm)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showLogoutConfirm = false }) {
+                    Text(localizedString(Res.string.cancel))
+                }
+            },
+        )
+    }
+
     TaratiBackground {
         // Acciones compartidas entre TopBar (FullScreen) y CompanionPanelHeader (CompanionPanel).
         val topBarActions: @Composable RowScope.() -> Unit = {
@@ -306,8 +396,23 @@ fun OnlineLobbyScreen(
                     )
                 }
             }
-            // Botón 🔍 — visible en el tab de lobby salvo partida online en curso.
-            if (selectedTab == 0 && !hasActiveGame) {
+            // Botón Login / Logout
+            IconButton(onClick = {
+                when {
+                    !isAuthenticated || isGuest -> onShowLogin()
+                    else -> showLogoutConfirm = true
+                }
+            }) {
+                Icon(
+                    imageVector = if (isAuthenticated && !isGuest) TaratiIcons.Logout else TaratiIcons.AccountCircle,
+                    contentDescription = localizedString(
+                        if (isAuthenticated && !isGuest) Res.string.login_logout else Res.string.sign_in
+                    ),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            // Botón 🔍 — visible en el tab "En Vivo" salvo partida online en curso.
+            if (selectedTab == 1 && !hasActiveGame) {
                 IconButton(onClick = { showMatchmakingSheet = true }) {
                     Icon(
                         imageVector = TaratiIcons.Search,
@@ -343,6 +448,12 @@ fun OnlineLobbyScreen(
                     .fillMaxSize()
                     .padding(padding),
             ) {
+                // Mostrar loader durante el auto-connect inicial
+                if (isAutoConnecting) {
+                    CenteredLoader()
+                    return@Scaffold
+                }
+
                 when (val state = connectionState) {
                     is ConnectionState.Offline -> {
                         CenteredMessage(text = localizedString(Res.string.not_connected_to_server))
@@ -370,10 +481,29 @@ fun OnlineLobbyScreen(
                     is ConnectionState.Online -> Unit
                 }
 
+                // Banner de sesión invitado
+                if (isGuest) {
+                    GuestSessionBanner(onSignIn = onShowLogin)
+                }
+
                 PrimaryScrollableTabRow(selectedTabIndex = selectedTab) {
+                    // 0 — Conectados
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
+                        text = { Text(localizedString(Res.string.connected_tab)) },
+                        icon = {
+                            Icon(
+                                TaratiIcons.Group,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
+                    // 1 — En Vivo
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
                         text = { LocalizedText(Res.string.in_live) },
                         icon = {
                             Icon(
@@ -383,9 +513,23 @@ fun OnlineLobbyScreen(
                             )
                         },
                     )
+                    // 2 — Torneos
                     Tab(
-                        selected = selectedTab == 1,
-                        onClick = { selectedTab = 1 },
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        text = { Text(localizedString(Res.string.tournaments)) },
+                        icon = {
+                            Icon(
+                                TaratiIcons.EmojiEvents,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    )
+                    // 3 — Mis Partidas
+                    Tab(
+                        selected = selectedTab == 3,
+                        onClick = { selectedTab = 3 },
                         text = { LocalizedText(Res.string.my_games) },
                         icon = {
                             Icon(
@@ -395,9 +539,10 @@ fun OnlineLobbyScreen(
                             )
                         },
                     )
+                    // 4 — Seguidos
                     Tab(
-                        selected = selectedTab == 2,
-                        onClick = { selectedTab = 2 },
+                        selected = selectedTab == 4,
+                        onClick = { selectedTab = 4 },
                         text = { LocalizedText(Res.string.feed) },
                         icon = {
                             Icon(
@@ -407,22 +552,18 @@ fun OnlineLobbyScreen(
                             )
                         },
                     )
-                    Tab(
-                        selected = selectedTab == 3,
-                        onClick = { selectedTab = 3 },
-                        text = { Text("Torneos") },
-                        icon = {
-                            Icon(
-                                TaratiIcons.EmojiEvents,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        },
-                    )
                 }
 
                 when (selectedTab) {
-                    0 -> LobbyTab(
+                    0 -> ConnectedUsersTab(
+                        viewModel = viewModel,
+                        currentUserId = authViewModel.currentUser?.userId,
+                        isCurrentUserGuest = isGuest,
+                        onlineGameViewModel = onlineGameViewModel,
+                        onNavigateToProfile = onNavigateToProfile,
+                    )
+
+                    1 -> LobbyTab(
                         viewModel = viewModel,
                         onJoinSearch = handleJoinExistingSearch,
                         matchmakingState = matchmakingState,
@@ -437,9 +578,9 @@ fun OnlineLobbyScreen(
                         } else null,
                     )
 
-                    1 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
-                    2 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
-                    3 -> TournamentsTab(onNavigateToTournament = onNavigateToTournament)
+                    2 -> TournamentsTab(onNavigateToTournament = onNavigateToTournament)
+                    3 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                    4 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
                 }
             }
         }
@@ -705,8 +846,43 @@ private fun LiveGameCard(game: LiveGameDto, onSpectate: (() -> Unit)? = null) {
                 whiteTimeFmt = whiteTimeFmt,
                 blackTimeFmt = blackTimeFmt,
             )
+            if (game.tournamentId != null) {
+                TournamentContextRow(
+                    name = game.tournamentName ?: localizedString(Res.string.tournament),
+                    round = game.tournamentRound,
+                    totalRounds = game.tournamentTotalRounds,
+                )
+            }
         },
     )
+}
+
+@Composable
+private fun TournamentContextRow(name: String, round: Int?, totalRounds: Int?) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Icon(
+            TaratiIcons.EmojiEvents,
+            contentDescription = null,
+            modifier = Modifier.size(12.dp),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            text = buildString {
+                append(name)
+                if (round != null && totalRounds != null) {
+                    append(" · R$round/$totalRounds")
+                }
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable
@@ -930,17 +1106,23 @@ private fun NewSearchSheet(
     onStartSearch: (timeControl: String, rated: Boolean, spectatingAllowed: Boolean) -> Unit,
     onDismiss: () -> Unit,
     settings: SettingsRepository = koinInject(),
+    authViewModel: IAuthViewModel = koinInject(),
 ) {
     val scope = rememberCoroutineScope()
     val timeControls = TimeControl.list()
+    val isGuest = authViewModel.currentUser?.isGuest == true
 
     val savedTc by settings.onlineTimeControl.collectAsState(TimeControl.BLITZ.key)
     val savedRated by settings.onlineRated.collectAsState(true)
     val savedSpectatingAllowed by settings.onlineSpectatingAllowed.collectAsState(true)
 
     var selectedTc by remember(savedTc) { mutableStateOf(savedTc) }
-    var isRated by remember(savedRated) { mutableStateOf(savedRated) }
-    var spectatingAllowed by remember(savedSpectatingAllowed) { mutableStateOf(savedSpectatingAllowed) }
+    // Invitados solo pueden jugar partidas no-puntuadas
+    var isRated by remember(savedRated, isGuest) { mutableStateOf(if (isGuest) false else savedRated) }
+    // Los invitados siempre permiten espectadores — el toggle queda desactivado.
+    var spectatingAllowed by remember(savedSpectatingAllowed, isGuest) {
+        mutableStateOf(if (isGuest) true else savedSpectatingAllowed)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -976,6 +1158,7 @@ private fun NewSearchSheet(
                             isRated = it
                             scope.launch { settings.setOnlineRated(it) }
                         },
+                        enabled = !isGuest,
                     )
                 }
                 // Allow spectators row
@@ -994,6 +1177,7 @@ private fun NewSearchSheet(
                             spectatingAllowed = it
                             scope.launch { settings.setOnlineSpectatingAllowed(it) }
                         },
+                        enabled = !isGuest,
                     )
                 }
             }
@@ -1335,7 +1519,7 @@ private fun TournamentsTab(
 ) {
     val state by viewModel.listState.collectAsState()
     val scope = rememberCoroutineScope()
-    val token = authViewModel.getStoredToken()
+    val token = authViewModel.accessToken ?: authViewModel.getStoredToken()
     var showCreateDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -1351,13 +1535,13 @@ private fun TournamentsTab(
             state.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        state.error ?: "Error",
+                        state.error.orEmpty(),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(8.dp))
                     Button(onClick = { if (token != null) viewModel.loadTournaments(token) }) {
-                        Text("Reintentar")
+                        Text(localizedString(Res.string.retry))
                     }
                 }
             }
@@ -1365,13 +1549,13 @@ private fun TournamentsTab(
             state.isEmpty -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        "No hay torneos disponibles",
+                        localizedString(Res.string.no_tournaments_available),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(12.dp))
                     Button(onClick = { showCreateDialog = true }) {
-                        Text("Crear torneo")
+                        Text(localizedString(Res.string.create_tournament))
                     }
                 }
             }
@@ -1381,7 +1565,7 @@ private fun TournamentsTab(
                     if (state.registering.isNotEmpty()) {
                         item {
                             Text(
-                                "Inscripciones abiertas",
+                                localizedString(Res.string.tournament_registering_section),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(vertical = 8.dp),
@@ -1394,7 +1578,7 @@ private fun TournamentsTab(
                     if (state.active.isNotEmpty()) {
                         item {
                             Text(
-                                "En curso",
+                                localizedString(Res.string.tournament_status_active),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
@@ -1407,7 +1591,7 @@ private fun TournamentsTab(
                     if (state.finished.isNotEmpty()) {
                         item {
                             Text(
-                                "Finalizados",
+                                localizedString(Res.string.tournaments_finished_section),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 12.dp, bottom = 8.dp),
@@ -1427,7 +1611,7 @@ private fun TournamentsTab(
                         .align(Alignment.BottomEnd)
                         .padding(16.dp),
                 ) {
-                    Icon(TaratiIcons.EmojiEvents, contentDescription = "Crear torneo")
+                    Icon(TaratiIcons.EmojiEvents, contentDescription = localizedString(Res.string.create_tournament))
                 }
             }
         }
@@ -1480,7 +1664,10 @@ private fun TournamentCard(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    tournament.type.name.replace('_', ' '),
+                    when (tournament.type) {
+                        TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
+                        TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1492,7 +1679,9 @@ private fun TournamentCard(
                 )
                 Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${tournament.participantCount}/${tournament.maxPlayers} jugadores",
+                    localizedString(Res.string.tournament_players_of)
+                        .replace($$"%1$d", "${tournament.participantCount}")
+                        .replace($$"%2$d", "${tournament.maxPlayers}"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1506,13 +1695,16 @@ private fun TournamentCard(
 private fun CreateTournamentDialog(
     onDismiss: () -> Unit,
     onCreate: (CreateTournamentRequest) -> Unit,
+    authViewModel: IAuthViewModel = koinInject(),
 ) {
+    val isGuest = authViewModel.currentUser?.isGuest == true
     var name by remember { mutableStateOf("") }
     var selectedType by remember {
         mutableStateOf(TournamentType.ROUND_ROBIN)
     }
     var selectedTc by remember { mutableStateOf("blitz") }
     var isRated by remember { mutableStateOf(true) }
+    var spectatingAllowed by remember { mutableStateOf(true) }
     var minPlayers by remember { mutableStateOf("4") }
     var maxPlayers by remember { mutableStateOf("16") }
 
@@ -1527,18 +1719,18 @@ private fun CreateTournamentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Crear torneo") },
+        title = { Text(localizedString(Res.string.create_tournament)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Nombre") },
+                    label = { Text(localizedString(Res.string.user_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 // Tipo
-                Text("Formato", style = MaterialTheme.typography.labelMedium)
+                Text(localizedString(Res.string.tournament_format), style = MaterialTheme.typography.labelMedium)
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -1547,12 +1739,19 @@ private fun CreateTournamentDialog(
                         FilterChip(
                             selected = selectedType == type,
                             onClick = { selectedType = type },
-                            label = { Text(type.name.replace('_', ' ')) },
+                            label = {
+                                Text(
+                                    when (type) {
+                                        TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
+                                        TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
+                                    }
+                                )
+                            },
                         )
                     }
                 }
                 // Time control
-                Text("Control de tiempo", style = MaterialTheme.typography.labelMedium)
+                Text(localizedString(Res.string.time_control), style = MaterialTheme.typography.labelMedium)
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -1565,28 +1764,45 @@ private fun CreateTournamentDialog(
                         )
                     }
                 }
-                // Rated toggle
+                // Rated toggle — invitados solo juegan no puntuado
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Rated")
-                    Switch(checked = isRated, onCheckedChange = { isRated = it })
+                    Text(localizedString(Res.string.rated))
+                    Switch(
+                        checked = if (isGuest) false else isRated,
+                        onCheckedChange = { isRated = it },
+                        enabled = !isGuest,
+                    )
+                }
+                // Spectating toggle — invitados siempre permiten espectadores
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(localizedString(Res.string.allow_spectators))
+                    Switch(
+                        checked = if (isGuest) true else spectatingAllowed,
+                        onCheckedChange = { spectatingAllowed = it },
+                        enabled = !isGuest,
+                    )
                 }
                 // Jugadores
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = minPlayers,
                         onValueChange = { minPlayers = it },
-                        label = { Text("Mín. jugadores") },
+                        label = { Text(localizedString(Res.string.min_players)) },
                         singleLine = true,
                         modifier = Modifier.weight(1f),
                     )
                     OutlinedTextField(
                         value = maxPlayers,
                         onValueChange = { maxPlayers = it },
-                        label = { Text("Máx. jugadores") },
+                        label = { Text(localizedString(Res.string.max_players)) },
                         singleLine = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -1605,14 +1821,226 @@ private fun CreateTournamentDialog(
                         isRated = isRated,
                         minPlayers = minPlayers.toIntOrNull() ?: 4,
                         maxPlayers = maxPlayers.toIntOrNull() ?: 16,
+                        spectatingAllowed = if (isGuest) true else spectatingAllowed,
                     )
                     onCreate(request)
                 },
                 enabled = name.isNotBlank(),
-            ) { Text("Crear") }
+            ) { Text(localizedString(Res.string.create)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(localizedString(Res.string.cancel)) }
         },
     )
+}
+
+// ── Tab: Conectados ───────────────────────────────────────────────────────────
+
+@Composable
+private fun ConnectedUsersTab(
+    viewModel: IOnlineLobbyViewModel,
+    currentUserId: String?,
+    isCurrentUserGuest: Boolean,
+    onlineGameViewModel: IOnlineGameViewModel,
+    onNavigateToProfile: ((String) -> Unit)?,
+) {
+    val users by viewModel.onlineUsers.collectAsState()
+    var challengeTarget by remember { mutableStateOf<OnlineUserDto?>(null) }
+    val scope = rememberCoroutineScope()
+
+    challengeTarget?.let { target ->
+        ConnectedUserChallengeDialog(
+            targetName = target.displayName,
+            isCurrentUserGuest = isCurrentUserGuest,
+            onConfirm = { tc, rated ->
+                challengeTarget = null
+                scope.launch { onlineGameViewModel.sendChallenge(target.userId, tc, rated) }
+            },
+            onDismiss = { challengeTarget = null },
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (users.isEmpty()) {
+            CenteredMessage(text = localizedString(Res.string.online_users_section))
+        } else {
+            LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
+                items(users, key = { it.userId }) { user ->
+                    ConnectedUserRow(
+                        user = user,
+                        isSelf = user.userId == currentUserId,
+                        onClick = if (!user.isGuest && onNavigateToProfile != null) {
+                            { onNavigateToProfile(user.userId) }
+                        } else null,
+                        onChallenge = if (!user.isGuest && user.userId != currentUserId) {
+                            { challengeTarget = user }
+                        } else null,
+                    )
+                    androidx.compose.material3.HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConnectedUserRow(
+    user: OnlineUserDto,
+    isSelf: Boolean,
+    onClick: (() -> Unit)?,
+    onChallenge: (() -> Unit)?,
+) {
+    val statusColor = if (user.status == OnlineUserStatus.PLAYING) Color(0xFF4CAF50)
+    else MaterialTheme.colorScheme.outline
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(8.dp)
+                .background(statusColor, androidx.compose.foundation.shape.CircleShape)
+        )
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                if (isSelf) "${user.displayName} (${localizedString(Res.string.you)})"
+                else user.displayName,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (isSelf) FontWeight.SemiBold else FontWeight.Normal,
+            )
+            Text(
+                localizedString(
+                    if (user.status == OnlineUserStatus.PLAYING) Res.string.status_playing
+                    else Res.string.status_in_lobby
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = if (user.status == OnlineUserStatus.PLAYING) Color(0xFF4CAF50)
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (!user.isGuest && user.ratingBlitz != null) {
+            Text(
+                "${user.ratingBlitz}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(end = 4.dp),
+            )
+        }
+        if (onChallenge != null) {
+            IconButton(onClick = onChallenge, modifier = Modifier.size(36.dp)) {
+                Icon(
+                    TaratiIcons.PlayArrow,
+                    contentDescription = localizedString(Res.string.challenge),
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConnectedUserChallengeDialog(
+    targetName: String,
+    isCurrentUserGuest: Boolean,
+    onConfirm: (timeControl: String, rated: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val timeControls = TimeControl.list()
+    var selectedTc by remember { mutableStateOf(TimeControl.BLITZ.key) }
+    var isRated by remember { mutableStateOf(!isCurrentUserGuest) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                localizedString(Res.string.challenge_dialog_title).replace($$"%1$s", targetName),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(timeControls) { tc ->
+                        FilterChip(
+                            selected = selectedTc == tc,
+                            onClick = { selectedTc = tc },
+                            label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(localizedString(Res.string.rated), style = MaterialTheme.typography.bodyMedium)
+                    Switch(
+                        checked = isRated,
+                        onCheckedChange = { isRated = it },
+                        enabled = !isCurrentUserGuest,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(selectedTc, isRated) }) {
+                Text(localizedString(Res.string.challenge))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(localizedString(Res.string.cancel))
+            }
+        },
+    )
+}
+
+// ── Sesión invitado ───────────────────────────────────────────────────────────
+
+@Composable
+private fun GuestSessionBanner(onSignIn: () -> Unit) {
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        tonalElevation = 2.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                TaratiIcons.Person,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+            Spacer(Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    localizedString(Res.string.guest_banner_title),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+                Text(
+                    localizedString(Res.string.guest_login_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f),
+                )
+            }
+            androidx.compose.material3.TextButton(onClick = onSignIn) {
+                Text(
+                    localizedString(Res.string.sign_in),
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
+        }
+    }
 }

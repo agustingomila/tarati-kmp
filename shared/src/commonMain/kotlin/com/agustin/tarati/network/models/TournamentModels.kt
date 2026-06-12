@@ -25,14 +25,15 @@ enum class TournamentStatus { REGISTERING, ACTIVE, FINISHED, CANCELLED }
 /**
  * Request para crear un nuevo torneo.
  *
- * @property name Nombre visible del torneo (1–100 chars)
- * @property type Formato del torneo
- * @property timeControl Tipo de control de tiempo: "bullet" | "blitz" | "rapid" | "classical"
- * @property initialTime Tiempo inicial en segundos
- * @property increment Incremento por movimiento en segundos
- * @property isRated Si las partidas del torneo afectan el rating Glicko-2
- * @property minPlayers Mínimo de jugadores para poder iniciar
- * @property maxPlayers Máximo de inscritos
+ * @property name              Nombre visible del torneo (1–100 chars)
+ * @property type              Formato del torneo
+ * @property timeControl       Tipo de control de tiempo: "bullet" | "blitz" | "rapid" | "classical"
+ * @property initialTime       Tiempo inicial en segundos
+ * @property increment         Incremento por movimiento en segundos
+ * @property isRated           Si las partidas del torneo afectan el rating Glicko-2
+ * @property minPlayers        Mínimo de jugadores para poder iniciar
+ * @property maxPlayers        Máximo de inscritos
+ * @property spectatingAllowed Si los espectadores externos pueden ver las partidas del torneo
  */
 @Serializable
 data class CreateTournamentRequest(
@@ -44,6 +45,7 @@ data class CreateTournamentRequest(
     val isRated: Boolean = true,
     val minPlayers: Int = 4,
     val maxPlayers: Int = 16,
+    val spectatingAllowed: Boolean = true,
 )
 
 // ── DTOs de respuesta ─────────────────────────────────────────────────────────
@@ -67,6 +69,7 @@ data class TournamentSummaryDto(
     val participantCount: Int,
     val creatorId: String,
     val creatorUsername: String,
+    val spectatingAllowed: Boolean = true,
     val createdAt: Instant,
     val startsAt: Instant?,
     val finishedAt: Instant?,
@@ -92,6 +95,7 @@ data class TournamentDetailDto(
     val creatorUsername: String,
     val currentRound: Int,
     val totalRounds: Int,
+    val spectatingAllowed: Boolean = true,
     val standings: List<TournamentStandingDto>,
     val rounds: List<TournamentRoundDto>,
     val createdAt: Instant,

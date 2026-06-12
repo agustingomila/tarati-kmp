@@ -161,18 +161,24 @@ data class GameSummary(
  * el cliente los interpola localmente igual que hace con los GameStateUpdates
  * del WebSocket.
  *
- * @property gameId        ID único de la sesión.
- * @property whiteUsername Username del jugador blanco.
- * @property blackUsername Username del jugador negro.
- * @property whiteRating   ELO blancas al inicio de la partida.
- * @property blackRating   ELO negras al inicio de la partida.
- * @property timeControl   Etiqueta + tiempos del time control.
- * @property rated         Si la partida afecta el rating.
- * @property moveCount     Cantidad de movimientos jugados hasta ahora.
- * @property whiteTimeMs   Tiempo restante de blancas en ms (snapshot).
- * @property blackTimeMs   Tiempo restante de negras en ms (snapshot).
- * @property currentTurn   "white" o "black" — quién tiene el turno ahora.
- * @property startedAtMs   Epoch ms del inicio de la partida (para mostrar duración).
+ * @property gameId              ID único de la sesión.
+ * @property whiteUsername       Username del jugador blanco.
+ * @property blackUsername       Username del jugador negro.
+ * @property whiteRating         ELO blancas al inicio de la partida.
+ * @property blackRating         ELO negras al inicio de la partida.
+ * @property timeControl         Etiqueta + tiempos del time control.
+ * @property rated               Si la partida afecta el rating.
+ * @property moveCount           Cantidad de movimientos jugados hasta ahora.
+ * @property whiteTimeMs         Tiempo restante de blancas en ms (snapshot).
+ * @property blackTimeMs         Tiempo restante de negras en ms (snapshot).
+ * @property currentTurn         "white" o "black" — quién tiene el turno ahora.
+ * @property startedAtMs         Epoch ms del inicio de la partida (para mostrar duración).
+ * @property positionNotation    Notación FEN-like del estado actual del tablero.
+ * @property spectatingAllowed   Si los espectadores pueden unirse a observar.
+ * @property tournamentId        ID del torneo al que pertenece la partida, null si no es de torneo.
+ * @property tournamentName      Nombre del torneo, null si no es de torneo.
+ * @property tournamentRound     Ronda actual del torneo, null si no es de torneo.
+ * @property tournamentTotalRounds Total de rondas del torneo, null si no es de torneo.
  */
 @Serializable
 data class LiveGameDto(
@@ -192,6 +198,14 @@ data class LiveGameDto(
     val positionNotation: String = "",
     /** Si los espectadores pueden unirse a observar esta partida. */
     val spectatingAllowed: Boolean = false,
+    /** ID del torneo al que pertenece esta partida. Null para partidas regulares. */
+    val tournamentId: String? = null,
+    /** Nombre visible del torneo. Null para partidas regulares. */
+    val tournamentName: String? = null,
+    /** Número de ronda actual dentro del torneo. Null para partidas regulares. */
+    val tournamentRound: Int? = null,
+    /** Total de rondas del torneo. Null para partidas regulares. */
+    val tournamentTotalRounds: Int? = null,
 )
 
 /**
@@ -248,4 +262,33 @@ data class PagedResponse<T>(
     val total: Long,
     val page: Int,
     val limit: Int,
+)
+
+// ── Usuarios en línea ─────────────────────────────────────────────────────────
+
+@Serializable
+enum class OnlineUserStatus {
+    /** Tiene una sesión de juego activa o iniciándose. */
+    PLAYING,
+
+    /** Conectado al WebSocket pero sin partida activa. */
+    IN_LOBBY,
+}
+
+/**
+ * Usuario conectado actualmente visible en el lobby.
+ *
+ * @property userId     ID del usuario.
+ * @property displayName Nombre para mostrar (displayName si tiene, username si no).
+ * @property isGuest    True para cuentas temporales sin registro.
+ * @property status     Estado de actividad actual.
+ * @property ratingBlitz Rating blitz (null para invitados).
+ */
+@Serializable
+data class OnlineUserDto(
+    val userId: String,
+    val displayName: String,
+    val isGuest: Boolean,
+    val status: OnlineUserStatus,
+    val ratingBlitz: Int? = null,
 )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Gestiona el estado de la conexión WebSocket al servidor de Tarati.
@@ -69,7 +70,7 @@ class ConnectionViewModel(
         _connectionState.value = ConnectionState.Connecting
 
         return try {
-            wsClient.connect()
+            wsClient.connect(authToken)
 
             val userInfo = resolveUserInfo()
             lastUserInfo = userInfo
@@ -184,11 +185,11 @@ class ConnectionViewModel(
         reconnectJob = viewModelScope.launch {
             for ((index, delayMs) in reconnectDelays.withIndex()) {
                 _connectionState.value = ConnectionState.Reconnecting(userInfo, attempt = index + 1)
-                delay(delayMs)
+                delay(delayMs.milliseconds)
                 if (_connectionState.value !is ConnectionState.Reconnecting) return@launch
                 try {
                     lastUserInfo = userInfo
-                    wsClient.connect()
+                    wsClient.connect(lastAuthToken)
                     // Éxito: syncWebSocketState(Connected) habrá seteado Online ya
                     logger.debug("Auto-reconnect attempt ${index + 1} succeeded")
                     return@launch

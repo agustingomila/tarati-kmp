@@ -256,50 +256,25 @@ fun GameScreen(
             }
 
             else -> {
-                val token = authViewModel.getStoredToken()
+                if (authViewModel.isTokenExpiringSoon()) authViewModel.refreshToken()
+                val token = authViewModel.accessToken ?: authViewModel.getStoredToken()
                 if (token == null) {
                     Result.failure(Exception(connectToServerFirstMsg))
                 } else {
-                    if (authViewModel.isTokenExpiringSoon()) authViewModel.refreshToken()
-                    connectionViewModel.connectToServer(devServerUrl, token)
-                        .map { Unit }
+                    connectionViewModel.connectToServer(devServerUrl, token).map { Unit }
                 }
             }
-        }
-    }
-
-    suspend fun handleOnlineLobby() {
-        val r = ensureConnected()
-        if (r.isSuccess) {
-            onOnlineLobby()
-        } else {
-            bus.toast(UIMessage.Toast(r.exceptionOrNull()?.message ?: couldNotConnectMsg))
         }
     }
 
     val handleNavigateToOnlineLobby: () -> Unit = {
-        scope.launch {
-            if (authViewModel.getStoredToken() == null) {
-                // La suspend lambda es ejecutada por NavGraph en su scope estable,
-                // no por el scope de GameScreen que puede recomponerse.
-                onNavigateToLogin { handleOnlineLobby() }
-                return@launch
-            }
-            handleOnlineLobby()
-        }
+        // Siempre ir directo al Lobby — la auto-conexión como invitado sucede allí.
+        onOnlineLobby()
     }
 
-    /** Flujo completo del botón único: auth → connect → modal de creación de búsqueda. */
+    /** Flujo completo del botón único: connect → modal de creación de búsqueda. */
     val handleCreateSearch: () -> Unit = {
         scope.launch {
-            if (authViewModel.getStoredToken() == null) {
-                onNavigateToLogin {
-                    val r = ensureConnected()
-                    if (r.isSuccess) showMatchmakingModal = true
-                    else bus.toast(UIMessage.Toast(r.exceptionOrNull()?.message ?: couldNotConnectMsg))
-                }
-                return@launch
-            }
             val r = ensureConnected()
             if (r.isSuccess) showMatchmakingModal = true
             else bus.toast(UIMessage.Toast(r.exceptionOrNull()?.message ?: couldNotConnectMsg))

@@ -9,6 +9,7 @@ import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel.Companion.LIVE_POLL_INTERVAL
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LiveGameDto
+import com.agustin.tarati.network.models.OnlineUserDto
 import com.agustin.tarati.network.models.OpenSearchDto
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -97,6 +98,9 @@ class OnlineLobbyViewModel(
 
     private val logger = getLogger("OnlineLobbyViewModel")
 
+    private val _onlineUsers = MutableStateFlow<List<OnlineUserDto>>(emptyList())
+    override val onlineUsers: StateFlow<List<OnlineUserDto>> = _onlineUsers.asStateFlow()
+
     private val _liveGames = MutableStateFlow(LiveGamesUiState())
     override val liveGames: StateFlow<LiveGamesUiState> = _liveGames.asStateFlow()
 
@@ -117,8 +121,13 @@ class OnlineLobbyViewModel(
     companion object {
         /** Intervalo de refresco del lobby (partidas en vivo + búsquedas). */
         val LIVE_POLL_INTERVAL = 5.seconds
+
+        /** Usuarios en línea se refrescan cada 2 ciclos (~10 s). */
+        private const val ONLINE_USERS_EVERY_N_CYCLES = 2
         const val PAGE_SIZE = 20
     }
+
+    private var pollCycle = 0
 
     // ── Polling ────────────────────────────────────────────────────────────────
 
@@ -128,6 +137,10 @@ class OnlineLobbyViewModel(
             while (isActive) {
                 fetchLiveGames()
                 fetchOpenSearches()
+                pollCycle++
+                if (pollCycle % ONLINE_USERS_EVERY_N_CYCLES == 0) {
+                    fetchOnlineUsers()
+                }
                 delay(LIVE_POLL_INTERVAL)
             }
         }
@@ -146,6 +159,13 @@ class OnlineLobbyViewModel(
     private suspend fun getValidToken(): String? {
         if (authViewModel.isTokenExpiringSoon()) authViewModel.refreshToken()
         return authViewModel.accessToken
+    }
+
+    private suspend fun fetchOnlineUsers() {
+        val token = getValidToken() ?: return
+        repository.getOnlineUsers(token).onSuccess { users ->
+            _onlineUsers.value = users
+        }
     }
 
     private suspend fun fetchLiveGames() {

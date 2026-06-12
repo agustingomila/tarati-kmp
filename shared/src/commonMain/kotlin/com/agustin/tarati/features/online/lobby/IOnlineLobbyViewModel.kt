@@ -2,6 +2,7 @@ package com.agustin.tarati.features.online.lobby
 
 
 import com.agustin.tarati.core.data.database.dto.MatchDto
+import com.agustin.tarati.network.models.OnlineUserDto
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -13,6 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 interface IOnlineLobbyViewModel {
 
     // ── State ──────────────────────────────────────────────────────────────────
+
+    /** Usuarios conectados al servidor ahora. Refresco cada ~10 s durante el polling. */
+    val onlineUsers: StateFlow<List<OnlineUserDto>>
 
     /** Partidas actualmente en curso. Refresco cada [LIVE_POLL_INTERVAL]. */
     val liveGames: StateFlow<LiveGamesUiState>

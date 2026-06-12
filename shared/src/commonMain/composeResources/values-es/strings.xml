@@ -426,4 +426,58 @@
     <string name="feed">Seguidos</string>
     <string name="no_feed_games">Las partidas de los jugadores que seguís aparecerán aquí</string>
     <string name="feed_player_context">%1$s jugó</string>
+
+    <!-- ── Torneos ──────────────────────────────────────────────────── -->
+    <string name="tournament">Torneo</string>
+    <string name="tournaments">Torneos</string>
+    <string name="standings">Clasificación</string>
+    <string name="fixture">Fixture</string>
+    <string name="casual">Casual</string>
+    <string name="create">Crear</string>
+    <string name="tournament_format">Formato</string>
+    <string name="min_players">Mín. jugadores</string>
+    <string name="max_players">Máx. jugadores</string>
+    <string name="no_tournaments_available">No hay torneos disponibles</string>
+    <string name="create_tournament">Crear torneo</string>
+    <string name="tournament_registering_section">Inscripciones abiertas</string>
+    <string name="tournaments_finished_section">Finalizados</string>
+    <string name="tournament_round_progress">Ronda %1$d de %2$d</string>
+    <string name="tournament_created_by">Creado por %1$s</string>
+    <string name="tournament_players_of">%1$d/%2$d jugadores</string>
+    <string name="tournament_start">Iniciar torneo</string>
+    <string name="tournament_register">Inscribirse</string>
+    <string name="tournament_unregister">Desinscribirse</string>
+    <string name="tournament_active_status">Torneo en curso</string>
+    <string name="tournament_finished_status">Torneo finalizado</string>
+    <string name="tournament_cancelled_status">Torneo cancelado</string>
+    <string name="tournament_status_registering">Inscripciones</string>
+    <string name="tournament_status_active">En curso</string>
+    <string name="tournament_status_finished">Finalizado</string>
+    <string name="tournament_status_cancelled">Cancelado</string>
+    <string name="tournament_type_round_robin">Round Robin</string>
+    <string name="tournament_type_swiss">Suizo</string>
+    <string name="tournament_round_n">Ronda %1$d</string>
+    <string name="tournament_game_assigned">Torneo · Ronda %1$d/%2$d: tu partida está lista</string>
+    <string name="tournament_finished_notification">El torneo finalizó — ver la clasificación final</string>
+
+    <!-- ── Login invitado ───────────────────────────────────────────────────── -->
+    <string name="guest_login">Continuar como invitado</string>
+    <string name="guest_login_description">Sin torneos · Solo partidas no puntuadas</string>
+    <string name="or_separator">o</string>
+    <string name="guest_username_label">Nombre de usuario (opcional)</string>
+    <string name="guest_username_hint">Ingresá un nombre, o dejalo en blanco para uno aleatorio</string>
+    <string name="guest_username_invalid">Entre 3 y 20 caracteres: letras, números y guiones bajos</string>
+    <string name="guest_terms_prefix">Al unirte, aceptás nuestros</string>
+    <string name="guest_terms_link_terms">Términos de Uso</string>
+    <string name="guest_terms_link_privacy">Política de Privacidad</string>
+    <string name="guest_terms_link_rules">Reglas</string>
+    <string name="connected_tab">Conectados</string>
+    <string name="sign_in">Iniciar sesión</string>
+    <string name="guest_banner_title">Sesión de invitado</string>
+    <string name="online_users_section">En línea</string>
+    <string name="status_playing">Jugando</string>
+    <string name="status_in_lobby">En el lobby</string>
+    <string name="logout_confirm_body">¿Querés cerrar sesión?</string>
+    <string name="visibility_online">Mostrar presencia en línea</string>
+    <string name="visibility_online_description">Aparecer en la lista de usuarios conectados</string>
 </resources>

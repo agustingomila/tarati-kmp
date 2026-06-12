@@ -5,6 +5,7 @@ import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.Game
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LiveGameDto
+import com.agustin.tarati.network.models.OnlineUserDto
 import com.agustin.tarati.network.models.OpenSearchDto
 import com.agustin.tarati.network.models.PagedResponse
 import io.ktor.client.HttpClient
@@ -107,6 +108,18 @@ class OnlineLobbyRepository(
      */
     suspend fun getOpenSearches(token: String): Result<List<OpenSearchDto>> = runCatching {
         httpClient.get("$baseUrl/api/lobby/open-searches") {
+            header("Authorization", "Bearer $token")
+        }.body()
+    }
+
+    /**
+     * Obtiene la lista de usuarios actualmente conectados al servidor.
+     * Excluye bots y usuarios con visibilidad oculta.
+     *
+     * @param token JWT del usuario autenticado.
+     */
+    suspend fun getOnlineUsers(token: String): Result<List<OnlineUserDto>> = runCatching {
+        httpClient.get("$baseUrl/api/lobby/online-users") {
             header("Authorization", "Bearer $token")
         }.body()
     }

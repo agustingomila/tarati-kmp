@@ -20,8 +20,9 @@ import com.agustin.tarati.features.game.IGameModel
 import com.agustin.tarati.features.library.GamesLibraryScreen
 import com.agustin.tarati.features.library.GamesLibraryViewModel
 import com.agustin.tarati.features.library.IGamesLibraryViewModel
+import com.agustin.tarati.features.online.auth.AuthState
 import com.agustin.tarati.features.online.auth.IAuthViewModel
-import com.agustin.tarati.features.online.auth.LoginScreen
+import com.agustin.tarati.features.online.game.IOnlineGameViewModel
 import com.agustin.tarati.features.online.lobby.IOnlineLobbyViewModel
 import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
@@ -40,7 +41,6 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameDetail
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GamesLibraryDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.LeaderboardDest
-import com.agustin.tarati.ui.components.navigation.ScreenDestinations.LoginScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
@@ -57,6 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NavGraph(
+    onShowLogin: ((suspend () -> Unit)?) -> Unit = {},
     gameViewModel: IGameModel = injectGameViewModel(),
     animationViewModel: IBoardAnimationViewModel = koinViewModel<BoardAnimationViewModel>(),
     geometryViewModel: IBoardGeometryViewModel = koinViewModel<BoardGeometryViewModel>(),
@@ -64,6 +65,7 @@ fun NavGraph(
     gameDetailsViewModel: IGameDetailsViewModel = koinViewModel<GameDetailsViewModel>(),
     settingsViewModel: ISettingsViewModel = koinViewModel<SettingsViewModel>(),
     onlineLobbyViewModel: IOnlineLobbyViewModel = koinViewModel<OnlineLobbyViewModel>(),
+    onlineGameViewModel: IOnlineGameViewModel = koinInject(),
     authViewModel: IAuthViewModel = koinInject(),
     clipboardHelper: GameClipboardHelper = koinInject(),
 ) {
@@ -72,11 +74,6 @@ fun NavGraph(
 
     // Estado de transferencia entre el lobby y GameScreen.
     val pendingMatchmaking = remember { mutableStateOf<Pair<String, Boolean>?>(null) }
-
-    // Acción suspend a ejecutar tras un login iniciado desde una acción online pendiente.
-    // Se almacena como suspend lambda y se lanza desde el scope de NavGraph (estable),
-    // evitando el problema de capturar el scope volátil de rememberCoroutineScope() de GameScreen.
-    val pendingPostLoginAction = remember { mutableStateOf<(suspend () -> Unit)?>(null) }
 
     NavHost(
         navController = navController,
@@ -89,25 +86,6 @@ fun NavGraph(
                     popUpTo(SplashScreenDest.route) { inclusive = true }
                 }
             }
-        }
-
-        // Login se muestra como pantalla de paso solo cuando se necesita auth para una acción online.
-        composable(route = LoginScreenDest.route) {
-            LoginScreen(
-                onLoginSuccess = {
-                    val action = pendingPostLoginAction.value
-                    pendingPostLoginAction.value = null
-                    navController.popBackStack()
-                    // Lanzar desde el scope de NavGraph (no de GameScreen) para evitar
-                    // que un recompose de GameScreen cancele el scope antes de ejecutar.
-                    action?.let { scope.launch { it() } }
-                },
-                onBack = {
-                    pendingPostLoginAction.value = null
-                    navController.popBackStack()
-                },
-                authViewModel = authViewModel,
-            )
         }
 
         composable(route = GameScreenDest.route) {
@@ -140,10 +118,7 @@ fun NavGraph(
                         navController.navigate(ScreenDestinations.OnlineLobbyDest.route)
                 },
                 onSaveGame = { match -> gamesLibraryViewModel.saveCurrentGame(match) },
-                onNavigateToLogin = { suspendAction ->
-                    pendingPostLoginAction.value = suspendAction
-                    navController.navigate(LoginScreenDest.route)
-                },
+                onNavigateToLogin = { suspendAction -> onShowLogin(suspendAction) },
                 initialMatchmaking = pendingMatchmaking.value.also { pendingMatchmaking.value = null },
             )
         }
@@ -156,7 +131,7 @@ fun NavGraph(
                 events = settingsEvents(settingsViewModel),
                 isGameActive = gameStatus == GameStatus.PLAYING,
                 onNavigateBack = { navController.popBackStack() },
-                loggedInUsername = (currentUser as? com.agustin.tarati.features.online.auth.AuthState.Authenticated)
+                loggedInUsername = (currentUser as? AuthState.Authenticated)
                     ?.userInfo?.username,
                 onLogout = if (authViewModel.isAuthenticated) {
                     {
@@ -211,12 +186,14 @@ fun NavGraph(
         composable(ScreenDestinations.OnlineLobbyDest.route) {
             OnlineLobbyScreen(
                 onBack = { navController.popBackStack() },
+                onShowLogin = { onShowLogin(null) },
                 onSpectateGame = { _ ->
-                    // spectateGame ya fue llamado en OnlineLobbyScreen antes de navegar.
-                    // Solo necesitamos volver a GameScreen donde el spectatingState se aplica.
                     navController.popBackStack()
                 },
                 onLeaderboard = { navController.navigate(LeaderboardDest.route) },
+                onNavigateToProfile = { userId ->
+                    navController.navigate(PublicProfileDest.createRoute(userId))
+                },
                 onNavigateToGameDetails = { gameId ->
                     // Pre-cargar el detalle desde el servidor antes de navegar.
                     // loadAndPreviewGame obtiene el Game y lo convierte a MatchDto;
@@ -270,6 +247,20 @@ fun NavGraph(
             TournamentDetailScreen(
                 tournamentId = tournamentId,
                 onBack = { navController.popBackStack() },
+                onSpectateGame = { _ ->
+                    // spectateGame ya fue llamado en TournamentDetailScreen antes del callback.
+                    // Volver a GameScreen donde el spectatingState se aplica.
+                    navController.popBackStack()
+                },
+                onNavigateToGameDetails = { gameId ->
+                    scope.launch {
+                        val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
+                        if (matchDto != null) {
+                            gameDetailsViewModel.updateCurrentMatchDto(matchDto)
+                            navController.navigate("game_details/$gameId")
+                        }
+                    }
+                },
             )
         }
     }
