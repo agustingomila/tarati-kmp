@@ -481,6 +481,8 @@
     <string name="connected_tab">Conectados</string>
     <string name="sign_in">Iniciar sesión</string>
     <string name="guest_banner_title">Sesión de invitado</string>
+    <string name="guest_history_placeholder">Creá una cuenta para ver tu historial de partidas</string>
+    <string name="guest_feed_placeholder">Creá una cuenta para seguir jugadores y ver sus partidas</string>
     <string name="online_users_section">En línea</string>
     <string name="status_playing">Jugando</string>
     <string name="status_in_lobby">En el lobby</string>

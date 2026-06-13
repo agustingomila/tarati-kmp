@@ -21,6 +21,7 @@ import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.load_to_board
+import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
 import org.koin.compose.viewmodel.koinViewModel
@@ -32,6 +33,7 @@ fun GameDetailsScreen(
     onImport: (MatchDto) -> Unit = {},
     onCopyMoveHistory: (MatchDto) -> Unit = {},
     onBack: () -> Unit = {},
+    displayMode: DisplayMode = DisplayMode.FullScreen,
     viewModel: IGameDetailsViewModel = koinViewModel<GameDetailsViewModel>(),
 ) {
     val matchDto by viewModel.currentMatchDto.collectAsState()
@@ -52,6 +54,7 @@ fun GameDetailsScreen(
                     onBack = onBack,
                     onCopyMoveHistory = { matchDto?.let { onCopyMoveHistory(it) } },
                     viewModel = viewModel,
+                    displayMode = displayMode,
                 )
             },
             floatingActionButton = {

@@ -114,6 +114,8 @@ import com.agustin.tarati.shared.generated.resources.filter_live_games
 import com.agustin.tarati.shared.generated.resources.filter_open_searches
 import com.agustin.tarati.shared.generated.resources.filter_registered_only
 import com.agustin.tarati.shared.generated.resources.guest_banner_title
+import com.agustin.tarati.shared.generated.resources.guest_feed_placeholder
+import com.agustin.tarati.shared.generated.resources.guest_history_placeholder
 import com.agustin.tarati.shared.generated.resources.guest_login_description
 import com.agustin.tarati.shared.generated.resources.in_live
 import com.agustin.tarati.shared.generated.resources.join
@@ -589,8 +591,8 @@ fun OnlineLobbyScreen(
                     )
 
                     2 -> TournamentsTab(onNavigateToTournament = onNavigateToTournament)
-                    3 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
-                    4 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                    3 -> GameHistoryTab(viewModel = viewModel, isGuest = isGuest, onNavigateToGameDetails = onNavigateToGameDetails)
+                    4 -> FeedTab(viewModel = viewModel, isGuest = isGuest, onNavigateToGameDetails = onNavigateToGameDetails)
                 }
             }
         }
@@ -1208,8 +1210,14 @@ private fun NewSearchSheet(
 @Composable
 private fun GameHistoryTab(
     viewModel: IOnlineLobbyViewModel,
+    isGuest: Boolean = false,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
 ) {
+    if (isGuest) {
+        CenteredMessage(text = localizedString(Res.string.guest_history_placeholder))
+        return
+    }
+
     val state by viewModel.history.collectAsState()
     val listState = rememberLazyListState()
 
@@ -1392,8 +1400,14 @@ private fun HistoryGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null)
 @Composable
 private fun FeedTab(
     viewModel: IOnlineLobbyViewModel,
+    isGuest: Boolean = false,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
 ) {
+    if (isGuest) {
+        CenteredMessage(text = localizedString(Res.string.guest_feed_placeholder))
+        return
+    }
+
     val state by viewModel.feedState.collectAsState()
     val listState = rememberLazyListState()
 

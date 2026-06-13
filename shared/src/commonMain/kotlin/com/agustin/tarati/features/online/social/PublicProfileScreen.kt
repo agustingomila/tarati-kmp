@@ -85,6 +85,8 @@ import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
+import com.agustin.tarati.ui.layout.CompanionPanelHeader
+import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.datetime.LocalDate
@@ -93,6 +95,9 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import com.agustin.tarati.features.online.connection.ConnectionState
+import com.agustin.tarati.features.online.connection.IConnectionViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Instant
@@ -102,6 +107,7 @@ import kotlin.time.Instant
 fun PublicProfileScreen(
     userId: String,
     onBack: () -> Unit,
+    displayMode: DisplayMode = DisplayMode.FullScreen,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
     viewModel: IPublicProfileViewModel = koinViewModel<PublicProfileViewModel>(key = userId) {
         parametersOf(userId)
@@ -110,17 +116,26 @@ fun PublicProfileScreen(
     val profileState by viewModel.profileState.collectAsState()
     val historyState by viewModel.historyState.collectAsState()
     val followStatusState by viewModel.followStatusState.collectAsState()
+    val connectionViewModel: IConnectionViewModel = koinInject()
+    val connectionState by connectionViewModel.connectionState.collectAsState()
+    val isOnline = connectionState is ConnectionState.Online
 
     TaratiBackground {
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                TaratiTopBar(
-                    title = profileState.profile?.username
-                        ?: localizedString(Res.string.profile),
-                    navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = onBack,
-                )
+                val title = profileState.profile?.username ?: localizedString(Res.string.profile)
+                when (displayMode) {
+                    DisplayMode.FullScreen -> TaratiTopBar(
+                        title = title,
+                        navigationType = TopBarNavigationType.Back,
+                        onNavigationClick = onBack,
+                    )
+                    DisplayMode.CompanionPanel -> CompanionPanelHeader(
+                        title = title,
+                        onClose = onBack,
+                    )
+                }
             },
         ) { padding ->
             when {
@@ -148,6 +163,7 @@ fun PublicProfileScreen(
                     historyState = historyState,
                     followStatusState = followStatusState,
                     isOwnProfile = viewModel.isOwnProfile,
+                    isOnline = isOnline,
                     onToggleFollow = viewModel::toggleFollow,
                     onSendChallenge = { tc, rated -> viewModel.sendChallenge(tc, rated) },
                     onNavigateToGameDetails = onNavigateToGameDetails,
@@ -167,6 +183,7 @@ private fun ProfileContent(
     historyState: GameHistoryUiState,
     followStatusState: FollowStatusUiState,
     isOwnProfile: Boolean,
+    isOnline: Boolean,
     onToggleFollow: () -> Unit,
     onSendChallenge: (timeControl: String, rated: Boolean) -> Unit,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
@@ -209,6 +226,7 @@ private fun ProfileContent(
                 profile = profile,
                 followStatusState = followStatusState,
                 isOwnProfile = isOwnProfile,
+                isChallengeEnabled = isOnline,
                 onToggleFollow = onToggleFollow,
                 onChallenge = { showChallengeDialog = true },
             )
@@ -290,6 +308,7 @@ private fun ProfileHeader(
     profile: PublicProfileDto,
     followStatusState: FollowStatusUiState,
     isOwnProfile: Boolean,
+    isChallengeEnabled: Boolean,
     onToggleFollow: () -> Unit,
     onChallenge: () -> Unit,
 ) {
@@ -371,7 +390,7 @@ private fun ProfileHeader(
                         Text(localizedString(Res.string.follow), style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                OutlinedButton(onClick = onChallenge) {
+                OutlinedButton(onClick = onChallenge, enabled = isChallengeEnabled) {
                     Text(localizedString(Res.string.challenge), style = MaterialTheme.typography.labelMedium)
                 }
             }
