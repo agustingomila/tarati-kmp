@@ -20,7 +20,7 @@ private class WasmPathMeasure(
 
     override fun getSegment(startDistance: Float, endDistance: Float, startWithMoveTo: Boolean): Path? = null
 
-    override fun getPosTan(distance: Float): PosTan? {
+    override fun getPosTan(distance: Float): PosTan {
         val bounds = path.getBounds()
         return PosTan(
             position = floatArrayOf(bounds.left + bounds.width / 2f, bounds.top + bounds.height / 2f),

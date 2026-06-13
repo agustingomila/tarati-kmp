@@ -71,7 +71,7 @@ private class JvmPathMeasure(
         return null
     }
 
-    override fun getPosTan(distance: Float): PosTan? {
+    override fun getPosTan(distance: Float): PosTan {
         // Implementación aproximada basada en el bounding box.
         // Para animaciones complejas, esto no será preciso, pero permite
         // que el código compile y funcione de forma básica.

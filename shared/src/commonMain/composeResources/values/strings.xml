@@ -469,6 +469,7 @@
     <string name="guest_terms_link_privacy">Privacy Policy</string>
     <string name="guest_terms_link_rules">Rules</string>
     <string name="connected_tab">Connected</string>
+    <string name="no_players_match_filters">No players match the current filters</string>
     <string name="sign_in">Sign in</string>
     <string name="guest_banner_title">Guest session</string>
     <string name="online_users_section">Online now</string>

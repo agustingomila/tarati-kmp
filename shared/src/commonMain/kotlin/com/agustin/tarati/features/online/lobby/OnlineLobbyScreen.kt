@@ -132,6 +132,7 @@ import com.agustin.tarati.shared.generated.resources.my_games
 import com.agustin.tarati.shared.generated.resources.new_search
 import com.agustin.tarati.shared.generated.resources.no_feed_games
 import com.agustin.tarati.shared.generated.resources.no_games_found
+import com.agustin.tarati.shared.generated.resources.no_players_match_filters
 import com.agustin.tarati.shared.generated.resources.no_tournaments_available
 import com.agustin.tarati.shared.generated.resources.no_tournaments_match_filters
 import com.agustin.tarati.shared.generated.resources.not_connected_to_server
@@ -2191,7 +2192,7 @@ private fun ConnectedUsersTab(
                     CenteredMessage(text = localizedString(Res.string.online_users_section))
 
                 displayUsers.isEmpty() -> CenteredMessage(
-                    text = localizedString(Res.string.no_tournaments_match_filters),
+                    text = localizedString(Res.string.no_players_match_filters),
                 )
 
                 else -> LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
