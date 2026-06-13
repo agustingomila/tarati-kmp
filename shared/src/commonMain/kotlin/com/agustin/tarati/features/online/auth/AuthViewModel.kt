@@ -398,9 +398,17 @@ class AuthViewModel(
                 // al verificar si hay refresh token disponible.
                 // Usamos viewModelScope para no bloquear el init.
                 viewModelScope.launch {
-                    val result = refreshToken()
-                    if (result.isFailure) {
-                        logger.debug("Silent refresh failed — clearing session")
+                    try {
+                        val result = refreshToken()
+                        if (result.isFailure) {
+                            logger.debug("Silent refresh failed — clearing session")
+                            authRepository.clearAll()
+                            _authState.value = AuthState.Unauthenticated
+                        }
+                    } catch (e: Exception) {
+                        // Captura defensiva: cualquier excepción inesperada en el
+                        // pipeline de Ktor/serialization que escape de refreshToken().
+                        logger.error("Silent refresh threw unexpectedly: ${e::class.simpleName} — ${e.message}")
                         authRepository.clearAll()
                         _authState.value = AuthState.Unauthenticated
                     }
