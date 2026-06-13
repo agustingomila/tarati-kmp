@@ -81,8 +81,6 @@ import com.agustin.tarati.shared.generated.resources.search_games
 import com.agustin.tarati.shared.generated.resources.select_games
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
-import com.agustin.tarati.ui.layout.CompanionPanelHeader
-import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.flow.Flow
@@ -96,7 +94,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun GamesLibraryScreen(
     onGameSelected: (gameId: String) -> Unit = {},
     onBack: () -> Unit = {},
-    displayMode: DisplayMode = DisplayMode.FullScreen,
     viewModel: IGamesLibraryViewModel = koinViewModel<GamesLibraryViewModel>(),
 ) {
     // ── Ambas propiedades son StateFlow: collectAsState() sin parámetro
@@ -132,52 +129,51 @@ fun GamesLibraryScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                val topBarTitle = if (isMultiSelectMode) {
-                    localizedString(Res.string.games_selected, selectedGames.size)
-                } else {
-                    localizedString(Res.string.saved_games)
-                }
-                val onNavClick: () -> Unit = {
-                    if (isMultiSelectMode) {
-                        isMultiSelectMode = false
-                        selectedGames = emptySet()
-                    } else {
-                        onBack()
-                    }
-                }
-                when (displayMode) {
-                    DisplayMode.FullScreen -> TaratiTopBar(
-                        title = topBarTitle,
-                        navigationType = if (isMultiSelectMode) TopBarNavigationType.Close else TopBarNavigationType.Back,
-                        onNavigationClick = onNavClick,
-                        actions = {
-                            if (isMultiSelectMode && selectedGames.isNotEmpty()) {
-                                IconButton(onClick = { gamesToDelete = selectedGames }) {
-                                    Icon(TaratiIcons.Delete, localizedString(Res.string.delete_selected), tint = MaterialTheme.colorScheme.error)
-                                }
-                            } else if (!isMultiSelectMode && savedGames.isNotEmpty()) {
-                                IconButton(onClick = { isMultiSelectMode = true }) {
-                                    Icon(TaratiIcons.Check, localizedString(Res.string.select_games), tint = MaterialTheme.colorScheme.primary)
-                                }
-                            }
+                TaratiTopBar(
+                    title =
+                        if (isMultiSelectMode) {
+                            localizedString(Res.string.games_selected, selectedGames.size)
+                        } else {
+                            localizedString(Res.string.saved_games)
                         },
-                    )
-                    DisplayMode.CompanionPanel -> CompanionPanelHeader(
-                        title = topBarTitle,
-                        onClose = onNavClick,
-                        actions = {
-                            if (isMultiSelectMode && selectedGames.isNotEmpty()) {
-                                IconButton(onClick = { gamesToDelete = selectedGames }) {
-                                    Icon(TaratiIcons.Delete, localizedString(Res.string.delete_selected), tint = MaterialTheme.colorScheme.error)
-                                }
-                            } else if (!isMultiSelectMode && savedGames.isNotEmpty()) {
-                                IconButton(onClick = { isMultiSelectMode = true }) {
-                                    Icon(TaratiIcons.Check, localizedString(Res.string.select_games), tint = MaterialTheme.colorScheme.primary)
-                                }
-                            }
+                    navigationType =
+                        if (isMultiSelectMode) {
+                            TopBarNavigationType.Close
+                        } else {
+                            TopBarNavigationType.Back
                         },
-                    )
-                }
+                    onNavigationClick = {
+                        if (isMultiSelectMode) {
+                            isMultiSelectMode = false
+                            selectedGames = emptySet()
+                        } else {
+                            onBack()
+                        }
+                    },
+                    actions = {
+                        if (isMultiSelectMode && selectedGames.isNotEmpty()) {
+                            IconButton(
+                                onClick = { gamesToDelete = selectedGames },
+                            ) {
+                                Icon(
+                                    TaratiIcons.Delete,
+                                    localizedString(Res.string.delete_selected),
+                                    tint = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        } else if (!isMultiSelectMode && savedGames.isNotEmpty()) {
+                            IconButton(
+                                onClick = { isMultiSelectMode = true },
+                            ) {
+                                Icon(
+                                    TaratiIcons.Check,
+                                    localizedString(Res.string.select_games),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        }
+                    },
+                )
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { padding ->

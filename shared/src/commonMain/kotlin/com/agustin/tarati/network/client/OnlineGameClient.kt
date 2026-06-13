@@ -183,7 +183,7 @@ class OnlineGameClient(
      */
     suspend fun cancelMatchmaking() {
         val state = _matchmakingState.value
-        if (state is MatchmakingState.Searching) {
+        if (state is Searching) {
             logger.info("Cancelling matchmaking: ${state.ticket.ticketId}")
             wsClient.send(ClientMessage.CancelMatchmaking(state.ticket.ticketId))
             _matchmakingState.value = MatchmakingState.Idle
@@ -368,15 +368,20 @@ class OnlineGameClient(
             is ServerMessage.GameStateUpdate -> {
                 // Spectating: update spectating state if this gameId matches
                 if (_spectatingState.value?.gameId == message.gameId) {
-                    _spectatingState.value = _spectatingState.value?.copy(
+                    val current = _spectatingState.value!!
+                    _spectatingState.value = current.copy(
                         currentGameState = message.newState,
                         timeRemaining = message.timeLeft,
                         lastMove = message.lastMove,
+                        // Acumular el movimiento en el historial para que el fallback de
+                        // recarga completa (snap branch en OnlineGameSideEffects) tenga
+                        // siempre el historial al día.
+                        moveHistory = current.moveHistory + listOfNotNull(message.lastMove),
                     )
                     return
                 }
                 // Player's own game: no update after finished
-                if (_currentGame.value?.status is OnlineGameStatus.Finished) return
+                if (_currentGame.value?.status is Finished) return
                 _currentGame.value = _currentGame.value?.copy(
                     gameState = message.newState,
                     lastMove = message.lastMove,

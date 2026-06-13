@@ -1,6 +1,7 @@
 package com.agustin.tarati.network.models
 
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -8,6 +9,7 @@ import kotlin.time.Instant
  * Resumen de un usuario para listas de seguidores / seguidos.
  * Respuesta de GET /api/users/:id/followers y GET /api/users/:id/following.
  */
+@Immutable
 @Serializable
 data class UserSummaryDto(
     val id: String,
@@ -22,6 +24,7 @@ data class UserSummaryDto(
  * Estado de seguimiento entre el usuario autenticado y otro usuario.
  * Respuesta de GET /api/users/:id/follow-status.
  */
+@Immutable
 @Serializable
 data class FollowStatusDto(
     val isFollowing: Boolean,
@@ -33,6 +36,7 @@ data class FollowStatusDto(
  * Entrada de la tabla de clasificación.
  * Respuesta del endpoint GET /api/leaderboard/:timeControl.
  */
+@Immutable
 @Serializable
 data class LeaderboardEntryDto(
     val rank: Int,
@@ -54,6 +58,7 @@ data class LeaderboardEntryDto(
  *
  * Espeja la estructura de [UserProfile] del servidor sin importar módulos server.
  */
+@Immutable
 @Serializable
 data class PublicProfileDto(
     val id: String,
@@ -69,6 +74,7 @@ data class PublicProfileDto(
     val isBot: Boolean = false,
 )
 
+@Immutable
 @Serializable
 data class ProfileRatingsDto(
     val bullet: ProfileRatingDto = ProfileRatingDto(),
@@ -77,6 +83,7 @@ data class ProfileRatingsDto(
     val classical: ProfileRatingDto = ProfileRatingDto(),
 )
 
+@Immutable
 @Serializable
 data class ProfileRatingDto(
     val rating: Int = 1200,
@@ -84,6 +91,7 @@ data class ProfileRatingDto(
     val peak: Int = 1200,
 )
 
+@Immutable
 @Serializable
 data class ProfileStatsDto(
     val total: ProfileTimeControlStatsDto = ProfileTimeControlStatsDto(),
@@ -93,6 +101,7 @@ data class ProfileStatsDto(
     val classical: ProfileTimeControlStatsDto = ProfileTimeControlStatsDto(),
 )
 
+@Immutable
 @Serializable
 data class ProfileTimeControlStatsDto(
     val games: Int = 0,

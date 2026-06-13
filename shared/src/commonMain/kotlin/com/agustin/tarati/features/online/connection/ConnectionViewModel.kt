@@ -166,6 +166,10 @@ class ConnectionViewModel(
             }
 
             is TaratiWebSocketClient.ConnectionState.Error -> {
+                // Ignorar errores de bajo nivel durante disconnect intencional.
+                // disconnect() setea Offline antes de cancelar el job; la cancelación
+                // del coroutine puede lanzar una excepción que llega aquí como Error.
+                if (_connectionState.value == ConnectionState.Offline) return
                 _connectionState.value = ConnectionState.Error(
                     message = wsState.message,
                     isRecoverable = true,

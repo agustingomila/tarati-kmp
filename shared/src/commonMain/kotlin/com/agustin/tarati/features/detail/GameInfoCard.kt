@@ -528,9 +528,12 @@ private fun HeaderTitleSection(
 
         if (!isEditing) {
             // Resumen compacto visible solo cuando el panel está colapsado:
-            // resultado y fecha en una sola línea para dar contexto sin expandir.
+            // jugadores, resultado y fecha en una sola línea.
             if (!expanded) {
                 val summary = buildList {
+                    val white = header.white.takeIf { isValidValue(it) }
+                    val black = header.black.takeIf { isValidValue(it) }
+                    if (white != null && black != null) add("$white vs $black")
                     if (isValidValue(header.result)) add(header.result)
                     if (isValidValue(header.date)) add(header.date)
                 }.joinToString("  ·  ")

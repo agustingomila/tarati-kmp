@@ -3,6 +3,7 @@ package com.agustin.tarati.features.online.lobby
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -60,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -114,8 +117,6 @@ import com.agustin.tarati.shared.generated.resources.filter_live_games
 import com.agustin.tarati.shared.generated.resources.filter_open_searches
 import com.agustin.tarati.shared.generated.resources.filter_registered_only
 import com.agustin.tarati.shared.generated.resources.guest_banner_title
-import com.agustin.tarati.shared.generated.resources.guest_feed_placeholder
-import com.agustin.tarati.shared.generated.resources.guest_history_placeholder
 import com.agustin.tarati.shared.generated.resources.guest_login_description
 import com.agustin.tarati.shared.generated.resources.in_live
 import com.agustin.tarati.shared.generated.resources.join
@@ -255,6 +256,17 @@ fun OnlineLobbyScreen(
     // True mientras el usuario inició una búsqueda desde este lobby (nueva o uniéndose a otra).
     // Evita que el LaunchedEffect de MatchFound dispare si el estado viene de una partida anterior.
     var searchStartedInLobby by remember { mutableStateOf(false) }
+
+    // Rastrea si en esta sesión del lobby llegamos a estar Online alguna vez.
+    // Cuando volvemos a Offline habiendo estado Online → el usuario hizo logout o la sesión expiró:
+    // cerrar el panel en lugar de mostrar el mensaje "no conectado".
+    var hasBeenOnline by remember { mutableStateOf(connectionState is ConnectionState.Online) }
+    LaunchedEffect(connectionState) {
+        if (connectionState is ConnectionState.Online) hasBeenOnline = true
+        if (connectionState is ConnectionState.Offline && hasBeenOnline) onBack()
+    }
+
+    val tabScrollState = rememberScrollState()
 
     // Inicializa en true si no hay sesión activa — evita flashear el mensaje "no conectado"
     // mientras el auto-connect está en progreso en el primer frame.
@@ -468,7 +480,10 @@ fun OnlineLobbyScreen(
 
                 when (val state = connectionState) {
                     is ConnectionState.Offline -> {
-                        CenteredMessage(text = localizedString(Res.string.not_connected_to_server))
+                        // Si ya estuvimos Online, el LaunchedEffect llama onBack() — no mostrar nada.
+                        if (!hasBeenOnline) {
+                            CenteredMessage(text = localizedString(Res.string.not_connected_to_server))
+                        }
                         return@Scaffold
                     }
 
@@ -498,7 +513,17 @@ fun OnlineLobbyScreen(
                     GuestSessionBanner(onSignIn = onShowLogin)
                 }
 
-                PrimaryScrollableTabRow(selectedTabIndex = selectedTab) {
+                PrimaryScrollableTabRow(
+                    selectedTabIndex = selectedTab,
+                    scrollState = tabScrollState,
+                    edgePadding = 0.dp,
+                    modifier = Modifier.pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            tabScrollState.dispatchRawDelta(-dragAmount.x)
+                        }
+                    },
+                ) {
                     // 0 — Conectados
                     Tab(
                         selected = selectedTab == 0,
@@ -591,8 +616,8 @@ fun OnlineLobbyScreen(
                     )
 
                     2 -> TournamentsTab(onNavigateToTournament = onNavigateToTournament)
-                    3 -> GameHistoryTab(viewModel = viewModel, isGuest = isGuest, onNavigateToGameDetails = onNavigateToGameDetails)
-                    4 -> FeedTab(viewModel = viewModel, isGuest = isGuest, onNavigateToGameDetails = onNavigateToGameDetails)
+                    3 -> GameHistoryTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
+                    4 -> FeedTab(viewModel = viewModel, onNavigateToGameDetails = onNavigateToGameDetails)
                 }
             }
         }
@@ -1210,14 +1235,8 @@ private fun NewSearchSheet(
 @Composable
 private fun GameHistoryTab(
     viewModel: IOnlineLobbyViewModel,
-    isGuest: Boolean = false,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
 ) {
-    if (isGuest) {
-        CenteredMessage(text = localizedString(Res.string.guest_history_placeholder))
-        return
-    }
-
     val state by viewModel.history.collectAsState()
     val listState = rememberLazyListState()
 
@@ -1400,14 +1419,8 @@ private fun HistoryGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null)
 @Composable
 private fun FeedTab(
     viewModel: IOnlineLobbyViewModel,
-    isGuest: Boolean = false,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
 ) {
-    if (isGuest) {
-        CenteredMessage(text = localizedString(Res.string.guest_feed_placeholder))
-        return
-    }
-
     val state by viewModel.feedState.collectAsState()
     val listState = rememberLazyListState()
 
@@ -2139,6 +2152,11 @@ private fun ConnectedUsersTab(
     val users by viewModel.onlineUsers.collectAsState()
     var challengeTarget by remember { mutableStateOf<OnlineUserDto?>(null) }
     val scope = rememberCoroutineScope()
+
+    DisposableEffect(Unit) {
+        viewModel.startConnectedPolling()
+        onDispose { viewModel.stopConnectedPolling() }
+    }
 
     // ── Filtros locales ────────────────────────────────────────────────────────
     var statusFilter by remember { mutableStateOf<OnlineUserStatus?>(null) }

@@ -14,6 +14,7 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.header
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -158,6 +159,8 @@ class TaratiWebSocketClient(
                             logger.debug("Listening stopped: ${e.message}")
                         }
                     }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     logger.debug("Connection error: ${e.message}")
                     _connectionState.value = ConnectionState.Error(e.message ?: "Unknown error")
@@ -241,6 +244,8 @@ class TaratiWebSocketClient(
                     }
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Error in message loop: ${e.message}")
             _connectionState.value = ConnectionState.Error(e.message ?: "Connection lost")

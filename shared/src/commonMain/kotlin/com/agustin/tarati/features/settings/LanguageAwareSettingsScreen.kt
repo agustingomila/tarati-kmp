@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import com.agustin.tarati.services.localization.LocalAppLanguage
-import com.agustin.tarati.ui.layout.DisplayMode
 
 /**
  * Wrapper para SettingsScreen que fuerza recomposición cuando cambia el idioma.
@@ -22,7 +21,6 @@ fun LanguageAwareSettingsScreen(
     viewModel: ISettingsViewModel,
     events: SettingsEvents,
     onNavigateBack: () -> Unit = {},
-    displayMode: DisplayMode = DisplayMode.FullScreen,
     isGameActive: Boolean = false,
     onLogout: (() -> Unit)? = null,
     loggedInUsername: String? = null,
@@ -43,7 +41,6 @@ fun LanguageAwareSettingsScreen(
             viewModel = viewModel,
             events = events,
             onNavigateBack = onNavigateBack,
-            displayMode = displayMode,
             isGameActive = isGameActive,
             onLogout = onLogout,
             loggedInUsername = loggedInUsername,

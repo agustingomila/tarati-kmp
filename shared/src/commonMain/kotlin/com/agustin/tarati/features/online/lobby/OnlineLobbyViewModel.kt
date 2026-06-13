@@ -118,12 +118,13 @@ class OnlineLobbyViewModel(
     override val feedState: StateFlow<GameHistoryUiState> = _feedState.asStateFlow()
 
     private var pollingJob: Job? = null
+    private var connectedPollingJob: Job? = null
 
     companion object {
         /** Intervalo de refresco del lobby (partidas en vivo + búsquedas). */
         val LIVE_POLL_INTERVAL = 5.seconds
 
-        /** Usuarios en línea se refrescan cada 2 ciclos (~10 s). */
+        /** Usuarios en línea se refrescan cada 2 ciclos (~10 s) dentro del polling de En Vivo. */
         private const val ONLINE_USERS_EVERY_N_CYCLES = 2
         const val PAGE_SIZE = 20
     }
@@ -138,10 +139,11 @@ class OnlineLobbyViewModel(
             while (isActive) {
                 fetchLiveGames()
                 fetchOpenSearches()
-                pollCycle++
+                // Incrementar después del chequeo: el ciclo 0 también fetcha online users.
                 if (pollCycle % ONLINE_USERS_EVERY_N_CYCLES == 0) {
                     fetchOnlineUsers()
                 }
+                pollCycle++
                 delay(LIVE_POLL_INTERVAL)
             }
         }
@@ -150,6 +152,21 @@ class OnlineLobbyViewModel(
     override fun stopLivePolling() {
         pollingJob?.cancel()
         pollingJob = null
+    }
+
+    override fun startConnectedPolling() {
+        if (connectedPollingJob?.isActive == true) return
+        connectedPollingJob = viewModelScope.launch {
+            while (isActive) {
+                fetchOnlineUsers()
+                delay(LIVE_POLL_INTERVAL)
+            }
+        }
+    }
+
+    override fun stopConnectedPolling() {
+        connectedPollingJob?.cancel()
+        connectedPollingJob = null
     }
 
     override fun refreshOpenSearches() {

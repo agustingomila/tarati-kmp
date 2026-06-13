@@ -30,9 +30,11 @@
     </style>
 </head>
 <body>
-<!-- URL del servidor Ktor. Para desarrollo local, descomentar la línea siguiente:
+<!-- Override manual de URL del servidor Ktor (escape hatch).
+     En dev normal no hace falta: el webpack proxy en :3000 reenvía a Ktor en :8080.
+     Descomentar solo para apuntar a un servidor distinto (ej. staging remoto).
 <script>globalThis.__TARATI_SERVER__ = "localhost:8080";</script>
- -->
+-->
 <script src="tarati.js"></script>
 </body>
 </html>

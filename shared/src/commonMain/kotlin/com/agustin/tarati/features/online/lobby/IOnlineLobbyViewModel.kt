@@ -32,13 +32,20 @@ interface IOnlineLobbyViewModel {
 
     // ── Polling (en vivo + búsquedas) ─────────────────────────────────────────
 
-    /** Inicia el polling. Llamar en [LaunchedEffect(Unit)] del tab "En Vivo". */
+    /** Inicia el polling de partidas en vivo y búsquedas. Llamar desde el tab "En Vivo". */
     fun startLivePolling()
 
     fun stopLivePolling()
 
     /** Refresca la lista de búsquedas abiertas inmediatamente. */
     fun refreshOpenSearches()
+
+    // ── Polling (usuarios conectados) ──────────────────────────────────────────
+
+    /** Inicia el polling de usuarios conectados con fetch inmediato. Llamar desde el tab "Conectados". */
+    fun startConnectedPolling()
+
+    fun stopConnectedPolling()
 
     // ── Lobby filters ──────────────────────────────────────────────────────────
 

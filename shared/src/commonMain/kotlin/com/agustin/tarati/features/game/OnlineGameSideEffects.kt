@@ -218,8 +218,20 @@ fun OnlineGameSideEffects(
         if (lastMove != null && localState.allMovesForTurn().contains(lastMove)) {
             events.applyMove(lastMove, localState)
         } else if (lastMove != null) {
-            viewModel.updateGameState(serverState)
+            // El estado local está más de un movimiento atrás del servidor
+            // (p. ej. varios GameStateUpdates llegaron antes de que LaunchedEffect(gameId)
+            // terminara de cargar el historial, o el cliente se quedó temporalmente atrás).
+            // Recargar desde el historial completo (que OnlineGameClient mantiene al día
+            // acumulando cada lastMove) para sincronizar tablero e historial en un solo paso.
+            val moveHistory = spectatingState.moveHistory
+            if (moveHistory.isNotEmpty()) {
+                viewModel.updateHistory(moveHistory)
+                viewModel.moveToCurrentState()
+            } else {
+                viewModel.updateGameState(serverState)
+            }
         }
+        // lastMove == null: snapshot inicial — LaunchedEffect(gameId) ya lo maneja.
     }
 
     // ── Espectador: reloj ─────────────────────────────────────────────────────

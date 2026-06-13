@@ -95,8 +95,6 @@ import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypeSelector
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
-import com.agustin.tarati.ui.layout.CompanionPanelHeader
-import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.BoardColors
 import com.agustin.tarati.ui.theme.GildedPalette
@@ -113,7 +111,6 @@ fun SettingsScreen(
     viewModel: ISettingsViewModel = koinViewModel<SettingsViewModel>(),
     events: SettingsEvents,
     onNavigateBack: () -> Unit = {},
-    displayMode: DisplayMode = DisplayMode.FullScreen,
     isGameActive: Boolean = false,
     onLogout: (() -> Unit)? = null,
     loggedInUsername: String? = null,
@@ -130,17 +127,11 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            when (displayMode) {
-                DisplayMode.FullScreen -> TaratiTopBar(
-                    title = localizedString(Res.string.settings),
-                    navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = onNavigateBack,
-                )
-                DisplayMode.CompanionPanel -> CompanionPanelHeader(
-                    title = localizedString(Res.string.settings),
-                    onClose = onNavigateBack,
-                )
-            }
+            TaratiTopBar(
+                title = localizedString(Res.string.settings),
+                navigationType = TopBarNavigationType.Back,
+                onNavigationClick = onNavigateBack,
+            )
         },
     ) { padding ->
         Surface(

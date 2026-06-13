@@ -471,8 +471,6 @@
     <string name="connected_tab">Connected</string>
     <string name="sign_in">Sign in</string>
     <string name="guest_banner_title">Guest session</string>
-    <string name="guest_history_placeholder">Create an account to view your game history</string>
-    <string name="guest_feed_placeholder">Create an account to follow players and see their games</string>
     <string name="online_users_section">Online now</string>
     <string name="status_playing">Playing</string>
     <string name="status_in_lobby">In lobby</string>

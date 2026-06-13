@@ -53,6 +53,7 @@ import com.agustin.tarati.services.dialogs.AboutDialog
 import com.agustin.tarati.services.dialogs.GameOverDialog
 import com.agustin.tarati.services.dialogs.NewGameDialog
 import com.agustin.tarati.services.dialogs.buildGameOverMessage
+import com.agustin.tarati.features.game.UndoWarningDialog
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.services.notifications.UIMessage
 import com.agustin.tarati.services.notifications.UIMessageBus
@@ -507,6 +508,14 @@ fun GameScreen(
     }
 
     TaratiBackground {
+        // ── Undo warning dialog ───────────────────────────────────────────────
+        if (undoRedo.showUndoWarning) {
+            UndoWarningDialog(
+                onConfirm = undoRedo.onUndoWarningConfirmed,
+                onDismiss = undoRedo.onUndoWarningDismissed,
+            )
+        }
+
         // ── Matchmaking modal ─────────────────────────────────────────────────
         if (showMatchmakingModal) {
             MatchmakingModal(

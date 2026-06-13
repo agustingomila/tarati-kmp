@@ -275,14 +275,12 @@ private fun CompanionPane(
             onNavigateToProfile = { userId ->
                 controller.navigate(CompanionPanelDestination.Profile(userId))
             },
-            displayMode = DisplayMode.CompanionPanel,
         )
 
         is CompanionPanelDestination.Profile -> key(dest.userId) {
             PublicProfileScreen(
                 userId = dest.userId,
                 onBack = controller::back,
-                displayMode = DisplayMode.CompanionPanel,
                 onNavigateToGameDetails = { gameId ->
                     scope.launch {
                         val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
@@ -300,7 +298,6 @@ private fun CompanionPane(
             events = settingsEvents(settingsViewModel),
             isGameActive = gameStatus == GameStatus.PLAYING,
             onNavigateBack = controller::close,
-            displayMode = DisplayMode.CompanionPanel,
             loggedInUsername = loggedInUsername,
             onLogout = if (authViewModel.isAuthenticated) {
                 {
@@ -317,7 +314,6 @@ private fun CompanionPane(
                 controller.navigate(CompanionPanelDestination.GameDetails(gameId))
             },
             onBack = controller::close,
-            displayMode = DisplayMode.CompanionPanel,
             viewModel = gamesLibraryViewModel,
         )
 
@@ -355,7 +351,6 @@ private fun CompanionPane(
                 }
             },
             onBack = controller::back,
-            displayMode = DisplayMode.CompanionPanel,
             viewModel = gameDetailsViewModel,
         )
     }

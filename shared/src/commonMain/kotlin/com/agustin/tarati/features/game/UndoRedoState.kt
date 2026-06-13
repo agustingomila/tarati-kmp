@@ -71,10 +71,14 @@ fun rememberUndoRedoState(
         }
     }
 
-    // True only when achievements are actually at stake: one human vs one AI,
-    // and the game was not loaded from a saved file (imported games have
-    // achievements disabled unconditionally — no point warning the user).
+    // True only when achievements are actually at stake:
+    // - one human vs one AI (whiteIsAI != blackIsAI)
+    // - game is currently in PLAYING state (not GAME_OVER, not NO_PLAYING after an
+    //   online game or spectating session — those leave the local config as Human vs AI
+    //   even though no real game is running)
+    // - game was not loaded from a saved file
     val achievementsPossible = screenState.whiteIsAI != screenState.blackIsAI
+            && gameManagerState.gameStatus == GameStatus.PLAYING
             && !viewModel.startedFromImportedGame.collectAsState().value
 
     val performUndo: () -> Unit = {
@@ -113,8 +117,6 @@ fun rememberUndoRedoState(
 
     val handleMoveToIndex: (Int) -> Unit = { index ->
         if (!isOnlineGame) {
-            // Show the same one-time warning as undo: navigating to a non-last
-            // move puts achievements at risk (moveIndex < size - 1 disables them).
             val isMovingBack = index < gameManagerState.history.size - 1
             if (isMovingBack && achievementsPossible && !hasWarnedAboutUndo) {
                 pendingAction = { viewModel.moveToIndex(index) }

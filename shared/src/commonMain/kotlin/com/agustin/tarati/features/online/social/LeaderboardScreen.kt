@@ -42,8 +42,6 @@ import com.agustin.tarati.shared.generated.resources.leaderboard
 import com.agustin.tarati.shared.generated.resources.no_leaderboard_data
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
-import com.agustin.tarati.ui.layout.CompanionPanelHeader
-import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
 import org.koin.compose.viewmodel.koinViewModel
@@ -53,7 +51,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LeaderboardScreen(
     onBack: () -> Unit,
     onNavigateToProfile: (userId: String) -> Unit,
-    displayMode: DisplayMode = DisplayMode.FullScreen,
     viewModel: ILeaderboardViewModel = koinViewModel<LeaderboardViewModel>(),
 ) {
     val state by viewModel.leaderboardState.collectAsState()
@@ -65,37 +62,21 @@ fun LeaderboardScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                when (displayMode) {
-                    DisplayMode.FullScreen -> TaratiTopBar(
-                        title = localizedString(Res.string.leaderboard),
-                        navigationType = TopBarNavigationType.Back,
-                        onNavigationClick = onBack,
-                        actions = {
-                            IconButton(onClick = viewModel::refresh) {
-                                Icon(
-                                    imageVector = TaratiIcons.Replay,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-                        },
-                    )
-                    DisplayMode.CompanionPanel -> CompanionPanelHeader(
-                        title = localizedString(Res.string.leaderboard),
-                        onClose = onBack,
-                        actions = {
-                            IconButton(onClick = viewModel::refresh) {
-                                Icon(
-                                    imageVector = TaratiIcons.Replay,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-                        },
-                    )
-                }
+                TaratiTopBar(
+                    title = localizedString(Res.string.leaderboard),
+                    navigationType = TopBarNavigationType.Back,
+                    onNavigationClick = onBack,
+                    actions = {
+                        IconButton(onClick = viewModel::refresh) {
+                            Icon(
+                                imageVector = TaratiIcons.Replay,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    },
+                )
             },
         ) { padding ->
             Column(
