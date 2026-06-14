@@ -281,14 +281,32 @@ shared/commonMain/
 │   ├── game/                  # Main game screen and ViewModels
 │   ├── detail/                # Game detail screen
 │   ├── library/               # Saved games library
+│   ├── online/                # Online multiplayer
+│   │   ├── auth/              # Auth flow, JWT, session management
+│   │   ├── connection/        # ConnectionViewModel, WebSocket lifecycle
+│   │   ├── game/              # OnlineGameViewModel, OnlineGameClient
+│   │   ├── lobby/             # OnlineLobbyScreen, matchmaking UI
+│   │   ├── social/            # Leaderboard, profiles, follow, feed
+│   │   ├── tournament/        # TournamentViewModel, TournamentDetailScreen
+│   │   └── ui/                # OnlineGameBar, UIMessageBus
+│   ├── seasonal/              # Seasonal events
 │   ├── settings/              # Settings screen
 │   └── splash/                # Splash screen
+├── network/
+│   ├── client/                # TaratiWebSocketClient, HTTP client
+│   ├── models/                # DTOs shared with server
+│   └── protocol/              # ClientMessage / ServerMessage sealed classes
 ├── services/
+│   ├── achievements/          # Cross-platform achievements, server sync
 │   ├── ai/                    # AI service and ViewModel
+│   ├── billing/               # Billing interface (expect/actual)
 │   ├── clipboard/             # Game export via clipboard
 │   ├── clock/                 # Game clock and time control logic
 │   ├── dialogs/               # Dialog system
-│   └── localization/          # Language management
+│   ├── localization/          # Language management
+│   ├── notifications/         # UIMessageBus (Toast + Alert)
+│   ├── sound/                 # Sound service interface (expect/actual)
+│   └── url/                   # URL resolver (dev/prod)
 └── ui/
     ├── components/
     │   ├── game/              # Board rendering, highlights, animations, pre-moves
@@ -302,26 +320,35 @@ shared/commonMain/
 
 androidApp/
 ├── features/
+│   ├── online/
+│   │   └── auth/              # Android auth repository (SharedPreferences)
 │   ├── seasonal/              # Seasonal events (Android)
 │   └── settings/              # Android-specific settings
 └── services/
     ├── achievements/          # Google Play Games
     ├── billing/               # Google Play Billing
     ├── clipboard/             # Android ClipboardManager
-    └── sound/                 # Android MediaPlayer
+    ├── localization/          # Android locale provider
+    ├── sound/                 # Android MediaPlayer
+    └── url/                   # Android URL intent handler
 
 desktopApp/
 ├── desktop/
 │   ├── data/                  # Desktop database builder
 │   ├── di/                    # Desktop Koin modules
-│   └── services/              # Desktop services (clipboard, no-ops)
+│   └── services/              # Desktop platform services
 ├── features/
-│   ├── game/                  # Desktop GameViewModel
+│   ├── online/
+│   │   └── auth/              # Desktop auth repository (java.util.prefs)
 │   └── settings/              # Desktop SettingsViewModel
+├── services/
+│   ├── clipboard/             # Desktop ClipboardManager
+│   └── url/                   # Desktop URL opener
 └── Main.kt                    # Desktop entry point
 
-server/
-└── Application.kt             # Ktor server (online play)
+webApp/
+└── web/
+    └── di/                    # Web Koin modules, platform implementations
 ```
 
 400+ unit tests and Compose previews.

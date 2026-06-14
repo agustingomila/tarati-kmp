@@ -286,14 +286,32 @@ shared/commonMain/
 │   ├── game/                  # Pantalla de juego principal y ViewModels
 │   ├── detail/                # Pantalla de detalle de partida
 │   ├── library/               # Biblioteca de partidas guardadas
+│   ├── online/                # Multijugador online
+│   │   ├── auth/              # Flujo de auth, JWT, gestión de sesión
+│   │   ├── connection/        # ConnectionViewModel, ciclo de vida WebSocket
+│   │   ├── game/              # OnlineGameViewModel, OnlineGameClient
+│   │   ├── lobby/             # OnlineLobbyScreen, UI de matchmaking
+│   │   ├── social/            # Clasificación, perfiles, seguidos, feed
+│   │   ├── tournament/        # TournamentViewModel, TournamentDetailScreen
+│   │   └── ui/                # OnlineGameBar, UIMessageBus
+│   ├── seasonal/              # Eventos de temporada
 │   ├── settings/              # Pantalla de configuración
 │   └── splash/                # Pantalla de inicio
+├── network/
+│   ├── client/                # TaratiWebSocketClient, cliente HTTP
+│   ├── models/                # DTOs compartidos con el servidor
+│   └── protocol/              # ClientMessage / ServerMessage (sealed classes)
 ├── services/
+│   ├── achievements/          # Logros cross-platform, sincronización al servidor
 │   ├── ai/                    # Servicio de IA y ViewModel
+│   ├── billing/               # Interfaz de billing (expect/actual)
 │   ├── clipboard/             # Exportación de partidas por portapapeles
 │   ├── clock/                 # Reloj de partida y lógica de control de tiempo
 │   ├── dialogs/               # Sistema de diálogos
-│   └── localization/          # Gestión de idiomas
+│   ├── localization/          # Gestión de idiomas
+│   ├── notifications/         # UIMessageBus (Toast + Alert)
+│   ├── sound/                 # Interfaz de sonido (expect/actual)
+│   └── url/                   # Resolvedor de URLs (dev/prod)
 └── ui/
     ├── components/
     │   ├── game/              # Tablero, highlights, animaciones, pre-movimientos
@@ -307,26 +325,35 @@ shared/commonMain/
 
 androidApp/
 ├── features/
+│   ├── online/
+│   │   └── auth/              # Auth repository Android (SharedPreferences)
 │   ├── seasonal/              # Eventos de temporada (Android)
 │   └── settings/              # Settings Android-specific
 └── services/
     ├── achievements/          # Google Play Games
     ├── billing/               # Google Play Billing
     ├── clipboard/             # ClipboardManager Android
-    └── sound/                 # MediaPlayer Android
+    ├── localization/          # Proveedor de locale Android
+    ├── sound/                 # MediaPlayer Android
+    └── url/                   # Manejo de intents de URL
 
 desktopApp/
 ├── desktop/
 │   ├── data/                  # Desktop database builder
 │   ├── di/                    # Desktop Koin modules
-│   └── services/              # Desktop services (clipboard, no-ops)
+│   └── services/              # Servicios de plataforma Desktop
 ├── features/
-│   ├── game/                  # Desktop GameViewModel
+│   ├── online/
+│   │   └── auth/              # Auth repository Desktop (java.util.prefs)
 │   └── settings/              # Desktop SettingsViewModel
+├── services/
+│   ├── clipboard/             # ClipboardManager Desktop
+│   └── url/                   # Apertura de URLs Desktop
 └── Main.kt                    # Entry point Desktop
 
-server/
-└── Application.kt             # Servidor Ktor (partidas online)
+webApp/
+└── web/
+    └── di/                    # Módulos Koin web, implementaciones de plataforma
 ```
 
 Más de 400 tests unitarios y previews de Compose.
