@@ -1,13 +1,13 @@
 package com.agustin.tarati.ui.theme
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.agustin.tarati.R
-
+import com.agustin.tarati.shared.R
 
 // ── Previews ──────────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@ private fun TaratiLogoDarkPreview() {
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun TaratiLogoXmlPreview() {
-    androidx.compose.foundation.Image(
+    Image(
         painter = painterResource(id = R.drawable.logo),
         contentDescription = "XML logo reference",
         modifier = Modifier.size(160.dp),

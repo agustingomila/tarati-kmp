@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.pieces.CobColor
+import com.agustin.tarati.core.domain.game.pieces.description
 import com.agustin.tarati.network.models.OnlineGame
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
@@ -46,7 +47,7 @@ fun OnlinePlayerBanner(
     localName: String,
     modifier: Modifier = Modifier,
 ) {
-    val localColor = if (onlineGame.yourColor == "white") CobColor.WHITE else CobColor.BLACK
+    val localColor = if (onlineGame.yourColor == CobColor.WHITE.description) CobColor.WHITE else CobColor.BLACK
     val remoteColor = if (localColor == CobColor.WHITE) CobColor.BLACK else CobColor.WHITE
 
     Column(

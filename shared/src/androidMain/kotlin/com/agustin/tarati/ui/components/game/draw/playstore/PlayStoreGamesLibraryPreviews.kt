@@ -1,4 +1,4 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -10,7 +10,7 @@ import com.agustin.tarati.features.library.IGamesLibraryViewModel
 import com.agustin.tarati.features.library.previews.PreviewContainer
 import com.agustin.tarati.features.library.previews.previewMatchDto
 import com.agustin.tarati.features.library.previews.previewSavedGames
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette
 import com.agustin.tarati.ui.theme.DarkPalette

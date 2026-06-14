@@ -92,8 +92,9 @@ kotlin {
         androidMain.dependencies {
             // Room KTX (solo en Android)
             implementation(libs.androidx.room.ktx)
+
             // UI Tooling para previews
-            implementation(libs.androidx.compose.uiTooling)
+            implementation(libs.androidx.compose.ui.tooling.preview)
         }
 
         // JVM (Desktop + Server)

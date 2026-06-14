@@ -1,11 +1,6 @@
 package com.agustin.tarati.features.settings.previews
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Animation
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -34,6 +29,7 @@ import com.agustin.tarati.shared.generated.resources.general
 import com.agustin.tarati.shared.generated.resources.language
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteList
+import com.agustin.tarati.ui.theme.TaratiIcons
 import com.agustin.tarati.ui.theme.TaratiTheme
 import com.agustin.tarati.ui.theme.availablePalettes as allPalettes
 
@@ -89,31 +85,31 @@ fun ToggleSettingsPreview() {
     TaratiTheme {
         Column {
             ToggleSetting(
-                icon = Icons.Default.Visibility,
+                icon = TaratiIcons.Visibility,
                 title = Res.string.board_labels,
                 checked = true,
                 onCheckedChange = {},
             )
             ToggleSetting(
-                icon = Icons.Default.Visibility,
+                icon = TaratiIcons.Visibility,
                 title = Res.string.board_vertices,
                 checked = false,
                 onCheckedChange = {},
             )
             ToggleSetting(
-                icon = Icons.Default.Animation,
+                icon = TaratiIcons.Animation,
                 title = Res.string.animate_effects,
                 checked = true,
                 onCheckedChange = {},
             )
             ToggleSetting(
-                icon = Icons.Default.Visibility,
+                icon = TaratiIcons.Visibility,
                 title = Res.string.board_regions,
                 checked = false,
                 onCheckedChange = {},
             )
             ToggleSetting(
-                icon = Icons.Default.Visibility,
+                icon = TaratiIcons.Visibility,
                 title = Res.string.board_perimeter,
                 checked = false,
                 onCheckedChange = {},
@@ -128,7 +124,7 @@ fun SettingItemPreview() {
     TaratiTheme {
         Column {
             SettingItem(
-                icon = Icons.Default.Language,
+                icon = TaratiIcons.Language,
                 title = Res.string.language,
                 subtitle = Res.string.language,
                 trailingContent = {
@@ -136,7 +132,7 @@ fun SettingItemPreview() {
                 },
             )
             SettingItem(
-                icon = Icons.Default.DarkMode,
+                icon = TaratiIcons.DarkMode,
                 title = Res.string.dark_theme,
                 subtitle = Res.string.dark_theme,
                 trailingContent = {

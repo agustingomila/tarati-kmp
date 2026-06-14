@@ -11,10 +11,13 @@ interface ITournamentViewModel {
 
     fun loadTournaments(token: String)
     fun loadTournament(token: String, id: String)
+    fun startTournamentPolling()
+    fun stopTournamentPolling()
     suspend fun createTournament(token: String, request: CreateTournamentRequest): Result<TournamentSummaryDto>
     suspend fun register(token: String, id: String): Result<Unit>
     suspend fun unregister(token: String, id: String): Result<Unit>
     suspend fun start(token: String, id: String): Result<Unit>
+    suspend fun cancel(token: String, id: String): Result<Unit>
 }
 
 data class TournamentListUiState(
@@ -30,6 +33,6 @@ data class TournamentListUiState(
 
 data class TournamentDetailUiState(
     val tournament: TournamentDetailDto? = null,
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val error: String? = null,
 )

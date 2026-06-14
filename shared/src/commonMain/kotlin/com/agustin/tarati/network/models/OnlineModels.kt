@@ -52,6 +52,8 @@ data class OnlineGame(
     val lastTimeUpdateMs: Long = 0L,
     /** ID del torneo al que pertenece esta partida. Null para partidas regulares (matchmaking o challenge). */
     val tournamentId: String? = null,
+    /** Nombre visible del torneo. Null para partidas regulares. */
+    val tournamentName: String? = null,
     /** Número de ronda actual dentro del torneo. Null para partidas regulares. */
     val tournamentRound: Int? = null,
     /** Total de rondas del torneo. Null para partidas regulares. */

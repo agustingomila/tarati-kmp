@@ -1,5 +1,7 @@
 package com.agustin.tarati.network.client
 
+import com.agustin.tarati.core.domain.game.pieces.CobColor
+import com.agustin.tarati.core.domain.game.pieces.description
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.features.online.game.ServerErrorEvent
 import com.agustin.tarati.network.models.OnlineGameStatus
@@ -75,7 +77,7 @@ class OnlineGameClientConnectionTest {
             ServerMessage.MatchFound(
                 gameId = gameId,
                 opponentInfo = opponent,
-                yourColor = "white",
+                yourColor = CobColor.WHITE.description,
                 timeControl = testTC,
             )
         )

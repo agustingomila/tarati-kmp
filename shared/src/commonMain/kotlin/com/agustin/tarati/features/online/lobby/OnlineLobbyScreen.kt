@@ -126,6 +126,10 @@ import com.agustin.tarati.shared.generated.resources.logout_confirm_body
 import com.agustin.tarati.shared.generated.resources.loss
 import com.agustin.tarati.shared.generated.resources.max_players
 import com.agustin.tarati.shared.generated.resources.min_players
+import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
+import com.agustin.tarati.shared.generated.resources.validation_max_players_count
+import com.agustin.tarati.shared.generated.resources.validation_min_players_count
+import com.agustin.tarati.shared.generated.resources.validation_players_number
 import com.agustin.tarati.shared.generated.resources.move
 import com.agustin.tarati.shared.generated.resources.moves
 import com.agustin.tarati.shared.generated.resources.my_games
@@ -182,6 +186,8 @@ import com.agustin.tarati.ui.layout.CompanionPanelHeader
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -1679,8 +1685,9 @@ private fun TournamentsTab(
     var recentOnly by remember { mutableStateOf(true) }
     var sortBy by remember { mutableStateOf(TournamentSort.NEWEST) }
 
-    LaunchedEffect(Unit) {
-        if (token != null) viewModel.loadTournaments(token)
+    DisposableEffect(Unit) {
+        viewModel.startTournamentPolling()
+        onDispose { viewModel.stopTournamentPolling() }
     }
 
     // ── Aplicar filtros ────────────────────────────────────────────────────────
@@ -2013,6 +2020,16 @@ private fun CreateTournamentDialog(
     var minPlayers by remember { mutableStateOf("4") }
     var maxPlayers by remember { mutableStateOf("16") }
 
+    val minInt = minPlayers.toIntOrNull()
+    val maxInt = maxPlayers.toIntOrNull()
+    val playerError: String? = when {
+        minInt == null || maxInt == null -> localizedString(Res.string.validation_players_number)
+        minInt < 2 -> localizedString(Res.string.validation_min_players_count)
+        maxInt > 128 -> localizedString(Res.string.validation_max_players_count)
+        maxInt < minInt -> localizedString(Res.string.validation_max_gte_min)
+        else -> null
+    }
+
     // Presets de tiempo control
     val tcPresets = mapOf(
         "bullet" to (60 to 0),
@@ -2102,6 +2119,8 @@ private fun CreateTournamentDialog(
                         onValueChange = { minPlayers = it },
                         label = { Text(localizedString(Res.string.min_players)) },
                         singleLine = true,
+                        isError = playerError != null,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f),
                     )
                     OutlinedTextField(
@@ -2109,7 +2128,16 @@ private fun CreateTournamentDialog(
                         onValueChange = { maxPlayers = it },
                         label = { Text(localizedString(Res.string.max_players)) },
                         singleLine = true,
+                        isError = playerError != null,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f),
+                    )
+                }
+                if (playerError != null) {
+                    Text(
+                        text = playerError,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
             }
@@ -2124,13 +2152,13 @@ private fun CreateTournamentDialog(
                         initialTime = initialTime,
                         increment = increment,
                         isRated = isRated,
-                        minPlayers = minPlayers.toIntOrNull() ?: 4,
-                        maxPlayers = maxPlayers.toIntOrNull() ?: 16,
+                        minPlayers = minInt ?: 4,
+                        maxPlayers = maxInt ?: 16,
                         spectatingAllowed = if (isGuest) true else spectatingAllowed,
                     )
                     onCreate(request)
                 },
-                enabled = name.isNotBlank(),
+                enabled = name.isNotBlank() && playerError == null,
             ) { Text(localizedString(Res.string.create)) }
         },
         dismissButton = {

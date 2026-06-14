@@ -10,16 +10,44 @@ import kotlin.time.Instant
  * Formato del torneo.
  * ROUND_ROBIN: todos contra todos, emparejamientos generados al inicio.
  * SWISS: emparejamiento por puntos por ronda, evitando repetir rivales.
+ *
+ * [key] es el valor almacenado en la columna tournaments.type.
  */
 @Serializable
-enum class TournamentType { ROUND_ROBIN, SWISS }
+enum class TournamentType {
+    ROUND_ROBIN, SWISS;
+
+    val key: String get() = name.lowercase()
+}
 
 /**
  * Estado del ciclo de vida de un torneo.
  * REGISTERING → ACTIVE → FINISHED (o CANCELLED en cualquier punto antes de FINISHED)
+ *
+ * [key] es el valor almacenado en la columna tournaments.status.
  */
 @Serializable
-enum class TournamentStatus { REGISTERING, ACTIVE, FINISHED, CANCELLED }
+enum class TournamentStatus {
+    REGISTERING, ACTIVE, FINISHED, CANCELLED;
+
+    val key: String get() = name.lowercase()
+}
+
+/**
+ * Estado de un emparejamiento individual dentro de un torneo.
+ *
+ * PENDING   — emparejamiento creado por el motor, partida aún no iniciada.
+ * ACTIVE    — partida en curso (gameId asignado en GameSessionManager).
+ * COMPLETED — partida finalizada (result asignado).
+ *
+ * [key] es el valor almacenado en la columna tournament_games.status.
+ */
+@Serializable
+enum class TournamentGameStatus {
+    PENDING, ACTIVE, COMPLETED;
+
+    val key: String get() = name.lowercase()
+}
 
 // ── Request ───────────────────────────────────────────────────────────────────
 
@@ -143,7 +171,6 @@ data class TournamentRoundDto(
  *
  * gameId es null hasta que el GameSessionManager crea la partida al iniciar la ronda.
  * result es null hasta que la partida termina: "white_wins" | "black_wins" | "draw".
- * status: "pending" | "active" | "completed"
  */
 @Immutable
 @Serializable
@@ -155,5 +182,5 @@ data class TournamentPairingDto(
     val blackUsername: String,
     val gameId: String?,
     val result: String?,
-    val status: String,
+    val status: TournamentGameStatus,
 )

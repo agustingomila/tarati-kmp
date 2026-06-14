@@ -1,4 +1,4 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
@@ -6,7 +6,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.agustin.tarati.features.game.previews.GameScreenPreviewConfig
 import com.agustin.tarati.features.game.previews.GameScreenPreview_WithDrawer_Portrait
 import com.agustin.tarati.features.game.previews.previewRandomMidGameState
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.components.sidebar.SidebarUIState
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette

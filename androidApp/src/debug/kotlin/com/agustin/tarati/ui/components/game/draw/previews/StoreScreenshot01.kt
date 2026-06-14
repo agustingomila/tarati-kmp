@@ -3,7 +3,9 @@ package com.agustin.tarati.ui.components.game.draw.previews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.agustin.tarati.R
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.STORE_H_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.STORE_W_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.theme.ClassicPalette
 import com.agustin.tarati.ui.theme.DarkPalette
 import com.agustin.tarati.ui.theme.GrayscalePalette

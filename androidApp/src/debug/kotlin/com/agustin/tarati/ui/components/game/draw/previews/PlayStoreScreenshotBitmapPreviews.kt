@@ -31,8 +31,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.ui.components.game.draw.board.drawBoardBackground
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.BOTTOM
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.BEZEL_BOTTOM_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.BEZEL_SIDE_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.BEZEL_TOP_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.CENTERED_TEXT_FRACTION
+import com.agustin.tarati.ui.components.game.draw.playstore.PHONE_ASPECT_RATIO
+import com.agustin.tarati.ui.components.game.draw.playstore.PHONE_W_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.SCREEN_CORNER_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.STORE_H_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.STORE_W_DP
+import com.agustin.tarati.ui.components.game.draw.playstore.TEXT_AREA_FRACTION
+import com.agustin.tarati.ui.components.game.draw.playstore.TextBlockSpec
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.drawBackgroundLayer
+import com.agustin.tarati.ui.components.game.draw.playstore.drawCameraLens
+import com.agustin.tarati.ui.components.game.draw.playstore.drawHomeIndicator
+import com.agustin.tarati.ui.components.game.draw.playstore.drawPhoneBody
+import com.agustin.tarati.ui.components.game.draw.playstore.drawPhoneShadow
+import com.agustin.tarati.ui.components.game.draw.playstore.drawPhoneUnitShadow
+import com.agustin.tarati.ui.components.game.draw.playstore.drawRimLight
+import com.agustin.tarati.ui.components.game.draw.playstore.drawScreenInnerBorder
+import com.agustin.tarati.ui.components.game.draw.playstore.drawScreenReflection
+import com.agustin.tarati.ui.components.game.draw.playstore.drawSingleTextBlock
+import com.agustin.tarati.ui.components.game.draw.playstore.drawTextBlock
+import com.agustin.tarati.ui.components.game.draw.playstore.screenshotBackground
 import com.agustin.tarati.ui.theme.BoardColors
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette
@@ -88,7 +112,7 @@ import kotlin.math.roundToInt
  * @param screenshotRes ID del drawable (`R.drawable.ss_01_es_classic`), o `null`.
  * @param title         Título principal. Máx. ~3 palabras cortas para evitar wrap.
  * @param subtitle      Descripción de apoyo. Máx. 2 líneas (~60 caracteres).
- * @param textPosition  [TextPosition.TOP] o [TextPosition.BOTTOM].
+ * @param textPosition  [com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP] o [com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM].
  * @param palette       Paleta de colores; define fondo, texto y placeholder.
  */
 @SuppressLint("LocalContextResourcesRead")
@@ -155,7 +179,7 @@ internal fun PlayStoreScreenshot(
  * del rect el reflejo llega hasta el borde inferior de la pantalla sin corte
  * recto alguno; el [clipPath] de la pantalla es el único límite visible.
  */
-private fun DrawScope.drawScreen(
+fun DrawScope.drawScreen(
     screenX: Float, screenY: Float, screenW: Float, screenH: Float,
     screenshot: ImageBitmap?,
     boardColors: BoardColors,
@@ -210,7 +234,7 @@ private fun DrawScope.drawScreen(
  *
  * Úsalo dentro de un bloque `rotate(…) { }` para aplicar inclinación.
  */
-private fun DrawScope.drawPhoneUnit(
+fun DrawScope.drawPhoneUnit(
     phoneX: Float, phoneY: Float, phoneW: Float, phoneH: Float,
     screenshot: ImageBitmap?,
     boardColors: BoardColors,
@@ -245,7 +269,7 @@ private fun DrawScope.drawPhoneUnit(
  * Pantalla de un teléfono escalado: screenshot o placeholder + reflejo + borde.
  * Acepta [cornerRadius] en px para adaptarse al tamaño del teléfono.
  */
-private fun DrawScope.drawScreenUnit(
+fun DrawScope.drawScreenUnit(
     screenX: Float, screenY: Float, screenW: Float, screenH: Float,
     screenshot: ImageBitmap?,
     boardColors: BoardColors,

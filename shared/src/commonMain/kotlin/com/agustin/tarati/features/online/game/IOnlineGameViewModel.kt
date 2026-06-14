@@ -342,6 +342,7 @@ sealed class TournamentEvent {
      */
     data class GameAssigned(
         val tournamentId: String,
+        val tournamentName: String,
         val gameId: String,
         val round: Int,
         val totalRounds: Int,
@@ -365,6 +366,9 @@ sealed class TournamentEvent {
         val tournamentId: String,
         val finalStandings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
     ) : TournamentEvent()
+
+    /** El torneo fue cancelado por su creador. */
+    data class Cancelled(val tournamentId: String) : TournamentEvent()
 }
 
 data class SpectatingState(

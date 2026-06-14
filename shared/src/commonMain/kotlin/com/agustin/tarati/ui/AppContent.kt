@@ -66,6 +66,7 @@ import com.agustin.tarati.shared.generated.resources.challenge_declined_msg
 import com.agustin.tarati.shared.generated.resources.challenge_expired_msg
 import com.agustin.tarati.shared.generated.resources.challenge_from
 import com.agustin.tarati.shared.generated.resources.challenge_invite
+import com.agustin.tarati.shared.generated.resources.tournament_cancelled_notification
 import com.agustin.tarati.shared.generated.resources.tournament_finished_notification
 import com.agustin.tarati.shared.generated.resources.tournament_game_assigned
 import com.agustin.tarati.ui.components.navigation.NavGraph
@@ -444,6 +445,7 @@ private fun TournamentNotificationEffect(
 ) {
     val gameAssignedTemplate = localizedString(Res.string.tournament_game_assigned)
     val tournamentFinishedMsg = localizedString(Res.string.tournament_finished_notification)
+    val tournamentCancelledMsg = localizedString(Res.string.tournament_cancelled_notification)
 
     LaunchedEffect(Unit) {
         onlineGameViewModel.tournamentEvents.collect { event ->
@@ -451,8 +453,9 @@ private fun TournamentNotificationEffect(
                 is TournamentEvent.GameAssigned -> bus.toast(
                     UIMessage.Toast(
                         gameAssignedTemplate
-                            .replace($$"%1$d", "${event.round}")
-                            .replace($$"%2$d", "${event.totalRounds}")
+                            .replace($$"%1$s", event.tournamentName)
+                            .replace($$"%2$d", "${event.round}")
+                            .replace($$"%3$d", "${event.totalRounds}")
                     )
                 )
 
@@ -462,6 +465,7 @@ private fun TournamentNotificationEffect(
 
                 is TournamentEvent.RoundStarted -> Unit
                 is TournamentEvent.StandingsUpdated -> Unit
+                is TournamentEvent.Cancelled -> bus.toast(UIMessage.Toast(tournamentCancelledMsg))
             }
         }
     }

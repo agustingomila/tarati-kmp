@@ -1,4 +1,4 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview

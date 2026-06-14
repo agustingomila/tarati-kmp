@@ -65,6 +65,7 @@ import com.agustin.tarati.shared.generated.resources.rating_nbr
 import com.agustin.tarati.shared.generated.resources.resign
 import com.agustin.tarati.shared.generated.resources.spectator_count
 import com.agustin.tarati.shared.generated.resources.time_control
+import com.agustin.tarati.shared.generated.resources.tournament_round_progress
 import com.agustin.tarati.shared.generated.resources.your_color
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.theme.TaratiIcons
@@ -267,6 +268,31 @@ fun OnlineGameBar(
                             Text(
                                 text = game.timeControl.label,
                                 style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+
+                    // ── Fila torneo (si aplica) ───────────────────────────────────
+                    if (game.tournamentName != null) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = TaratiIcons.EmojiEvents,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.secondary,
+                            )
+                            val roundSuffix = if (game.tournamentRound != null && game.tournamentTotalRounds != null) {
+                                " · " + localizedString(Res.string.tournament_round_progress)
+                                    .replace($$"%1$d", "${game.tournamentRound}")
+                                    .replace($$"%2$d", "${game.tournamentTotalRounds}")
+                            } else ""
+                            Text(
+                                text = "${game.tournamentName}$roundSuffix",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         }
                     }

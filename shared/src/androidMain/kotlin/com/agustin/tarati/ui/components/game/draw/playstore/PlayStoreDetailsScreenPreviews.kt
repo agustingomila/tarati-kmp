@@ -1,11 +1,11 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.agustin.tarati.features.detail.previews.GameDetailScreenPreview
 import com.agustin.tarati.features.detail.previews.PreviewGameDetailsViewModel
 import com.agustin.tarati.features.detail.previews.randomFinalMatchDto
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.BOTTOM
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette
 import com.agustin.tarati.ui.theme.DarkPalette

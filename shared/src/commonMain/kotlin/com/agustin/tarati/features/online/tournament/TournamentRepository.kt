@@ -30,11 +30,15 @@ class TournamentRepository(private val httpClient: HttpClient) {
         token: String,
         status: String? = null,
         type: String? = null,
+        limit: Int? = null,
+        offset: Int = 0,
     ): Result<List<TournamentSummaryDto>> = runCatching {
         httpClient.get("$baseUrl/api/tournaments") {
             header("Authorization", "Bearer $token")
             if (status != null) parameter("status", status)
             if (type != null) parameter("type", type)
+            if (limit != null) parameter("limit", limit)
+            if (offset > 0) parameter("offset", offset)
         }.body()
     }
 
@@ -71,6 +75,13 @@ class TournamentRepository(private val httpClient: HttpClient) {
 
     suspend fun start(token: String, id: String): Result<Unit> = runCatching {
         httpClient.post("$baseUrl/api/tournaments/$id/start") {
+            header("Authorization", "Bearer $token")
+        }
+        Unit
+    }
+
+    suspend fun cancel(token: String, id: String): Result<Unit> = runCatching {
+        httpClient.post("$baseUrl/api/tournaments/$id/cancel") {
             header("Authorization", "Bearer $token")
         }
         Unit

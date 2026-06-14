@@ -1,4 +1,4 @@
-package features.settings.previews
+package com.agustin.tarati.features.settings.previews
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -11,10 +11,6 @@ import com.agustin.tarati.ui.theme.DarkPalette
 import com.agustin.tarati.ui.theme.GrayscalePalette
 import com.agustin.tarati.ui.theme.NaturePalette
 import com.agustin.tarati.ui.theme.PaletteList
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Previews
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Preview(group = "PaletteSelector", showBackground = true, widthDp = 420, heightDp = 180)
 @Composable

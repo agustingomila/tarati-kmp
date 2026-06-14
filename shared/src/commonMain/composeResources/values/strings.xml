@@ -449,8 +449,14 @@
     <string name="tournament_type_round_robin">Round Robin</string>
     <string name="tournament_type_swiss">Swiss</string>
     <string name="tournament_round_n">Round %1$d</string>
-    <string name="tournament_game_assigned">Tournament · Round %1$d/%2$d: your game is ready</string>
+    <string name="tournament_game_assigned">%1$s · Round %2$d/%3$d: your game is ready</string>
     <string name="tournament_finished_notification">The tournament ended — see the final standings</string>
+    <string name="tournament_cancelled_notification">The tournament was cancelled</string>
+    <string name="cancel_tournament">Cancel tournament</string>
+    <string name="validation_players_number">Enter numbers for player counts</string>
+    <string name="validation_min_players_count">Minimum is 2 players</string>
+    <string name="validation_max_players_count">Maximum is 128 players</string>
+    <string name="validation_max_gte_min">Max players must be ≥ min</string>
     <string name="tournament_filter_all">All</string>
     <string name="tournament_recent_only">Recent</string>
     <string name="sort_most_players">Most players</string>

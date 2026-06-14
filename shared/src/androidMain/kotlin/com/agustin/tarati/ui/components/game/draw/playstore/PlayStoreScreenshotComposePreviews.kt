@@ -1,4 +1,4 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.BOTTOM
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.theme.BoardColors
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette

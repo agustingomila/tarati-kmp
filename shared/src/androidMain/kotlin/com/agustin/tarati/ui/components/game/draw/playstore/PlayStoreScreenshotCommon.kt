@@ -1,4 +1,4 @@
-package com.agustin.tarati.ui.components.game.draw.previews
+package com.agustin.tarati.ui.components.game.draw.playstore
 
 import android.content.res.Configuration
 import android.graphics.BlurMaskFilter
@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.services.localization.LocalAppLanguage
 import com.agustin.tarati.ui.components.game.draw.board.drawBoardBackground
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.BOTTOM
-import com.agustin.tarati.ui.components.game.draw.previews.TextPosition.TOP
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM
+import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.theme.BoardColors
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.ClassicPalette
@@ -180,7 +180,7 @@ fun screenshotBackground(palette: BoardPalette): Pair<Color, Color> = when (pale
 }
 
 // ── Textos ─────────────────────────────────────────────────────────────────────
-internal data class TextBlockSpec(
+data class TextBlockSpec(
     val text: String,
     val style: TextStyle,
     val areaTopDp: Float,
@@ -264,7 +264,7 @@ internal fun DrawScope.drawBoardOverlay(
  *
  * @param boardColors    Colores de la paleta para los tableros de fondo.
  */
-internal fun DrawScope.drawBackgroundLayer(
+fun DrawScope.drawBackgroundLayer(
     gradTop: Color,
     gradBottom: Color,
     textPosition: TextPosition,
@@ -324,7 +324,7 @@ internal fun DrawScope.drawBackgroundLayer(
  * Sombra difusa con [BlurMaskFilter] — desenfoque gaussiano real.
  * [scale] ajusta offset y radio de blur proporcionalmente al tamaño del teléfono.
  */
-internal fun DrawScope.drawPhoneShadow(
+fun DrawScope.drawPhoneShadow(
     phoneX: Float, phoneY: Float, phoneW: Float, phoneH: Float,
     scale: Float = 1f, colors: BoardColors
 ) {
@@ -354,7 +354,7 @@ internal fun DrawScope.drawPhoneShadow(
 }
 
 /** Cuerpo del teléfono: base oscura + gradiente lateral que simula aluminio. */
-internal fun DrawScope.drawPhoneBody(
+fun DrawScope.drawPhoneBody(
     topLeft: Offset,
     size: Size,
     phoneRefWidthPx: Float = PHONE_W_DP.dp.toPx()
@@ -399,14 +399,14 @@ internal fun DrawScope.drawPhoneBody(
  * El parámetro [color] se mantiene por compatibilidad con callers existentes
  * pero el alpha real se fija en [drawPhoneShadow] (~0.31).
  */
-internal fun DrawScope.drawPhoneUnitShadow(
+fun DrawScope.drawPhoneUnitShadow(
     phoneX: Float, phoneY: Float, phoneW: Float, phoneH: Float, boardColors: BoardColors
 ) {
     val scale = phoneW / PHONE_W_DP.dp.toPx()
     drawPhoneShadow(phoneX, phoneY, phoneW, phoneH, scale, boardColors)
 }
 
-internal fun DrawScope.drawScreenReflection(
+fun DrawScope.drawScreenReflection(
     screenX: Float, screenY: Float, screenW: Float, screenH: Float,
 ) {
     val reflectW = screenW * 0.42f
@@ -426,7 +426,7 @@ internal fun DrawScope.drawScreenReflection(
 /**
  * Borde interior de pantalla (separación entre pantalla y bezel)
  */
-internal fun DrawScope.drawScreenInnerBorder(
+fun DrawScope.drawScreenInnerBorder(
     x: Float,
     y: Float,
     width: Float,
@@ -601,7 +601,7 @@ internal fun DrawScope.drawScreenGlassOverlay(
  * Cámara frontal: punch-hole centrado en el bezel superior.
  * [scale] escala el radio y el trazo proporcionalmente al tamaño del teléfono.
  */
-internal fun DrawScope.drawCameraLens(
+fun DrawScope.drawCameraLens(
     phoneX: Float, phoneY: Float, phoneW: Float,
     scale: Float = 1f,
 ) {
@@ -627,7 +627,7 @@ internal fun DrawScope.drawCameraLens(
  * Indicador de inicio (home bar) centrado en el bezel inferior.
  * [scale] escala las dimensiones proporcionalmente al tamaño del teléfono.
  */
-internal fun DrawScope.drawHomeIndicator(
+fun DrawScope.drawHomeIndicator(
     phoneX: Float, phoneY: Float, phoneW: Float, phoneH: Float,
     scale: Float = 1f,
 ) {
@@ -645,7 +645,7 @@ internal fun DrawScope.drawHomeIndicator(
 }
 
 /** Borde exterior del teléfono (rim light): línea blanca semitransparente. */
-internal fun DrawScope.drawRimLight(
+fun DrawScope.drawRimLight(
     phoneX: Float, phoneY: Float, phoneW: Float, phoneH: Float,
     scale: Float = 1f,
 ) {
@@ -662,7 +662,7 @@ internal fun DrawScope.drawRimLight(
  * Bloque de texto (título + subtítulo) centrado horizontal y verticalmente
  * dentro del área reservada para texto.
  */
-internal fun DrawScope.drawTextBlock(
+fun DrawScope.drawTextBlock(
     textMeasurer: TextMeasurer,
     title: String,
     subtitle: String,
@@ -713,7 +713,7 @@ internal fun DrawScope.drawTextBlock(
  * @param areaTop Coordenada Y del borde superior del área (px).
  * @param areaH   Altura del área (px).
  */
-internal fun DrawScope.drawSingleTextBlock(
+fun DrawScope.drawSingleTextBlock(
     textMeasurer: TextMeasurer,
     text: String,
     style: TextStyle,

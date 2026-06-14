@@ -128,6 +128,7 @@ class OnlineGameClient(
     private data class PendingTournamentCtx(
         val gameId: String,
         val tournamentId: String,
+        val tournamentName: String,
         val round: Int,
         val totalRounds: Int,
     )
@@ -344,6 +345,7 @@ class OnlineGameClient(
                     timeControl = message.timeControl,
                     isRated = message.rated,
                     tournamentId = tournamentCtx?.tournamentId,
+                    tournamentName = tournamentCtx?.tournamentName,
                     tournamentRound = tournamentCtx?.round,
                     tournamentTotalRounds = tournamentCtx?.totalRounds,
                 )
@@ -596,18 +598,20 @@ class OnlineGameClient(
                 pendingTournamentContext = PendingTournamentCtx(
                     gameId = message.gameId,
                     tournamentId = message.tournamentId,
+                    tournamentName = message.tournamentName,
                     round = message.round,
                     totalRounds = message.totalRounds,
                 )
                 _tournamentEvents.tryEmit(
                     TournamentEvent.GameAssigned(
                         tournamentId = message.tournamentId,
+                        tournamentName = message.tournamentName,
                         gameId = message.gameId,
                         round = message.round,
                         totalRounds = message.totalRounds,
                     )
                 )
-                logger.info("Tournament game assigned: ${message.gameId} (round ${message.round}/${message.totalRounds})")
+                logger.info("Tournament game assigned: ${message.gameId} (${message.tournamentName}, round ${message.round}/${message.totalRounds})")
             }
 
             is ServerMessage.TournamentRoundStarted -> {
@@ -639,6 +643,11 @@ class OnlineGameClient(
                     )
                 )
                 logger.info("Tournament finished: ${message.tournamentId} — winner: ${message.finalStandings.firstOrNull()?.username}")
+            }
+
+            is ServerMessage.TournamentCancelled -> {
+                _tournamentEvents.tryEmit(TournamentEvent.Cancelled(message.tournamentId))
+                logger.info("Tournament cancelled: ${message.tournamentId}")
             }
         }
     }

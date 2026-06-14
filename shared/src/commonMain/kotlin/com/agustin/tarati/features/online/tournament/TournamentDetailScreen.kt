@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
 import com.agustin.tarati.network.models.TournamentDetailDto
+import com.agustin.tarati.network.models.TournamentGameStatus
 import com.agustin.tarati.network.models.TournamentPairingDto
 import com.agustin.tarati.network.models.TournamentRoundDto
 import com.agustin.tarati.network.models.TournamentStandingDto
@@ -58,6 +60,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_cancelled_status
 import com.agustin.tarati.shared.generated.resources.tournament_created_by
 import com.agustin.tarati.shared.generated.resources.tournament_finished_status
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
+import com.agustin.tarati.shared.generated.resources.cancel_tournament
 import com.agustin.tarati.shared.generated.resources.tournament_register
 import com.agustin.tarati.shared.generated.resources.tournament_round_n
 import com.agustin.tarati.shared.generated.resources.tournament_round_progress
@@ -113,7 +116,7 @@ fun TournamentDetailScreen(
     val token = authViewModel.accessToken ?: authViewModel.getStoredToken()
     val currentUserId = authViewModel.currentUser?.userId
 
-    LaunchedEffect(tournamentId) {
+    LaunchedEffect(tournamentId, token) {
         if (token != null) viewModel.loadTournament(token, tournamentId)
     }
 
@@ -158,6 +161,9 @@ fun TournamentDetailScreen(
                     onStart = {
                         if (token != null) scope.launch { viewModel.start(token, tournamentId) }
                     },
+                    onCancel = {
+                        if (token != null) scope.launch { viewModel.cancel(token, tournamentId) }
+                    },
                     onRefresh = {
                         if (token != null) viewModel.loadTournament(token, tournamentId)
                     },
@@ -182,6 +188,7 @@ private fun TournamentDetailContent(
     onRegister: () -> Unit,
     onUnregister: () -> Unit,
     onStart: () -> Unit,
+    onCancel: () -> Unit,
     onRefresh: () -> Unit,
     onSpectateGame: ((gameId: String) -> Unit)?,
     onNavigateToGameDetails: ((gameId: String) -> Unit)?,
@@ -212,6 +219,7 @@ private fun TournamentDetailContent(
                 onRegister = onRegister,
                 onUnregister = onUnregister,
                 onStart = onStart,
+                onCancel = onCancel,
             )
         }
 
@@ -318,6 +326,7 @@ private fun TournamentActions(
     onRegister: () -> Unit,
     onUnregister: () -> Unit,
     onStart: () -> Unit,
+    onCancel: () -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         when (tournament.status) {
@@ -329,6 +338,14 @@ private fun TournamentActions(
                     Button(onClick = onRegister) { Text(localizedString(Res.string.tournament_register)) }
                 } else if (isParticipant) {
                     OutlinedButton(onClick = onUnregister) { Text(localizedString(Res.string.tournament_unregister)) }
+                }
+                if (isCreator) {
+                    OutlinedButton(
+                        onClick = onCancel,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                    ) { Text(localizedString(Res.string.cancel_tournament)) }
                 }
             }
 
@@ -454,10 +471,10 @@ private fun RoundSection(
         round.pairings.forEach { pairing ->
             PairingRow(
                 pairing = pairing,
-                onSpectate = if (pairing.status == "active" && pairing.gameId != null && onSpectateGame != null) {
+                onSpectate = if (pairing.status == TournamentGameStatus.ACTIVE && pairing.gameId != null && onSpectateGame != null) {
                     { onSpectateGame(pairing.gameId) }
                 } else null,
-                onViewCompleted = if (pairing.status == "completed" && pairing.gameId != null && onNavigateToGameDetails != null) {
+                onViewCompleted = if (pairing.status == TournamentGameStatus.COMPLETED && pairing.gameId != null && onNavigateToGameDetails != null) {
                     { onNavigateToGameDetails(pairing.gameId) }
                 } else null,
             )
@@ -471,8 +488,8 @@ private fun PairingRow(
     onSpectate: (() -> Unit)?,
     onViewCompleted: (() -> Unit)?,
 ) {
-    val isActive = pairing.status == "active"
-    val isPending = pairing.status == "pending"
+    val isActive = pairing.status == TournamentGameStatus.ACTIVE
+    val isPending = pairing.status == TournamentGameStatus.PENDING
     val isCompleted = pairing.result != null
 
     val dimColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)

@@ -14,6 +14,7 @@ import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.core.domain.game.board.Vertex
 import com.agustin.tarati.core.domain.game.pieces.CobColor.BLACK
 import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
+import com.agustin.tarati.core.domain.game.pieces.PieceCounts
 import com.agustin.tarati.core.domain.game.pieces.opponent
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
@@ -26,7 +27,6 @@ import com.agustin.tarati.ui.components.editor.EditActionState
 import com.agustin.tarati.ui.components.editor.EditColorEvents
 import com.agustin.tarati.ui.components.editor.EditColorState
 import com.agustin.tarati.ui.components.editor.LeftControls
-import com.agustin.tarati.core.domain.game.pieces.PieceCounts
 import com.agustin.tarati.ui.components.editor.RightControls
 import com.agustin.tarati.ui.components.editor.TopControls
 import com.agustin.tarati.ui.components.game.Board

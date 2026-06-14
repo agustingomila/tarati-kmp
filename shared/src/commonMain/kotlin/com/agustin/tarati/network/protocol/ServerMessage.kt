@@ -560,14 +560,16 @@ sealed class ServerMessage {
      * El servidor asignó al jugador una partida dentro de un torneo.
      * Enviado antes de [MatchFound] para que el cliente muestre el contexto del torneo.
      *
-     * @param tournamentId ID del torneo
-     * @param gameId       ID de la partida asignada (igual al gameId de [MatchFound])
-     * @param round        Número de ronda actual
-     * @param totalRounds  Total de rondas del torneo
+     * @param tournamentId   ID del torneo
+     * @param tournamentName Nombre visible del torneo (ej. "Bot Cup 6P Round Robin")
+     * @param gameId         ID de la partida asignada (igual al gameId de [MatchFound])
+     * @param round          Número de ronda actual
+     * @param totalRounds    Total de rondas del torneo
      */
     @Serializable
     data class TournamentGameAssigned(
         val tournamentId: String,
+        val tournamentName: String,
         val gameId: String,
         val round: Int,
         val totalRounds: Int,
@@ -602,6 +604,15 @@ sealed class ServerMessage {
     data class TournamentFinished(
         val tournamentId: String,
         val finalStandings: List<com.agustin.tarati.network.models.TournamentStandingDto>,
+    ) : ServerMessage()
+
+    /**
+     * El torneo fue cancelado por su creador (solo desde estado REGISTERING).
+     * Enviado a todos los participantes inscritos.
+     */
+    @Serializable
+    data class TournamentCancelled(
+        val tournamentId: String,
     ) : ServerMessage()
 }
 
