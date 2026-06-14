@@ -137,8 +137,8 @@ data class TournamentDetailDto(
 /**
  * Posición de un jugador en la tabla de clasificación del torneo.
  *
- * score: sistema 2-1-0 (victoria=2, empate=1, derrota=0).
- * buchholz: suma de scores de todos los oponentes enfrentados (desempate en Swiss).
+ * score: medios puntos de notación estándar 1-½-0 (vic=2, emp=1, der=0).
+ * buchholz: suma de scores (en medios puntos) de los oponentes enfrentados (desempate en Swiss).
  */
 @Immutable
 @Serializable

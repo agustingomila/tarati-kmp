@@ -80,6 +80,7 @@ import com.agustin.tarati.ui.layout.ScreenLayout
 import com.agustin.tarati.ui.layout.screenLayoutFor
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteManager
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.ui.theme.TaratiTheme
 import com.agustin.tarati.ui.theme.availablePalettes
 import kotlinx.coroutines.launch
@@ -123,19 +124,23 @@ fun AppContent(
     var pendingLoginAction by remember { mutableStateOf<(suspend () -> Unit)?>(null) }
     val loginScope = rememberCoroutineScope()
 
-    val onShowLogin: ((suspend () -> Unit)?) -> Unit = { action ->
-        pendingLoginAction = action
-        showLoginModal = true
-    }
+    val onShowLogin: ((suspend () -> Unit)?) -> Unit = if (FeatureFlags.ONLINE_ENABLED) {
+        { action ->
+            pendingLoginAction = action
+            showLoginModal = true
+        }
+    } else { _ -> }
 
     // Al autenticarse, precarga el nombre local con el displayName de la cuenta.
     // El usuario puede cambiarlo después sin afectar su cuenta online.
-    LaunchedEffect(authState) {
-        val state = authState
-        if (state is AuthState.Authenticated && !state.userInfo.isGuest) {
-            val name = state.userInfo.displayName.takeIf { it.isNotBlank() }
-                ?: state.userInfo.username
-            settingsViewModel.setUserName(name)
+    if (FeatureFlags.ONLINE_ENABLED) {
+        LaunchedEffect(authState) {
+            val state = authState
+            if (state is AuthState.Authenticated && !state.userInfo.isGuest) {
+                val name = state.userInfo.displayName.takeIf { it.isNotBlank() }
+                    ?: state.userInfo.username
+                settingsViewModel.setUserName(name)
+            }
         }
     }
 
@@ -183,9 +188,9 @@ fun AppContent(
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                         )
                         AlertHost()
-                        ChallengeNotificationEffect()
-                        TournamentNotificationEffect()
-                        if (showLoginModal) {
+                        if (FeatureFlags.ONLINE_ENABLED) ChallengeNotificationEffect()
+                        if (FeatureFlags.ONLINE_ENABLED) TournamentNotificationEffect()
+                        if (FeatureFlags.ONLINE_ENABLED && showLoginModal) {
                             LoginSheet(
                                 onLoginSuccess = {
                                     showLoginModal = false

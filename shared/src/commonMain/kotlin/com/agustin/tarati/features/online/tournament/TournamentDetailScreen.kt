@@ -428,13 +428,13 @@ private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean) {
         // Puntos (+ buchholz para Swiss)
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                "${standing.score} pts",
+                "${formatTournamentScore(standing.score)} pts",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             if (isSwiss) {
                 Text(
-                    "BH ${standing.buchholz}",
+                    "BH ${formatTournamentScore(standing.buchholz)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -591,5 +591,21 @@ private fun PairingRow(
             color = if (isPending) dimColor else MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.End,
         )
+    }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Convierte medios puntos (almacenamiento interno 2-1-0) a notación estándar 1-½-0.
+ * 0→"0"  1→"½"  2→"1"  3→"1½"  4→"2"  ...
+ */
+private fun formatTournamentScore(halfPoints: Int): String {
+    val whole = halfPoints / 2
+    val hasHalf = halfPoints % 2 != 0
+    return when {
+        !hasHalf -> whole.toString()
+        whole == 0 -> "½"
+        else -> "$whole½"
     }
 }

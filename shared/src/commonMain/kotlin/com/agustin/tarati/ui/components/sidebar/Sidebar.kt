@@ -82,6 +82,7 @@ import com.agustin.tarati.core.domain.game.play.GameEndReason.UNDETERMINED
 import com.agustin.tarati.core.domain.game.play.MatchState
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.features.game.GameEvents
 import com.agustin.tarati.features.game.IGameModel
 import com.agustin.tarati.features.online.game.SpectatingState
@@ -960,13 +961,15 @@ private fun MoveHistorySection(
                 )
             }
 
-            IconButton(onOnlineLobby, Modifier.size(32.dp)) {
-                Icon(
-                    TaratiIcons.Public,
-                    localizedString(Res.string.online_lobby),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
-                )
+            if (FeatureFlags.ONLINE_ENABLED) {
+                IconButton(onOnlineLobby, Modifier.size(32.dp)) {
+                    Icon(
+                        TaratiIcons.Public,
+                        localizedString(Res.string.online_lobby),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
 

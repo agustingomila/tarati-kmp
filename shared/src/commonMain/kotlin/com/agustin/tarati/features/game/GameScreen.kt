@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.agustin.tarati.core.data.database.dto.MatchDto
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
 import com.agustin.tarati.core.domain.ai.services.Difficulty
@@ -646,9 +647,10 @@ fun GameScreen(
                         spectatingState = spectatingState,
                     )
                 }) else null,
-                // Botón único: oculto solo durante partida propia; visible en espectado
-                // para que el jugador pueda crear una búsqueda mientras observa.
+                // Botón único: oculto durante partida propia, en modo lobby expandido,
+                // y cuando el acceso online está desactivado por FeatureFlags.
                 connectionState = when {
+                    !FeatureFlags.ONLINE_ENABLED -> null
                     isOnlineGame -> null
                     screenLayout == ScreenLayout.Expanded &&
                             companionDestination == CompanionPanelDestination.Lobby -> null
