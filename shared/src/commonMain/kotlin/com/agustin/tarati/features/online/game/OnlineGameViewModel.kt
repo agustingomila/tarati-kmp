@@ -237,12 +237,13 @@ class OnlineGameViewModel(
         onlineClient.clearCurrentGame(gameId)
     }
 
-    override suspend fun spectateGame(gameId: String) {
+    override suspend fun spectateGame(gameId: String): Boolean {
         logger.debug("spectateGame: $gameId")
-        try {
+        return try {
             onlineClient.spectateGame(gameId)
         } catch (e: Exception) {
             logger.error("spectateGame failed: ${e.message}")
+            false
         }
     }
 

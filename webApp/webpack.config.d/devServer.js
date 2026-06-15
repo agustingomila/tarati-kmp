@@ -15,7 +15,7 @@ if (config.devServer) {
             changeOrigin: true,
         },
         {
-            context: ['/ws'],
+            context: ['/ws/game'],
             target: 'ws://localhost:8080',
             ws: true,
             changeOrigin: true,

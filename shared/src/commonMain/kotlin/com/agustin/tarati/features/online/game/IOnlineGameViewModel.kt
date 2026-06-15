@@ -177,8 +177,11 @@ interface IOnlineGameViewModel {
     /** Estado de la partida que se está observando como espectador. Null cuando no se espectea. */
     val spectatingState: StateFlow<SpectatingState?>
 
-    /** Emite WS SpectateGame y setea [spectatingState] al recibir SpectatingStarted. */
-    suspend fun spectateGame(gameId: String)
+    /**
+     * Emite WS SpectateGame y espera la respuesta del servidor.
+     * @return true si el servidor confirmó el espectado; false si rechazó (partida no encontrada, ya terminada, etc.)
+     */
+    suspend fun spectateGame(gameId: String): Boolean
 
     /** Emite WS LeaveSpectating y limpia [spectatingState]. */
     suspend fun stopSpectating()

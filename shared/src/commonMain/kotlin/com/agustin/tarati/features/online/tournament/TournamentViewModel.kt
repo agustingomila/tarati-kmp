@@ -52,11 +52,14 @@ class TournamentViewModel(
 
                 when (event) {
                     is TournamentEvent.StandingsUpdated -> {
-                        // Standings inline: solo actualiza el detalle si es el torneo activo.
                         if (event.tournamentId != targetId) return@onEach
+                        // Actualiza standings inline para feedback inmediato
                         _detailState.value = _detailState.value.let { s ->
                             s.copy(tournament = s.tournament?.copy(standings = event.standings))
                         }
+                        // Recarga el detalle completo para capturar el fixture actualizado
+                        // (estado ACTIVE → COMPLETED + resultado de la partida)
+                        if (token != null) loadTournament(token, targetId)
                     }
 
                     is TournamentEvent.RoundStarted -> {

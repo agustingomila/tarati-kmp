@@ -58,6 +58,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -244,6 +245,8 @@ fun OnlineLobbyScreen(
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
     /** Callback al tocar un torneo en el tab Torneos. Null = sin navegación al detalle. */
     onNavigateToTournament: ((tournamentId: String) -> Unit)? = null,
+    /** Tab inicial a mostrar al entrar. Útil en CompanionPanel para restaurar el tab activo. */
+    initialTab: Int = 0,
     viewModel: IOnlineLobbyViewModel = koinViewModel<OnlineLobbyViewModel>(),
     connectionViewModel: IConnectionViewModel = koinInject(),
     onlineGameViewModel: IOnlineGameViewModel = koinInject(),
@@ -256,7 +259,7 @@ fun OnlineLobbyScreen(
     val currentGame by onlineGameViewModel.currentGame.collectAsState()
     val hasActiveGame = currentGame?.status == OnlineGameStatus.InProgress
     val scope = rememberCoroutineScope()
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by rememberSaveable { mutableIntStateOf(initialTab) }
     var showMatchmakingSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     var showLogoutConfirm by remember { mutableStateOf(false) }
@@ -2231,7 +2234,7 @@ private fun ConnectedUsersTab(
                             onClick = if (!user.isGuest && onNavigateToProfile != null) {
                                 { onNavigateToProfile(user.userId) }
                             } else null,
-                            onChallenge = if (!user.isGuest && user.userId != currentUserId) {
+                            onChallenge = if (!user.isGuest && user.userId != currentUserId && user.status == OnlineUserStatus.IN_LOBBY) {
                                 { challengeTarget = user }
                             } else null,
                         )

@@ -168,8 +168,17 @@ fun TournamentDetailScreen(
                         if (token != null) viewModel.loadTournament(token, tournamentId)
                     },
                     onSpectateGame = if (onSpectateGame != null) { gameId ->
-                        scope.launch { onlineGameViewModel.spectateGame(gameId) }
-                        onSpectateGame(gameId)
+                        scope.launch {
+                            val ok = onlineGameViewModel.spectateGame(gameId)
+                            if (ok) {
+                                onSpectateGame(gameId)
+                            } else {
+                                // La partida terminó entre el fixture load y el tap.
+                                // Recargar el fixture y abrir detalles si es posible.
+                                if (token != null) viewModel.loadTournament(token, tournamentId)
+                                onNavigateToGameDetails?.invoke(gameId)
+                            }
+                        }
                     } else null,
                     onNavigateToGameDetails = onNavigateToGameDetails,
                 )

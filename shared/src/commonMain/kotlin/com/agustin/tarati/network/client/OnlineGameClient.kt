@@ -27,12 +27,14 @@ import com.agustin.tarati.network.models.OnlineGameStatus
 import com.agustin.tarati.network.models.OnlineGameStatus.Finished
 import com.agustin.tarati.network.protocol.ClientMessage
 import com.agustin.tarati.network.protocol.ServerMessage
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -285,14 +287,25 @@ class OnlineGameClient(
 
     // ============ Spectating API ============
 
+    // Deferred resuelto cuando el servidor confirma (SpectatingStarted) o rechaza (Error spectate_error)
+    private var pendingSpectate: CompletableDeferred<Boolean>? = null
+
     /**
      * Observar una partida como espectador.
      *
-     * @param gameId ID de la partida a observar.
+     * @return true si el servidor respondió con SpectatingStarted; false si devolvió error
+     *         (partida no encontrada, ya terminada, etc.).
      */
-    suspend fun spectateGame(gameId: String) {
+    suspend fun spectateGame(gameId: String): Boolean {
         logger.info("Spectating game $gameId")
-        wsClient.send(ClientMessage.SpectateGame(gameId))
+        val deferred = CompletableDeferred<Boolean>()
+        pendingSpectate = deferred
+        return try {
+            wsClient.send(ClientMessage.SpectateGame(gameId))
+            withTimeoutOrNull(5_000) { deferred.await() } ?: false
+        } finally {
+            pendingSpectate = null
+        }
     }
 
     /** Limpia [spectatingState] localmente sin enviar WS — usado cuando la partida terminó sola. */
@@ -486,7 +499,11 @@ class OnlineGameClient(
 
             is ServerMessage.Error -> {
                 logger.error("Server error: ${message.code} - ${message.message}")
-                _serverErrors.tryEmit(GenericError(message.code, message.message))
+                if (message.code == "spectate_error") {
+                    pendingSpectate?.complete(false)
+                } else {
+                    _serverErrors.tryEmit(GenericError(message.code, message.message))
+                }
             }
 
             // Heartbeat
@@ -496,6 +513,7 @@ class OnlineGameClient(
 
             // ── Spectating ──────────────────────────────────────────────────
             is ServerMessage.SpectatingStarted -> {
+                pendingSpectate?.complete(true)
                 _spectatingState.value = SpectatingState(
                     gameId = message.gameId,
                     whitePlayer = message.whitePlayer,

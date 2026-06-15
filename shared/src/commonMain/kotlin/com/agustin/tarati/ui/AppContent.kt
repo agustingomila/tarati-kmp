@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -249,6 +250,10 @@ private fun CompanionPane(
     val authState by authViewModel.authState.collectAsState()
     val loggedInUsername = (authState as? AuthState.Authenticated)?.userInfo?.username
 
+    // Tab del Lobby activo al momento de navegar a una subpantalla (TournamentDetail, etc.)
+    // Permite restaurar el tab correcto al volver con controller.back().
+    var lastLobbyTab by remember { mutableIntStateOf(0) }
+
     when (val dest = controller.destination) {
         CompanionPanelDestination.None -> Unit
 
@@ -272,8 +277,10 @@ private fun CompanionPane(
                 }
             },
             onNavigateToTournament = { tournamentId ->
+                lastLobbyTab = 2 // Tab "Torneos"
                 controller.navigate(CompanionPanelDestination.TournamentDetail(tournamentId))
             },
+            initialTab = lastLobbyTab,
         )
 
         CompanionPanelDestination.Leaderboard -> LeaderboardScreen(
@@ -328,6 +335,7 @@ private fun CompanionPane(
                 tournamentId = dest.tournamentId,
                 onBack = controller::back,
                 displayMode = DisplayMode.CompanionPanel,
+                onSpectateGame = { _ -> },
                 onNavigateToGameDetails = { gameId ->
                     scope.launch {
                         val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)

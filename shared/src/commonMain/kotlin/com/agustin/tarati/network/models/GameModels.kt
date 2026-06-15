@@ -289,6 +289,7 @@ data class OnlineUserDto(
     val userId: String,
     val displayName: String,
     val isGuest: Boolean,
+    val isBot: Boolean = false,
     val status: OnlineUserStatus,
     val ratingBlitz: Int? = null,
 )

@@ -247,11 +247,7 @@ fun NavGraph(
             TournamentDetailScreen(
                 tournamentId = tournamentId,
                 onBack = { navController.popBackStack() },
-                onSpectateGame = { _ ->
-                    // spectateGame ya fue llamado en TournamentDetailScreen antes del callback.
-                    // Volver a GameScreen donde el spectatingState se aplica.
-                    navController.popBackStack()
-                },
+                onSpectateGame = { _ -> },
                 onNavigateToGameDetails = { gameId ->
                     scope.launch {
                         val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
