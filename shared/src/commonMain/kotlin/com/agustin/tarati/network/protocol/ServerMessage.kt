@@ -224,6 +224,25 @@ sealed class ClientMessage {
     ) : ClientMessage()
 
     /**
+     * Unirse directamente a la búsqueda abierta de un jugador específico.
+     *
+     * A diferencia de [JoinMatchmaking] (que entra al queue y espera al mejor rival),
+     * este mensaje crea la partida inmediatamente con [targetUserId].
+     * El servidor valida que [targetUserId] siga en cola, lo elimina del queue y
+     * crea la sesión con [MatchmakingEngine.createDirectMatch].
+     *
+     * @param targetUserId ID del jugador cuya búsqueda se quiere aceptar.
+     * @param timeControl  Time control de la búsqueda (debe coincidir con el del anfitrión).
+     * @param rated        Si la partida debe ser rated (debe coincidir con el del anfitrión).
+     */
+    @Serializable
+    data class JoinOpenSearch(
+        val targetUserId: String,
+        val timeControl: String,
+        val rated: Boolean,
+    ) : ClientMessage()
+
+    /**
      * Mensaje de heartbeat para mantener la conexión viva
      * El servidor responderá con HeartbeatAck
      */

@@ -24,6 +24,7 @@ import com.agustin.tarati.shared.generated.resources.back
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.editing
 import com.agustin.tarati.shared.generated.resources.menu
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,8 @@ fun TaratiTopBar(
             when (navigationType) {
                 TopBarNavigationType.None -> {}
                 TopBarNavigationType.Menu -> {
-                    IconButton(
+                    TooltipIconButton(
+                        tooltip = localizedString(Res.string.menu),
                         onClick = {
                             drawerState?.let {
                                 scope.launch {
@@ -61,7 +63,10 @@ fun TaratiTopBar(
                 }
 
                 TopBarNavigationType.Back -> {
-                    IconButton(onClick = { onNavigationClick?.invoke() }) {
+                    TooltipIconButton(
+                        tooltip = localizedString(Res.string.back),
+                        onClick = { onNavigationClick?.invoke() },
+                    ) {
                         Icon(
                             imageVector = TaratiIcons.ArrowBack,
                             contentDescription = localizedString(Res.string.back),
@@ -70,7 +75,10 @@ fun TaratiTopBar(
                 }
 
                 TopBarNavigationType.Close -> {
-                    IconButton(onClick = { onNavigationClick?.invoke() }) {
+                    TooltipIconButton(
+                        tooltip = localizedString(Res.string.cancel),
+                        onClick = { onNavigationClick?.invoke() },
+                    ) {
                         Icon(
                             imageVector = TaratiIcons.Cancel,
                             contentDescription = localizedString(Res.string.cancel),

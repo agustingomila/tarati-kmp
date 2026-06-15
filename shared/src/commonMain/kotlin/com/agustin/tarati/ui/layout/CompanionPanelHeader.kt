@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.agustin.tarati.services.localization.localizedString
+import com.agustin.tarati.shared.generated.resources.Res
+import com.agustin.tarati.shared.generated.resources.close
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 
 /**
@@ -49,10 +52,13 @@ fun CompanionPanelHeader(
                 modifier = Modifier.weight(1f),
             )
             actions()
-            IconButton(onClick = onClose) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.close),
+                onClick = onClose,
+            ) {
                 Icon(
                     imageVector = TaratiIcons.Close,
-                    contentDescription = "Cerrar panel",
+                    contentDescription = localizedString(Res.string.close),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

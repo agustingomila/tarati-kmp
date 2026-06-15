@@ -361,6 +361,39 @@ class AuthViewModel(
         }
     }
 
+    override suspend fun forgotPassword(email: String): Result<Unit> {
+        return try {
+            httpClient.post("$devServerUrl/auth/forgot-password") {
+                contentType(Application.Json)
+                setBody("""{"email":"${email.trim()}"}""")
+            }
+            // Siempre éxito desde el punto de vista del cliente — el servidor nunca revela si el email existe
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.debug("forgotPassword error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun resetPassword(token: String, newPassword: String): Result<Unit> {
+        return try {
+            val response = httpClient.post("$devServerUrl/auth/reset-password") {
+                contentType(Application.Json)
+                setBody("""{"token":"$token","newPassword":"$newPassword"}""")
+            }
+            if (response.status.value == 200) {
+                Result.success(Unit)
+            } else {
+                val msg = parseServerError(response.bodyAsText())
+                    ?: "Reset failed: HTTP ${response.status.value}"
+                Result.failure(Exception(msg))
+            }
+        } catch (e: Exception) {
+            logger.debug("resetPassword error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     override fun clearError() {
         if (_authState.value is AuthState.Error) {
             _authState.value = AuthState.Unauthenticated

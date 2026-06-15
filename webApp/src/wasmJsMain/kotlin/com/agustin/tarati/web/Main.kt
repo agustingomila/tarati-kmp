@@ -1,8 +1,13 @@
 package com.agustin.tarati.web
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import com.agustin.tarati.features.online.auth.ResetPasswordSheet
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.services.sound.ISoundService
 import com.agustin.tarati.services.sound.LocalSoundService
@@ -28,6 +33,15 @@ fun main() {
         overrideNavigatorLanguages(langCode)
     }
 
+    // Detectar token de reset de contraseña en la URL (/reset-password?token=...)
+    val resetToken: String? = runCatching {
+        val pathname = window.location.pathname.toString()
+        val search = window.location.search.toString()
+        if (pathname.contains("reset-password") && search.contains("token=")) {
+            search.substringAfter("token=").substringBefore("&").takeIf { it.isNotBlank() }
+        } else null
+    }.getOrNull()
+
     ComposeViewport(document.body!!) {
         KoinApplication(
             configuration = koinConfiguration(declaration = { modules(webModules) }),
@@ -38,6 +52,17 @@ fun main() {
             WasmLanguageAwareApp(settingsViewModel) {
                 CompositionLocalProvider(LocalSoundService provides soundService) {
                     AppContent(settingsViewModel)
+
+                    // Mostrar sheet de reset si la URL contiene un token válido.
+                    // Se renderiza sobre AppContent — el usuario completa el reset
+                    // y luego inicia sesión normalmente.
+                    var showResetSheet by remember { mutableStateOf(resetToken != null) }
+                    if (showResetSheet && resetToken != null) {
+                        ResetPasswordSheet(
+                            token = resetToken,
+                            onDone = { showResetSheet = false },
+                        )
+                    }
                 }
             }
         }

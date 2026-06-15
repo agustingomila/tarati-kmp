@@ -117,6 +117,8 @@ data class OpenSearchEntry(
 @Serializable
 data class OpenSearchDto(
     val searchId: String,
+    /** ID del jugador que publicó la búsqueda. Requerido para [ClientMessage.JoinOpenSearch]. */
+    val userId: String,
     val playerUsername: String,
     val playerRating: Int,
     val timeControl: GameTimeControl,

@@ -164,4 +164,27 @@ interface IAuthViewModel {
         displayName: String? = null,
         rememberMe: Boolean = true,
     ): Result<String>
+
+    /**
+     * Solicita un link de recuperación de contraseña.
+     *
+     * Hace POST /auth/forgot-password. El servidor siempre responde 200
+     * para no revelar si el email existe. El link incluye un token UUID
+     * con TTL de 1 hora guardado en Redis.
+     *
+     * @return Result.success(Unit) si el request llegó al servidor.
+     *         Result.failure si hubo un error de red.
+     */
+    suspend fun forgotPassword(email: String): Result<Unit>
+
+    /**
+     * Restablece la contraseña usando el token del email de recuperación.
+     *
+     * Hace POST /auth/reset-password. El token es de un solo uso.
+     * En caso de éxito, revoca todas las sesiones activas del usuario.
+     *
+     * @return Result.success(Unit) si la contraseña se actualizó correctamente.
+     *         Result.failure si el token es inválido o expiró.
+     */
+    suspend fun resetPassword(token: String, newPassword: String): Result<Unit>
 }

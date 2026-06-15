@@ -59,6 +59,12 @@ import com.agustin.tarati.shared.generated.resources.guest_terms_prefix
 import com.agustin.tarati.shared.generated.resources.guest_username_hint
 import com.agustin.tarati.shared.generated.resources.guest_username_invalid
 import com.agustin.tarati.shared.generated.resources.guest_username_label
+import com.agustin.tarati.shared.generated.resources.forgot_password_back
+import com.agustin.tarati.shared.generated.resources.forgot_password_email_label
+import com.agustin.tarati.shared.generated.resources.forgot_password_link
+import com.agustin.tarati.shared.generated.resources.forgot_password_send
+import com.agustin.tarati.shared.generated.resources.forgot_password_sent
+import com.agustin.tarati.shared.generated.resources.forgot_password_title
 import com.agustin.tarati.shared.generated.resources.login_button
 import com.agustin.tarati.shared.generated.resources.login_email
 import com.agustin.tarati.shared.generated.resources.login_email_error
@@ -78,7 +84,7 @@ import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private enum class LoginMode { LOGIN, REGISTER }
+private enum class LoginMode { LOGIN, REGISTER, FORGOT_PASSWORD }
 
 @Composable
 private fun GuestTermsText() {
@@ -172,6 +178,11 @@ private fun LoginSheetContent(
     var guestUsernameError by remember { mutableStateOf<String?>(null) }
     var guestServerError by remember { mutableStateOf<String?>(null) }
 
+    var forgotEmail by remember { mutableStateOf("") }
+    var forgotEmailError by remember { mutableStateOf<String?>(null) }
+    var forgotSent by remember { mutableStateOf(false) }
+    var forgotLoading by remember { mutableStateOf(false) }
+
     val isLoading = authState is AuthState.Authenticating
     val serverError = (authState as? AuthState.Error)?.message
 
@@ -186,6 +197,12 @@ private fun LoginSheetContent(
     val errEmail = localizedString(Res.string.login_email_error)
     val errPassword = localizedString(Res.string.login_password_error)
     val errGuestUsername = localizedString(Res.string.guest_username_invalid)
+    val labelForgotLink = localizedString(Res.string.forgot_password_link)
+    val labelForgotTitle = localizedString(Res.string.forgot_password_title)
+    val labelForgotEmailLabel = localizedString(Res.string.forgot_password_email_label)
+    val labelForgotSend = localizedString(Res.string.forgot_password_send)
+    val labelForgotSent = localizedString(Res.string.forgot_password_sent)
+    val labelForgotBack = localizedString(Res.string.forgot_password_back)
 
     // Cerrar el sheet solo cuando el usuario se autenticó como cuenta registrada (no como invitado).
     // Los invitados ya tienen authState = Authenticated, así que sin este guard el sheet
@@ -252,6 +269,94 @@ private fun LoginSheetContent(
             .padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // ── Forgot password form ──────────────────────────────────────
+        AnimatedVisibility(visible = mode == LoginMode.FORGOT_PASSWORD) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = labelForgotTitle,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(24.dp))
+
+                if (!forgotSent) {
+                    OutlinedTextField(
+                        value = forgotEmail,
+                        onValueChange = { forgotEmail = it; forgotEmailError = null },
+                        label = { Text(labelForgotEmailLabel) },
+                        isError = forgotEmailError != null,
+                        supportingText = forgotEmailError?.let { { Text(it) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            if (!forgotEmail.contains('@') || !forgotEmail.contains('.')) {
+                                forgotEmailError = errEmail
+                                return@Button
+                            }
+                            forgotEmailError = null
+                            focusManager.clearFocus()
+                            scope.launch {
+                                forgotLoading = true
+                                authViewModel.forgotPassword(forgotEmail.trim())
+                                forgotLoading = false
+                                forgotSent = true
+                            }
+                        },
+                        enabled = !forgotLoading,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        if (forgotLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        } else {
+                            Text(labelForgotSend)
+                        }
+                    }
+                } else {
+                    Text(
+                        text = labelForgotSent,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = labelForgotBack,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clickable { mode = LoginMode.LOGIN }
+                        .padding(vertical = 4.dp),
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+
+        // ── Login / Register tabs ─────────────────────────────────────
+        AnimatedVisibility(visible = mode != LoginMode.FORGOT_PASSWORD) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
         Text(
             text = localizedString(Res.string.login_title),
             style = MaterialTheme.typography.titleLarge,
@@ -260,7 +365,7 @@ private fun LoginSheetContent(
 
         Spacer(Modifier.height(16.dp))
 
-        PrimaryTabRow(selectedTabIndex = mode.ordinal) {
+        PrimaryTabRow(selectedTabIndex = if (mode == LoginMode.REGISTER) 1 else 0) {
             Tab(
                 selected = mode == LoginMode.LOGIN,
                 onClick = { mode = LoginMode.LOGIN },
@@ -338,6 +443,24 @@ private fun LoginSheetContent(
             keyboardActions = KeyboardActions(onDone = { submit() }),
             modifier = Modifier.fillMaxWidth(),
         )
+
+        // Link "Forgot password?" — solo en modo LOGIN, debajo del campo de contraseña
+        AnimatedVisibility(visible = mode == LoginMode.LOGIN) {
+            Text(
+                text = labelForgotLink,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        forgotEmail = ""
+                        forgotEmailError = null
+                        forgotSent = false
+                        mode = LoginMode.FORGOT_PASSWORD
+                    }
+                    .padding(top = 6.dp, bottom = 2.dp),
+            )
+        }
 
         Spacer(Modifier.height(8.dp))
 
@@ -480,6 +603,9 @@ private fun LoginSheetContent(
         Spacer(Modifier.height(4.dp))
 
         GuestTermsText()
+
+            } // end Column (LOGIN/REGISTER)
+        } // end AnimatedVisibility
 
         Spacer(Modifier.height(32.dp))
     }

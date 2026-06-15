@@ -179,6 +179,7 @@ import com.agustin.tarati.shared.generated.resources.waiting_time
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.shared.generated.resources.win
 import com.agustin.tarati.shared.generated.resources.you
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -361,14 +362,16 @@ fun OnlineLobbyScreen(
     }
 
     /**
-     * Intento de unirse a una búsqueda existente.
+     * Acepta directamente la búsqueda abierta de [targetUserId] (lógica estilo Lichess seek board).
      *
-     * 1. Garantiza conexión WS.
-     * 2. Inicia matchmaking con el TC y rated del anfitrión.
-     * 3. Si tiene éxito → marca [searchStartedInLobby] y espera [MatchmakingState.MatchFound].
-     * 4. Si falla → muestra snackbar y refresca la lista (la búsqueda ya no existe).
+     * En lugar de entrar al queue general con el mismo TC y esperar al matchmaking worker,
+     * envía [ClientMessage.JoinOpenSearch] para que el servidor cree la partida de inmediato
+     * con ese jugador específico. Ambos reciben [ServerMessage.MatchFound] directamente.
+     *
+     * Si la búsqueda ya no existe (el jugador se fue o fue emparejado por el worker),
+     * el servidor devuelve Error("search_not_found") y se resetea la búsqueda.
      */
-    val handleJoinExistingSearch: (String, Boolean) -> Unit = { tc, rated ->
+    val handleJoinExistingSearch: (String, String, Boolean) -> Unit = { targetUserId, tc, rated ->
         scope.launch {
             val connResult = ensureConnected()
             if (connResult.isFailure) {
@@ -378,11 +381,10 @@ fun OnlineLobbyScreen(
                 )
                 return@launch
             }
-            // Marcar ANTES del suspend: MatchFound puede llegar durante la espera de
-            // MatchmakingStarted, y el LaunchedEffect necesita la flag ya activa.
+            // Marcar ANTES del suspend: MatchFound puede llegar durante el RTT del servidor.
             searchStartedInLobby = true
-            val matchResult = onlineGameViewModel.startMatchmaking(tc, rated)
-            if (matchResult.isFailure) {
+            val joinResult = onlineGameViewModel.joinOpenSearch(targetUserId, tc, rated)
+            if (joinResult.isFailure) {
                 searchStartedInLobby = false
                 snackbarHostState.showSnackbar(
                     message = searchNoLongerAvailableMsg,
@@ -422,7 +424,10 @@ fun OnlineLobbyScreen(
         // Acciones compartidas entre TopBar (FullScreen) y CompanionPanelHeader (CompanionPanel).
         val topBarActions: @Composable RowScope.() -> Unit = {
             if (onLeaderboard != null) {
-                IconButton(onClick = onLeaderboard) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.leaderboard),
+                    onClick = onLeaderboard,
+                ) {
                     Icon(
                         imageVector = TaratiIcons.Leaderboard,
                         contentDescription = localizedString(Res.string.leaderboard),
@@ -431,23 +436,30 @@ fun OnlineLobbyScreen(
                 }
             }
             // Botón Login / Logout
-            IconButton(onClick = {
-                when {
-                    !isAuthenticated || isGuest -> onShowLogin()
-                    else -> showLogoutConfirm = true
-                }
-            }) {
+            val loginLogoutLabel = localizedString(
+                if (isAuthenticated && !isGuest) Res.string.login_logout else Res.string.sign_in
+            )
+            TooltipIconButton(
+                tooltip = loginLogoutLabel,
+                onClick = {
+                    when {
+                        !isAuthenticated || isGuest -> onShowLogin()
+                        else -> showLogoutConfirm = true
+                    }
+                },
+            ) {
                 Icon(
                     imageVector = if (isAuthenticated && !isGuest) TaratiIcons.Logout else TaratiIcons.AccountCircle,
-                    contentDescription = localizedString(
-                        if (isAuthenticated && !isGuest) Res.string.login_logout else Res.string.sign_in
-                    ),
+                    contentDescription = loginLogoutLabel,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
             // Botón 🔍 — visible en el tab "En Vivo" salvo partida online en curso.
             if (selectedTab == 1 && !hasActiveGame) {
-                IconButton(onClick = { showMatchmakingSheet = true }) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.new_search),
+                    onClick = { showMatchmakingSheet = true },
+                ) {
                     Icon(
                         imageVector = TaratiIcons.Search,
                         contentDescription = localizedString(Res.string.new_search),
@@ -612,7 +624,7 @@ fun OnlineLobbyScreen(
 
                     1 -> LobbyTab(
                         viewModel = viewModel,
-                        onJoinSearch = handleJoinExistingSearch,
+                        onJoinSearch = { userId, tc, rated -> handleJoinExistingSearch(userId, tc, rated) },
                         matchmakingState = matchmakingState,
                         currentUser = authViewModel.currentUser,
                         onCancelMatchmaking = {
@@ -681,7 +693,7 @@ private sealed class LobbyItem {
 @Composable
 private fun LobbyTab(
     viewModel: IOnlineLobbyViewModel,
-    onJoinSearch: (timeControl: String, rated: Boolean) -> Unit,
+    onJoinSearch: (targetUserId: String, timeControl: String, rated: Boolean) -> Unit,
     matchmakingState: MatchmakingState,
     currentUser: UserInfo?,
     onCancelMatchmaking: () -> Unit,
@@ -764,7 +776,13 @@ private fun LobbyTab(
 
                             is LobbyItem.Search -> OpenSearchCard(
                                 search = item.dto,
-                                onJoin = { onJoinSearch(item.dto.timeControl.type.key, item.dto.rated) },
+                                onJoin = {
+                                    onJoinSearch(
+                                        item.dto.userId,
+                                        item.dto.timeControl.type.key,
+                                        item.dto.rated,
+                                    )
+                                },
                             )
 
                             is LobbyItem.OwnSearch -> OwnSearchCard(

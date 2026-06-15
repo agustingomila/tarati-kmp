@@ -121,6 +121,21 @@ class OnlineGameViewModel(
         }
     }
 
+    override suspend fun joinOpenSearch(
+        targetUserId: String,
+        timeControl: String,
+        rated: Boolean,
+    ): Result<Unit> {
+        logger.debug("joinOpenSearch: target=$targetUserId tc=$timeControl rated=$rated")
+        return try {
+            onlineClient.joinOpenSearch(targetUserId, timeControl, rated)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.error("joinOpenSearch failed: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     override suspend fun cancelMatchmaking() {
         logger.debug("cancelMatchmaking")
         if (!isSearchingMatch) {

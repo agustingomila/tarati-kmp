@@ -32,6 +32,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import com.agustin.tarati.ui.components.TooltipIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -419,7 +420,8 @@ private fun SidebarHeader(
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            IconButton(
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.achievements),
                 onClick = onShowAchievements,
                 modifier = Modifier
                     .size(40.dp)
@@ -432,7 +434,8 @@ private fun SidebarHeader(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            IconButton(
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.settings),
                 onClick = onSettings,
                 modifier = Modifier
                     .size(40.dp)
@@ -441,7 +444,7 @@ private fun SidebarHeader(
             ) {
                 Icon(
                     imageVector = TaratiIcons.Settings,
-                    contentDescription = stringResource(Res.string.settings),
+                    contentDescription = localizedString(Res.string.settings),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -924,7 +927,8 @@ private fun MoveHistorySection(
                 fontWeight = FontWeight.Medium,
             )
 
-            IconButton(
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.copy_move_history),
                 onClick = {
                     isCopying = true; onCopyMoveHistory(moves)
                     CoroutineScope(Dispatchers.Main).launch {
@@ -944,15 +948,23 @@ private fun MoveHistorySection(
                 )
             }
 
-            IconButton(onSaveGame, Modifier.size(32.dp)) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.save_game),
+                onClick = onSaveGame,
+                modifier = Modifier.size(32.dp),
+            ) {
                 Icon(
-                    TaratiIcons.Save, stringResource(Res.string.save_game),
+                    TaratiIcons.Save, localizedString(Res.string.save_game),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(18.dp)
                 )
             }
 
-            IconButton(onGamesLibrary, Modifier.size(32.dp)) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.saved_games),
+                onClick = onGamesLibrary,
+                modifier = Modifier.size(32.dp),
+            ) {
                 Icon(
                     TaratiIcons.MenuBook,
                     localizedString(Res.string.saved_games),
@@ -962,7 +974,11 @@ private fun MoveHistorySection(
             }
 
             if (FeatureFlags.ONLINE_ENABLED) {
-                IconButton(onOnlineLobby, Modifier.size(32.dp)) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.online_lobby),
+                    onClick = onOnlineLobby,
+                    modifier = Modifier.size(32.dp),
+                ) {
                     Icon(
                         TaratiIcons.Public,
                         localizedString(Res.string.online_lobby),

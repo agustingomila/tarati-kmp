@@ -124,6 +124,21 @@ interface IOnlineGameViewModel {
     suspend fun cancelMatchmaking()
 
     /**
+     * Acepta directamente la búsqueda abierta de [targetUserId].
+     *
+     * A diferencia de [startMatchmaking], no pasa por el queue general ni espera
+     * [MatchmakingState.Searching] — el servidor crea la partida de inmediato.
+     * Ambos jugadores recibirán [MatchmakingState.MatchFound] directamente.
+     *
+     * Si la búsqueda ya no existe, el servidor envía un error que se propaga
+     * al flujo de errores estándar del cliente.
+     *
+     * @return Result.success si el mensaje fue enviado al servidor.
+     *         Result.failure si no hay conexión WS activa.
+     */
+    suspend fun joinOpenSearch(targetUserId: String, timeControl: String, rated: Boolean): Result<Unit>
+
+    /**
      * Realizar un movimiento en la partida online.
      *
      * Envía el movimiento al servidor, que lo valida y propaga a ambos jugadores.

@@ -165,6 +165,18 @@ class OnlineGameClient(
     // ============ Matchmaking API ============
 
     /**
+     * Acepta directamente la búsqueda abierta de [targetUserId] sin pasar por el queue general.
+     * El servidor responderá con [ServerMessage.MatchFound] si el target sigue en cola,
+     * o con [ServerMessage.Error] (code = "search_not_found") si ya se fue.
+     */
+    suspend fun joinOpenSearch(targetUserId: String, timeControl: String, rated: Boolean) {
+        logger.info("Joining open search of $targetUserId ($timeControl, rated=$rated)")
+        pendingMatchmakingTimeControl = timeControl
+        pendingMatchmakingRated = rated
+        wsClient.send(ClientMessage.JoinOpenSearch(targetUserId, timeControl, rated))
+    }
+
+    /**
      * Inicia búsqueda de partida
      *
      * @param timeControl "bullet", "blitz", "rapid", "classical"
