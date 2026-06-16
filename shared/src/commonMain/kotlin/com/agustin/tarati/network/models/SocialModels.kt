@@ -78,6 +78,18 @@ data class PublicProfileDto(
     val acceptsChallenges: Boolean = true,
 )
 
+/**
+ * Respuesta del endpoint GET/PUT /api/profile (perfil propio).
+ * Subconjunto de [PublicProfileDto] con los campos editables + isVisible,
+ * que no se expone en perfiles públicos ajenos.
+ */
+@Serializable
+data class OwnProfileDto(
+    val bio: String?,
+    val isVisible: Boolean = true,
+    val acceptsChallenges: Boolean = true,
+)
+
 @Immutable
 @Serializable
 data class ProfileRatingsDto(

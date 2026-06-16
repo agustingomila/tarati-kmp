@@ -11,6 +11,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import com.agustin.tarati.network.models.OwnProfileDto
+import io.ktor.client.call.body
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
 import io.ktor.http.contentType
@@ -412,8 +414,12 @@ class AuthViewModel(
                 header("Authorization", "Bearer $token")
             }
             if (response.status.value == 200) {
-                val body = response.bodyAsText()
-                _profileData.value = parseProfileData(body)
+                val dto = response.body<OwnProfileDto>()
+                _profileData.value = ProfileData(
+                    bio = dto.bio,
+                    isVisible = dto.isVisible,
+                    challengesEnabled = dto.acceptsChallenges,
+                )
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("fetchProfile HTTP ${response.status.value}"))
@@ -429,7 +435,7 @@ class AuthViewModel(
         val bodyParts = mutableListOf<String>()
         if (bio != null) {
             val escaped = bio.trim().jsonEscape()
-            bodyParts.add(if (escaped.isEmpty()) """"bio":null""" else """"bio":"$escaped"""")
+            bodyParts.add(""""bio":"$escaped"""")
         }
         if (isVisible != null) bodyParts.add(""""isVisible":$isVisible""")
         if (challengesEnabled != null) bodyParts.add(""""challengesEnabled":$challengesEnabled""")
@@ -442,7 +448,12 @@ class AuthViewModel(
                 setBody("{${bodyParts.joinToString(",")}}")
             }
             if (response.status.value == 200) {
-                _profileData.value = parseProfileData(response.bodyAsText())
+                val dto = response.body<OwnProfileDto>()
+                _profileData.value = ProfileData(
+                    bio = dto.bio,
+                    isVisible = dto.isVisible,
+                    challengesEnabled = dto.acceptsChallenges,
+                )
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("updateProfile HTTP ${response.status.value}"))
@@ -510,14 +521,6 @@ class AuthViewModel(
             logger.error("Failed to restore session: ${e.message}")
             authRepository.clearAll()
         }
-    }
-
-    private fun parseProfileData(body: String): ProfileData {
-        val bioNull = body.contains(""""bio":null""")
-        val bio = if (bioNull) null else Regex(""""bio":"([^"]*)"""").find(body)?.groupValues?.get(1)
-        val isVisible = !body.contains(""""isVisible":false""")
-        val challengesEnabled = !body.contains(""""acceptsChallenges":false""")
-        return ProfileData(bio = bio, isVisible = isVisible, challengesEnabled = challengesEnabled)
     }
 
     private fun String.jsonEscape(): String = replace("\\", "\\\\")

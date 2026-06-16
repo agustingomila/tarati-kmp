@@ -31,6 +31,7 @@ import com.agustin.tarati.features.online.social.PublicProfileScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
+import com.agustin.tarati.features.settings.OnlineSettingsScreen
 import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.ui.components.game.animation.BoardAnimationViewModel
@@ -42,6 +43,7 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameScreen
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GamesLibraryDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.LeaderboardDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.OnlineSettingsDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.TournamentDetailDest
@@ -137,12 +139,19 @@ fun NavGraph(
                     {
                         scope.launch {
                             authViewModel.logout()
-                            // El NavGraph no necesita hacer nada más:
-                            // el guard de authState en LoginScreen se disparará al Unauthenticated
                             navController.popBackStack()
                         }
                     }
                 } else null,
+                onNavigateToOnlineSettings = {
+                    navController.navigate(OnlineSettingsDest.route)
+                },
+            )
+        }
+
+        composable(route = OnlineSettingsDest.route) {
+            OnlineSettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
             )
         }
 

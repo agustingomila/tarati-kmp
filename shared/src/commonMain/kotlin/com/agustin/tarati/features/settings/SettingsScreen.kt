@@ -30,9 +30,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.GITHUB_URL
 import com.agustin.tarati.appVersion
+import com.agustin.tarati.services.pwa.pwaInstall
+import com.agustin.tarati.services.pwa.pwaInstallAvailable
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.OwnedProducts
 import com.agustin.tarati.services.billing.PaletteProducts
@@ -53,13 +54,7 @@ import com.agustin.tarati.shared.generated.resources.animations
 import com.agustin.tarati.shared.generated.resources.app_version
 import com.agustin.tarati.shared.generated.resources.appearance
 import com.agustin.tarati.features.online.auth.IAuthViewModel
-import com.agustin.tarati.shared.generated.resources.auth_account
-import com.agustin.tarati.shared.generated.resources.auth_logged_in_as
 import com.agustin.tarati.shared.generated.resources.auth_logout
-import com.agustin.tarati.shared.generated.resources.profile_accept_challenges
-import com.agustin.tarati.shared.generated.resources.profile_bio
-import com.agustin.tarati.shared.generated.resources.profile_bio_placeholder
-import com.agustin.tarati.shared.generated.resources.profile_visible_online
 import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.shared.generated.resources.auto_theme
 import com.agustin.tarati.shared.generated.resources.board_display
@@ -86,6 +81,7 @@ import com.agustin.tarati.shared.generated.resources.pre_moves
 import com.agustin.tarati.shared.generated.resources.save
 import com.agustin.tarati.shared.generated.resources.select_color_palette
 import com.agustin.tarati.shared.generated.resources.settings
+import com.agustin.tarati.shared.generated.resources.settings_install_app
 import com.agustin.tarati.shared.generated.resources.sound
 import com.agustin.tarati.shared.generated.resources.sound_disabled
 import com.agustin.tarati.shared.generated.resources.sound_effects
@@ -123,8 +119,16 @@ fun SettingsScreen(
     isGameActive: Boolean = false,
     onLogout: (() -> Unit)? = null,
     loggedInUsername: String? = null,
+    onNavigateToOnlineSettings: (() -> Unit)? = null,
 ) {
     val settingsState by viewModel.settingsState.collectAsState()
+
+    // Prefetch del perfil online para que bio/visibility estén listos cuando el
+    // usuario navegue a OnlineSettingsScreen. Se dispara al loguear o al abrir Settings.
+    androidx.compose.runtime.LaunchedEffect(loggedInUsername) {
+        val isGuest = authViewModel.currentUser?.isGuest == true
+        if (!loggedInUsername.isNullOrBlank() && !isGuest) authViewModel.fetchProfile()
+    }
     // Los colores de tablero se leen desde el CompositionLocal activo, igual que
     // en el resto de la app. Se pasan explícitamente al selector de piezas para
     // que el preview de las piezas use siempre la paleta activa en tiempo real.
@@ -298,11 +302,60 @@ fun SettingsScreen(
                 )
 
                 if (onLogout != null) {
-                    AccountSection(
-                        username = loggedInUsername,
-                        authViewModel = authViewModel,
-                        onLogout = onLogout,
-                    )
+                    val isGuest = authViewModel.currentUser?.isGuest == true
+                    SettingsCategory(title = Res.string.settings_online)
+                    if (onNavigateToOnlineSettings != null && !loggedInUsername.isNullOrBlank() && !isGuest) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToOnlineSettings() }
+                                .padding(horizontal = 20.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = TaratiIcons.AccountCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp),
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            Text(
+                                text = loggedInUsername,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Icon(
+                                imageVector = TaratiIcons.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 56.dp, end = 16.dp),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onLogout)
+                            .padding(horizontal = 20.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = TaratiIcons.Logout,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = localizedString(Res.string.auth_logout),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                 }
 
                 AboutSection()
@@ -317,6 +370,17 @@ fun SettingsScreen(
 private fun AboutSection(
     urlLauncher: IUrlLauncher = koinInject(),
 ) {
+    var canInstall by remember { mutableStateOf(pwaInstallAvailable()) }
+
+    // Sondea disponibilidad del prompt PWA cada segundo mientras la pantalla está visible.
+    // En Android/Desktop pwaInstallAvailable() siempre retorna false (no-op).
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        while (true) {
+            delay(1_000)
+            canInstall = pwaInstallAvailable()
+        }
+    }
+
     SettingsCategory(title = Res.string.about)
 
     SettingItem(
@@ -356,140 +420,45 @@ private fun AboutSection(
         modifier = Modifier.padding(start = 56.dp, end = 16.dp),
         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
     )
-}
 
-@Composable
-private fun AccountSection(
-    username: String?,
-    authViewModel: IAuthViewModel? = null,
-    onLogout: () -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-    val isGuest = authViewModel?.currentUser?.isGuest == true
-    val profileData by authViewModel?.profileData?.collectAsState() ?: remember {
-        mutableStateOf(null)
-    }
-
-    // Fetch profile on first display (only for authenticated non-guest users)
-    androidx.compose.runtime.LaunchedEffect(username) {
-        if (!username.isNullOrBlank() && !isGuest) {
-            authViewModel?.fetchProfile()
-        }
-    }
-
-    // ── Sección Online: opciones de perfil público ────────────────────────────
-
-    if (!username.isNullOrBlank() && !isGuest && authViewModel != null) {
-        // Estado local optimista para que los toggles respondan inmediatamente.
-        // remember(key) sincroniza con el valor del servidor cuando profileData cambia.
-        var localIsVisible by remember(profileData?.isVisible) {
-            mutableStateOf(profileData?.isVisible ?: true)
-        }
-        var localChallengesEnabled by remember(profileData?.challengesEnabled) {
-            mutableStateOf(profileData?.challengesEnabled ?: true)
-        }
-        var bioText by remember(profileData?.bio) { mutableStateOf(profileData?.bio ?: "") }
-
-        SettingsCategory(title = Res.string.settings_online)
-
-        // Bio
-        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
-            Text(
-                text = localizedString(Res.string.profile_bio),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(4.dp))
-            TextField(
-                value = bioText,
-                onValueChange = { if (it.length <= 200) bioText = it },
-                placeholder = {
-                    Text(
-                        localizedString(Res.string.profile_bio_placeholder),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2,
-                maxLines = 4,
-            )
-            Spacer(Modifier.height(4.dp))
-            androidx.compose.material3.TextButton(
-                onClick = { scope.launch { authViewModel.updateProfile(bio = bioText) } },
-                modifier = Modifier.align(Alignment.End),
-            ) {
-                Text(localizedString(Res.string.save))
-            }
-        }
-
-        ToggleSetting(
-            icon = TaratiIcons.Visibility,
-            title = Res.string.profile_visible_online,
-            checked = localIsVisible,
-            onCheckedChange = { visible ->
-                localIsVisible = visible
-                scope.launch { authViewModel.updateProfile(isVisible = visible) }
-            },
-        )
-
-        ToggleSetting(
-            icon = TaratiIcons.AccountCircle,
-            title = Res.string.profile_accept_challenges,
-            checked = localChallengesEnabled,
-            onCheckedChange = { enabled ->
-                localChallengesEnabled = enabled
-                scope.launch { authViewModel.updateProfile(challengesEnabled = enabled) }
-            },
-        )
-    }
-
-    // ── Sección Cuenta: info de sesión y logout ───────────────────────────────
-
-    SettingsCategory(title = Res.string.auth_account)
-
-    if (!username.isNullOrBlank()) {
+    if (canInstall) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .clickable {
+                    pwaInstall()
+                    canInstall = false
+                }
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = TaratiIcons.AccountCircle,
+                imageVector = TaratiIcons.Download,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp),
             )
             Spacer(Modifier.width(16.dp))
             Text(
-                text = localizedString(Res.string.auth_logged_in_as).replace($$"%1$s", username),
+                text = localizedString(Res.string.settings_install_app),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                imageVector = TaratiIcons.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-    }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onLogout)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = TaratiIcons.Logout,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(24.dp),
-        )
-        Spacer(Modifier.width(16.dp))
-        Text(
-            text = localizedString(Res.string.auth_logout),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error,
+        HorizontalDivider(
+            modifier = Modifier.padding(start = 56.dp, end = 16.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
         )
     }
 }
+
 
 @Composable
 fun SettingsCategory(

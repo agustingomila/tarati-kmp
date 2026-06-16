@@ -35,14 +35,41 @@
      Descomentar solo para apuntar a un servidor distinto (ej. staging remoto).
 <script>globalThis.__TARATI_SERVER__ = "localhost:8080";</script>
 -->
+<script>
+    // Captura el prompt de instalación PWA antes de que el browser lo muestre.
+    // __pwaInstall() lo dispara; __pwaCanInstall() indica si está disponible.
+    var __pwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        __pwaPrompt = e;
+    });
+    window.addEventListener('appinstalled', function() {
+        __pwaPrompt = null;
+    });
+    globalThis.__pwaCanInstall = function() { return __pwaPrompt != null; };
+    globalThis.__pwaInstall   = function() {
+        if (!__pwaPrompt) return;
+        var p = __pwaPrompt;
+        __pwaPrompt = null;
+        p.prompt();
+    };
+</script>
 <script src="tarati.js"></script>
 <script>
     const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    if ('serviceWorker' in navigator && !isDev) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .catch(err => console.warn('[SW] Registration failed:', err));
-        });
+    if ('serviceWorker' in navigator) {
+        if (isDev) {
+            // En dev desregistramos cualquier SW previo para que no interfiera con HMR.
+            // (Un SW instalado desde producción o antes del guard sirve bundles cacheados
+            // con hashes viejos → 404 en .wasm → loop infinito al pulsar F5.)
+            navigator.serviceWorker.getRegistrations()
+                .then(regs => regs.forEach(r => r.unregister()));
+        } else {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .catch(err => console.warn('[SW] Registration failed:', err));
+            });
+        }
     }
 </script>
 </body>

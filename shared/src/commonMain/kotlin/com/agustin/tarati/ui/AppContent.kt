@@ -54,6 +54,7 @@ import com.agustin.tarati.features.online.social.PublicProfileScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
+import com.agustin.tarati.features.settings.OnlineSettingsScreen
 import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.localization.localizedString
@@ -320,6 +321,13 @@ private fun CompanionPane(
                     }
                 }
             } else null,
+            onNavigateToOnlineSettings = {
+                controller.navigate(CompanionPanelDestination.OnlineSettings)
+            },
+        )
+
+        CompanionPanelDestination.OnlineSettings -> OnlineSettingsScreen(
+            onNavigateBack = controller::back,
         )
 
         CompanionPanelDestination.Library -> GamesLibraryScreen(
