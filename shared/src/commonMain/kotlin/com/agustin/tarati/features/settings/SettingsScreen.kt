@@ -1,7 +1,6 @@
 package com.agustin.tarati.features.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +60,7 @@ import com.agustin.tarati.shared.generated.resources.profile_accept_challenges
 import com.agustin.tarati.shared.generated.resources.profile_bio
 import com.agustin.tarati.shared.generated.resources.profile_bio_placeholder
 import com.agustin.tarati.shared.generated.resources.profile_visible_online
+import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.shared.generated.resources.auto_theme
 import com.agustin.tarati.shared.generated.resources.board_display
 import com.agustin.tarati.shared.generated.resources.board_edges
@@ -366,7 +366,7 @@ private fun AccountSection(
 ) {
     val scope = rememberCoroutineScope()
     val isGuest = authViewModel?.currentUser?.isGuest == true
-    val profileData by authViewModel?.profileData?.collectAsState() ?: androidx.compose.runtime.remember {
+    val profileData by authViewModel?.profileData?.collectAsState() ?: remember {
         mutableStateOf(null)
     }
 
@@ -377,8 +377,73 @@ private fun AccountSection(
         }
     }
 
-    // Local state for bio text field — synced from profileData
-    var bioText by remember(profileData?.bio) { mutableStateOf(profileData?.bio ?: "") }
+    // ── Sección Online: opciones de perfil público ────────────────────────────
+
+    if (!username.isNullOrBlank() && !isGuest && authViewModel != null) {
+        // Estado local optimista para que los toggles respondan inmediatamente.
+        // remember(key) sincroniza con el valor del servidor cuando profileData cambia.
+        var localIsVisible by remember(profileData?.isVisible) {
+            mutableStateOf(profileData?.isVisible ?: true)
+        }
+        var localChallengesEnabled by remember(profileData?.challengesEnabled) {
+            mutableStateOf(profileData?.challengesEnabled ?: true)
+        }
+        var bioText by remember(profileData?.bio) { mutableStateOf(profileData?.bio ?: "") }
+
+        SettingsCategory(title = Res.string.settings_online)
+
+        // Bio
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
+            Text(
+                text = localizedString(Res.string.profile_bio),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(4.dp))
+            TextField(
+                value = bioText,
+                onValueChange = { if (it.length <= 200) bioText = it },
+                placeholder = {
+                    Text(
+                        localizedString(Res.string.profile_bio_placeholder),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 4,
+            )
+            Spacer(Modifier.height(4.dp))
+            androidx.compose.material3.TextButton(
+                onClick = { scope.launch { authViewModel.updateProfile(bio = bioText) } },
+                modifier = Modifier.align(Alignment.End),
+            ) {
+                Text(localizedString(Res.string.save))
+            }
+        }
+
+        ToggleSetting(
+            icon = TaratiIcons.Visibility,
+            title = Res.string.profile_visible_online,
+            checked = localIsVisible,
+            onCheckedChange = { visible ->
+                localIsVisible = visible
+                scope.launch { authViewModel.updateProfile(isVisible = visible) }
+            },
+        )
+
+        ToggleSetting(
+            icon = TaratiIcons.AccountCircle,
+            title = Res.string.profile_accept_challenges,
+            checked = localChallengesEnabled,
+            onCheckedChange = { enabled ->
+                localChallengesEnabled = enabled
+                scope.launch { authViewModel.updateProfile(challengesEnabled = enabled) }
+            },
+        )
+    }
+
+    // ── Sección Cuenta: info de sesión y logout ───────────────────────────────
 
     SettingsCategory(title = Res.string.auth_account)
 
@@ -401,79 +466,6 @@ private fun AccountSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-        }
-
-        // Profile editing — only for authenticated non-guest users
-        if (!isGuest && authViewModel != null) {
-            // Bio
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
-                Text(
-                    text = localizedString(Res.string.profile_bio),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(4.dp))
-                TextField(
-                    value = bioText,
-                    onValueChange = { if (it.length <= 200) bioText = it },
-                    placeholder = {
-                        Text(
-                            localizedString(Res.string.profile_bio_placeholder),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 2,
-                    maxLines = 4,
-                )
-                Spacer(Modifier.height(4.dp))
-                androidx.compose.material3.TextButton(
-                    onClick = { scope.launch { authViewModel.updateProfile(bio = bioText) } },
-                    modifier = Modifier.align(Alignment.End),
-                ) {
-                    Text(localizedString(Res.string.save))
-                }
-            }
-
-            // Visibility toggle
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = localizedString(Res.string.profile_visible_online),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Switch(
-                    checked = profileData?.isVisible ?: true,
-                    onCheckedChange = { visible ->
-                        scope.launch { authViewModel.updateProfile(isVisible = visible) }
-                    },
-                )
-            }
-
-            // Accept challenges toggle
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = localizedString(Res.string.profile_accept_challenges),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Switch(
-                    checked = profileData?.challengesEnabled ?: true,
-                    onCheckedChange = { enabled ->
-                        scope.launch { authViewModel.updateProfile(challengesEnabled = enabled) }
-                    },
-                )
-            }
         }
     }
 

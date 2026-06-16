@@ -8,6 +8,10 @@
 // No hace falta descomentar __TARATI_SERVER__ en index.html.
 if (config.devServer) {
     config.devServer.port = 3000;
+    // Evita que el browser cachee tarati.js y el bundle WASM en desarrollo.
+    // Sin esto, al re-ejecutar desde la IDE el browser usa el bundle anterior
+    // con el hash de WASM viejo → 404 → loop HMR.
+    config.devServer.headers = { "Cache-Control": "no-store" };
     config.devServer.proxy = [
         {
             context: ['/api', '/auth', '/health', '/stats', '/metrics'],

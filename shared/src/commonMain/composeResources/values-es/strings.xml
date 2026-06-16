@@ -430,6 +430,7 @@
     <string name="profile_member_since">Miembro desde %1$s</string>
     <string name="profile_ratings_section">Puntajes</string>
     <string name="profile_history_section">Partidas</string>
+    <string name="settings_online">Online</string>
     <string name="profile_bio">Descripción</string>
     <string name="profile_bio_placeholder">Contá algo sobre vos…</string>
     <string name="profile_visible_online">Visible en lista de conectados</string>
