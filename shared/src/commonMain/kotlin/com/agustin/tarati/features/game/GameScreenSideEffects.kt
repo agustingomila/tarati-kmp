@@ -145,8 +145,12 @@ fun GameScreenSideEffects(
             return@LaunchedEffect
         }
 
-        val isAITurn = (state.currentTurn == CobColor.WHITE && screenState.whiteIsAI) ||
-                (state.currentTurn == CobColor.BLACK && screenState.blackIsAI)
+        // En partidas online no hay IA local: el oponente es remoto y whiteIsAI/blackIsAI
+        // reflejan la configuración de la partida local anterior (no reseteada al entrar online).
+        // Ignorar el check de IA en ese contexto para que el pre-move pueda disparar.
+        val isAITurn = !isOnlineGame && (
+                (state.currentTurn == CobColor.WHITE && screenState.whiteIsAI) ||
+                (state.currentTurn == CobColor.BLACK && screenState.blackIsAI))
         if (isAITurn) return@LaunchedEffect
 
         if (move !in state.allMovesForTurn()) {
@@ -160,7 +164,9 @@ fun GameScreenSideEffects(
         val liveMove = selectViewModel.pendingPreMove.value
         if (liveMove != move) return@LaunchedEffect
 
-        handleGameMove(events, gameManagerState, move, viewModel)
+        // onMoveHandled en lugar de handleGameMove: en partidas online envía el movimiento
+        // al servidor vía makeOnlineMove (igual que las promociones forzadas en línea 97).
+        onMoveHandled(move)
         selectViewModel.resetPreMove()
     }
 
