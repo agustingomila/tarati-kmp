@@ -294,4 +294,6 @@ data class OnlineUserDto(
     val isBot: Boolean = false,
     val status: OnlineUserStatus,
     val ratingBlitz: Int? = null,
+    /** Si el usuario acepta recibir desafíos de partida. */
+    val acceptsChallenges: Boolean = true,
 )

@@ -17,5 +17,5 @@ object FeatureFlags {
      *
      * Cambiar a `true` para desarrollo con servidor activo.
      */
-    const val ONLINE_ENABLED = false
+    const val ONLINE_ENABLED = true
 }

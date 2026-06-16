@@ -72,6 +72,10 @@ data class PublicProfileDto(
     val createdAt: Instant,
     val isVerified: Boolean,
     val isBot: Boolean = false,
+    /** True para cuentas temporales. La UI lo usa para forzar partidas no-puntuadas en desafíos. */
+    val isGuest: Boolean = false,
+    /** Si el usuario acepta recibir desafíos de partida. */
+    val acceptsChallenges: Boolean = true,
 )
 
 @Immutable

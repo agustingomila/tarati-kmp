@@ -2228,6 +2228,7 @@ private fun ConnectedUsersTab(
         ConnectedUserChallengeDialog(
             targetName = target.displayName,
             isCurrentUserGuest = isCurrentUserGuest,
+            isTargetGuest = target.isGuest,
             onConfirm = { tc, rated ->
                 challengeTarget = null
                 scope.launch { onlineGameViewModel.sendChallenge(target.userId, tc, rated) }
@@ -2260,7 +2261,8 @@ private fun ConnectedUsersTab(
                             onClick = if (!user.isGuest && onNavigateToProfile != null) {
                                 { onNavigateToProfile(user.userId) }
                             } else null,
-                            onChallenge = if (!user.isGuest && user.userId != currentUserId && user.status == OnlineUserStatus.IN_LOBBY) {
+                            onChallenge = if (!user.isGuest && user.userId != currentUserId &&
+                                user.status == OnlineUserStatus.IN_LOBBY && user.acceptsChallenges) {
                                 { challengeTarget = user }
                             } else null,
                         )
@@ -2389,12 +2391,14 @@ private fun ConnectedUserRow(
 private fun ConnectedUserChallengeDialog(
     targetName: String,
     isCurrentUserGuest: Boolean,
+    isTargetGuest: Boolean = false,
     onConfirm: (timeControl: String, rated: Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val timeControls = TimeControl.list()
     var selectedTc by remember { mutableStateOf(TimeControl.BLITZ.key) }
-    var isRated by remember { mutableStateOf(!isCurrentUserGuest) }
+    val forceNonRated = isCurrentUserGuest || isTargetGuest
+    var isRated by remember(forceNonRated) { mutableStateOf(!forceNonRated) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -2424,7 +2428,7 @@ private fun ConnectedUserChallengeDialog(
                     Switch(
                         checked = isRated,
                         onCheckedChange = { isRated = it },
-                        enabled = !isCurrentUserGuest,
+                        enabled = !forceNonRated,
                     )
                 }
             }

@@ -187,4 +187,31 @@ interface IAuthViewModel {
      *         Result.failure si el token es inválido o expiró.
      */
     suspend fun resetPassword(token: String, newPassword: String): Result<Unit>
+
+    /**
+     * Datos de perfil editable del usuario autenticado (bio, isVisible).
+     * Null hasta que se llama [fetchProfile].
+     */
+    val profileData: StateFlow<ProfileData?>
+
+    /**
+     * Obtiene bio e isVisible del servidor y actualiza [profileData].
+     * No-op si no hay sesión activa.
+     */
+    suspend fun fetchProfile(): Result<Unit>
+
+    /**
+     * Actualiza bio y/o visibilidad del usuario autenticado.
+     *
+     * Solo los parámetros no-null se envían al servidor.
+     * En caso de éxito actualiza [profileData] con los valores devueltos por el servidor.
+     *
+     * @param bio Nuevo texto de descripción. Null = no cambiar. String vacío = limpiar bio.
+     * @param isVisible Nuevo estado de visibilidad. Null = no cambiar.
+     */
+    suspend fun updateProfile(
+        bio: String? = null,
+        isVisible: Boolean? = null,
+        challengesEnabled: Boolean? = null,
+    ): Result<Unit>
 }

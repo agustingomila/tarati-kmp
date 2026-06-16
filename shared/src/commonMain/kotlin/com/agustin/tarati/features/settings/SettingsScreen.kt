@@ -1,6 +1,7 @@
 package com.agustin.tarati.features.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +31,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,9 +53,14 @@ import com.agustin.tarati.shared.generated.resources.animate_effects
 import com.agustin.tarati.shared.generated.resources.animations
 import com.agustin.tarati.shared.generated.resources.app_version
 import com.agustin.tarati.shared.generated.resources.appearance
+import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.shared.generated.resources.auth_account
 import com.agustin.tarati.shared.generated.resources.auth_logged_in_as
 import com.agustin.tarati.shared.generated.resources.auth_logout
+import com.agustin.tarati.shared.generated.resources.profile_accept_challenges
+import com.agustin.tarati.shared.generated.resources.profile_bio
+import com.agustin.tarati.shared.generated.resources.profile_bio_placeholder
+import com.agustin.tarati.shared.generated.resources.profile_visible_online
 import com.agustin.tarati.shared.generated.resources.auto_theme
 import com.agustin.tarati.shared.generated.resources.board_display
 import com.agustin.tarati.shared.generated.resources.board_edges
@@ -109,6 +117,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsScreen(
     viewModel: ISettingsViewModel = koinViewModel<SettingsViewModel>(),
+    authViewModel: IAuthViewModel = koinInject(),
     events: SettingsEvents,
     onNavigateBack: () -> Unit = {},
     isGameActive: Boolean = false,
@@ -291,6 +300,7 @@ fun SettingsScreen(
                 if (onLogout != null) {
                     AccountSection(
                         username = loggedInUsername,
+                        authViewModel = authViewModel,
                         onLogout = onLogout,
                     )
                 }
@@ -351,8 +361,25 @@ private fun AboutSection(
 @Composable
 private fun AccountSection(
     username: String?,
+    authViewModel: IAuthViewModel? = null,
     onLogout: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val isGuest = authViewModel?.currentUser?.isGuest == true
+    val profileData by authViewModel?.profileData?.collectAsState() ?: androidx.compose.runtime.remember {
+        mutableStateOf(null)
+    }
+
+    // Fetch profile on first display (only for authenticated non-guest users)
+    androidx.compose.runtime.LaunchedEffect(username) {
+        if (!username.isNullOrBlank() && !isGuest) {
+            authViewModel?.fetchProfile()
+        }
+    }
+
+    // Local state for bio text field — synced from profileData
+    var bioText by remember(profileData?.bio) { mutableStateOf(profileData?.bio ?: "") }
+
     SettingsCategory(title = Res.string.auth_account)
 
     if (!username.isNullOrBlank()) {
@@ -374,6 +401,79 @@ private fun AccountSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+
+        // Profile editing — only for authenticated non-guest users
+        if (!isGuest && authViewModel != null) {
+            // Bio
+            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
+                Text(
+                    text = localizedString(Res.string.profile_bio),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(4.dp))
+                TextField(
+                    value = bioText,
+                    onValueChange = { if (it.length <= 200) bioText = it },
+                    placeholder = {
+                        Text(
+                            localizedString(Res.string.profile_bio_placeholder),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4,
+                )
+                Spacer(Modifier.height(4.dp))
+                androidx.compose.material3.TextButton(
+                    onClick = { scope.launch { authViewModel.updateProfile(bio = bioText) } },
+                    modifier = Modifier.align(Alignment.End),
+                ) {
+                    Text(localizedString(Res.string.save))
+                }
+            }
+
+            // Visibility toggle
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = localizedString(Res.string.profile_visible_online),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Switch(
+                    checked = profileData?.isVisible ?: true,
+                    onCheckedChange = { visible ->
+                        scope.launch { authViewModel.updateProfile(isVisible = visible) }
+                    },
+                )
+            }
+
+            // Accept challenges toggle
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = localizedString(Res.string.profile_accept_challenges),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Switch(
+                    checked = profileData?.challengesEnabled ?: true,
+                    onCheckedChange = { enabled ->
+                        scope.launch { authViewModel.updateProfile(challengesEnabled = enabled) }
+                    },
+                )
+            }
         }
     }
 

@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.localizedApiError
+import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
@@ -67,6 +70,9 @@ class AuthViewModel(
     private var _accessToken: String? = null
     override val accessToken: String?
         get() = _accessToken
+
+    private val _profileData = MutableStateFlow<ProfileData?>(null)
+    override val profileData: StateFlow<ProfileData?> = _profileData.asStateFlow()
 
     init {
         // Intentar restaurar sesión guardada
@@ -399,6 +405,54 @@ class AuthViewModel(
         }
     }
 
+    override suspend fun fetchProfile(): Result<Unit> {
+        val token = _accessToken ?: return Result.success(Unit)
+        return try {
+            val response = httpClient.get("$devServerUrl/api/profile") {
+                header("Authorization", "Bearer $token")
+            }
+            if (response.status.value == 200) {
+                val body = response.bodyAsText()
+                _profileData.value = parseProfileData(body)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("fetchProfile HTTP ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            logger.debug("fetchProfile error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateProfile(bio: String?, isVisible: Boolean?, challengesEnabled: Boolean?): Result<Unit> {
+        val token = _accessToken ?: return Result.failure(Exception("Not authenticated"))
+        val bodyParts = mutableListOf<String>()
+        if (bio != null) {
+            val escaped = bio.trim().jsonEscape()
+            bodyParts.add(if (escaped.isEmpty()) """"bio":null""" else """"bio":"$escaped"""")
+        }
+        if (isVisible != null) bodyParts.add(""""isVisible":$isVisible""")
+        if (challengesEnabled != null) bodyParts.add(""""challengesEnabled":$challengesEnabled""")
+        if (bodyParts.isEmpty()) return Result.success(Unit)
+
+        return try {
+            val response = httpClient.put("$devServerUrl/api/profile") {
+                header("Authorization", "Bearer $token")
+                contentType(Application.Json)
+                setBody("{${bodyParts.joinToString(",")}}")
+            }
+            if (response.status.value == 200) {
+                _profileData.value = parseProfileData(response.bodyAsText())
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("updateProfile HTTP ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            logger.debug("updateProfile error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     override fun clearError() {
         if (_authState.value is AuthState.Error) {
             _authState.value = AuthState.Unauthenticated
@@ -457,6 +511,20 @@ class AuthViewModel(
             authRepository.clearAll()
         }
     }
+
+    private fun parseProfileData(body: String): ProfileData {
+        val bioNull = body.contains(""""bio":null""")
+        val bio = if (bioNull) null else Regex(""""bio":"([^"]*)"""").find(body)?.groupValues?.get(1)
+        val isVisible = !body.contains(""""isVisible":false""")
+        val challengesEnabled = !body.contains(""""acceptsChallenges":false""")
+        return ProfileData(bio = bio, isVisible = isVisible, challengesEnabled = challengesEnabled)
+    }
+
+    private fun String.jsonEscape(): String = replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
 
     private fun parseTokenExpiry(token: String): Long? = runCatching {
         val parts = token.split(".")

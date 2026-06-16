@@ -420,6 +420,10 @@
     <string name="profile_member_since">Member since %1$s</string>
     <string name="profile_ratings_section">Ratings</string>
     <string name="profile_history_section">Games</string>
+    <string name="profile_bio">Description</string>
+    <string name="profile_bio_placeholder">Tell us about yourself…</string>
+    <string name="profile_visible_online">Visible in online list</string>
+    <string name="profile_accept_challenges">Accept challenges</string>
     <!-- ── Social ─────────────────────────────────────────────────────────── -->
     <string name="social_follow">Follow</string>
     <string name="social_unfollow">Following</string>

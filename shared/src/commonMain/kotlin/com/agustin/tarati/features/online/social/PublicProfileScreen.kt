@@ -93,8 +93,10 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import com.agustin.tarati.features.online.auth.IAuthViewModel
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +108,9 @@ fun PublicProfileScreen(
     viewModel: IPublicProfileViewModel = koinViewModel<PublicProfileViewModel>(key = userId) {
         parametersOf(userId)
     },
+    authViewModel: IAuthViewModel = koinInject(),
 ) {
+    val isCurrentUserGuest = authViewModel.currentUser?.isGuest == true
     val profileState by viewModel.profileState.collectAsState()
     val historyState by viewModel.historyState.collectAsState()
     val followStatusState by viewModel.followStatusState.collectAsState()
@@ -152,6 +156,7 @@ fun PublicProfileScreen(
                     onToggleFollow = viewModel::toggleFollow,
                     onSendChallenge = { tc, rated -> viewModel.sendChallenge(tc, rated) },
                     onNavigateToGameDetails = onNavigateToGameDetails,
+                    forceNonRated = isCurrentUserGuest || profileState.profile!!.isGuest,
                     viewModel = viewModel,
                     modifier = Modifier.padding(padding),
                 )
@@ -171,6 +176,7 @@ private fun ProfileContent(
     onToggleFollow: () -> Unit,
     onSendChallenge: (timeControl: String, rated: Boolean) -> Unit,
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
+    forceNonRated: Boolean = false,
     viewModel: IPublicProfileViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -180,6 +186,7 @@ private fun ProfileContent(
     if (showChallengeDialog) {
         ChallengeDialog(
             targetName = profile.displayName?.takeIf { it.isNotBlank() } ?: profile.username,
+            forceNonRated = forceNonRated,
             onConfirm = { tc: String, rated: Boolean ->
                 showChallengeDialog = false
                 onSendChallenge(tc, rated)
@@ -211,7 +218,9 @@ private fun ProfileContent(
                 followStatusState = followStatusState,
                 isOwnProfile = isOwnProfile,
                 onToggleFollow = onToggleFollow,
-                onChallenge = { showChallengeDialog = true },
+                onChallenge = if (profile.acceptsChallenges) {
+                    { showChallengeDialog = true }
+                } else null,
             )
         }
 
@@ -292,7 +301,7 @@ private fun ProfileHeader(
     followStatusState: FollowStatusUiState,
     isOwnProfile: Boolean,
     onToggleFollow: () -> Unit,
-    onChallenge: () -> Unit,
+    onChallenge: (() -> Unit)?,
 ) {
     Column(
         modifier = Modifier
@@ -374,8 +383,10 @@ private fun ProfileHeader(
                         Text(localizedString(Res.string.social_follow), style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                OutlinedButton(onClick = onChallenge) {
-                    Text(localizedString(Res.string.social_challenge), style = MaterialTheme.typography.labelMedium)
+                if (onChallenge != null) {
+                    OutlinedButton(onClick = onChallenge) {
+                        Text(localizedString(Res.string.social_challenge), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
         }
@@ -574,12 +585,13 @@ private fun SectionHeader(text: String) {
 @Composable
 private fun ChallengeDialog(
     targetName: String,
+    forceNonRated: Boolean = false,
     onConfirm: (timeControl: String, rated: Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val timeControls = TimeControl.list()
     var selectedTc by remember { mutableStateOf(TimeControl.BLITZ.key) }
-    var isRated by remember { mutableStateOf(true) }
+    var isRated by remember(forceNonRated) { mutableStateOf(!forceNonRated) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -606,7 +618,11 @@ private fun ChallengeDialog(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(localizedString(Res.string.rated), style = MaterialTheme.typography.bodyMedium)
-                    Switch(checked = isRated, onCheckedChange = { isRated = it })
+                    Switch(
+                        checked = isRated,
+                        onCheckedChange = { isRated = it },
+                        enabled = !forceNonRated,
+                    )
                 }
             }
         },

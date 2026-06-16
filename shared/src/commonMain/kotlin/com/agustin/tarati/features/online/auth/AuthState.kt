@@ -67,6 +67,13 @@ data class UserInfo(
     val isGuest: Boolean = false
 )
 
+/** Datos de perfil editable del usuario autenticado: bio, isVisible, challengesEnabled. */
+data class ProfileData(
+    val bio: String?,
+    val isVisible: Boolean,
+    val challengesEnabled: Boolean = true,
+)
+
 /**
  * Credenciales de login
  * 
