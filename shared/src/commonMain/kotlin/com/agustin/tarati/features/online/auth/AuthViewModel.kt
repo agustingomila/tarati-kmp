@@ -9,6 +9,7 @@ import com.agustin.tarati.network.models.localizedApiError
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.delete
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import com.agustin.tarati.network.models.OwnProfileDto
@@ -460,6 +461,28 @@ class AuthViewModel(
             }
         } catch (e: Exception) {
             logger.debug("updateProfile error: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteAccount(): Result<Unit> {
+        val token = _accessToken ?: return Result.failure(Exception("Not authenticated"))
+        return try {
+            val response = httpClient.delete("$devServerUrl/api/profile") {
+                header("Authorization", "Bearer $token")
+            }
+            if (response.status.value == 200) {
+                authRepository.clearAll()
+                _inMemoryRefreshToken = null
+                _accessToken = null
+                _profileData.value = null
+                _authState.value = AuthState.Unauthenticated
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("deleteAccount HTTP ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            logger.debug("deleteAccount error: ${e.message}")
             Result.failure(e)
         }
     }

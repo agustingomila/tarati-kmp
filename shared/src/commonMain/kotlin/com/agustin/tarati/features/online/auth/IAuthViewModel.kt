@@ -214,4 +214,15 @@ interface IAuthViewModel {
         isVisible: Boolean? = null,
         challengesEnabled: Boolean? = null,
     ): Result<Unit>
+
+    /**
+     * Elimina la cuenta del usuario autenticado.
+     *
+     * Llama DELETE /api/profile. En caso de éxito limpia tokens locales
+     * y devuelve el estado a [AuthState.Unauthenticated].
+     *
+     * @return Result.success(Unit) si la cuenta fue eliminada.
+     *         Result.failure si hubo un error de red o el servidor rechazó la operación.
+     */
+    suspend fun deleteAccount(): Result<Unit>
 }

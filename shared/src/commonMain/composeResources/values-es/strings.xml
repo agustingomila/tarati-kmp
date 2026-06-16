@@ -524,4 +524,9 @@
     <string name="api_error_internal_error">Algo salió mal. Intentá de nuevo.</string>
     <string name="api_error_user_not_found">Usuario no encontrado</string>
     <string name="api_error_unknown">Algo salió mal. Intentá de nuevo.</string>
+
+    <!-- Eliminación de cuenta -->
+    <string name="settings_delete_account">Eliminar cuenta</string>
+    <string name="settings_delete_account_title">¿Eliminar cuenta?</string>
+    <string name="settings_delete_account_body">Esta acción es permanente e irreversible. Tus partidas, rating y logros serán eliminados.</string>
 </resources>

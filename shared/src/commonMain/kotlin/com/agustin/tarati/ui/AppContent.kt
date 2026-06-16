@@ -75,7 +75,15 @@ import com.agustin.tarati.shared.generated.resources.tournament_game_assigned
 import com.agustin.tarati.ui.components.navigation.NavGraph
 import com.agustin.tarati.ui.components.navigation.injectGameViewModel
 import com.agustin.tarati.ui.layout.CompanionPanelController
-import com.agustin.tarati.ui.layout.CompanionPanelDestination
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.GameDetails
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Leaderboard
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Library
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Lobby
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.None
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.OnlineSettings
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Profile
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Settings
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.TournamentDetail
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.layout.LocalCompanionPanelController
 import com.agustin.tarati.ui.layout.LocalScreenLayout
@@ -256,42 +264,42 @@ private fun CompanionPane(
     var lastLobbyTab by remember { mutableIntStateOf(0) }
 
     when (val dest = controller.destination) {
-        CompanionPanelDestination.None -> Unit
+        None -> Unit
 
-        CompanionPanelDestination.Lobby -> OnlineLobbyScreen(
+        Lobby -> OnlineLobbyScreen(
             displayMode = DisplayMode.CompanionPanel,
             onBack = controller::close,
             onShowLogin = { onShowLogin(null) },
             onMatchFound = { /* no-op: el tablero en el panel primario ya muestra la partida */ },
             onSpectateGame = { /* no-op: el tablero en el panel primario ya muestra el espectado */ },
-            onLeaderboard = { controller.navigate(CompanionPanelDestination.Leaderboard) },
+            onLeaderboard = { controller.navigate(Leaderboard) },
             onNavigateToProfile = { userId ->
-                controller.navigate(CompanionPanelDestination.Profile(userId))
+                controller.navigate(Profile(userId))
             },
             onNavigateToGameDetails = { gameId ->
                 scope.launch {
                     val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
                     if (matchDto != null) {
                         gameDetailsViewModel.updateCurrentMatchDto(matchDto)
-                        controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                        controller.navigate(GameDetails(gameId))
                     }
                 }
             },
             onNavigateToTournament = { tournamentId ->
                 lastLobbyTab = 2 // Tab "Torneos"
-                controller.navigate(CompanionPanelDestination.TournamentDetail(tournamentId))
+                controller.navigate(TournamentDetail(tournamentId))
             },
             initialTab = lastLobbyTab,
         )
 
-        CompanionPanelDestination.Leaderboard -> LeaderboardScreen(
+        Leaderboard -> LeaderboardScreen(
             onBack = controller::back,
             onNavigateToProfile = { userId ->
-                controller.navigate(CompanionPanelDestination.Profile(userId))
+                controller.navigate(Profile(userId))
             },
         )
 
-        is CompanionPanelDestination.Profile -> key(dest.userId) {
+        is Profile -> key(dest.userId) {
             PublicProfileScreen(
                 userId = dest.userId,
                 onBack = controller::back,
@@ -300,14 +308,14 @@ private fun CompanionPane(
                         val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
                         if (matchDto != null) {
                             gameDetailsViewModel.updateCurrentMatchDto(matchDto)
-                            controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                            controller.navigate(GameDetails(gameId))
                         }
                     }
                 },
             )
         }
 
-        CompanionPanelDestination.Settings -> LanguageAwareSettingsScreen(
+        Settings -> LanguageAwareSettingsScreen(
             viewModel = settingsViewModel,
             events = settingsEvents(settingsViewModel),
             isGameActive = gameStatus == GameStatus.PLAYING,
@@ -322,23 +330,23 @@ private fun CompanionPane(
                 }
             } else null,
             onNavigateToOnlineSettings = {
-                controller.navigate(CompanionPanelDestination.OnlineSettings)
+                controller.navigate(OnlineSettings)
             },
         )
 
-        CompanionPanelDestination.OnlineSettings -> OnlineSettingsScreen(
+        OnlineSettings -> OnlineSettingsScreen(
             onNavigateBack = controller::back,
         )
 
-        CompanionPanelDestination.Library -> GamesLibraryScreen(
+        Library -> GamesLibraryScreen(
             onGameSelected = { gameId ->
-                controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                controller.navigate(GameDetails(gameId))
             },
             onBack = controller::close,
             viewModel = gamesLibraryViewModel,
         )
 
-        is CompanionPanelDestination.TournamentDetail -> key(dest.tournamentId) {
+        is TournamentDetail -> key(dest.tournamentId) {
             TournamentDetailScreen(
                 tournamentId = dest.tournamentId,
                 onBack = controller::back,
@@ -349,14 +357,14 @@ private fun CompanionPane(
                         val matchDto = onlineLobbyViewModel.loadAndPreviewGame(gameId)
                         if (matchDto != null) {
                             gameDetailsViewModel.updateCurrentMatchDto(matchDto)
-                            controller.navigate(CompanionPanelDestination.GameDetails(gameId))
+                            controller.navigate(GameDetails(gameId))
                         }
                     }
                 },
             )
         }
 
-        is CompanionPanelDestination.GameDetails -> GameDetailsScreen(
+        is GameDetails -> GameDetailsScreen(
             gameId = dest.gameId,
             onImport = { matchDto ->
                 gameViewModel.importGameFromMatchDto(matchDto)

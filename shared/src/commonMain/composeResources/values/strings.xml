@@ -514,4 +514,9 @@
     <string name="api_error_internal_error">Something went wrong. Try again later.</string>
     <string name="api_error_user_not_found">User not found</string>
     <string name="api_error_unknown">Something went wrong. Try again later.</string>
+
+    <!-- Account deletion -->
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_delete_account_title">Delete account?</string>
+    <string name="settings_delete_account_body">This action is permanent and cannot be undone. Your games, rating and achievements will be deleted.</string>
 </resources>

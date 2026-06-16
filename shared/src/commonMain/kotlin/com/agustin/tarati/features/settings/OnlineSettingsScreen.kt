@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -31,11 +34,16 @@ import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.services.localization.LocalAppLanguage
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
+import com.agustin.tarati.shared.generated.resources.cancel
+import com.agustin.tarati.shared.generated.resources.delete
 import com.agustin.tarati.shared.generated.resources.profile_accept_challenges
 import com.agustin.tarati.shared.generated.resources.profile_bio
 import com.agustin.tarati.shared.generated.resources.profile_bio_placeholder
 import com.agustin.tarati.shared.generated.resources.profile_visible_online
 import com.agustin.tarati.shared.generated.resources.save
+import com.agustin.tarati.shared.generated.resources.settings_delete_account
+import com.agustin.tarati.shared.generated.resources.settings_delete_account_body
+import com.agustin.tarati.shared.generated.resources.settings_delete_account_title
 import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
@@ -63,6 +71,31 @@ private fun OnlineSettingsContent(
 ) {
     val scope = rememberCoroutineScope()
     val profileData by authViewModel.profileData.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(localizedString(Res.string.settings_delete_account_title)) },
+            text = { Text(localizedString(Res.string.settings_delete_account_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        scope.launch { authViewModel.deleteAccount() }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) { Text(localizedString(Res.string.delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(localizedString(Res.string.cancel))
+                }
+            },
+        )
+    }
 
     LaunchedEffect(Unit) {
         authViewModel.fetchProfile()
@@ -160,6 +193,22 @@ private fun OnlineSettingsContent(
                         scope.launch { authViewModel.updateProfile(challengesEnabled = enabled) }
                     },
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(horizontal = 12.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text(localizedString(Res.string.settings_delete_account))
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }

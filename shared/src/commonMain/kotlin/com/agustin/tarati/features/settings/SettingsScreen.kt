@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.GITHUB_URL
 import com.agustin.tarati.appVersion
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.services.pwa.pwaInstall
 import com.agustin.tarati.services.pwa.pwaInstallAvailable
 import com.agustin.tarati.services.billing.LockedPalettes
@@ -125,9 +126,11 @@ fun SettingsScreen(
 
     // Prefetch del perfil online para que bio/visibility estén listos cuando el
     // usuario navegue a OnlineSettingsScreen. Se dispara al loguear o al abrir Settings.
-    androidx.compose.runtime.LaunchedEffect(loggedInUsername) {
-        val isGuest = authViewModel.currentUser?.isGuest == true
-        if (!loggedInUsername.isNullOrBlank() && !isGuest) authViewModel.fetchProfile()
+    if (FeatureFlags.ONLINE_ENABLED) {
+        androidx.compose.runtime.LaunchedEffect(loggedInUsername) {
+            val isGuest = authViewModel.currentUser?.isGuest == true
+            if (!loggedInUsername.isNullOrBlank() && !isGuest) authViewModel.fetchProfile()
+        }
     }
     // Los colores de tablero se leen desde el CompositionLocal activo, igual que
     // en el resto de la app. Se pasan explícitamente al selector de piezas para
@@ -301,7 +304,7 @@ fun SettingsScreen(
                     },
                 )
 
-                if (onLogout != null) {
+                if (FeatureFlags.ONLINE_ENABLED && onLogout != null) {
                     val isGuest = authViewModel.currentUser?.isGuest == true
                     SettingsCategory(title = Res.string.settings_online)
                     if (onNavigateToOnlineSettings != null && !loggedInUsername.isNullOrBlank() && !isGuest) {
