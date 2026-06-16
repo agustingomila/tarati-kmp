@@ -50,6 +50,7 @@ import com.agustin.tarati.network.models.TournamentStatus
 import com.agustin.tarati.network.models.TournamentType
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
+import com.agustin.tarati.shared.generated.resources.cancel_tournament
 import com.agustin.tarati.shared.generated.resources.casual
 import com.agustin.tarati.shared.generated.resources.fixture
 import com.agustin.tarati.shared.generated.resources.rated
@@ -60,7 +61,6 @@ import com.agustin.tarati.shared.generated.resources.tournament_cancelled_status
 import com.agustin.tarati.shared.generated.resources.tournament_created_by
 import com.agustin.tarati.shared.generated.resources.tournament_finished_status
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
-import com.agustin.tarati.shared.generated.resources.cancel_tournament
 import com.agustin.tarati.shared.generated.resources.tournament_register
 import com.agustin.tarati.shared.generated.resources.tournament_round_n
 import com.agustin.tarati.shared.generated.resources.tournament_round_progress

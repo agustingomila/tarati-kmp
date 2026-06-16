@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.play.GameStatus
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.features.detail.GameDetailsScreen
 import com.agustin.tarati.features.detail.GameDetailsViewModel
 import com.agustin.tarati.features.detail.IGameDetailsViewModel
@@ -63,10 +64,10 @@ import com.agustin.tarati.services.notifications.UIMessageBus
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.accept
 import com.agustin.tarati.shared.generated.resources.cancel
-import com.agustin.tarati.shared.generated.resources.challenge_declined_msg
-import com.agustin.tarati.shared.generated.resources.challenge_expired_msg
-import com.agustin.tarati.shared.generated.resources.challenge_from
-import com.agustin.tarati.shared.generated.resources.challenge_invite
+import com.agustin.tarati.shared.generated.resources.social_challenge_declined
+import com.agustin.tarati.shared.generated.resources.social_challenge_expired
+import com.agustin.tarati.shared.generated.resources.social_challenge_from
+import com.agustin.tarati.shared.generated.resources.social_challenge_invite
 import com.agustin.tarati.shared.generated.resources.tournament_cancelled_notification
 import com.agustin.tarati.shared.generated.resources.tournament_finished_notification
 import com.agustin.tarati.shared.generated.resources.tournament_game_assigned
@@ -81,7 +82,6 @@ import com.agustin.tarati.ui.layout.ScreenLayout
 import com.agustin.tarati.ui.layout.screenLayoutFor
 import com.agustin.tarati.ui.theme.AppTheme
 import com.agustin.tarati.ui.theme.PaletteManager
-import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.ui.theme.TaratiTheme
 import com.agustin.tarati.ui.theme.availablePalettes
 import kotlinx.coroutines.launch
@@ -384,8 +384,8 @@ private fun ChallengeNotificationEffect(
     bus: UIMessageBus = koinInject(),
 ) {
     val scope = rememberCoroutineScope()
-    val challengeDeclinedMsg = localizedString(Res.string.challenge_declined_msg)
-    val challengeExpiredMsg = localizedString(Res.string.challenge_expired_msg)
+    val challengeDeclinedMsg = localizedString(Res.string.social_challenge_declined)
+    val challengeExpiredMsg = localizedString(Res.string.social_challenge_expired)
 
     LaunchedEffect(Unit) {
         onlineGameViewModel.challengeEvents.collect { event ->
@@ -399,12 +399,12 @@ private fun ChallengeNotificationEffect(
                             modifier = Modifier.padding(16.dp),
                         ) {
                             Text(
-                                text = localizedString(Res.string.challenge_from)
+                                text = localizedString(Res.string.social_challenge_from)
                                     .replace($$"%1$s", event.challengerInfo.username),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                text = localizedString(Res.string.challenge_invite)
+                                text = localizedString(Res.string.social_challenge_invite)
                                     .replace($$"%1$s", event.challengerInfo.username)
                                     .replace($$"%2$s", "$tcDisplay $ratedDisplay"),
                                 style = MaterialTheme.typography.bodyMedium,

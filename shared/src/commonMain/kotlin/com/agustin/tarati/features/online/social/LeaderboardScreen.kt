@@ -38,8 +38,8 @@ import com.agustin.tarati.network.models.LeaderboardEntryDto
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.error
-import com.agustin.tarati.shared.generated.resources.leaderboard
-import com.agustin.tarati.shared.generated.resources.no_leaderboard_data
+import com.agustin.tarati.shared.generated.resources.profile_leaderboard
+import com.agustin.tarati.shared.generated.resources.profile_no_leaderboard_data
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
@@ -63,7 +63,7 @@ fun LeaderboardScreen(
             containerColor = Color.Transparent,
             topBar = {
                 TaratiTopBar(
-                    title = localizedString(Res.string.leaderboard),
+                    title = localizedString(Res.string.profile_leaderboard),
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onBack,
                     actions = {
@@ -122,7 +122,7 @@ fun LeaderboardScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = localizedString(Res.string.no_leaderboard_data),
+                            text = localizedString(Res.string.profile_no_leaderboard_data),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
                         )

@@ -50,6 +50,9 @@ import com.agustin.tarati.shared.generated.resources.animate_effects
 import com.agustin.tarati.shared.generated.resources.animations
 import com.agustin.tarati.shared.generated.resources.app_version
 import com.agustin.tarati.shared.generated.resources.appearance
+import com.agustin.tarati.shared.generated.resources.auth_account
+import com.agustin.tarati.shared.generated.resources.auth_logged_in_as
+import com.agustin.tarati.shared.generated.resources.auth_logout
 import com.agustin.tarati.shared.generated.resources.auto_theme
 import com.agustin.tarati.shared.generated.resources.board_display
 import com.agustin.tarati.shared.generated.resources.board_edges
@@ -70,9 +73,6 @@ import com.agustin.tarati.shared.generated.resources.gameplay
 import com.agustin.tarati.shared.generated.resources.general
 import com.agustin.tarati.shared.generated.resources.language
 import com.agustin.tarati.shared.generated.resources.light_theme
-import com.agustin.tarati.shared.generated.resources.login_account
-import com.agustin.tarati.shared.generated.resources.login_logged_in_as
-import com.agustin.tarati.shared.generated.resources.login_logout
 import com.agustin.tarati.shared.generated.resources.piece_type
 import com.agustin.tarati.shared.generated.resources.pre_moves
 import com.agustin.tarati.shared.generated.resources.save
@@ -353,7 +353,7 @@ private fun AccountSection(
     username: String?,
     onLogout: () -> Unit,
 ) {
-    SettingsCategory(title = Res.string.login_account)
+    SettingsCategory(title = Res.string.auth_account)
 
     if (!username.isNullOrBlank()) {
         Row(
@@ -370,7 +370,7 @@ private fun AccountSection(
             )
             Spacer(Modifier.width(16.dp))
             Text(
-                text = localizedString(Res.string.login_logged_in_as).replace($$"%1$s", username),
+                text = localizedString(Res.string.auth_logged_in_as).replace($$"%1$s", username),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -392,7 +392,7 @@ private fun AccountSection(
         )
         Spacer(Modifier.width(16.dp))
         Text(
-            text = localizedString(Res.string.login_logout),
+            text = localizedString(Res.string.auth_logout),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.error,
         )

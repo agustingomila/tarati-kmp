@@ -35,8 +35,8 @@ fun main() {
 
     // Detectar token de reset de contraseña en la URL (/reset-password?token=...)
     val resetToken: String? = runCatching {
-        val pathname = window.location.pathname.toString()
-        val search = window.location.search.toString()
+        val pathname = window.location.pathname
+        val search = window.location.search
         if (pathname.contains("reset-password") && search.contains("token=")) {
             search.substringAfter("token=").substringBefore("&").takeIf { it.isNotBlank() }
         } else null

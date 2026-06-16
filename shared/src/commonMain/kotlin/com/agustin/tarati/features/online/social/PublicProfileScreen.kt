@@ -59,27 +59,27 @@ import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
-import com.agustin.tarati.shared.generated.resources.challenge
-import com.agustin.tarati.shared.generated.resources.challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.social_challenge
+import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
-import com.agustin.tarati.shared.generated.resources.follow
-import com.agustin.tarati.shared.generated.resources.followers
-import com.agustin.tarati.shared.generated.resources.following
-import com.agustin.tarati.shared.generated.resources.games_played
-import com.agustin.tarati.shared.generated.resources.history_section
+import com.agustin.tarati.shared.generated.resources.social_follow
+import com.agustin.tarati.shared.generated.resources.social_followers
+import com.agustin.tarati.shared.generated.resources.social_following
+import com.agustin.tarati.shared.generated.resources.profile_games_played
+import com.agustin.tarati.shared.generated.resources.profile_history_section
 import com.agustin.tarati.shared.generated.resources.loss
-import com.agustin.tarati.shared.generated.resources.member_since
+import com.agustin.tarati.shared.generated.resources.profile_member_since
 import com.agustin.tarati.shared.generated.resources.moves
 import com.agustin.tarati.shared.generated.resources.no_games_found
-import com.agustin.tarati.shared.generated.resources.peak_rating
-import com.agustin.tarati.shared.generated.resources.profile
+import com.agustin.tarati.shared.generated.resources.profile_peak_rating
+import com.agustin.tarati.shared.generated.resources.profile_title
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.rated_info_card
 import com.agustin.tarati.shared.generated.resources.rating
-import com.agustin.tarati.shared.generated.resources.ratings_section
+import com.agustin.tarati.shared.generated.resources.profile_ratings_section
 import com.agustin.tarati.shared.generated.resources.result
-import com.agustin.tarati.shared.generated.resources.unfollow
+import com.agustin.tarati.shared.generated.resources.social_unfollow
 import com.agustin.tarati.shared.generated.resources.win
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
@@ -118,7 +118,7 @@ fun PublicProfileScreen(
                 TaratiTopBar(
                     title = profileState.profile?.let {
                         it.displayName?.takeIf { d -> d.isNotBlank() } ?: it.username
-                    } ?: localizedString(Res.string.profile),
+                    } ?: localizedString(Res.string.profile_title),
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onBack,
                 )
@@ -217,14 +217,14 @@ private fun ProfileContent(
 
         // Ratings
         item {
-            SectionHeader(text = localizedString(Res.string.ratings_section))
+            SectionHeader(text = localizedString(Res.string.profile_ratings_section))
             RatingsGrid(ratings = profile.ratings, stats = profile.stats)
             Spacer(Modifier.height(8.dp))
         }
 
         // History header + filters
         item {
-            SectionHeader(text = localizedString(Res.string.history_section))
+            SectionHeader(text = localizedString(Res.string.profile_history_section))
             ProfileHistoryFilters(state = historyState, viewModel = viewModel)
         }
 
@@ -343,19 +343,19 @@ private fun ProfileHeader(
         }
         val joinDate = remember(profile.createdAt) { formatJoinDate(profile.createdAt) }
         Text(
-            text = localizedString(Res.string.member_since).replace($$"%1$s", joinDate),
+            text = localizedString(Res.string.profile_member_since).replace($$"%1$s", joinDate),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         // Contadores de seguidores / seguidos
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                text = "${followStatusState.followersCount} ${localizedString(Res.string.followers)}",
+                text = "${followStatusState.followersCount} ${localizedString(Res.string.social_followers)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "${followStatusState.followingCount} ${localizedString(Res.string.following)}",
+                text = "${followStatusState.followingCount} ${localizedString(Res.string.social_following)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -367,15 +367,15 @@ private fun ProfileHeader(
                     OutlinedButton(onClick = onToggleFollow) {
                         Icon(TaratiIcons.Check, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text(localizedString(Res.string.unfollow), style = MaterialTheme.typography.labelMedium)
+                        Text(localizedString(Res.string.social_unfollow), style = MaterialTheme.typography.labelMedium)
                     }
                 } else {
                     Button(onClick = onToggleFollow) {
-                        Text(localizedString(Res.string.follow), style = MaterialTheme.typography.labelMedium)
+                        Text(localizedString(Res.string.social_follow), style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 OutlinedButton(onClick = onChallenge) {
-                    Text(localizedString(Res.string.challenge), style = MaterialTheme.typography.labelMedium)
+                    Text(localizedString(Res.string.social_challenge), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
@@ -451,12 +451,12 @@ private fun RatingCard(
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = localizedString(Res.string.peak_rating).replace($$"%1$s", "$peak"),
+                text = localizedString(Res.string.profile_peak_rating).replace($$"%1$s", "$peak"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = localizedString(Res.string.games_played)
+                text = localizedString(Res.string.profile_games_played)
                     .replace($$"%1$s", "${stats.games}"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -585,7 +585,7 @@ private fun ChallengeDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                localizedString(Res.string.challenge_dialog_title).replace($$"%1$s", targetName),
+                localizedString(Res.string.social_challenge_dialog_title).replace($$"%1$s", targetName),
                 style = MaterialTheme.typography.titleMedium,
             )
         },
@@ -612,7 +612,7 @@ private fun ChallengeDialog(
         },
         confirmButton = {
             Button(onClick = { onConfirm(selectedTc, isRated) }) {
-                Text(localizedString(Res.string.challenge))
+                Text(localizedString(Res.string.social_challenge))
             }
         },
         dismissButton = {

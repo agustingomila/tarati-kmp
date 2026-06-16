@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -65,6 +66,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.pieces.CobColor
@@ -98,66 +100,62 @@ import com.agustin.tarati.services.localization.LocalizedText
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.allow_spectators
+import com.agustin.tarati.shared.generated.resources.auth_guest_banner_title
+import com.agustin.tarati.shared.generated.resources.auth_guest_description
+import com.agustin.tarati.shared.generated.resources.auth_logout
+import com.agustin.tarati.shared.generated.resources.auth_logout_confirm
+import com.agustin.tarati.shared.generated.resources.auth_sign_in
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
-import com.agustin.tarati.shared.generated.resources.challenge
-import com.agustin.tarati.shared.generated.resources.challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.social_challenge
+import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.clear_filters
 import com.agustin.tarati.shared.generated.resources.confirm
 import com.agustin.tarati.shared.generated.resources.connect_to_server_first
-import com.agustin.tarati.shared.generated.resources.connected_tab
+import com.agustin.tarati.shared.generated.resources.lobby_connected_tab
 import com.agustin.tarati.shared.generated.resources.could_not_connect
 import com.agustin.tarati.shared.generated.resources.create
 import com.agustin.tarati.shared.generated.resources.create_tournament
 import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
-import com.agustin.tarati.shared.generated.resources.feed
-import com.agustin.tarati.shared.generated.resources.feed_player_context
-import com.agustin.tarati.shared.generated.resources.filter_all
-import com.agustin.tarati.shared.generated.resources.filter_live_games
-import com.agustin.tarati.shared.generated.resources.filter_open_searches
-import com.agustin.tarati.shared.generated.resources.filter_registered_only
-import com.agustin.tarati.shared.generated.resources.guest_banner_title
-import com.agustin.tarati.shared.generated.resources.guest_login_description
-import com.agustin.tarati.shared.generated.resources.in_live
+import com.agustin.tarati.shared.generated.resources.social_feed
+import com.agustin.tarati.shared.generated.resources.social_feed_player_context
+import com.agustin.tarati.shared.generated.resources.lobby_filter_all
+import com.agustin.tarati.shared.generated.resources.lobby_filter_live_games
+import com.agustin.tarati.shared.generated.resources.lobby_filter_open_searches
+import com.agustin.tarati.shared.generated.resources.lobby_filter_registered_only
+import com.agustin.tarati.shared.generated.resources.lobby_in_live
 import com.agustin.tarati.shared.generated.resources.join
-import com.agustin.tarati.shared.generated.resources.leaderboard
-import com.agustin.tarati.shared.generated.resources.login_logout
-import com.agustin.tarati.shared.generated.resources.logout_confirm_body
+import com.agustin.tarati.shared.generated.resources.profile_leaderboard
 import com.agustin.tarati.shared.generated.resources.loss
 import com.agustin.tarati.shared.generated.resources.max_players
 import com.agustin.tarati.shared.generated.resources.min_players
-import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
-import com.agustin.tarati.shared.generated.resources.validation_max_players_count
-import com.agustin.tarati.shared.generated.resources.validation_min_players_count
-import com.agustin.tarati.shared.generated.resources.validation_players_number
 import com.agustin.tarati.shared.generated.resources.move
 import com.agustin.tarati.shared.generated.resources.moves
-import com.agustin.tarati.shared.generated.resources.my_games
-import com.agustin.tarati.shared.generated.resources.new_search
-import com.agustin.tarati.shared.generated.resources.no_feed_games
+import com.agustin.tarati.shared.generated.resources.lobby_my_games
+import com.agustin.tarati.shared.generated.resources.lobby_new_search
+import com.agustin.tarati.shared.generated.resources.social_no_feed_games
 import com.agustin.tarati.shared.generated.resources.no_games_found
-import com.agustin.tarati.shared.generated.resources.no_players_match_filters
+import com.agustin.tarati.shared.generated.resources.lobby_no_players_match_filters
 import com.agustin.tarati.shared.generated.resources.no_tournaments_available
 import com.agustin.tarati.shared.generated.resources.no_tournaments_match_filters
-import com.agustin.tarati.shared.generated.resources.not_connected_to_server
+import com.agustin.tarati.shared.generated.resources.lobby_not_connected_to_server
 import com.agustin.tarati.shared.generated.resources.online_lobby
-import com.agustin.tarati.shared.generated.resources.online_users_section
+import com.agustin.tarati.shared.generated.resources.lobby_online_users_section
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.rated_info_card
 import com.agustin.tarati.shared.generated.resources.rating
 import com.agustin.tarati.shared.generated.resources.result
 import com.agustin.tarati.shared.generated.resources.retry
 import com.agustin.tarati.shared.generated.resources.search_no_longer_available
-import com.agustin.tarati.shared.generated.resources.sign_in
 import com.agustin.tarati.shared.generated.resources.sort
-import com.agustin.tarati.shared.generated.resources.sort_most_players
+import com.agustin.tarati.shared.generated.resources.tournament_sort_most_players
 import com.agustin.tarati.shared.generated.resources.sort_newest
-import com.agustin.tarati.shared.generated.resources.sort_oldest
-import com.agustin.tarati.shared.generated.resources.sort_rating
-import com.agustin.tarati.shared.generated.resources.status_in_lobby
-import com.agustin.tarati.shared.generated.resources.status_playing
-import com.agustin.tarati.shared.generated.resources.there_are_no_games_in_progress
+import com.agustin.tarati.shared.generated.resources.lobby_sort_oldest
+import com.agustin.tarati.shared.generated.resources.lobby_sort_rating
+import com.agustin.tarati.shared.generated.resources.lobby_status_in_lobby
+import com.agustin.tarati.shared.generated.resources.lobby_status_playing
+import com.agustin.tarati.shared.generated.resources.lobby_no_live_games
 import com.agustin.tarati.shared.generated.resources.time_control
 import com.agustin.tarati.shared.generated.resources.tournament
 import com.agustin.tarati.shared.generated.resources.tournament_filter_all
@@ -175,7 +173,12 @@ import com.agustin.tarati.shared.generated.resources.tournaments
 import com.agustin.tarati.shared.generated.resources.tournaments_finished_section
 import com.agustin.tarati.shared.generated.resources.turn
 import com.agustin.tarati.shared.generated.resources.user_name
-import com.agustin.tarati.shared.generated.resources.waiting_time
+import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
+import com.agustin.tarati.shared.generated.resources.validation_max_players_count
+import com.agustin.tarati.shared.generated.resources.validation_min_players_count
+import com.agustin.tarati.shared.generated.resources.validation_players_number
+import com.agustin.tarati.shared.generated.resources.lobby_waiting_time
+import com.agustin.tarati.shared.generated.resources.spectator_unavailable
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.shared.generated.resources.win
 import com.agustin.tarati.shared.generated.resources.you
@@ -188,8 +191,6 @@ import com.agustin.tarati.ui.layout.CompanionPanelHeader
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -264,6 +265,7 @@ fun OnlineLobbyScreen(
     var showMatchmakingSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     var showLogoutConfirm by remember { mutableStateOf(false) }
+    val spectatorUnavailableMsg = localizedString(Res.string.spectator_unavailable)
     // True mientras el usuario inició una búsqueda desde este lobby (nueva o uniéndose a otra).
     // Evita que el LaunchedEffect de MatchFound dispare si el estado viene de una partida anterior.
     var searchStartedInLobby by remember { mutableStateOf(false) }
@@ -401,8 +403,8 @@ fun OnlineLobbyScreen(
     if (showLogoutConfirm) {
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
-            title = { Text(localizedString(Res.string.login_logout)) },
-            text = { Text(localizedString(Res.string.logout_confirm_body)) },
+            title = { Text(localizedString(Res.string.auth_logout)) },
+            text = { Text(localizedString(Res.string.auth_logout_confirm)) },
             confirmButton = {
                 Button(onClick = {
                     showLogoutConfirm = false
@@ -425,19 +427,19 @@ fun OnlineLobbyScreen(
         val topBarActions: @Composable RowScope.() -> Unit = {
             if (onLeaderboard != null) {
                 TooltipIconButton(
-                    tooltip = localizedString(Res.string.leaderboard),
+                    tooltip = localizedString(Res.string.profile_leaderboard),
                     onClick = onLeaderboard,
                 ) {
                     Icon(
                         imageVector = TaratiIcons.Leaderboard,
-                        contentDescription = localizedString(Res.string.leaderboard),
+                        contentDescription = localizedString(Res.string.profile_leaderboard),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
             // Botón Login / Logout
             val loginLogoutLabel = localizedString(
-                if (isAuthenticated && !isGuest) Res.string.login_logout else Res.string.sign_in
+                if (isAuthenticated && !isGuest) Res.string.auth_logout else Res.string.auth_sign_in
             )
             TooltipIconButton(
                 tooltip = loginLogoutLabel,
@@ -457,12 +459,12 @@ fun OnlineLobbyScreen(
             // Botón 🔍 — visible en el tab "En Vivo" salvo partida online en curso.
             if (selectedTab == 1 && !hasActiveGame) {
                 TooltipIconButton(
-                    tooltip = localizedString(Res.string.new_search),
+                    tooltip = localizedString(Res.string.lobby_new_search),
                     onClick = { showMatchmakingSheet = true },
                 ) {
                     Icon(
                         imageVector = TaratiIcons.Search,
-                        contentDescription = localizedString(Res.string.new_search),
+                        contentDescription = localizedString(Res.string.lobby_new_search),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
@@ -504,7 +506,7 @@ fun OnlineLobbyScreen(
                     is ConnectionState.Offline -> {
                         // Si ya estuvimos Online, el LaunchedEffect llama onBack() — no mostrar nada.
                         if (!hasBeenOnline) {
-                            CenteredMessage(text = localizedString(Res.string.not_connected_to_server))
+                            CenteredMessage(text = localizedString(Res.string.lobby_not_connected_to_server))
                         }
                         return@Scaffold
                     }
@@ -550,7 +552,7 @@ fun OnlineLobbyScreen(
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        text = { Text(localizedString(Res.string.connected_tab)) },
+                        text = { Text(localizedString(Res.string.lobby_connected_tab)) },
                         icon = {
                             Icon(
                                 TaratiIcons.Group,
@@ -563,7 +565,7 @@ fun OnlineLobbyScreen(
                     Tab(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        text = { LocalizedText(Res.string.in_live) },
+                        text = { LocalizedText(Res.string.lobby_in_live) },
                         icon = {
                             Icon(
                                 TaratiIcons.Public,
@@ -589,7 +591,7 @@ fun OnlineLobbyScreen(
                     Tab(
                         selected = selectedTab == 3,
                         onClick = { selectedTab = 3 },
-                        text = { LocalizedText(Res.string.my_games) },
+                        text = { LocalizedText(Res.string.lobby_my_games) },
                         icon = {
                             Icon(
                                 TaratiIcons.MenuBook,
@@ -602,7 +604,7 @@ fun OnlineLobbyScreen(
                     Tab(
                         selected = selectedTab == 4,
                         onClick = { selectedTab = 4 },
-                        text = { LocalizedText(Res.string.feed) },
+                        text = { LocalizedText(Res.string.social_feed) },
                         icon = {
                             Icon(
                                 TaratiIcons.Group,
@@ -632,8 +634,14 @@ fun OnlineLobbyScreen(
                             searchStartedInLobby = false
                         },
                         onSpectateGame = if (onSpectateGame != null) { gameId ->
-                            scope.launch { onlineGameViewModel.spectateGame(gameId) }
-                            onSpectateGame(gameId)
+                            scope.launch {
+                                val success = onlineGameViewModel.spectateGame(gameId)
+                                if (success) {
+                                    onSpectateGame(gameId)
+                                } else {
+                                    snackbarHostState.showSnackbar(spectatorUnavailableMsg)
+                                }
+                            }
                         } else null,
                     )
 
@@ -753,7 +761,7 @@ private fun LobbyTab(
             when {
                 gamesState.isLoading && combinedItems.isEmpty() -> CenteredLoader()
                 combinedItems.isEmpty() -> CenteredMessage(
-                    text = localizedString(Res.string.there_are_no_games_in_progress),
+                    text = localizedString(Res.string.lobby_no_live_games),
                 )
 
                 else -> LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
@@ -813,13 +821,13 @@ private fun LobbyFilterBar(filters: LobbyFilters, viewModel: IOnlineLobbyViewMod
         FilterChip(
             selected = filters.showLiveGames,
             onClick = { viewModel.setShowLiveGames(!filters.showLiveGames) },
-            label = { LocalizedText(Res.string.filter_live_games) },
+            label = { LocalizedText(Res.string.lobby_filter_live_games) },
             leadingIcon = { Icon(TaratiIcons.Timer, null, Modifier.size(14.dp)) },
         )
         FilterChip(
             selected = filters.showOpenSearches,
             onClick = { viewModel.setShowOpenSearches(!filters.showOpenSearches) },
-            label = { LocalizedText(Res.string.filter_open_searches) },
+            label = { LocalizedText(Res.string.lobby_filter_open_searches) },
             leadingIcon = { Icon(TaratiIcons.Search, null, Modifier.size(14.dp)) },
         )
         Spacer(Modifier.weight(1f))
@@ -837,8 +845,8 @@ private fun LobbyFilterBar(filters: LobbyFilters, viewModel: IOnlineLobbyViewMod
             DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
                 listOf(
                     LobbySort.NEWEST to Res.string.sort_newest,
-                    LobbySort.OLDEST to Res.string.sort_oldest,
-                    LobbySort.RATING_DESC to Res.string.sort_rating,
+                    LobbySort.OLDEST to Res.string.lobby_sort_oldest,
+                    LobbySort.RATING_DESC to Res.string.lobby_sort_rating,
                 ).forEach { (sort, stringRes) ->
                     DropdownMenuItem(
                         text = { LocalizedText(stringRes) },
@@ -879,7 +887,7 @@ private fun LiveGameCard(game: LiveGameDto, onSpectate: (() -> Unit)? = null) {
             { StaticBoardRenderer(modifier = Modifier.fillMaxSize(), gameState = state) }
         },
         leadingIcon = if (boardState == null) TaratiIcons.Timer else null,
-        badge = localizedString(Res.string.in_live),
+        badge = localizedString(Res.string.lobby_in_live),
         badgeColor = MaterialTheme.colorScheme.error,
         badgeTrailingContent = if (onSpectate != null) {
             {
@@ -1051,7 +1059,7 @@ private fun OpenSearchCard(search: OpenSearchDto, onJoin: (() -> Unit)?) {
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
                 )
                 Text(
-                    text = localizedString(Res.string.waiting_time).replace($$"%1$s", waitingFmt),
+                    text = localizedString(Res.string.lobby_waiting_time).replace($$"%1$s", waitingFmt),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.6f),
                 )
@@ -1139,7 +1147,7 @@ private fun OwnSearchCard(
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                 )
                 Text(
-                    text = localizedString(Res.string.waiting_time).replace($$"%1$s", waitingFmt),
+                    text = localizedString(Res.string.lobby_waiting_time).replace($$"%1$s", waitingFmt),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
                 )
@@ -1191,7 +1199,7 @@ private fun NewSearchSheet(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { LocalizedText(Res.string.new_search, style = MaterialTheme.typography.titleMedium) },
+        title = { LocalizedText(Res.string.lobby_new_search, style = MaterialTheme.typography.titleMedium) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // Time control chips
@@ -1249,7 +1257,7 @@ private fun NewSearchSheet(
         },
         confirmButton = {
             Button(onClick = { onStartSearch(selectedTc, isRated, spectatingAllowed) }) {
-                LocalizedText(Res.string.new_search)
+                LocalizedText(Res.string.lobby_new_search)
             }
         },
         dismissButton = {
@@ -1494,7 +1502,7 @@ private fun FeedTab(
                 )
 
                 state.games.isEmpty() -> CenteredMessage(
-                    text = localizedString(Res.string.no_feed_games),
+                    text = localizedString(Res.string.social_no_feed_games),
                 )
 
                 displayGames.isEmpty() -> Column(
@@ -1567,7 +1575,7 @@ private fun FeedFilterBar(
                     label = {
                         Text(
                             when (result) {
-                                null -> localizedString(Res.string.filter_all)
+                                null -> localizedString(Res.string.lobby_filter_all)
                                 "win" -> localizedString(Res.string.win)
                                 "loss" -> localizedString(Res.string.loss)
                                 else -> localizedString(Res.string.draw)
@@ -1602,7 +1610,7 @@ private fun FeedFilterBar(
                     )
                         .forEach { tc ->
                             DropdownMenuItem(
-                                text = { Text(if (tc == null) localizedString(Res.string.filter_all) else tc.description) },
+                                text = { Text(if (tc == null) localizedString(Res.string.lobby_filter_all) else tc.description) },
                                 onClick = { onTcFilter(tc); showTcMenu = false },
                                 leadingIcon = if (tcFilter == tc) ({
                                     Icon(TaratiIcons.Check, null, Modifier.size(16.dp))
@@ -1644,7 +1652,7 @@ private fun FeedGameCard(game: GameHistoryDto, onClick: (() -> Unit)? = null) {
     val playerLabel = game.playerUsername ?: "?"
 
     GameCardItem(
-        title = localizedString(Res.string.feed_player_context).replace($$"%1$s", playerLabel) +
+        title = localizedString(Res.string.social_feed_player_context).replace($$"%1$s", playerLabel) +
                 " vs ${game.opponentUsername} (${game.opponentRating})",
         subtitle = "${game.timeControl.toDisplayString()} · ${
             if (game.rated) localizedString(Res.string.rated_info_card)
@@ -1947,7 +1955,7 @@ private fun TournamentFilterBar(
                 DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
                     listOf(
                         TournamentSort.NEWEST to Res.string.sort_newest,
-                        TournamentSort.MOST_PLAYERS to Res.string.sort_most_players,
+                        TournamentSort.MOST_PLAYERS to Res.string.tournament_sort_most_players,
                     ).forEach { (sort, stringRes) ->
                         DropdownMenuItem(
                             text = { LocalizedText(stringRes) },
@@ -2238,10 +2246,10 @@ private fun ConnectedUsersTab(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 users.isEmpty() ->
-                    CenteredMessage(text = localizedString(Res.string.online_users_section))
+                    CenteredMessage(text = localizedString(Res.string.lobby_online_users_section))
 
                 displayUsers.isEmpty() -> CenteredMessage(
-                    text = localizedString(Res.string.no_players_match_filters),
+                    text = localizedString(Res.string.lobby_no_players_match_filters),
                 )
 
                 else -> LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
@@ -2290,9 +2298,9 @@ private fun ConnectedUsersFilterBar(
                         label = {
                             Text(
                                 when (status) {
-                                    null -> localizedString(Res.string.filter_all)
-                                    OnlineUserStatus.PLAYING -> localizedString(Res.string.status_playing)
-                                    OnlineUserStatus.IN_LOBBY -> localizedString(Res.string.status_in_lobby)
+                                    null -> localizedString(Res.string.lobby_filter_all)
+                                    OnlineUserStatus.PLAYING -> localizedString(Res.string.lobby_status_playing)
+                                    OnlineUserStatus.IN_LOBBY -> localizedString(Res.string.lobby_status_in_lobby)
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                             )
@@ -2309,7 +2317,7 @@ private fun ConnectedUsersFilterBar(
             FilterChip(
                 selected = registeredOnly,
                 onClick = onRegisteredOnlyToggle,
-                label = { LocalizedText(Res.string.filter_registered_only) },
+                label = { LocalizedText(Res.string.lobby_filter_registered_only) },
                 leadingIcon = { Icon(TaratiIcons.Person, null, Modifier.size(14.dp)) },
             )
         }
@@ -2348,8 +2356,8 @@ private fun ConnectedUserRow(
             )
             Text(
                 localizedString(
-                    if (user.status == OnlineUserStatus.PLAYING) Res.string.status_playing
-                    else Res.string.status_in_lobby
+                    if (user.status == OnlineUserStatus.PLAYING) Res.string.lobby_status_playing
+                    else Res.string.lobby_status_in_lobby
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = if (user.status == OnlineUserStatus.PLAYING) Color(0xFF4CAF50)
@@ -2368,7 +2376,7 @@ private fun ConnectedUserRow(
             IconButton(onClick = onChallenge, modifier = Modifier.size(36.dp)) {
                 Icon(
                     TaratiIcons.PlayArrow,
-                    contentDescription = localizedString(Res.string.challenge),
+                    contentDescription = localizedString(Res.string.social_challenge),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.primary,
                 )
@@ -2392,7 +2400,7 @@ private fun ConnectedUserChallengeDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                localizedString(Res.string.challenge_dialog_title).replace($$"%1$s", targetName),
+                localizedString(Res.string.social_challenge_dialog_title).replace($$"%1$s", targetName),
                 style = MaterialTheme.typography.titleMedium,
             )
         },
@@ -2423,7 +2431,7 @@ private fun ConnectedUserChallengeDialog(
         },
         confirmButton = {
             Button(onClick = { onConfirm(selectedTc, isRated) }) {
-                Text(localizedString(Res.string.challenge))
+                Text(localizedString(Res.string.social_challenge))
             }
         },
         dismissButton = {
@@ -2456,19 +2464,19 @@ private fun GuestSessionBanner(onSignIn: () -> Unit) {
             Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    localizedString(Res.string.guest_banner_title),
+                    localizedString(Res.string.auth_guest_banner_title),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
                 )
                 Text(
-                    localizedString(Res.string.guest_login_description),
+                    localizedString(Res.string.auth_guest_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f),
                 )
             }
             TextButton(onClick = onSignIn) {
                 Text(
-                    localizedString(Res.string.sign_in),
+                    localizedString(Res.string.auth_sign_in),
                     color = MaterialTheme.colorScheme.tertiary,
                 )
             }

@@ -39,16 +39,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
-import com.agustin.tarati.shared.generated.resources.login_hide_password
-import com.agustin.tarati.shared.generated.resources.login_show_password
-import com.agustin.tarati.shared.generated.resources.reset_password_button
-import com.agustin.tarati.shared.generated.resources.reset_password_confirm
-import com.agustin.tarati.shared.generated.resources.reset_password_field
-import com.agustin.tarati.shared.generated.resources.reset_password_min_length
-import com.agustin.tarati.shared.generated.resources.reset_password_mismatch
-import com.agustin.tarati.shared.generated.resources.login_tab
-import com.agustin.tarati.shared.generated.resources.reset_password_success
-import com.agustin.tarati.shared.generated.resources.reset_password_title
+import com.agustin.tarati.shared.generated.resources.auth_hide_password
+import com.agustin.tarati.shared.generated.resources.auth_login_tab
+import com.agustin.tarati.shared.generated.resources.auth_reset_button
+import com.agustin.tarati.shared.generated.resources.auth_reset_confirm
+import com.agustin.tarati.shared.generated.resources.auth_reset_field
+import com.agustin.tarati.shared.generated.resources.auth_reset_min_length
+import com.agustin.tarati.shared.generated.resources.auth_reset_mismatch
+import com.agustin.tarati.shared.generated.resources.auth_reset_success
+import com.agustin.tarati.shared.generated.resources.auth_reset_title
+import com.agustin.tarati.shared.generated.resources.auth_show_password
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -102,20 +102,24 @@ private fun ResetPasswordContent(
     var isLoading by remember { mutableStateOf(false) }
     var success by remember { mutableStateOf(false) }
 
-    val labelTitle = localizedString(Res.string.reset_password_title)
-    val labelField = localizedString(Res.string.reset_password_field)
-    val labelConfirm = localizedString(Res.string.reset_password_confirm)
-    val labelButton = localizedString(Res.string.reset_password_button)
-    val labelSuccess = localizedString(Res.string.reset_password_success)
-    val errMinLength = localizedString(Res.string.reset_password_min_length)
-    val errMismatch = localizedString(Res.string.reset_password_mismatch)
-    val labelShow = localizedString(Res.string.login_show_password)
-    val labelHide = localizedString(Res.string.login_hide_password)
+    val labelTitle = localizedString(Res.string.auth_reset_title)
+    val labelField = localizedString(Res.string.auth_reset_field)
+    val labelConfirm = localizedString(Res.string.auth_reset_confirm)
+    val labelButton = localizedString(Res.string.auth_reset_button)
+    val labelSuccess = localizedString(Res.string.auth_reset_success)
+    val errMinLength = localizedString(Res.string.auth_reset_min_length)
+    val errMismatch = localizedString(Res.string.auth_reset_mismatch)
+    val labelShow = localizedString(Res.string.auth_show_password)
+    val labelHide = localizedString(Res.string.auth_hide_password)
 
     fun validate(): Boolean {
         var valid = true
-        passwordError = if (password.length < 8) { valid = false; errMinLength } else null
-        confirmError = if (password != confirm) { valid = false; errMismatch } else null
+        passwordError = if (password.length < 8) {
+            valid = false; errMinLength
+        } else null
+        confirmError = if (password != confirm) {
+            valid = false; errMismatch
+        } else null
         return valid
     }
 
@@ -147,7 +151,7 @@ private fun ResetPasswordContent(
                 onClick = onDone,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(localizedString(Res.string.login_tab))
+                Text(localizedString(Res.string.auth_login_tab))
             }
         } else {
             OutlinedTextField(

@@ -42,7 +42,7 @@ import com.agustin.tarati.shared.generated.resources.allow_spectators
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.find_an_opponent
 import com.agustin.tarati.shared.generated.resources.just_for_fun
-import com.agustin.tarati.shared.generated.resources.new_search
+import com.agustin.tarati.shared.generated.resources.lobby_new_search
 import com.agustin.tarati.shared.generated.resources.offer_draw
 import com.agustin.tarati.shared.generated.resources.rated_game
 import com.agustin.tarati.shared.generated.resources.resign
@@ -308,7 +308,7 @@ fun MatchmakingModal(
                     onDismiss()
                 }
             ) {
-                LocalizedText(if (isSearching) Res.string.new_search else Res.string.start_search)
+                LocalizedText(if (isSearching) Res.string.lobby_new_search else Res.string.start_search)
             }
         },
         dismissButton = {

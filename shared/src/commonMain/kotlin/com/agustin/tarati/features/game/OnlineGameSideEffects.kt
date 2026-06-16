@@ -58,9 +58,8 @@ import com.agustin.tarati.shared.generated.resources.rematch_declined
 import com.agustin.tarati.shared.generated.resources.rematch_expired
 import com.agustin.tarati.shared.generated.resources.rematch_offered_by_opponent
 import com.agustin.tarati.shared.generated.resources.server_error
-import com.agustin.tarati.shared.generated.resources.spectator_game_ended_black_wins
 import com.agustin.tarati.shared.generated.resources.spectator_game_ended_draw
-import com.agustin.tarati.shared.generated.resources.spectator_game_ended_white_wins
+import com.agustin.tarati.shared.generated.resources.spectator_game_ended_wins
 import com.agustin.tarati.ui.components.game.animation.AnimationCoordinator
 import com.agustin.tarati.ui.components.game.animation.AnimationEvent
 import kotlinx.coroutines.channels.Channel
@@ -135,8 +134,7 @@ fun OnlineGameSideEffects(
     val drawOfferDeclinedMsg by rememberUpdatedState(stringResource(Res.string.draw_offer_declined))
     val onlineMoveFailedMsg by rememberUpdatedState(stringResource(Res.string.online_move_failed))
     val serverErrorMsg by rememberUpdatedState(stringResource(Res.string.server_error))
-    val spectEndWhiteWins by rememberUpdatedState(stringResource(Res.string.spectator_game_ended_white_wins))
-    val spectEndBlackWins by rememberUpdatedState(stringResource(Res.string.spectator_game_ended_black_wins))
+    val spectEndWins by rememberUpdatedState(stringResource(Res.string.spectator_game_ended_wins))
     val spectEndDraw by rememberUpdatedState(stringResource(Res.string.spectator_game_ended_draw))
 
     // ── Cleanup al salir ──────────────────────────────────────────────────────
@@ -268,8 +266,8 @@ fun OnlineGameSideEffects(
             }
 
             val result = when (event.result) {
-                GameResult.WHITE_WIN.key -> spectEndWhiteWins.replace($$"%1$s", event.whiteUsername)
-                GameResult.BLACK_WIN.key -> spectEndBlackWins.replace($$"%1$s", event.blackUsername)
+                GameResult.WHITE_WIN.key -> spectEndWins.replace($$"%1$s", event.whiteUsername)
+                GameResult.BLACK_WIN.key -> spectEndWins.replace($$"%1$s", event.blackUsername)
                 else -> spectEndDraw
             }
             val reason = when (event.reason) {

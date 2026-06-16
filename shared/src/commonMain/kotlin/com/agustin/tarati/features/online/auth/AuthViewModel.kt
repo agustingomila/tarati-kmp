@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.devServerUrl
+import com.agustin.tarati.network.models.localizedApiError
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -149,7 +150,8 @@ class AuthViewModel(
 
                 authenticateWithToken(accessToken).map { accessToken }
             } else {
-                val msg = parseServerError(response.bodyAsText()) ?: "Login failed: HTTP ${response.status.value}"
+                val code = parseServerError(response.bodyAsText())
+                val msg = if (code != null) localizedApiError(code) else "Login failed: HTTP ${response.status.value}"
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
@@ -295,8 +297,9 @@ class AuthViewModel(
 
                 authenticateWithToken(accessToken).map { accessToken }
             } else {
-                val msg = parseServerError(response.bodyAsText())
-                    ?: "Registration failed: HTTP ${response.status.value}"
+                val code = parseServerError(response.bodyAsText())
+                val msg =
+                    if (code != null) localizedApiError(code) else "Registration failed: HTTP ${response.status.value}"
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
@@ -350,7 +353,9 @@ class AuthViewModel(
                 _accessToken = accessToken
                 authenticateWithToken(accessToken).map { accessToken }
             } else {
-                val msg = parseServerError(response.bodyAsText()) ?: "Guest login failed: HTTP ${response.status.value}"
+                val code = parseServerError(response.bodyAsText())
+                val msg =
+                    if (code != null) localizedApiError(code) else "Guest login failed: HTTP ${response.status.value}"
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
@@ -384,8 +389,8 @@ class AuthViewModel(
             if (response.status.value == 200) {
                 Result.success(Unit)
             } else {
-                val msg = parseServerError(response.bodyAsText())
-                    ?: "Reset failed: HTTP ${response.status.value}"
+                val code = parseServerError(response.bodyAsText())
+                val msg = if (code != null) localizedApiError(code) else "Reset failed: HTTP ${response.status.value}"
                 Result.failure(Exception(msg))
             }
         } catch (e: Exception) {
@@ -501,7 +506,9 @@ class AuthViewModel(
         return bytes.toByteArray().decodeToString()
     }
 
+    // Prefiere el campo `code` (máquina-legible) sobre `message` o `error` (texto inglés).
     private fun parseServerError(body: String): String? =
-        Regex(""""message"\s*:\s*"([^"]+)"""").find(body)?.groupValues?.get(1)
+        Regex(""""code"\s*:\s*"([^"]+)"""").find(body)?.groupValues?.get(1)
+            ?: Regex(""""message"\s*:\s*"([^"]+)"""").find(body)?.groupValues?.get(1)
             ?: Regex(""""error"\s*:\s*"([^"]+)"""").find(body)?.groupValues?.get(1)
 }

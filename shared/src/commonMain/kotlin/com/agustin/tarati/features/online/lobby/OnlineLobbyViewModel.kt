@@ -11,6 +11,7 @@ import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LiveGameDto
 import com.agustin.tarati.network.models.OnlineUserDto
 import com.agustin.tarati.network.models.OpenSearchDto
+import com.agustin.tarati.network.models.PagedResponse
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -238,67 +239,28 @@ class OnlineLobbyViewModel(
     // ── Game history ───────────────────────────────────────────────────────────
 
     override fun loadHistory() {
-        viewModelScope.launch {
-            val token = getValidToken() ?: run {
-                logger.debug("loadHistory: no token, skipping")
-                return@launch
-            }
-            _history.update { it.copy(isLoading = true, error = null, currentPage = 0, games = emptyList()) }
-
+        loadPagedContent(_history) { token, page, limit ->
             repository.getGameHistory(
                 token = token,
-                page = 0,
-                limit = PAGE_SIZE,
+                page = page,
+                limit = limit,
                 timeControl = _history.value.filters.timeControl,
                 result = _history.value.filters.result,
                 rated = _history.value.filters.rated,
-            ).onSuccess { paged ->
-                _history.update {
-                    it.copy(
-                        games = paged.items,
-                        isLoading = false,
-                        currentPage = 0,
-                        total = paged.total,
-                        hasMore = paged.items.size < paged.total,
-                    )
-                }
-            }.onFailure { e ->
-                if (e is CancellationException) throw e
-                _history.update { it.copy(isLoading = false, error = e.message) }
-            }
+            )
         }
     }
 
     override fun loadMoreHistory() {
-        val state = _history.value
-        if (state.isLoadingMore || !state.hasMore) return
-
-        viewModelScope.launch {
-            val token = getValidToken() ?: return@launch
-            val nextPage = state.currentPage + 1
-            _history.update { it.copy(isLoadingMore = true) }
-
+        loadMorePagedContent(_history) { token, page, limit ->
             repository.getGameHistory(
                 token = token,
-                page = nextPage,
-                limit = PAGE_SIZE,
-                timeControl = state.filters.timeControl,
-                result = state.filters.result,
-                rated = state.filters.rated,
-            ).onSuccess { paged ->
-                _history.update {
-                    it.copy(
-                        games = it.games + paged.items,
-                        isLoadingMore = false,
-                        currentPage = nextPage,
-                        total = paged.total,
-                        hasMore = (it.games.size + paged.items.size) < paged.total,
-                    )
-                }
-            }.onFailure { e ->
-                if (e is CancellationException) throw e
-                _history.update { it.copy(isLoadingMore = false, error = e.message) }
-            }
+                page = page,
+                limit = limit,
+                timeControl = _history.value.filters.timeControl,
+                result = _history.value.filters.result,
+                rated = _history.value.filters.rated,
+            )
         }
     }
 
@@ -336,12 +298,36 @@ class OnlineLobbyViewModel(
     // ── Social feed ────────────────────────────────────────────────────────────
 
     override fun loadFeed() {
+        loadPagedContent(_feedState) { token, page, limit ->
+            repository.getFeed(token = token, page = page, limit = limit)
+        }
+    }
+
+    override fun loadMoreFeed() {
+        loadMorePagedContent(_feedState) { token, page, limit ->
+            repository.getFeed(token = token, page = page, limit = limit)
+        }
+    }
+
+    // ── Pagination helpers ─────────────────────────────────────────────────────
+
+    /**
+     * Carga la primera página de contenido paginado en [stateFlow].
+     * Resetea el estado y delega la llamada al repositorio a [load].
+     */
+    private fun loadPagedContent(
+        stateFlow: MutableStateFlow<GameHistoryUiState>,
+        load: suspend (token: String, page: Int, limit: Int) -> Result<PagedResponse<GameHistoryDto>>,
+    ) {
         viewModelScope.launch {
-            val token = getValidToken() ?: return@launch
-            _feedState.update { it.copy(isLoading = true, error = null, currentPage = 0, games = emptyList()) }
-            repository.getFeed(token = token, page = 0, limit = PAGE_SIZE)
+            val token = getValidToken() ?: run {
+                logger.debug("loadPagedContent: no token, skipping")
+                return@launch
+            }
+            stateFlow.update { it.copy(isLoading = true, error = null, currentPage = 0, games = emptyList()) }
+            load(token, 0, PAGE_SIZE)
                 .onSuccess { paged ->
-                    _feedState.update {
+                    stateFlow.update {
                         it.copy(
                             games = paged.items,
                             isLoading = false,
@@ -353,21 +339,28 @@ class OnlineLobbyViewModel(
                 }
                 .onFailure { e ->
                     if (e is CancellationException) throw e
-                    _feedState.update { it.copy(isLoading = false, error = e.message) }
+                    stateFlow.update { it.copy(isLoading = false, error = e.message) }
                 }
         }
     }
 
-    override fun loadMoreFeed() {
-        val state = _feedState.value
+    /**
+     * Agrega la siguiente página de contenido paginado en [stateFlow].
+     * No-op si ya hay una carga en curso o no hay más páginas.
+     */
+    private fun loadMorePagedContent(
+        stateFlow: MutableStateFlow<GameHistoryUiState>,
+        load: suspend (token: String, page: Int, limit: Int) -> Result<PagedResponse<GameHistoryDto>>,
+    ) {
+        val state = stateFlow.value
         if (state.isLoadingMore || !state.hasMore) return
         viewModelScope.launch {
             val token = getValidToken() ?: return@launch
             val nextPage = state.currentPage + 1
-            _feedState.update { it.copy(isLoadingMore = true) }
-            repository.getFeed(token = token, page = nextPage, limit = PAGE_SIZE)
+            stateFlow.update { it.copy(isLoadingMore = true) }
+            load(token, nextPage, PAGE_SIZE)
                 .onSuccess { paged ->
-                    _feedState.update {
+                    stateFlow.update {
                         it.copy(
                             games = it.games + paged.items,
                             isLoadingMore = false,
@@ -379,7 +372,7 @@ class OnlineLobbyViewModel(
                 }
                 .onFailure { e ->
                     if (e is CancellationException) throw e
-                    _feedState.update { it.copy(isLoadingMore = false, error = e.message) }
+                    stateFlow.update { it.copy(isLoadingMore = false, error = e.message) }
                 }
         }
     }

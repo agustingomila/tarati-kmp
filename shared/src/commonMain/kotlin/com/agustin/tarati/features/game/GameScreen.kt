@@ -21,7 +21,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.agustin.tarati.core.data.database.dto.MatchDto
-import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
 import com.agustin.tarati.core.domain.ai.services.Difficulty
@@ -33,6 +32,7 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
+import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.connection.ConnectionState
 import com.agustin.tarati.features.online.connection.IConnectionViewModel
@@ -54,7 +54,6 @@ import com.agustin.tarati.services.dialogs.AboutDialog
 import com.agustin.tarati.services.dialogs.GameOverDialog
 import com.agustin.tarati.services.dialogs.NewGameDialog
 import com.agustin.tarati.services.dialogs.buildGameOverMessage
-import com.agustin.tarati.features.game.UndoWarningDialog
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.services.notifications.UIMessage
 import com.agustin.tarati.services.notifications.UIMessageBus
