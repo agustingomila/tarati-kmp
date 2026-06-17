@@ -528,5 +528,7 @@
     <!-- Eliminación de cuenta -->
     <string name="settings_delete_account">Eliminar cuenta</string>
     <string name="settings_delete_account_title">¿Eliminar cuenta?</string>
-    <string name="settings_delete_account_body">Esta acción es permanente e irreversible. Tus partidas, rating y logros serán eliminados.</string>
+    <string name="settings_delete_account_body">Esta acción es permanente e irreversible. Tus partidas, rating y logros
+        serán eliminados.
+    </string>
 </resources>

@@ -69,7 +69,10 @@ jbcrypt = "0.4"
 kreds = "0.9.1"
 logback = "1.5.32"
 postgresql = "42.7.11"
+resend = "3.1.0"
 slf4j = "1.7.36"
+micrometer = "1.13.6"
+sentry = "7.14.0"
 
 # Utils
 material3 = "1.9.0"
@@ -89,6 +92,7 @@ ktor-server-auth-jvm = { module = "io.ktor:ktor-server-auth-jvm", version.ref = 
 ktor-server-auth-jwt-jvm = { module = "io.ktor:ktor-server-auth-jwt-jvm", version.ref = "ktor" }
 ktor-server-call-logging-jvm = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor" }
 ktor-server-content-negotiation-jvm = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-auto-head-response-jvm = { module = "io.ktor:ktor-server-auto-head-response-jvm", version.ref = "ktor" }
 ktor-server-cors-jvm = { module = "io.ktor:ktor-server-cors-jvm", version.ref = "ktor" }
 ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-status-pages-jvm = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
@@ -105,9 +109,6 @@ androidx-compose-material3 = { module = "org.jetbrains.compose.material3:materia
 androidx-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose-multiplatform" }
 androidx-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 androidx-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
-
-# ── Compose Debug — androidMain ───────────────────────────────────────────────
-androidx-compose-uiTooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
 # ── Compose AndroidX — androidApp (gestionadas por BOM) ──────────────────────
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -184,6 +185,10 @@ kreds = { module = "io.github.crackthecodeabhi:kreds", version.ref = "kreds" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+resend-java = { module = "com.resend:resend-java", version.ref = "resend" }
+ktor-server-metrics-micrometer-jvm = { module = "io.ktor:ktor-server-metrics-micrometer-jvm", version.ref = "ktor" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "micrometer" }
+sentry-logback = { module = "io.sentry:sentry-logback", version.ref = "sentry" }
 
 [plugins]
 # Android

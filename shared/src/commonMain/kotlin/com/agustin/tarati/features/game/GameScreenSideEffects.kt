@@ -150,7 +150,7 @@ fun GameScreenSideEffects(
         // Ignorar el check de IA en ese contexto para que el pre-move pueda disparar.
         val isAITurn = !isOnlineGame && (
                 (state.currentTurn == CobColor.WHITE && screenState.whiteIsAI) ||
-                (state.currentTurn == CobColor.BLACK && screenState.blackIsAI))
+                        (state.currentTurn == CobColor.BLACK && screenState.blackIsAI))
         if (isAITurn) return@LaunchedEffect
 
         if (move !in state.allMovesForTurn()) {

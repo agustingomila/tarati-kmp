@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
 import com.agustin.tarati.core.domain.game.time.TimeControl
+import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.lobby.GameHistoryUiState
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.ProfileRatingsDto
@@ -59,26 +60,26 @@ import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
-import com.agustin.tarati.shared.generated.resources.social_challenge
-import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
-import com.agustin.tarati.shared.generated.resources.social_follow
-import com.agustin.tarati.shared.generated.resources.social_followers
-import com.agustin.tarati.shared.generated.resources.social_following
-import com.agustin.tarati.shared.generated.resources.profile_games_played
-import com.agustin.tarati.shared.generated.resources.profile_history_section
 import com.agustin.tarati.shared.generated.resources.loss
-import com.agustin.tarati.shared.generated.resources.profile_member_since
 import com.agustin.tarati.shared.generated.resources.moves
 import com.agustin.tarati.shared.generated.resources.no_games_found
+import com.agustin.tarati.shared.generated.resources.profile_games_played
+import com.agustin.tarati.shared.generated.resources.profile_history_section
+import com.agustin.tarati.shared.generated.resources.profile_member_since
 import com.agustin.tarati.shared.generated.resources.profile_peak_rating
+import com.agustin.tarati.shared.generated.resources.profile_ratings_section
 import com.agustin.tarati.shared.generated.resources.profile_title
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.rated_info_card
 import com.agustin.tarati.shared.generated.resources.rating
-import com.agustin.tarati.shared.generated.resources.profile_ratings_section
 import com.agustin.tarati.shared.generated.resources.result
+import com.agustin.tarati.shared.generated.resources.social_challenge
+import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.social_follow
+import com.agustin.tarati.shared.generated.resources.social_followers
+import com.agustin.tarati.shared.generated.resources.social_following
 import com.agustin.tarati.shared.generated.resources.social_unfollow
 import com.agustin.tarati.shared.generated.resources.win
 import com.agustin.tarati.ui.components.carditem.GameCardItem
@@ -96,7 +97,6 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import com.agustin.tarati.features.online.auth.IAuthViewModel
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)

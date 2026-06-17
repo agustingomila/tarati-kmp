@@ -42,8 +42,8 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameDetail
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GamesLibraryDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.LeaderboardDest
-import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.OnlineSettingsDest
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.TournamentDetailDest

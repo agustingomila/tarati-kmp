@@ -107,55 +107,56 @@ import com.agustin.tarati.shared.generated.resources.auth_logout_confirm
 import com.agustin.tarati.shared.generated.resources.auth_sign_in
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
-import com.agustin.tarati.shared.generated.resources.social_challenge
-import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.clear_filters
 import com.agustin.tarati.shared.generated.resources.confirm
 import com.agustin.tarati.shared.generated.resources.connect_to_server_first
-import com.agustin.tarati.shared.generated.resources.lobby_connected_tab
 import com.agustin.tarati.shared.generated.resources.could_not_connect
 import com.agustin.tarati.shared.generated.resources.create
 import com.agustin.tarati.shared.generated.resources.create_tournament
 import com.agustin.tarati.shared.generated.resources.draw
 import com.agustin.tarati.shared.generated.resources.error
-import com.agustin.tarati.shared.generated.resources.social_feed
-import com.agustin.tarati.shared.generated.resources.social_feed_player_context
+import com.agustin.tarati.shared.generated.resources.join
+import com.agustin.tarati.shared.generated.resources.lobby_connected_tab
 import com.agustin.tarati.shared.generated.resources.lobby_filter_all
 import com.agustin.tarati.shared.generated.resources.lobby_filter_live_games
 import com.agustin.tarati.shared.generated.resources.lobby_filter_open_searches
 import com.agustin.tarati.shared.generated.resources.lobby_filter_registered_only
 import com.agustin.tarati.shared.generated.resources.lobby_in_live
-import com.agustin.tarati.shared.generated.resources.join
-import com.agustin.tarati.shared.generated.resources.profile_leaderboard
+import com.agustin.tarati.shared.generated.resources.lobby_my_games
+import com.agustin.tarati.shared.generated.resources.lobby_new_search
+import com.agustin.tarati.shared.generated.resources.lobby_no_live_games
+import com.agustin.tarati.shared.generated.resources.lobby_no_players_match_filters
+import com.agustin.tarati.shared.generated.resources.lobby_not_connected_to_server
+import com.agustin.tarati.shared.generated.resources.lobby_online_users_section
+import com.agustin.tarati.shared.generated.resources.lobby_sort_oldest
+import com.agustin.tarati.shared.generated.resources.lobby_sort_rating
+import com.agustin.tarati.shared.generated.resources.lobby_status_in_lobby
+import com.agustin.tarati.shared.generated.resources.lobby_status_playing
+import com.agustin.tarati.shared.generated.resources.lobby_waiting_time
 import com.agustin.tarati.shared.generated.resources.loss
 import com.agustin.tarati.shared.generated.resources.max_players
 import com.agustin.tarati.shared.generated.resources.min_players
 import com.agustin.tarati.shared.generated.resources.move
 import com.agustin.tarati.shared.generated.resources.moves
-import com.agustin.tarati.shared.generated.resources.lobby_my_games
-import com.agustin.tarati.shared.generated.resources.lobby_new_search
-import com.agustin.tarati.shared.generated.resources.social_no_feed_games
 import com.agustin.tarati.shared.generated.resources.no_games_found
-import com.agustin.tarati.shared.generated.resources.lobby_no_players_match_filters
 import com.agustin.tarati.shared.generated.resources.no_tournaments_available
 import com.agustin.tarati.shared.generated.resources.no_tournaments_match_filters
-import com.agustin.tarati.shared.generated.resources.lobby_not_connected_to_server
 import com.agustin.tarati.shared.generated.resources.online_lobby
-import com.agustin.tarati.shared.generated.resources.lobby_online_users_section
+import com.agustin.tarati.shared.generated.resources.profile_leaderboard
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.rated_info_card
 import com.agustin.tarati.shared.generated.resources.rating
 import com.agustin.tarati.shared.generated.resources.result
 import com.agustin.tarati.shared.generated.resources.retry
 import com.agustin.tarati.shared.generated.resources.search_no_longer_available
+import com.agustin.tarati.shared.generated.resources.social_challenge
+import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
+import com.agustin.tarati.shared.generated.resources.social_feed
+import com.agustin.tarati.shared.generated.resources.social_feed_player_context
+import com.agustin.tarati.shared.generated.resources.social_no_feed_games
 import com.agustin.tarati.shared.generated.resources.sort
-import com.agustin.tarati.shared.generated.resources.tournament_sort_most_players
 import com.agustin.tarati.shared.generated.resources.sort_newest
-import com.agustin.tarati.shared.generated.resources.lobby_sort_oldest
-import com.agustin.tarati.shared.generated.resources.lobby_sort_rating
-import com.agustin.tarati.shared.generated.resources.lobby_status_in_lobby
-import com.agustin.tarati.shared.generated.resources.lobby_status_playing
-import com.agustin.tarati.shared.generated.resources.lobby_no_live_games
+import com.agustin.tarati.shared.generated.resources.spectator_unavailable
 import com.agustin.tarati.shared.generated.resources.time_control
 import com.agustin.tarati.shared.generated.resources.tournament
 import com.agustin.tarati.shared.generated.resources.tournament_filter_all
@@ -163,6 +164,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_format
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
 import com.agustin.tarati.shared.generated.resources.tournament_recent_only
 import com.agustin.tarati.shared.generated.resources.tournament_registering_section
+import com.agustin.tarati.shared.generated.resources.tournament_sort_most_players
 import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
@@ -177,8 +179,6 @@ import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
 import com.agustin.tarati.shared.generated.resources.validation_max_players_count
 import com.agustin.tarati.shared.generated.resources.validation_min_players_count
 import com.agustin.tarati.shared.generated.resources.validation_players_number
-import com.agustin.tarati.shared.generated.resources.lobby_waiting_time
-import com.agustin.tarati.shared.generated.resources.spectator_unavailable
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.shared.generated.resources.win
 import com.agustin.tarati.shared.generated.resources.you
@@ -2262,7 +2262,8 @@ private fun ConnectedUsersTab(
                                 { onNavigateToProfile(user.userId) }
                             } else null,
                             onChallenge = if (!user.isGuest && user.userId != currentUserId &&
-                                user.status == OnlineUserStatus.IN_LOBBY && user.acceptsChallenges) {
+                                user.status == OnlineUserStatus.IN_LOBBY && user.acceptsChallenges
+                            ) {
                                 { challengeTarget = user }
                             } else null,
                         )

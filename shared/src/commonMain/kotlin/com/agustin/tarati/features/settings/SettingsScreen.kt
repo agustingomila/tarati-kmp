@@ -31,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,13 +39,14 @@ import androidx.compose.ui.unit.dp
 import com.agustin.tarati.GITHUB_URL
 import com.agustin.tarati.appVersion
 import com.agustin.tarati.core.utils.FeatureFlags
-import com.agustin.tarati.services.pwa.pwaInstall
-import com.agustin.tarati.services.pwa.pwaInstallAvailable
+import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.OwnedProducts
 import com.agustin.tarati.services.billing.PaletteProducts
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.services.localization.localizedString
+import com.agustin.tarati.services.pwa.pwaInstall
+import com.agustin.tarati.services.pwa.pwaInstallAvailable
 import com.agustin.tarati.services.url.IUrlLauncher
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.about
@@ -54,9 +54,7 @@ import com.agustin.tarati.shared.generated.resources.animate_effects
 import com.agustin.tarati.shared.generated.resources.animations
 import com.agustin.tarati.shared.generated.resources.app_version
 import com.agustin.tarati.shared.generated.resources.appearance
-import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.shared.generated.resources.auth_logout
-import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.shared.generated.resources.auto_theme
 import com.agustin.tarati.shared.generated.resources.board_display
 import com.agustin.tarati.shared.generated.resources.board_edges
@@ -83,6 +81,7 @@ import com.agustin.tarati.shared.generated.resources.save
 import com.agustin.tarati.shared.generated.resources.select_color_palette
 import com.agustin.tarati.shared.generated.resources.settings
 import com.agustin.tarati.shared.generated.resources.settings_install_app
+import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.shared.generated.resources.sound
 import com.agustin.tarati.shared.generated.resources.sound_disabled
 import com.agustin.tarati.shared.generated.resources.sound_effects
@@ -106,6 +105,7 @@ import com.agustin.tarati.ui.theme.GildedPalette
 import com.agustin.tarati.ui.theme.PaletteList
 import com.agustin.tarati.ui.theme.TaratiIcons
 import com.agustin.tarati.ui.theme.getBoardColors
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel

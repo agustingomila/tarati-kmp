@@ -518,5 +518,7 @@
     <!-- Account deletion -->
     <string name="settings_delete_account">Delete account</string>
     <string name="settings_delete_account_title">Delete account?</string>
-    <string name="settings_delete_account_body">This action is permanent and cannot be undone. Your games, rating and achievements will be deleted.</string>
+    <string name="settings_delete_account_body">This action is permanent and cannot be undone. Your games, rating and
+        achievements will be deleted.
+    </string>
 </resources>
