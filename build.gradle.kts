@@ -18,3 +18,9 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
     kotlin("jvm")
 }
+
+// Forzar ws >= 8.20.1 para evitar CVE-2026-45736 (uninitialized memory disclosure en websocket.close).
+// ws es dependencia transitiva de webpack-dev-server usada solo durante el build WASM.
+plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+    the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().resolution("ws", ">=8.20.1")
+}
