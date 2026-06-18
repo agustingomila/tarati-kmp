@@ -947,7 +947,7 @@ private fun TournamentContextRow(name: String, round: Int?, totalRounds: Int?) {
         Text(
             text = buildString {
                 append(name)
-                if (round != null && totalRounds != null) {
+                if (round != null && totalRounds != null && round > 0 && totalRounds > 0) {
                     append(" · R$round/$totalRounds")
                 }
             },

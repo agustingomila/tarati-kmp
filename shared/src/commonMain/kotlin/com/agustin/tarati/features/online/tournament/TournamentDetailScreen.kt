@@ -32,7 +32,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,9 +72,14 @@ import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
 import com.agustin.tarati.shared.generated.resources.tournament_status_registering
+import com.agustin.tarati.shared.generated.resources.tournament_arena_ended
+import com.agustin.tarati.shared.generated.resources.tournament_arena_ends_in
 import com.agustin.tarati.shared.generated.resources.tournament_type_arena
 import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
 import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlinx.coroutines.delay
 import com.agustin.tarati.shared.generated.resources.tournament_unregister
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -243,7 +251,11 @@ private fun TournamentDetailContent(
                 )
             }
             itemsIndexed(tournament.standings) { _, standing ->
-                StandingRow(standing, isSwiss = tournament.type == TournamentType.SWISS)
+                StandingRow(
+                    standing,
+                    isSwiss = tournament.type == TournamentType.SWISS,
+                    isArena = tournament.type == TournamentType.ARENA,
+                )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
             }
         }
@@ -312,14 +324,25 @@ private fun TournamentHeader(tournament: TournamentDetailDto) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        if (tournament.status == TournamentStatus.ACTIVE) {
-            Text(
-                localizedString(Res.string.tournament_round_progress)
-                    .replace($$"%1$d", "${tournament.currentRound}")
-                    .replace($$"%2$d", "${tournament.totalRounds}"),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-            )
+        when {
+            tournament.status == TournamentStatus.ACTIVE && tournament.type == TournamentType.ARENA ->
+                ArenaCountdown(tournament.endsAt)
+
+            tournament.status == TournamentStatus.ACTIVE ->
+                Text(
+                    localizedString(Res.string.tournament_round_progress)
+                        .replace($$"%1$d", "${tournament.currentRound}")
+                        .replace($$"%2$d", "${tournament.totalRounds}"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                )
+
+            tournament.type == TournamentType.ARENA && tournament.durationMinutes != null ->
+                Text(
+                    "${tournament.durationMinutes} min",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
         }
         Text(
             localizedString(Res.string.tournament_created_by).replace($$"%1$s", tournament.creatorUsername),
@@ -402,7 +425,7 @@ private fun StatusBadge(status: TournamentStatus) {
 }
 
 @Composable
-private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean) {
+private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean, isArena: Boolean = false) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -436,13 +459,26 @@ private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.width(8.dp))
-        // Puntos (+ buchholz para Swiss)
+        // Puntos (+ buchholz para Swiss · + racha para Arena)
         Column(horizontalAlignment = Alignment.End) {
-            Text(
-                "${formatTournamentScore(standing.score)} pts",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "${formatTournamentScore(standing.score)} pts",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (isArena && standing.currentStreak >= 2) {
+                    Text(
+                        "×${standing.currentStreak}",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
             if (isSwiss) {
                 Text(
                     "BH ${formatTournamentScore(standing.buchholz)}",
@@ -452,6 +488,43 @@ private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean) {
             }
         }
     }
+}
+
+@Composable
+private fun ArenaCountdown(endsAt: kotlin.time.Instant?) {
+    if (endsAt == null) return
+
+    var remaining by remember(endsAt) { mutableStateOf(endsAt - Clock.System.now()) }
+
+    LaunchedEffect(endsAt) {
+        while (remaining.isPositive()) {
+            delay(1000)
+            remaining = endsAt - Clock.System.now()
+        }
+    }
+
+    val ended = !remaining.isPositive()
+    val text = if (ended) {
+        localizedString(Res.string.tournament_arena_ended)
+    } else {
+        val formatted = if (remaining.inWholeHours > 0) {
+            "${remaining.inWholeHours}h ${remaining.inWholeMinutes % 60}m"
+        } else {
+            "${remaining.inWholeMinutes}m ${remaining.inWholeSeconds % 60}s"
+        }
+        localizedString(Res.string.tournament_arena_ends_in).replace($$"%1$s", formatted)
+    }
+
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.Medium,
+        color = when {
+            ended -> MaterialTheme.colorScheme.onSurfaceVariant
+            remaining.inWholeMinutes < 5 -> MaterialTheme.colorScheme.error
+            else -> MaterialTheme.colorScheme.primary
+        },
+    )
 }
 
 @Composable
