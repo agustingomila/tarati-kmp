@@ -169,6 +169,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
 import com.agustin.tarati.shared.generated.resources.tournament_status_registering
+import com.agustin.tarati.shared.generated.resources.tournament_type_arena
 import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
 import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
 import com.agustin.tarati.shared.generated.resources.tournaments
@@ -2008,6 +2009,7 @@ private fun TournamentCard(
                     when (tournament.type) {
                         TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
                         TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
+                        TournamentType.ARENA -> localizedString(Res.string.tournament_type_arena)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -2095,6 +2097,7 @@ private fun CreateTournamentDialog(
                                     when (type) {
                                         TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
                                         TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
+                                        TournamentType.ARENA -> localizedString(Res.string.tournament_type_arena)
                                     }
                                 )
                             },

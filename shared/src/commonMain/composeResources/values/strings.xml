@@ -467,6 +467,7 @@
     <string name="tournament_status_cancelled">Cancelled</string>
     <string name="tournament_type_round_robin">Round Robin</string>
     <string name="tournament_type_swiss">Swiss</string>
+    <string name="tournament_type_arena">Arena</string>
     <string name="tournament_round_n">Round %1$d</string>
     <string name="tournament_game_assigned">%1$s · Round %2$d/%3$d: your game is ready</string>
     <string name="tournament_finished_notification">The tournament ended — see the final standings</string>

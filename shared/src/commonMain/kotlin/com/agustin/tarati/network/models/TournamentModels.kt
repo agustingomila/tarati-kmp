@@ -10,12 +10,13 @@ import kotlin.time.Instant
  * Formato del torneo.
  * ROUND_ROBIN: todos contra todos, emparejamientos generados al inicio.
  * SWISS: emparejamiento por puntos por ronda, evitando repetir rivales.
+ * ARENA: ventana de tiempo fija; partidas continuas hasta que vence el timer.
  *
  * [key] es el valor almacenado en la columna tournaments.type.
  */
 @Serializable
 enum class TournamentType {
-    ROUND_ROBIN, SWISS;
+    ROUND_ROBIN, SWISS, ARENA;
 
     val key: String get() = name.lowercase()
 }
@@ -63,6 +64,7 @@ enum class TournamentGameStatus {
  * @property minPlayers        Mínimo de jugadores para poder iniciar
  * @property maxPlayers        Máximo de inscritos
  * @property spectatingAllowed Si los espectadores externos pueden ver las partidas del torneo
+ * @property durationMinutes   Duración en minutos — solo para Arena; null en Swiss/Round Robin
  */
 @Serializable
 data class CreateTournamentRequest(
@@ -75,6 +77,7 @@ data class CreateTournamentRequest(
     val minPlayers: Int = 4,
     val maxPlayers: Int = 16,
     val spectatingAllowed: Boolean = true,
+    val durationMinutes: Int? = null,
 )
 
 // ── DTOs de respuesta ─────────────────────────────────────────────────────────
@@ -100,8 +103,10 @@ data class TournamentSummaryDto(
     val creatorId: String,
     val creatorUsername: String,
     val spectatingAllowed: Boolean = true,
+    val durationMinutes: Int? = null,
     val createdAt: Instant,
     val startsAt: Instant?,
+    val endsAt: Instant? = null,
     val finishedAt: Instant?,
 )
 
@@ -127,18 +132,22 @@ data class TournamentDetailDto(
     val currentRound: Int,
     val totalRounds: Int,
     val spectatingAllowed: Boolean = true,
+    val durationMinutes: Int? = null,
     val standings: List<TournamentStandingDto>,
     val rounds: List<TournamentRoundDto>,
     val createdAt: Instant,
     val startsAt: Instant?,
+    val endsAt: Instant? = null,
     val finishedAt: Instant?,
 )
 
 /**
  * Posición de un jugador en la tabla de clasificación del torneo.
  *
- * score: medios puntos de notación estándar 1-½-0 (vic=2, emp=1, der=0).
- * buchholz: suma de scores (en medios puntos) de los oponentes enfrentados (desempate en Swiss).
+ * score:         medios puntos de notación estándar 1-½-0 (vic=2, emp=1, der=0).
+ *                En Arena incluye los bonos de racha acumulados.
+ * buchholz:      suma de scores de los oponentes enfrentados (desempate en Swiss; 0 en Arena).
+ * currentStreak: victorias consecutivas actuales (solo relevante en Arena; 0 en Swiss/RR).
  */
 @Immutable
 @Serializable
@@ -154,10 +163,12 @@ data class TournamentStandingDto(
     val losses: Int,
     val draws: Int,
     val buchholz: Int,
+    val currentStreak: Int = 0,
 )
 
 /**
  * Una ronda del torneo con todos sus enfrentamientos.
+ * En Arena las rondas no aplican; [rounds] será vacío.
  */
 @Immutable
 @Serializable

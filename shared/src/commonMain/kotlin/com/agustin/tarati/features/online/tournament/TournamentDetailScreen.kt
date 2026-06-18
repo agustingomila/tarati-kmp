@@ -69,6 +69,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
 import com.agustin.tarati.shared.generated.resources.tournament_status_registering
+import com.agustin.tarati.shared.generated.resources.tournament_type_arena
 import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
 import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
 import com.agustin.tarati.shared.generated.resources.tournament_unregister
@@ -300,6 +301,7 @@ private fun TournamentHeader(tournament: TournamentDetailDto) {
         val typeLabel = when (tournament.type) {
             TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
             TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
+            TournamentType.ARENA -> localizedString(Res.string.tournament_type_arena)
         }
         Text(
             "$typeLabel · ${
