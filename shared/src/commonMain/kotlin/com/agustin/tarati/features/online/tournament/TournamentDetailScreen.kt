@@ -60,6 +60,8 @@ import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.standings
 import com.agustin.tarati.shared.generated.resources.tournament
 import com.agustin.tarati.shared.generated.resources.tournament_active_status
+import com.agustin.tarati.shared.generated.resources.tournament_arena_ended
+import com.agustin.tarati.shared.generated.resources.tournament_arena_ends_in
 import com.agustin.tarati.shared.generated.resources.tournament_cancelled_status
 import com.agustin.tarati.shared.generated.resources.tournament_created_by
 import com.agustin.tarati.shared.generated.resources.tournament_finished_status
@@ -72,14 +74,9 @@ import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
 import com.agustin.tarati.shared.generated.resources.tournament_status_registering
-import com.agustin.tarati.shared.generated.resources.tournament_arena_ended
-import com.agustin.tarati.shared.generated.resources.tournament_arena_ends_in
 import com.agustin.tarati.shared.generated.resources.tournament_type_arena
 import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
 import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
-import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlinx.coroutines.delay
 import com.agustin.tarati.shared.generated.resources.tournament_unregister
 import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -88,9 +85,11 @@ import com.agustin.tarati.ui.layout.CompanionPanelHeader
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
 
 /**
  * Pantalla de detalle de un torneo.

@@ -3,11 +3,11 @@ package com.agustin.tarati.features.online.social
 
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.FollowStatusDto
-import com.agustin.tarati.network.models.ServerAchievementDto
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LeaderboardEntryDto
 import com.agustin.tarati.network.models.PagedResponse
 import com.agustin.tarati.network.models.PublicProfileDto
+import com.agustin.tarati.network.models.ServerAchievementDto
 import com.agustin.tarati.network.models.UserSummaryDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

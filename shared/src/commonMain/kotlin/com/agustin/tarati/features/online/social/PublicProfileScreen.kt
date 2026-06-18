@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import com.agustin.tarati.features.achievements.ProfileAchievementsSection
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -50,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
 import com.agustin.tarati.core.domain.game.time.TimeControl
+import com.agustin.tarati.features.achievements.ProfileAchievementsSection
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.lobby.GameHistoryUiState
 import com.agustin.tarati.network.models.GameHistoryDto

@@ -20,7 +20,6 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor.WHITE
 import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
 import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameResult
-import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
@@ -50,8 +49,8 @@ import com.agustin.tarati.shared.generated.resources.draw_offer_declined
 import com.agustin.tarati.shared.generated.resources.notification_draw
 import com.agustin.tarati.shared.generated.resources.notification_reason_agreement
 import com.agustin.tarati.shared.generated.resources.notification_reason_mit
-import com.agustin.tarati.shared.generated.resources.notification_reason_stalemit
 import com.agustin.tarati.shared.generated.resources.notification_reason_resignation
+import com.agustin.tarati.shared.generated.resources.notification_reason_stalemit
 import com.agustin.tarati.shared.generated.resources.notification_reason_timeout
 import com.agustin.tarati.shared.generated.resources.notification_you_lost
 import com.agustin.tarati.shared.generated.resources.notification_you_won

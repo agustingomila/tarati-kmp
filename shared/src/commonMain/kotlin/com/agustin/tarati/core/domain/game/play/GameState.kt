@@ -1,6 +1,7 @@
 package com.agustin.tarati.core.domain.game.play
 
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.data.database.dto.GameDto
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.data.database.dto.PGNHeader.Companion.createPGNHeader
@@ -28,7 +29,6 @@ import com.agustin.tarati.core.domain.game.play.GameState.Companion.POS_DELIMITE
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.TURN_DELIMITER_CHAR
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.MatchResult.UNDEFINED
-import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
 @Stable

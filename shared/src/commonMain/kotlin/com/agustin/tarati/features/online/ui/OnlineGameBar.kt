@@ -285,7 +285,8 @@ fun OnlineGameBar(
                                 tint = MaterialTheme.colorScheme.secondary,
                             )
                             val roundSuffix = if (game.tournamentRound != null && game.tournamentRound > 0 &&
-                                game.tournamentTotalRounds != null && game.tournamentTotalRounds > 0) {
+                                game.tournamentTotalRounds != null && game.tournamentTotalRounds > 0
+                            ) {
                                 " · " + localizedString(Res.string.tournament_round_progress)
                                     .replace($$"%1$d", "${game.tournamentRound}")
                                     .replace($$"%2$d", "${game.tournamentTotalRounds}")
