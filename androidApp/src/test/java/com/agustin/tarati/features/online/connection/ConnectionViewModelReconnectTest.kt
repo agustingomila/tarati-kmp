@@ -78,7 +78,7 @@ class ConnectionViewModelReconnectTest {
      * [TestScope] receptor permite llamar a [runCurrent] directamente.
      */
     private suspend fun TestScope.goOnline() {
-        coEvery { mockWsClient.connect() } answers {
+        coEvery { mockWsClient.connect(any()) } answers {
             wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Connected
         }
         viewModel.connectToServer("localhost:8080", "token")
@@ -91,7 +91,7 @@ class ConnectionViewModelReconnectTest {
     @Test
     fun `unexpected WS drop while Online triggers Reconnecting on first attempt`() = runTest {
         goOnline()
-        coEvery { mockWsClient.connect() } throws Exception("Server unreachable")
+        coEvery { mockWsClient.connect(any()) } throws Exception("Server unreachable")
 
         wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Disconnected
         // runCurrent: procesa el collector y arranca autoReconnect hasta el primer delay
@@ -108,7 +108,7 @@ class ConnectionViewModelReconnectTest {
         goOnline()
 
         var attempts = 0
-        coEvery { mockWsClient.connect() } answers {
+        coEvery { mockWsClient.connect(any()) } answers {
             attempts++
             if (attempts == 1) throw Exception("Timeout")
             wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Connected
@@ -138,7 +138,7 @@ class ConnectionViewModelReconnectTest {
     @Test
     fun `intentional disconnect cancels auto-reconnect and goes Offline`() = runTest {
         goOnline()
-        coEvery { mockWsClient.connect() } throws Exception("Still down")
+        coEvery { mockWsClient.connect(any()) } throws Exception("Still down")
 
         wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Disconnected
         runCurrent()                       // → Reconnecting(attempt=1)
@@ -154,7 +154,7 @@ class ConnectionViewModelReconnectTest {
     @Test
     fun `all reconnect attempts exhausted transitions to Offline`() = runTest {
         goOnline()
-        coEvery { mockWsClient.connect() } throws Exception("Server down")
+        coEvery { mockWsClient.connect(any()) } throws Exception("Server down")
 
         wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Disconnected
         runCurrent()                       // → Reconnecting(attempt=1)

@@ -40,6 +40,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -137,6 +138,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Internal UI state for the sidebar — tracks which difficulty dropdowns are open.
  */
+@Immutable
 data class SidebarUIState(
     val isDifficultyExpandedWhite: Boolean = false,
     val isDifficultyExpandedBlack: Boolean = false,
@@ -160,6 +162,7 @@ fun SidebarContent(
     /** Estado de espectador activo. Mutuamente excluyente con [onlineGame]. */
     spectatingState: SpectatingState? = null,
     onOnlineLobby: () -> Unit = {},
+    onNavigateToAchievements: () -> Unit = {},
 ) {
     var sidebarUIState by remember { mutableStateOf(SidebarUIState()) }
 
@@ -177,6 +180,7 @@ fun SidebarContent(
         onNavigateToSettings = onNavigateToSettings,
         onUndo = onUndo,
         onOnlineLobby = onOnlineLobby,
+        onNavigateToAchievements = onNavigateToAchievements,
     )
 
     val sidebarGameState = SidebarGameState(
@@ -211,6 +215,7 @@ fun createSidebarEvents(
     onNavigateToSettings: () -> Unit,
     onUndo: () -> Unit,
     onOnlineLobby: () -> Unit = {},
+    onNavigateToAchievements: () -> Unit = {},
 ): SidebarEvents {
     return object : SidebarEvents {
         override fun onMoveToCurrent() = gameModel.moveToCurrentState()
@@ -270,7 +275,7 @@ fun createSidebarEvents(
         override fun onSaveGame() = gameEvents.saveGame()
         override fun onAboutClick() = gameEvents.showAboutDialog()
         override fun onCopyMoveHistory(moves: List<Move>) = gameEvents.copyMovesToClipboard(moves)
-        override fun onShowAchievements() = gameEvents.showAchievementsUI()
+        override fun onShowAchievements() = gameEvents.showAchievementsUI(onNavigateToAchievements)
     }
 }
 

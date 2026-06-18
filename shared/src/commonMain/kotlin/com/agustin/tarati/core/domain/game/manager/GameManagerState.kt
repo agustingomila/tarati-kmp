@@ -1,11 +1,13 @@
 package com.agustin.tarati.core.domain.game.manager
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.domain.game.play.StableHistoryList
 import kotlinx.serialization.Serializable
 
+@Stable
 @Serializable
 data class GameManagerState(
     val gameState: GameState,

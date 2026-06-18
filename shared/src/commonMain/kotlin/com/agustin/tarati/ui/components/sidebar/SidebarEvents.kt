@@ -1,10 +1,12 @@
 package com.agustin.tarati.ui.components.sidebar
 
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.play.Move
 
+@Stable
 interface SidebarEvents {
     fun onMoveToCurrent()
 

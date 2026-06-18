@@ -40,6 +40,7 @@ import com.agustin.tarati.GITHUB_URL
 import com.agustin.tarati.appVersion
 import com.agustin.tarati.core.utils.FeatureFlags
 import com.agustin.tarati.features.online.auth.IAuthViewModel
+import com.agustin.tarati.services.achievements.IAchievementsManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.OwnedProducts
 import com.agustin.tarati.services.billing.PaletteProducts
@@ -80,6 +81,7 @@ import com.agustin.tarati.shared.generated.resources.pre_moves
 import com.agustin.tarati.shared.generated.resources.save
 import com.agustin.tarati.shared.generated.resources.select_color_palette
 import com.agustin.tarati.shared.generated.resources.settings
+import com.agustin.tarati.shared.generated.resources.settings_achievements
 import com.agustin.tarati.shared.generated.resources.settings_install_app
 import com.agustin.tarati.shared.generated.resources.settings_online
 import com.agustin.tarati.shared.generated.resources.sound
@@ -109,6 +111,7 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,6 +124,7 @@ fun SettingsScreen(
     onLogout: (() -> Unit)? = null,
     loggedInUsername: String? = null,
     onNavigateToOnlineSettings: (() -> Unit)? = null,
+    onNavigateToAchievements: (() -> Unit)? = null,
 ) {
     val settingsState by viewModel.settingsState.collectAsState()
 
@@ -304,7 +308,7 @@ fun SettingsScreen(
                     },
                 )
 
-                if (FeatureFlags.ONLINE_ENABLED && onLogout != null) {
+                if (onLogout != null) {
                     val isGuest = authViewModel.currentUser?.isGuest == true
                     SettingsCategory(title = Res.string.settings_online)
                     if (onNavigateToOnlineSettings != null && !loggedInUsername.isNullOrBlank() && !isGuest) {
@@ -361,7 +365,7 @@ fun SettingsScreen(
                     }
                 }
 
-                AboutSection()
+                AboutSection(onNavigateToAchievements = onNavigateToAchievements)
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -372,6 +376,8 @@ fun SettingsScreen(
 @Composable
 private fun AboutSection(
     urlLauncher: IUrlLauncher = koinInject(),
+    achievementsManager: IAchievementsManager = koinInject(),
+    onNavigateToAchievements: (() -> Unit)? = null,
 ) {
     var canInstall by remember { mutableStateOf(pwaInstallAvailable()) }
 
@@ -379,12 +385,46 @@ private fun AboutSection(
     // En Android/Desktop pwaInstallAvailable() siempre retorna false (no-op).
     androidx.compose.runtime.LaunchedEffect(Unit) {
         while (true) {
-            delay(1_000)
+            delay(1_000.milliseconds)
             canInstall = pwaInstallAvailable()
         }
     }
 
     SettingsCategory(title = Res.string.about)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                achievementsManager.showAchievementsUI { onNavigateToAchievements?.invoke() }
+            }
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = TaratiIcons.EmojiEvents,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(Modifier.width(16.dp))
+        Text(
+            text = localizedString(Res.string.settings_achievements),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = TaratiIcons.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+
+    HorizontalDivider(
+        modifier = Modifier.padding(start = 56.dp, end = 16.dp),
+        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+    )
 
     SettingItem(
         icon = TaratiIcons.Info,

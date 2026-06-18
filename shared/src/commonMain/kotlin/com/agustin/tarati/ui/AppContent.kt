@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.utils.FeatureFlags
+import com.agustin.tarati.features.achievements.AchievementsScreen
 import com.agustin.tarati.features.detail.GameDetailsScreen
 import com.agustin.tarati.features.detail.GameDetailsViewModel
 import com.agustin.tarati.features.detail.IGameDetailsViewModel
@@ -75,6 +76,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_game_assigned
 import com.agustin.tarati.ui.components.navigation.NavGraph
 import com.agustin.tarati.ui.components.navigation.injectGameViewModel
 import com.agustin.tarati.ui.layout.CompanionPanelController
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Achievements
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.GameDetails
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Leaderboard
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Library
@@ -200,7 +202,7 @@ fun AppContent(
                         AlertHost()
                         if (FeatureFlags.ONLINE_ENABLED) ChallengeNotificationEffect()
                         if (FeatureFlags.ONLINE_ENABLED) TournamentNotificationEffect()
-                        if (FeatureFlags.ONLINE_ENABLED && showLoginModal) {
+                        if (showLoginModal) {
                             LoginSheet(
                                 onLoginSuccess = {
                                     showLoginModal = false
@@ -332,7 +334,12 @@ private fun CompanionPane(
             onNavigateToOnlineSettings = {
                 controller.navigate(OnlineSettings)
             },
+            onNavigateToAchievements = {
+                controller.navigate(Achievements)
+            },
         )
+
+        Achievements -> AchievementsScreen(onBack = controller::back)
 
         OnlineSettings -> OnlineSettingsScreen(
             onNavigateBack = controller::back,

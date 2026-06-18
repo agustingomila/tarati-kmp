@@ -21,6 +21,7 @@ import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
 import com.agustin.tarati.core.domain.game.play.GameEndReason
 import com.agustin.tarati.core.domain.game.play.GameResult
 import com.agustin.tarati.core.domain.game.play.GameState
+import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.auth.IAuthViewModel
@@ -34,6 +35,7 @@ import com.agustin.tarati.features.online.game.SpectatingState
 import com.agustin.tarati.network.models.OnlineGame
 import com.agustin.tarati.network.models.OnlineGameStatus
 import com.agustin.tarati.network.protocol.TimeControlInfo
+import com.agustin.tarati.services.achievements.IAchievementsManager
 import com.agustin.tarati.services.clock.ClockViewModel
 import com.agustin.tarati.services.clock.IClockService
 import com.agustin.tarati.services.localization.localizedString
@@ -48,6 +50,7 @@ import com.agustin.tarati.shared.generated.resources.draw_offer_declined
 import com.agustin.tarati.shared.generated.resources.notification_draw
 import com.agustin.tarati.shared.generated.resources.notification_reason_agreement
 import com.agustin.tarati.shared.generated.resources.notification_reason_mit
+import com.agustin.tarati.shared.generated.resources.notification_reason_stalemit
 import com.agustin.tarati.shared.generated.resources.notification_reason_resignation
 import com.agustin.tarati.shared.generated.resources.notification_reason_timeout
 import com.agustin.tarati.shared.generated.resources.notification_you_lost
@@ -113,6 +116,7 @@ fun OnlineGameSideEffects(
 ) {
     val scope = rememberCoroutineScope()
     val bus: UIMessageBus = koinInject()
+    val achievementsManager: IAchievementsManager = koinInject()
     var onlinePlayerSide by onlinePlayerSideState
 
     // ── Strings ───────────────────────────────────────────────────────────────
@@ -126,6 +130,7 @@ fun OnlineGameSideEffects(
     val notifTimeout by rememberUpdatedState(stringResource(Res.string.notification_reason_timeout))
     val notifAgreement by rememberUpdatedState(stringResource(Res.string.notification_reason_agreement))
     val notifMit by rememberUpdatedState(stringResource(Res.string.notification_reason_mit))
+    val notifStalemit by rememberUpdatedState(stringResource(Res.string.notification_reason_stalemit))
     val rematchLabel by rememberUpdatedState(stringResource(Res.string.rematch))
     val cancelLabel by rememberUpdatedState(localizedString(Res.string.cancel))
     val rematchDeclinedMsg by rememberUpdatedState(stringResource(Res.string.rematch_declined))
@@ -274,7 +279,8 @@ fun OnlineGameSideEffects(
                 GameEndReason.RESIGNATION.key -> notifResignation
                 GameEndReason.TIMEOUT.key -> notifTimeout
                 GameEndReason.DRAW_AGREEMENT.key -> notifAgreement
-                GameEndReason.MIT.key, GameEndReason.STALEMIT.key -> notifMit
+                GameEndReason.MIT.key -> notifMit
+                GameEndReason.STALEMIT.key -> notifStalemit
                 else -> null
             }
             val msg = if (reason != null) "$result · $reason" else result
@@ -369,8 +375,7 @@ fun OnlineGameSideEffects(
             OnlineGameStatus.InProgress -> {
                 // Si estábamos espectando, dejar la partida antes de iniciar la propia.
                 onlineGameViewModel.stopSpectating()
-                val game = currentOnlineGame
-                val onlineColor = cobColorByDescription(game.yourColor) ?: BLACK
+                val onlineColor = cobColorByDescription(currentOnlineGame.yourColor) ?: BLACK
                 onlinePlayerSide = onlineColor
                 setShowMatchmakingModal(false)
                 bus.clearAlert()
@@ -397,19 +402,18 @@ fun OnlineGameSideEffects(
                 viewModel.suppressLogoTransition()
                 // Apply the full server state if moves arrived before startGame() ran
                 // (e.g. device rotation mid-game or bot moving before GameStarted is processed).
-                val serverState = game.gameState
+                val serverState = currentOnlineGame.gameState
                 if (serverState != null &&
-                    serverState.hashBoard() != GameState.initialGameState().hashBoard()
+                    serverState.hashBoard() != initialGameState().hashBoard()
                 ) {
                     viewModel.updateGameState(serverState)
                 }
             }
 
             is OnlineGameStatus.Finished -> {
-                val game = currentOnlineGame
-                val finishedGameId = game.gameId
-                val move = game.lastMove
-                val finalState = game.gameState
+                val finishedGameId = currentOnlineGame.gameId
+                val move = currentOnlineGame.lastMove
+                val finalState = currentOnlineGame.gameState
                 if (move != null && finalState != null &&
                     gameManagerState.gameState.hashBoard() != finalState.hashBoard()
                 ) {
@@ -438,6 +442,21 @@ fun OnlineGameSideEffects(
                     }
                 }
                 setOnlineFinishedResult(status)
+
+                // Disparar logros de fin de partida online.
+                // difficulty = null indica que no hay IA — los logros de dificultad no aplican.
+                val finalMatchState = gameManagerState.gameState.getMatchState()
+                val capturedSide = onlinePlayerSide
+                if (capturedSide != null) {
+                    scope.launch {
+                        achievementsManager.onGameOver(
+                            matchState = finalMatchState,
+                            playerSide = capturedSide,
+                            difficulty = null,
+                        )
+                    }
+                }
+
                 bus.toast(
                     UIMessage.Toast(
                         message = buildFinalNotifMessage(
@@ -450,6 +469,7 @@ fun OnlineGameSideEffects(
                             notifTimeout = notifTimeout,
                             notifAgreement = notifAgreement,
                             notifMit = notifMit,
+                            notifStalemit = notifStalemit,
                         ),
                         duration = 5.seconds,
                     )
@@ -499,6 +519,18 @@ fun OnlineGameSideEffects(
             // Starting → manejado por LaunchedEffect(status=Starting) en GameScreen
             OnlineGameStatus.Starting -> Unit
             null -> Unit
+        }
+    }
+
+    // ── Limpieza de toasts de revancha al iniciar partida local ──────────────
+    // Si el usuario pulsa "Nueva partida" mientras hay un juego online en Finished,
+    // el tablero vuelve a la posición inicial. Detectamos ese cambio y descartamos
+    // cualquier toast de resultado/revancha que aún esté visible o encolado.
+    LaunchedEffect(gameManagerState.gameState) {
+        val boardIsReset = gameManagerState.gameState.hashBoard() ==
+                initialGameState().hashBoard()
+        if (boardIsReset && currentOnlineGame?.status is OnlineGameStatus.Finished) {
+            bus.clearAllToasts()
         }
     }
 
@@ -554,6 +586,7 @@ private fun buildFinalNotifMessage(
     notifTimeout: String,
     notifAgreement: String,
     notifMit: String,
+    notifStalemit: String,
 ): String {
     val resultPrefix = when {
         status.result == GameResult.DRAW.key -> notifDraw
@@ -565,7 +598,8 @@ private fun buildFinalNotifMessage(
         GameEndReason.RESIGNATION.key -> notifResignation
         GameEndReason.TIMEOUT.key -> notifTimeout
         GameEndReason.DRAW_AGREEMENT.key -> notifAgreement
-        GameEndReason.MIT.key, GameEndReason.STALEMIT.key -> notifMit
+        GameEndReason.MIT.key -> notifMit
+        GameEndReason.STALEMIT.key -> notifStalemit
         else -> null
     }
     val ratingDelta = status.ratingUpdate?.change?.let { delta ->

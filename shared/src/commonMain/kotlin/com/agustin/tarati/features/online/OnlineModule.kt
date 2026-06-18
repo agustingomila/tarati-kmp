@@ -1,6 +1,8 @@
 package com.agustin.tarati.features.online
 
 
+import com.agustin.tarati.features.achievements.AchievementsViewModel
+import com.agustin.tarati.features.achievements.IAchievementsViewModel
 import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.features.online.auth.AuthViewModel
 import com.agustin.tarati.features.online.auth.IAuthViewModel
@@ -243,6 +245,15 @@ val onlineModule = module {
             onlineGameViewModel = get(),
         )
     } bind IPublicProfileViewModel::class
+
+    // ============ Achievements ============
+
+    viewModel {
+        AchievementsViewModel(
+            syncService = get(),
+            authViewModel = get(),
+        )
+    } bind IAchievementsViewModel::class
 }
 
 /**

@@ -25,6 +25,7 @@ fun LanguageAwareSettingsScreen(
     onLogout: (() -> Unit)? = null,
     loggedInUsername: String? = null,
     onNavigateToOnlineSettings: (() -> Unit)? = null,
+    onNavigateToAchievements: (() -> Unit)? = null,
 ) {
     // Observar el código de idioma actual (String: "es", "en", etc.)
     val currentLanguage = LocalAppLanguage.current
@@ -46,6 +47,7 @@ fun LanguageAwareSettingsScreen(
             onLogout = onLogout,
             loggedInUsername = loggedInUsername,
             onNavigateToOnlineSettings = onNavigateToOnlineSettings,
+            onNavigateToAchievements = onNavigateToAchievements,
         )
     }
 }

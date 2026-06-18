@@ -2,14 +2,11 @@ package com.agustin.tarati.services.achievements
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import com.agustin.tarati.R
 import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.auth.AuthRepository
 import com.agustin.tarati.ui.theme.SeasonalThemeManager
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.games.PlayGames
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -137,27 +134,33 @@ class AchievementsManager(
 
     // ── UI ────────────────────────────────────────────────────────────────────
 
-    override fun showAchievementsUI() {
+    override fun showAchievementsUI(onNavigateToScreen: () -> Unit) {
         val activity = activityProvider.get() ?: run {
             getLogger().debug("showAchievementsUI skipped: no activity")
+            onNavigateToScreen()
             return
         }
 
-        PlayGames.getAchievementsClient(activity)
-            .achievementsIntent
-            .addOnSuccessListener { intent -> launchAchievementsIntent(intent) }
-            .addOnFailureListener { e ->
-                val isSignInRequired = (e as? ApiException)?.statusCode == CommonStatusCodes.SIGN_IN_REQUIRED
-                if (isSignInRequired) {
-                    getLogger().debug("showAchievementsUI: user not signed in to Play Games")
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.achievements_sign_in_required),
-                        Toast.LENGTH_SHORT
-                    ).show()
+        // Verifica si el usuario tiene sesión Google activa antes de intentar abrir Play Games.
+        PlayGames.getGamesSignInClient(activity)
+            .isAuthenticated
+            .addOnSuccessListener { result ->
+                if (result.isAuthenticated) {
+                    PlayGames.getAchievementsClient(activity)
+                        .achievementsIntent
+                        .addOnSuccessListener { intent -> launchAchievementsIntent(intent) }
+                        .addOnFailureListener { e ->
+                            getLogger().error("showAchievementsUI failed: ${e.message}", e)
+                            onNavigateToScreen()
+                        }
                 } else {
-                    getLogger().error("showAchievementsUI failed: ${e.message}", e)
+                    getLogger().debug("showAchievementsUI: user not signed in to Play Games — navigating to own screen")
+                    onNavigateToScreen()
                 }
+            }
+            .addOnFailureListener { e ->
+                getLogger().debug("showAchievementsUI: could not check sign-in status — ${e.message}")
+                onNavigateToScreen()
             }
     }
 

@@ -1,5 +1,8 @@
 package com.agustin.tarati.ui.components.game.animation
 
+import androidx.compose.runtime.Stable
+
+@Stable
 class AnimationCoordinator(
     private val animationViewModel: IBoardAnimationViewModel,
 ) {

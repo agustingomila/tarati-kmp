@@ -26,4 +26,6 @@ sealed class ScreenDestinations(
     object TournamentDetailDest : ScreenDestinations(route = "tournament/{tournamentId}") {
         fun createRoute(tournamentId: String) = "tournament/$tournamentId"
     }
+
+    object AchievementsDest : ScreenDestinations(route = "achievements")
 }

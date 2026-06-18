@@ -1,5 +1,6 @@
 package com.agustin.tarati.core.domain.game.play
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,6 +24,7 @@ import kotlinx.serialization.Serializable
  * y muerte de proceso. Una `List<HistoryEntry>` plana no sería serializable
  * directamente por `SavedStateHandle` sin configuración adicional.
  */
+@Stable
 @Serializable
 class StableHistoryList(
     private val entries: List<HistoryEntry>,

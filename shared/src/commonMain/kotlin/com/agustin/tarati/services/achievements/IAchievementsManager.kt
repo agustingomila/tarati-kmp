@@ -59,9 +59,9 @@ interface IAchievementsManager {
      *
      * @param matchState  Estado final (ganador, razón de fin)
      * @param playerSide  Bando del jugador humano
-     * @param difficulty  Dificultad de la IA contra la que jugó
+     * @param difficulty  Dificultad de la IA contra la que jugó. Null en partidas online.
      */
-    suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty)
+    suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty?)
 
     /** Notifica que el jugador completó el tutorial. */
     suspend fun onTutorialCompleted()
@@ -69,8 +69,11 @@ interface IAchievementsManager {
     /**
      * Muestra la UI de logros de la plataforma.
      *
-     * En Android: Abre la pantalla de Google Play Games.
-     * En Desktop/Web: No-op por defecto.
+     * En Android: Abre la pantalla de Google Play Games si el usuario tiene cuenta Google;
+     * de lo contrario llama [onNavigateToScreen].
+     * En Desktop/Web: llama [onNavigateToScreen] directamente.
+     *
+     * @param onNavigateToScreen Callback para navegar a la pantalla de logros propia.
      */
-    fun showAchievementsUI()
+    fun showAchievementsUI(onNavigateToScreen: () -> Unit = {})
 }

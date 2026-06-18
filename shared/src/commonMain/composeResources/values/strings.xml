@@ -223,10 +223,6 @@
     <string name="move_n_of_n">Move %1$d of %2$d</string>
     <string name="must_promote">Must promote</string>
     <string name="game_over_fifty_moves">Game over (50 mov)</string>
-    <string name="achievements">Achievements</string>
-    <string name="achievements_sign_in_required">Sign in to Google Play Games to view achievements</string>
-    <string name="halloween_theme_unlocked">🎃 You\'ve unlocked the Halloween theme permanently!</string>
-    <string name="christmas_theme_unlocked">🎄 You\'ve unlocked the Christmas theme permanently!</string>
     <string name="status_turn">%1$s to move</string>
     <string name="status_wins_mit">%1$s wins · Mit</string>
     <string name="status_wins_stalemit">%1$s wins · Stalemit</string>
@@ -405,6 +401,7 @@
     <string name="notification_reason_timeout">Time</string>
     <string name="notification_reason_agreement">Agreement</string>
     <string name="notification_reason_mit">Mit</string>
+    <string name="notification_reason_stalemit">Stalemit</string>
     <string name="draw_offer_sent">Draw offer sent…</string>
     <string name="draw_offer_declined">Draw offer declined</string>
     <string name="rematch">Rematch</string>
@@ -514,6 +511,75 @@
     <string name="api_error_internal_error">Something went wrong. Try again later.</string>
     <string name="api_error_user_not_found">User not found</string>
     <string name="api_error_unknown">Something went wrong. Try again later.</string>
+
+    <!-- ── Achievements ──────────────────────────────────────────────── -->
+    <string name="achievements">Achievements</string>
+    <string name="settings_achievements">Achievements</string>
+    <string name="achievements_count">%1$d / %2$d</string>
+    <string name="achievements_points_total">%1$d pts</string>
+    <string name="achievements_hidden_title">???</string>
+    <string name="achievements_hidden_desc">Secret achievement — unlock it to reveal</string>
+    <string name="achievement_progress">%1$d / %2$d</string>
+    <string name="achievements_unlocked_on">Unlocked on %1$s</string>
+    <string name="achievements_none_yet">No achievements yet</string>
+    <!-- Achievement messages -->
+    <string name="achievements_sign_in_required">Sign in to Google Play Games to view achievements</string>
+    <string name="halloween_theme_unlocked">🎃 You\'ve unlocked the Halloween theme permanently!</string>
+    <string name="christmas_theme_unlocked">🎄 You\'ve unlocked the Christmas theme permanently!</string>
+    <!-- Achievement titles -->
+    <string name="achievement_title_welcome_to_tarati">Welcome to Tarati</string>
+    <string name="achievement_title_first_capture">First Capture</string>
+    <string name="achievement_title_first_promotion">First Promotion</string>
+    <string name="achievement_title_first_victory">First Victory</string>
+    <string name="achievement_title_play_10_games">Play 10 Games</string>
+    <string name="achievement_title_the_flipper">The Flipper</string>
+    <string name="achievement_title_rok_master">Rok Master</string>
+    <string name="achievement_title_unstoppable">Unstoppable</string>
+    <string name="achievement_title_champion">Champion</string>
+    <string name="achievement_title_mit">Mit</string>
+    <string name="achievement_title_stalemit">Stalemit</string>
+    <string name="achievement_title_eternal_loop">Eternal Loop</string>
+    <string name="achievement_title_fifty_move_rule">Fifty Move Rule</string>
+    <string name="achievement_title_dead_but_dangerous">Dead but Dangerous</string>
+    <string name="achievement_title_grandmaster">Grandmaster</string>
+    <string name="achievement_title_halloween_theme">Halloween Theme</string>
+    <string name="achievement_title_christmas_theme">Christmas Theme</string>
+    <string name="achievement_title_apprentice">Apprentice</string>
+    <string name="achievement_title_strategist">Strategist</string>
+    <string name="achievement_title_tactician">Tactician</string>
+    <string name="achievement_title_the_first_light">The First Light</string>
+    <string name="achievement_title_the_dark_side">The Dark Side</string>
+    <!-- Achievement descriptions -->
+    <string name="achievement_desc_welcome_to_tarati">Complete the tutorial to learn the rules of the game.</string>
+    <string name="achievement_desc_first_capture">Flip an opponent\'s piece for the first time.</string>
+    <string name="achievement_desc_first_promotion">Promote a Cob to a Rok for the first time.</string>
+    <string name="achievement_desc_first_victory">Win your first game against the AI.</string>
+    <string name="achievement_desc_play_10_games">Complete 10 games against the AI.</string>
+    <string name="achievement_desc_the_flipper">Capture 50 enemy pieces in total.</string>
+    <string name="achievement_desc_rok_master">Promote 25 Cobs to Roks across all games.</string>
+    <string name="achievement_desc_unstoppable">Win 10 games against the AI.</string>
+    <string name="achievement_desc_champion">Win a game on Champion difficulty.</string>
+    <string name="achievement_desc_mit">Win a game by Mit: capture every enemy piece.</string>
+    <string name="achievement_desc_stalemit">Win a game by Stalemit: leave your opponent with no legal moves.</string>
+    <string name="achievement_desc_eternal_loop">Win a game by triple repetition.</string>
+    <string name="achievement_desc_fifty_move_rule">Claim a draw using the fifty-move rule.</string>
+    <string name="achievement_desc_dead_but_dangerous">Promote a dead Cob to win the game.</string>
+    <string name="achievement_desc_grandmaster">Win 50 games against the AI.</string>
+    <string name="achievement_desc_halloween_theme">Win on Champion difficulty on October 31st to unlock the Halloween
+        theme forever.
+    </string>
+    <string name="achievement_desc_christmas_theme">Win on Champion difficulty on December 25th to unlock the Christmas
+        theme forever.
+    </string>
+    <string name="achievement_desc_apprentice">Win a game on Easy difficulty.</string>
+    <string name="achievement_desc_strategist">Win a game on Medium difficulty.</string>
+    <string name="achievement_desc_tactician">Win a game on Hard difficulty.</string>
+    <string name="achievement_desc_the_first_light">Win as White on April 4th–6th to unlock an exclusive palette
+        forever.
+    </string>
+    <string name="achievement_desc_the_dark_side">Win as Black on April 4th–6th to unlock an exclusive palette
+        forever.
+    </string>
 
     <!-- Account deletion -->
     <string name="settings_delete_account">Delete account</string>

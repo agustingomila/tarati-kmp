@@ -20,6 +20,7 @@ import com.agustin.tarati.features.game.IGameModel
 import com.agustin.tarati.features.library.GamesLibraryScreen
 import com.agustin.tarati.features.library.GamesLibraryViewModel
 import com.agustin.tarati.features.library.IGamesLibraryViewModel
+import com.agustin.tarati.features.achievements.AchievementsScreen
 import com.agustin.tarati.features.online.auth.AuthState
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
@@ -38,6 +39,7 @@ import com.agustin.tarati.ui.components.game.animation.BoardAnimationViewModel
 import com.agustin.tarati.ui.components.game.animation.BoardGeometryViewModel
 import com.agustin.tarati.ui.components.game.animation.IBoardAnimationViewModel
 import com.agustin.tarati.ui.components.game.animation.IBoardGeometryViewModel
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.AchievementsDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameDetailsDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GameScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.GamesLibraryDest
@@ -107,6 +109,12 @@ fun NavGraph(
                     else
                         navController.navigate(SettingsScreenDest.route)
                 },
+                onNavigateToAchievements = {
+                    if (layout == ScreenLayout.Expanded)
+                        companion.navigate(CompanionPanelDestination.Achievements)
+                    else
+                        navController.navigate(AchievementsDest.route)
+                },
                 onGamesLibrary = {
                     if (layout == ScreenLayout.Expanded)
                         companion.navigate(CompanionPanelDestination.Library)
@@ -145,6 +153,9 @@ fun NavGraph(
                 } else null,
                 onNavigateToOnlineSettings = {
                     navController.navigate(OnlineSettingsDest.route)
+                },
+                onNavigateToAchievements = {
+                    navController.navigate(AchievementsDest.route)
                 },
             )
         }
@@ -247,6 +258,10 @@ fun NavGraph(
                     }
                 },
             )
+        }
+
+        composable(AchievementsDest.route) {
+            AchievementsScreen(onBack = { navController.popBackStack() })
         }
 
         composable(TournamentDetailDest.route) { backStackEntry ->

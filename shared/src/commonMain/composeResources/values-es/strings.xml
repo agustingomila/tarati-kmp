@@ -230,10 +230,6 @@
     <string name="move_n_of_n">Movimiento %1$d de %2$d</string>
     <string name="must_promote">Debe promocionar</string>
     <string name="game_over_fifty_moves">Partida terminada (50 mov)</string>
-    <string name="achievements">Logros</string>
-    <string name="achievements_sign_in_required">Iniciá sesión en Google Play Games para ver los logros</string>
-    <string name="halloween_theme_unlocked">🎃 ¡Has desbloqueado el tema de Halloween para siempre!</string>
-    <string name="christmas_theme_unlocked">🎄 ¡Has desbloqueado el tema navideño para siempre!</string>
     <string name="status_turn">%1$s mueven</string>
     <string name="status_wins_mit">%1$s gana · Mit</string>
     <string name="status_wins_stalemit">%1$s gana · Ahogado</string>
@@ -415,6 +411,7 @@
     <string name="notification_reason_timeout">Tiempo</string>
     <string name="notification_reason_agreement">Acuerdo</string>
     <string name="notification_reason_mit">Mit</string>
+    <string name="notification_reason_stalemit">Stalemit</string>
     <string name="draw_offer_sent">Tablas ofrecidas…</string>
     <string name="draw_offer_declined">Oferta de tablas rechazada</string>
     <string name="rematch">Revancha</string>
@@ -524,6 +521,76 @@
     <string name="api_error_internal_error">Algo salió mal. Intentá de nuevo.</string>
     <string name="api_error_user_not_found">Usuario no encontrado</string>
     <string name="api_error_unknown">Algo salió mal. Intentá de nuevo.</string>
+
+    <!-- ── Logros ─────────────────────────────────────────────────────── -->
+    <string name="achievements">Logros</string>
+    <string name="settings_achievements">Logros</string>
+    <string name="achievements_count">%1$d / %2$d</string>
+    <string name="achievements_points_total">%1$d pts</string>
+    <string name="achievements_hidden_title">???</string>
+    <string name="achievements_hidden_desc">Logro secreto — desbloquealo para revelarlo</string>
+    <string name="achievement_progress">%1$d / %2$d</string>
+    <string name="achievements_unlocked_on">Desbloqueado el %1$s</string>
+    <string name="achievements_none_yet">Aún sin logros</string>
+    <!-- Mensajes de logros -->
+    <string name="achievements_sign_in_required">Iniciá sesión en Google Play Games para ver los logros</string>
+    <string name="halloween_theme_unlocked">🎃 ¡Has desbloqueado el tema de Halloween para siempre!</string>
+    <string name="christmas_theme_unlocked">🎄 ¡Has desbloqueado el tema navideño para siempre!</string>
+    <!-- Títulos de logros -->
+    <string name="achievement_title_welcome_to_tarati">Bienvenido a Tarati</string>
+    <string name="achievement_title_first_capture">Primera captura</string>
+    <string name="achievement_title_first_promotion">Primera promoción</string>
+    <string name="achievement_title_first_victory">Primera victoria</string>
+    <string name="achievement_title_play_10_games">10 partidas jugadas</string>
+    <string name="achievement_title_the_flipper">El volteador</string>
+    <string name="achievement_title_rok_master">Maestro Rok</string>
+    <string name="achievement_title_unstoppable">Imparable</string>
+    <string name="achievement_title_champion">Campeón</string>
+    <string name="achievement_title_mit">Mit</string>
+    <string name="achievement_title_stalemit">Stalemit</string>
+    <string name="achievement_title_eternal_loop">Bucle eterno</string>
+    <string name="achievement_title_fifty_move_rule">Regla de los 50 movimientos</string>
+    <string name="achievement_title_dead_but_dangerous">Muerto pero peligroso</string>
+    <string name="achievement_title_grandmaster">Gran Maestro</string>
+    <string name="achievement_title_halloween_theme">Tema Halloween</string>
+    <string name="achievement_title_christmas_theme">Tema Navidad</string>
+    <string name="achievement_title_apprentice">Aprendiz</string>
+    <string name="achievement_title_strategist">Estratega</string>
+    <string name="achievement_title_tactician">Táctico</string>
+    <string name="achievement_title_the_first_light">La Primera Luz</string>
+    <string name="achievement_title_the_dark_side">El Lado Oscuro</string>
+    <!-- Descripciones de logros -->
+    <string name="achievement_desc_welcome_to_tarati">Completá el tutorial para aprender las reglas del juego.</string>
+    <string name="achievement_desc_first_capture">Volteá una pieza enemiga por primera vez.</string>
+    <string name="achievement_desc_first_promotion">Promové un Cob a Rok por primera vez.</string>
+    <string name="achievement_desc_first_victory">Ganá tu primera partida contra la IA.</string>
+    <string name="achievement_desc_play_10_games">Completá 10 partidas contra la IA.</string>
+    <string name="achievement_desc_the_flipper">Capturá 50 piezas enemigas en total.</string>
+    <string name="achievement_desc_rok_master">Promové 25 Cobs a Roks en todas las partidas.</string>
+    <string name="achievement_desc_unstoppable">Ganá 10 partidas contra la IA.</string>
+    <string name="achievement_desc_champion">Ganá una partida en dificultad Campeón.</string>
+    <string name="achievement_desc_mit">Ganá una partida por Mit: capturá todas las piezas enemigas.</string>
+    <string name="achievement_desc_stalemit">Ganá una partida por Stalemit: dejá al oponente sin movimientos legales.
+    </string>
+    <string name="achievement_desc_eternal_loop">Ganá una partida por triple repetición.</string>
+    <string name="achievement_desc_fifty_move_rule">Reclamá un empate usando la regla de los 50 movimientos.</string>
+    <string name="achievement_desc_dead_but_dangerous">Promové un Cob muerto para ganar la partida.</string>
+    <string name="achievement_desc_grandmaster">Ganá 50 partidas contra la IA.</string>
+    <string name="achievement_desc_halloween_theme">Ganá en dificultad Campeón el 31 de octubre para desbloquear el tema
+        Halloween para siempre.
+    </string>
+    <string name="achievement_desc_christmas_theme">Ganá en dificultad Campeón el 25 de diciembre para desbloquear el
+        tema Navidad para siempre.
+    </string>
+    <string name="achievement_desc_apprentice">Ganá una partida en dificultad Fácil.</string>
+    <string name="achievement_desc_strategist">Ganá una partida en dificultad Media.</string>
+    <string name="achievement_desc_tactician">Ganá una partida en dificultad Difícil.</string>
+    <string name="achievement_desc_the_first_light">Ganá con las Blancas del 4 al 6 de abril para desbloquear una paleta
+        exclusiva para siempre.
+    </string>
+    <string name="achievement_desc_the_dark_side">Ganá con las Negras del 4 al 6 de abril para desbloquear una paleta
+        exclusiva para siempre.
+    </string>
 
     <!-- Eliminación de cuenta -->
     <string name="settings_delete_account">Eliminar cuenta</string>

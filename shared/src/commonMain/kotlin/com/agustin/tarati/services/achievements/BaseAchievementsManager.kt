@@ -39,9 +39,9 @@ abstract class BaseAchievementsManager(
 
     // ── Estado de paletas desbloqueadas ───────────────────────────────────────
 
-    protected val _unlockedPalettes = MutableStateFlow<Set<AchievementId>>(emptySet())
+    protected val unlockedPalettes = MutableStateFlow<Set<AchievementId>>(emptySet())
     override val unlockedPaletteAchievements: StateFlow<Set<AchievementId>> =
-        _unlockedPalettes.asStateFlow()
+        unlockedPalettes.asStateFlow()
 
     // ── Contadores in-memory — las subclases los inicializan ──────────────────
 
@@ -115,7 +115,7 @@ abstract class BaseAchievementsManager(
         }
     }
 
-    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty) {
+    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty?) {
         val humanWon = matchState.winner == playerSide
 
         if (humanWon) {
@@ -128,6 +128,8 @@ abstract class BaseAchievementsManager(
                 else -> Unit
             }
 
+            // Logros de dificultad solo aplican en partidas locales contra IA.
+            // difficulty == null indica partida online.
             when (difficulty) {
                 Difficulty.EASY -> onUnlock(AchievementId.APPRENTICE)
                 Difficulty.MEDIUM -> onUnlock(AchievementId.STRATEGIST)
@@ -136,6 +138,8 @@ abstract class BaseAchievementsManager(
                     onUnlock(AchievementId.CHAMPION)
                     onChampionWin()
                 }
+
+                null -> Unit
             }
 
             val wins = incrementWins()
@@ -155,8 +159,8 @@ abstract class BaseAchievementsManager(
         onUnlock(AchievementId.WELCOME_TO_TARATI)
     }
 
-    /** No-op por defecto. Android sobreescribe con la pantalla de Google Play Games. */
-    override fun showAchievementsUI() = Unit
+    /** No-op por defecto. Subclases sobreescriben con la UI de la plataforma. */
+    override fun showAchievementsUI(onNavigateToScreen: () -> Unit) = onNavigateToScreen()
 
     /**
      * Llamado en cada victoria en [Difficulty.CHAMPION].
@@ -168,12 +172,12 @@ abstract class BaseAchievementsManager(
         when {
             SeasonalThemeManager.isHalloweenDay() -> {
                 onUnlock(AchievementId.HALLOWEEN_THEME)
-                _unlockedPalettes.update { it + AchievementId.HALLOWEEN_THEME }
+                unlockedPalettes.update { it + AchievementId.HALLOWEEN_THEME }
             }
 
             SeasonalThemeManager.isChristmasDay() -> {
                 onUnlock(AchievementId.CHRISTMAS_THEME)
-                _unlockedPalettes.update { it + AchievementId.CHRISTMAS_THEME }
+                unlockedPalettes.update { it + AchievementId.CHRISTMAS_THEME }
             }
         }
     }

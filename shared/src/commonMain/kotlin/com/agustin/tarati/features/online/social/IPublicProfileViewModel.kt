@@ -3,6 +3,7 @@ package com.agustin.tarati.features.online.social
 
 import com.agustin.tarati.features.online.lobby.GameHistoryUiState
 import com.agustin.tarati.network.models.PublicProfileDto
+import com.agustin.tarati.network.models.ServerAchievementDto
 import kotlinx.coroutines.flow.StateFlow
 
 data class PublicProfileUiState(
@@ -22,6 +23,7 @@ interface IPublicProfileViewModel {
     val profileState: StateFlow<PublicProfileUiState>
     val historyState: StateFlow<GameHistoryUiState>
     val followStatusState: StateFlow<FollowStatusUiState>
+    val achievements: StateFlow<List<ServerAchievementDto>>
 
     /** True si el perfil visualizado corresponde al usuario autenticado. */
     val isOwnProfile: Boolean

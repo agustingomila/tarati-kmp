@@ -1,10 +1,14 @@
 package com.agustin.tarati.ui.components.sidebar
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.core.domain.game.manager.GameManagerState
 import com.agustin.tarati.core.domain.game.pieces.CobColor
 
+// positionHistory: Map<String, Int> puede ser backed por un mutable Map en runtime,
+// por lo que no califica para @Immutable — @Stable es correcto aquí.
+@Stable
 data class SidebarGameState(
     val gameManagerState: GameManagerState,
     val playerSide: CobColor,

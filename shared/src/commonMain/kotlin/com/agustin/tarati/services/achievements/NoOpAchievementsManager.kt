@@ -19,7 +19,7 @@ class NoOpAchievementsManager : IAchievementsManager {
         MutableStateFlow(emptySet())
 
     override suspend fun onMoveApplied(move: Move, previousState: GameState, newState: GameState) = Unit
-    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty) = Unit
+    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty?) = Unit
     override suspend fun onTutorialCompleted() = Unit
-    override fun showAchievementsUI() = Unit
+    override fun showAchievementsUI(onNavigateToScreen: () -> Unit) = Unit
 }

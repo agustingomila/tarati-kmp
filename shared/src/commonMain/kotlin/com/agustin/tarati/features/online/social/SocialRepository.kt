@@ -3,6 +3,7 @@ package com.agustin.tarati.features.online.social
 
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.FollowStatusDto
+import com.agustin.tarati.network.models.ServerAchievementDto
 import com.agustin.tarati.network.models.GameHistoryDto
 import com.agustin.tarati.network.models.LeaderboardEntryDto
 import com.agustin.tarati.network.models.PagedResponse
@@ -102,6 +103,14 @@ class SocialRepository(
             header("Authorization", "Bearer $token")
             parameter("page", page)
             parameter("limit", limit)
+        }.body()
+    }
+
+    suspend fun getUserAchievements(
+        token: String, userId: String,
+    ): Result<List<ServerAchievementDto>> = runCatching {
+        httpClient.get("$baseUrl/api/users/$userId/achievements") {
+            header("Authorization", "Bearer $token")
         }.body()
     }
 }

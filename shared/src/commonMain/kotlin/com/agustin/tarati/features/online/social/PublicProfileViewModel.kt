@@ -8,6 +8,7 @@ import com.agustin.tarati.features.online.game.IOnlineGameViewModel
 import com.agustin.tarati.features.online.lobby.GameHistoryUiState
 import com.agustin.tarati.features.online.lobby.HistoryFilters
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel.Companion.PAGE_SIZE
+import com.agustin.tarati.network.models.ServerAchievementDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,12 +31,16 @@ class PublicProfileViewModel(
     private val _followStatusState = MutableStateFlow(FollowStatusUiState())
     override val followStatusState: StateFlow<FollowStatusUiState> = _followStatusState.asStateFlow()
 
+    private val _achievements = MutableStateFlow<List<ServerAchievementDto>>(emptyList())
+    override val achievements: StateFlow<List<ServerAchievementDto>> = _achievements.asStateFlow()
+
     override val isOwnProfile: Boolean
         get() = authViewModel.currentUser?.userId == userId
 
     init {
         loadProfile()
         loadHistory()
+        loadAchievements()
         if (!isOwnProfile) loadFollowStatus()
     }
 
@@ -184,6 +189,14 @@ class PublicProfileViewModel(
     }
 
     // ── Challenge ─────────────────────────────────────────────────────────────
+
+    private fun loadAchievements() {
+        viewModelScope.launch {
+            val token = getValidToken() ?: return@launch
+            repository.getUserAchievements(token = token, userId = userId)
+                .onSuccess { list -> _achievements.value = list }
+        }
+    }
 
     override fun sendChallenge(timeControl: String, rated: Boolean) {
         viewModelScope.launch {

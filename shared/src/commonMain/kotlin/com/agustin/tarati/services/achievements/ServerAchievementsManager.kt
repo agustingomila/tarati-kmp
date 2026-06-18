@@ -58,7 +58,7 @@ class ServerAchievementsManager(
             else -> {}
         }
         if (dto.unlockedAt != null && id in PALETTE_ACHIEVEMENTS) {
-            _unlockedPalettes.update { it + id }
+            unlockedPalettes.update { it + id }
         }
     }
 
@@ -73,7 +73,7 @@ class ServerAchievementsManager(
             pendingUnlocks.add(achievementId)
         }
         if (achievementId in PALETTE_ACHIEVEMENTS) {
-            _unlockedPalettes.update { it + achievementId }
+            unlockedPalettes.update { it + achievementId }
         }
     }
 

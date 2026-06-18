@@ -332,7 +332,8 @@ class GameEvents(
     fun saveGame() = onSaveGame()
 
     /** Delega a [IAchievementsManager] para abrir la pantalla de logros. */
-    fun showAchievementsUI() = achievementsManager.showAchievementsUI()
+    fun showAchievementsUI(onNavigateToScreen: () -> Unit = {}) =
+        achievementsManager.showAchievementsUI(onNavigateToScreen)
 }
 
 fun DrawerState.closeIfOpen(scope: CoroutineScope) {

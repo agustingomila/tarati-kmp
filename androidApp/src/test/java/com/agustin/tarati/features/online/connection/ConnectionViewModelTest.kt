@@ -80,7 +80,7 @@ class ConnectionViewModelTest {
 
     @Test
     fun `connectToServer updates state to Connecting then Online`() = runTest {
-        coEvery { mockWsClient.connect() } returns Unit
+        coEvery { mockWsClient.connect(any()) } returns Unit
 
         val result = viewModel.connectToServer(
             serverUrl = "localhost:8080",
@@ -95,12 +95,12 @@ class ConnectionViewModelTest {
         assertEquals("test_player", onlineState.userInfo.username)
         assertEquals(1500, onlineState.userInfo.rating)
 
-        coVerify { mockWsClient.connect() }
+        coVerify { mockWsClient.connect(any()) }
     }
 
     @Test
     fun `connectToServer with error updates state to Error`() = runTest {
-        coEvery { mockWsClient.connect() } throws Exception("Connection failed")
+        coEvery { mockWsClient.connect(any()) } throws Exception("Connection failed")
 
         val result = viewModel.connectToServer(
             serverUrl = "localhost:8080",
@@ -118,7 +118,7 @@ class ConnectionViewModelTest {
 
     @Test
     fun `disconnect updates state to Offline`() = runTest {
-        coEvery { mockWsClient.connect() } returns Unit
+        coEvery { mockWsClient.connect(any()) } returns Unit
         viewModel.connectToServer("localhost:8080", "test_token")
         advanceUntilIdle()
 
@@ -131,22 +131,22 @@ class ConnectionViewModelTest {
 
     @Test
     fun `retryConnection uses cached credentials`() = runTest {
-        coEvery { mockWsClient.connect() } throws Exception("First attempt failed")
+        coEvery { mockWsClient.connect(any()) } throws Exception("First attempt failed")
         viewModel.connectToServer("localhost:8080", "test_token")
         advanceUntilIdle()
 
-        coEvery { mockWsClient.connect() } returns Unit
+        coEvery { mockWsClient.connect(any()) } returns Unit
 
         viewModel.retryConnection()
         advanceUntilIdle()
 
         assertTrue(viewModel.connectionState.value is ConnectionState.Online)
-        coVerify(exactly = 2) { mockWsClient.connect() }
+        coVerify(exactly = 2) { mockWsClient.connect(any()) }
     }
 
     @Test
     fun `isConnected returns true when Online`() = runTest {
-        coEvery { mockWsClient.connect() } returns Unit
+        coEvery { mockWsClient.connect(any()) } returns Unit
 
         viewModel.connectToServer("localhost:8080", "test_token")
         advanceUntilIdle()

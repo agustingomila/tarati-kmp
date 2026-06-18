@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import com.agustin.tarati.features.achievements.ProfileAchievementsSection
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -228,6 +229,13 @@ private fun ProfileContent(
         item {
             SectionHeader(text = localizedString(Res.string.profile_ratings_section))
             RatingsGrid(ratings = profile.ratings, stats = profile.stats)
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // Achievements
+        item {
+            val achievementsList by viewModel.achievements.collectAsState()
+            ProfileAchievementsSection(achievements = achievementsList)
             Spacer(Modifier.height(8.dp))
         }
 

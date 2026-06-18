@@ -28,8 +28,10 @@ import com.agustin.tarati.core.domain.game.play.GameState.Companion.POS_DELIMITE
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.TURN_DELIMITER_CHAR
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.MatchResult.UNDEFINED
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
+@Stable
 @Serializable
 data class GameState(
     val cobs: Map<Vertex, Cob>,

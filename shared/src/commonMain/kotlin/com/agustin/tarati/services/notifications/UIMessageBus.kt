@@ -43,6 +43,12 @@ class UIMessageBus {
         _dismissRequest.tryEmit(Unit)
     }
 
+    /** Descarta el toast activo y vacía cualquier toast encolado pendiente. */
+    fun clearAllToasts() {
+        while (_toasts.tryReceive().isSuccess) { /* drain */ }
+        _dismissRequest.tryEmit(Unit)
+    }
+
     // ── Alerts ────────────────────────────────────────────────────────────────
 
     /**
