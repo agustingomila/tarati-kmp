@@ -67,11 +67,12 @@ compose.desktop {
 
             // Windows
             windows {
-                val iconFile = project.file("src/main/resources/icons/tarati.ico")
-                if (iconFile.exists()) {
-                    this.iconFile.set(iconFile)
-                }
+                iconFile.set(project.file("../webApp/src/wasmJsMain/resources/favicon.ico"))
 
+                // UUID estable — identifica el producto para upgrade in-place.
+                // Sin esto, cada MSI genera un upgradeCode aleatorio y Windows
+                // exige desinstalar la versión anterior antes de instalar la nueva.
+                upgradeUuid = "7B3E2F81-D4C6-4A91-B85D-F2E6C3A70948"
                 menuGroup = "Tarati"
                 shortcut = true
                 dirChooser = true
@@ -92,10 +93,7 @@ compose.desktop {
 
             // Linux
             linux {
-                val iconFile = project.file("src/main/resources/icons/tarati.png")
-                if (iconFile.exists()) {
-                    this.iconFile.set(iconFile)
-                }
+                iconFile.set(project.file("../webApp/src/wasmJsMain/resources/icon-512x512.png"))
 
                 appCategory = "Game"
                 debMaintainer = "tarati.gameboard@gmail.com"
