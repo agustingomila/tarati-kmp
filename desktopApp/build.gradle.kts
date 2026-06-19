@@ -67,7 +67,7 @@ compose.desktop {
 
             // Windows
             windows {
-                iconFile.set(project.file("../webApp/src/wasmJsMain/resources/favicon.ico"))
+                iconFile.set(project.file("src/main/resources/icons/tarati.ico"))
 
                 // UUID estable — identifica el producto para upgrade in-place.
                 // Sin esto, cada MSI genera un upgradeCode aleatorio y Windows
