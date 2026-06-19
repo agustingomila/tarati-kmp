@@ -1,5 +1,3 @@
-@file:OptIn(DelicateCoroutinesApi::class)
-
 package com.agustin.tarati.network.client
 
 
@@ -15,8 +13,12 @@ import io.ktor.client.request.header
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +28,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Cliente WebSocket compartido para Tarati Online
@@ -53,6 +57,10 @@ class TaratiWebSocketClient(
     private var heartbeatJob: Job? = null
     private var connectionJob: Job? = null  // ← Job para mantener la conexión viva
     private val logger = getLogger("TaratiWebSocketClient")
+
+    // Scope propio del cliente (vive lo que vive el singleton). Reemplaza GlobalScope:
+    // SupervisorJob aísla fallos y permite reusar el scope tras disconnect()/connect().
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private val _messages = MutableSharedFlow<ServerMessage>(
         replay = 0,
@@ -129,62 +137,74 @@ class TaratiWebSocketClient(
         val authToken = token ?: authRepository.getToken()
         ?: throw IllegalStateException("No auth token available. Please login first.")
 
-        try {
-            // Lanzar conexión en background job
-            connectionJob = kotlinx.coroutines.GlobalScope.launch {
-                try {
-                    httpClient.webSocket(
-                        urlString = "$serverUrl/ws/game",
-                        request = {
-                            header("Authorization", "Bearer $authToken")
-                            // El browser WebSocket API no puede enviar headers custom —
-                            // incluir token también como query param para WASM/web.
-                            // El servidor acepta ambos (WebSocketAuth.kt).
-                            url.parameters.append("token", authToken)
-                        }
-                    ) {
-                        session = this
-                        _connectionState.value = ConnectionState.Connected
-                        logger.debug("Connected successfully")
+        // Señaliza el resultado del handshake inicial: se completa al conectar o
+        // excepcionalmente al fallar. Reemplaza el busy-wait polling sobre el estado.
+        val handshake = CompletableDeferred<Unit>()
 
-                        // Iniciar heartbeat
-                        heartbeatJob = launch {
-                            startHeartbeat()
-                        }
-
-                        // Escuchar mensajes (bloquea hasta que se cierra)
-                        try {
-                            listenForMessages()
-                        } catch (e: Exception) {
-                            logger.debug("Listening stopped: ${e.message}")
-                        }
+        // Lanzar conexión en background job sobre el scope del cliente.
+        connectionJob = scope.launch {
+            try {
+                httpClient.webSocket(
+                    urlString = "$serverUrl/ws/game",
+                    request = {
+                        header("Authorization", "Bearer $authToken")
+                        // El browser WebSocket API no puede enviar headers custom —
+                        // incluir token también como query param para WASM/web.
+                        // El servidor acepta ambos (WebSocketAuth.kt).
+                        url.parameters.append("token", authToken)
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    logger.debug("Connection error: ${e.message}")
-                    _connectionState.value = ConnectionState.Error(e.message ?: "Unknown error")
-                } finally {
+                ) {
+                    session = this
+                    _connectionState.value = ConnectionState.Connected
+                    handshake.complete(Unit)
+                    logger.debug("Connected successfully")
+
+                    // Iniciar heartbeat
+                    heartbeatJob = launch {
+                        startHeartbeat()
+                    }
+
+                    // Escuchar mensajes (bloquea hasta que se cierra)
+                    try {
+                        listenForMessages()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.debug("Listening stopped: ${e.message}")
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.debug("Connection error: ${e.message}")
+                _connectionState.value = ConnectionState.Error(e.message ?: "Unknown error")
+                handshake.completeExceptionally(e)
+            } finally {
+                // No pisar un estado Error con Disconnected: un fallo previo ya dejó
+                // el estado correcto y completó el handshake. Solo marcar Disconnected
+                // cuando la conexión llegó a establecerse y luego se cerró.
+                if (_connectionState.value !is ConnectionState.Error) {
                     _connectionState.value = ConnectionState.Disconnected
-                    heartbeatJob?.cancel()
-                    session = null
+                }
+                heartbeatJob?.cancel()
+                session = null
+                if (!handshake.isCompleted) {
+                    handshake.completeExceptionally(
+                        CancellationException("Connection closed before established")
+                    )
                 }
             }
+        }
 
-            // Esperar a que el estado cambie a Connected o Error
-            var attempts = 0
-            while (attempts < 50) {  // Max 5 segundos
-                when (_connectionState.value) {
-                    is ConnectionState.Connected -> return
-                    is ConnectionState.Error -> throw Exception("Connection failed")
-                    else -> {
-                        delay(100.milliseconds)
-                        attempts++
-                    }
-                }
-            }
+        // Esperar el handshake con timeout, sin polling.
+        try {
+            withTimeout(CONNECT_TIMEOUT) { handshake.await() }
+        } catch (e: TimeoutCancellationException) {
+            connectionJob?.cancel()
+            _connectionState.value = ConnectionState.Error("Connection timeout")
             throw Exception("Connection timeout")
-
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Connection failed: ${e.message}")
             _connectionState.value = ConnectionState.Error(e.message ?: "Unknown error")
@@ -204,6 +224,8 @@ class TaratiWebSocketClient(
             try {
                 send(ClientMessage.Heartbeat)
                 logger.debug("Heartbeat sent")
+            } catch (e: CancellationException) {
+                throw e  // heartbeat cancelado al cerrar la conexión
             } catch (e: Exception) {
                 logger.error("Heartbeat failed: ${e.message}")
                 break
@@ -229,6 +251,8 @@ class TaratiWebSocketClient(
                             val message = json.decodeFromString<ServerMessage>(text)
                             logger.debug("Received: ${message::class.simpleName}")
                             _messages.emit(message)
+                        } catch (e: CancellationException) {
+                            throw e  // no tragar cancelación durante emit
                         } catch (e: Exception) {
                             logger.debug("Failed to parse message: ${e.message}")
                         }
@@ -274,6 +298,8 @@ class TaratiWebSocketClient(
             val jsonText = json.encodeToString(message)
             currentSession.send(Frame.Text(jsonText))
             logger.debug("Sent: ${message::class.simpleName}")
+        } catch (e: CancellationException) {
+            throw e  // propagar cancelación sin loguear un error espurio
         } catch (e: Exception) {
             logger.error("Failed to send message: ${e.message}")
             throw e
@@ -321,6 +347,11 @@ class TaratiWebSocketClient(
 
         // Puerto por defecto
         return if (url.startsWith("wss://")) 443 else 8080
+    }
+
+    private companion object {
+        // Tiempo máximo de espera del handshake WebSocket inicial.
+        val CONNECT_TIMEOUT = 5.seconds
     }
 }
 

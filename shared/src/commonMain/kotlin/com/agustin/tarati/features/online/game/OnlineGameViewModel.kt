@@ -10,6 +10,7 @@ import com.agustin.tarati.network.client.OnlineGameClient
 import com.agustin.tarati.network.models.MatchmakingState
 import com.agustin.tarati.network.models.OnlineGame
 import com.agustin.tarati.network.models.OnlineGameStatus
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -115,6 +116,8 @@ class OnlineGameViewModel(
                 Result.failure(Exception("Failed to enter matchmaking queue"))
             }
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("startMatchmaking failed: ${e.message}")
             Result.failure(e)
@@ -130,6 +133,8 @@ class OnlineGameViewModel(
         return try {
             onlineClient.joinOpenSearch(targetUserId, timeControl, rated)
             Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("joinOpenSearch failed: ${e.message}")
             Result.failure(e)
@@ -144,6 +149,8 @@ class OnlineGameViewModel(
         }
         try {
             onlineClient.cancelMatchmaking()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("cancelMatchmaking failed: ${e.message}")
         }
@@ -159,6 +166,8 @@ class OnlineGameViewModel(
         logger.debug("makeOnlineMove: ${move.from} → ${move.to}")
         try {
             onlineClient.makeMove(move)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("makeOnlineMove failed: ${e.message}")
         }
@@ -173,6 +182,8 @@ class OnlineGameViewModel(
         logger.debug("resign: gameId=${game.gameId}")
         try {
             onlineClient.resign()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("resign failed: ${e.message}")
         }
@@ -187,6 +198,8 @@ class OnlineGameViewModel(
         logger.debug("offerDraw: gameId=${game.gameId}")
         try {
             onlineClient.offerDraw()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("offerDraw failed: ${e.message}")
         }
@@ -201,6 +214,8 @@ class OnlineGameViewModel(
         logger.debug("respondToDraw: accept=$accept, gameId=${game.gameId}")
         try {
             onlineClient.respondToDraw(accept)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("respondToDraw failed: ${e.message}")
         }
@@ -212,6 +227,8 @@ class OnlineGameViewModel(
         logger.debug("offerRematch game=$gameId")
         try {
             onlineClient.offerRematch(gameId)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("offerRematch failed: ${e.message}")
         }
@@ -221,6 +238,8 @@ class OnlineGameViewModel(
         logger.debug("acceptRematch")
         try {
             onlineClient.acceptRematch()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("acceptRematch failed: ${e.message}")
         }
@@ -230,6 +249,8 @@ class OnlineGameViewModel(
         logger.debug("declineRematch")
         try {
             onlineClient.declineRematch()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("declineRematch failed: ${e.message}")
         }
@@ -256,6 +277,8 @@ class OnlineGameViewModel(
         logger.debug("spectateGame: $gameId")
         return try {
             onlineClient.spectateGame(gameId)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("spectateGame failed: ${e.message}")
             false
@@ -267,6 +290,8 @@ class OnlineGameViewModel(
         logger.debug("stopSpectating: $gameId")
         try {
             onlineClient.stopSpectating(gameId)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("stopSpectating failed: ${e.message}")
         }
@@ -303,6 +328,8 @@ class OnlineGameViewModel(
         logger.debug("sendChallenge: target=$targetUserId tc=$timeControl rated=$rated")
         try {
             onlineClient.sendChallenge(targetUserId, timeControl, rated)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("sendChallenge failed: ${e.message}")
         }
@@ -312,6 +339,8 @@ class OnlineGameViewModel(
         logger.debug("respondToChallenge: id=$challengeId accept=$accept")
         try {
             onlineClient.respondToChallenge(challengeId, accept)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("respondToChallenge failed: ${e.message}")
         }
@@ -321,6 +350,8 @@ class OnlineGameViewModel(
         logger.debug("cancelChallenge: id=$challengeId")
         try {
             onlineClient.cancelChallenge(challengeId)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("cancelChallenge failed: ${e.message}")
         }

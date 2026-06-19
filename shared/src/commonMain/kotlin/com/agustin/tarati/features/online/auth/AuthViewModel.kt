@@ -17,6 +17,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType.Application
 import io.ktor.http.contentType
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -102,6 +103,8 @@ class AuthViewModel(
             logger.debug("Authenticated as ${userInfo.username}")
             Result.success(userInfo)
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Authentication failed: ${e.message}")
             _authState.value = AuthState.Error(
@@ -164,6 +167,8 @@ class AuthViewModel(
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("loginWithServer error: ${e.message}")
             _authState.value = AuthState.Error(message = e.message ?: "Login failed", canRetry = true)
@@ -247,6 +252,8 @@ class AuthViewModel(
                     Result.failure(Exception(msg))
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("refreshToken error: ${e.message}")
             Result.failure(e)
@@ -312,6 +319,8 @@ class AuthViewModel(
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("registerWithServer error: ${e.message}")
             _authState.value = AuthState.Error(message = e.message ?: "Registration failed", canRetry = true)
@@ -329,6 +338,8 @@ class AuthViewModel(
                     contentType(Application.Json)
                     setBody("""{"refreshToken":"$refreshToken"}""")
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.debug("Server logout failed (proceeding with local logout): ${e.message}")
             }
@@ -368,6 +379,8 @@ class AuthViewModel(
                 _authState.value = AuthState.Error(message = msg, canRetry = true)
                 Result.failure(Exception(msg))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("loginAsGuest error: ${e.message}")
             _authState.value = AuthState.Error(message = e.message ?: "Guest login failed", canRetry = true)
@@ -383,6 +396,8 @@ class AuthViewModel(
             }
             // Siempre éxito desde el punto de vista del cliente — el servidor nunca revela si el email existe
             Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("forgotPassword error: ${e.message}")
             Result.failure(e)
@@ -402,6 +417,8 @@ class AuthViewModel(
                 val msg = if (code != null) localizedApiError(code) else "Reset failed: HTTP ${response.status.value}"
                 Result.failure(Exception(msg))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("resetPassword error: ${e.message}")
             Result.failure(e)
@@ -425,6 +442,8 @@ class AuthViewModel(
             } else {
                 Result.failure(Exception("fetchProfile HTTP ${response.status.value}"))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("fetchProfile error: ${e.message}")
             Result.failure(e)
@@ -459,6 +478,8 @@ class AuthViewModel(
             } else {
                 Result.failure(Exception("updateProfile HTTP ${response.status.value}"))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("updateProfile error: ${e.message}")
             Result.failure(e)
@@ -481,6 +502,8 @@ class AuthViewModel(
             } else {
                 Result.failure(Exception("deleteAccount HTTP ${response.status.value}"))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.debug("deleteAccount error: ${e.message}")
             Result.failure(e)
@@ -531,6 +554,8 @@ class AuthViewModel(
                             authRepository.clearAll()
                             _authState.value = AuthState.Unauthenticated
                         }
+                    } catch (e: CancellationException) {
+                        throw e  // viewModelScope cancelado — no tratar como fallo de refresh
                     } catch (e: Exception) {
                         // Captura defensiva: cualquier excepción inesperada en el
                         // pipeline de Ktor/serialization que escape de refreshToken().
