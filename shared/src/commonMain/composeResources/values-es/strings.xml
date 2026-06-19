@@ -492,6 +492,7 @@
     <string name="tournament_filter_all">Todos</string>
     <string name="tournament_recent_only">Recientes</string>
     <string name="tournament_sort_most_players">Más participantes</string>
+    <string name="tournament_cross_table">Tabla cruzada</string>
     <string name="no_tournaments_match_filters">Sin torneos con estos filtros</string>
     <string name="clear_filters">Borrar filtros</string>
 

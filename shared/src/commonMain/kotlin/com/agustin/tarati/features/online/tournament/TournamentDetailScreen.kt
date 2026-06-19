@@ -2,6 +2,7 @@ package com.agustin.tarati.features.online.tournament
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -41,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.game.IOnlineGameViewModel
@@ -64,6 +67,7 @@ import com.agustin.tarati.shared.generated.resources.tournament_arena_ended
 import com.agustin.tarati.shared.generated.resources.tournament_arena_ends_in
 import com.agustin.tarati.shared.generated.resources.tournament_cancelled_status
 import com.agustin.tarati.shared.generated.resources.tournament_created_by
+import com.agustin.tarati.shared.generated.resources.tournament_cross_table
 import com.agustin.tarati.shared.generated.resources.tournament_finished_status
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
 import com.agustin.tarati.shared.generated.resources.tournament_register
@@ -90,6 +94,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Pantalla de detalle de un torneo.
@@ -259,6 +264,24 @@ private fun TournamentDetailContent(
             }
         }
 
+        // ── Tabla cruzada (Round Robin) ───────────────────────────────────────
+        if (tournament.type == TournamentType.ROUND_ROBIN && tournament.rounds.isNotEmpty()) {
+            item {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    localizedString(Res.string.tournament_cross_table),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            item {
+                CrossTable(
+                    tournament = tournament,
+                    onNavigateToGameDetails = onNavigateToGameDetails,
+                )
+            }
+        }
+
         // ── Fixture (rondas) ──────────────────────────────────────────────────
         if (tournament.rounds.isNotEmpty()) {
             item {
@@ -268,6 +291,19 @@ private fun TournamentDetailContent(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
+            }
+            // Swiss: stepper visual de progreso de rondas
+            if (tournament.type == TournamentType.SWISS && tournament.totalRounds > 0) {
+                // Computar los estados fuera del composable — List<enum> es estable en Compose.
+                val swissStates = buildSwissRoundStates(
+                    totalRounds = tournament.totalRounds,
+                    currentRound = tournament.currentRound,
+                    tournamentStatus = tournament.status,
+                    rounds = tournament.rounds,
+                )
+                item {
+                    SwissRoundStepper(states = swissStates)
+                }
             }
             tournament.rounds.forEach { round ->
                 item {
@@ -325,7 +361,7 @@ private fun TournamentHeader(tournament: TournamentDetailDto) {
         )
         when {
             tournament.status == TournamentStatus.ACTIVE && tournament.type == TournamentType.ARENA ->
-                ArenaCountdown(tournament.endsAt)
+                ArenaCountdown(tournament.endsAt?.toEpochMilliseconds())
 
             tournament.status == TournamentStatus.ACTIVE ->
                 Text(
@@ -490,14 +526,16 @@ private fun StandingRow(standing: TournamentStandingDto, isSwiss: Boolean, isAre
 }
 
 @Composable
-private fun ArenaCountdown(endsAt: kotlin.time.Instant?) {
-    if (endsAt == null) return
+private fun ArenaCountdown(endsAtMs: Long?) {
+    if (endsAtMs == null) return
 
-    var remaining by remember(endsAt) { mutableStateOf(endsAt - Clock.System.now()) }
+    // Long es un primitivo estable en Compose; se convierte a Instant internamente.
+    val endsAt = remember(endsAtMs) { kotlin.time.Instant.fromEpochMilliseconds(endsAtMs) }
+    var remaining by remember(endsAtMs) { mutableStateOf(endsAt - Clock.System.now()) }
 
-    LaunchedEffect(endsAt) {
+    LaunchedEffect(endsAtMs) {
         while (remaining.isPositive()) {
-            delay(1000)
+            delay(1000.milliseconds)
             remaining = endsAt - Clock.System.now()
         }
     }
@@ -674,6 +712,293 @@ private fun PairingRow(
             color = if (isPending) dimColor else MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.End,
         )
+    }
+}
+
+// ── Swiss round stepper ───────────────────────────────────────────────────────
+
+private enum class SwissRoundState { Completed, Active, Pending }
+
+private fun buildSwissRoundStates(
+    totalRounds: Int,
+    currentRound: Int,
+    tournamentStatus: TournamentStatus,
+    rounds: List<TournamentRoundDto>,
+): List<SwissRoundState> = (1..totalRounds).map { n ->
+    val round = rounds.find { it.roundNumber == n }
+    when {
+        round != null && round.pairings.isNotEmpty() &&
+                round.pairings.all { it.status == TournamentGameStatus.COMPLETED } ->
+            SwissRoundState.Completed
+        n == currentRound && tournamentStatus == TournamentStatus.ACTIVE ->
+            SwissRoundState.Active
+        else ->
+            SwissRoundState.Pending
+    }
+}
+
+@Composable
+private fun SwissRoundStepper(states: List<SwissRoundState>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        states.forEachIndexed { index, state ->
+            RoundStep(roundNumber = index + 1, state = state)
+            if (index < states.lastIndex) {
+                // Conector: línea horizontal coloreada según si la ronda ya terminó
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .height(2.dp)
+                        .width(20.dp)
+                        .background(
+                            color = if (state == SwissRoundState.Completed)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.outlineVariant,
+                            shape = CircleShape,
+                        )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoundStep(roundNumber: Int, state: SwissRoundState) {
+    val circleSize = 28.dp
+    val (bgColor, contentColor) = when (state) {
+        SwissRoundState.Completed -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
+        SwissRoundState.Active -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        SwissRoundState.Pending -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(circleSize).background(bgColor, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (state == SwissRoundState.Completed) {
+                Icon(
+                    imageVector = TaratiIcons.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = contentColor,
+                )
+            } else {
+                Text(
+                    text = "$roundNumber",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = if (state == SwissRoundState.Active) FontWeight.Bold else FontWeight.Normal,
+                    color = contentColor,
+                )
+            }
+        }
+        Text(
+            text = "$roundNumber",
+            style = MaterialTheme.typography.labelSmall,
+            color = contentColor.copy(alpha = if (state == SwissRoundState.Pending) 0.6f else 1f),
+        )
+    }
+}
+
+// ── Tabla cruzada ─────────────────────────────────────────────────────────────
+
+private sealed class CrossTableResult {
+    data object Diagonal : CrossTableResult()
+    data object Pending : CrossTableResult()
+    data class Active(val gameId: String?) : CrossTableResult()
+    data class Completed(val score: String, val gameId: String?) : CrossTableResult()
+}
+
+private fun buildCrossTable(
+    players: List<TournamentStandingDto>,
+    rounds: List<TournamentRoundDto>,
+): List<List<CrossTableResult>> {
+    // (whiteId, blackId) → pairing — cada par aparece una sola vez con los roles fijos
+    val pairingMap = buildMap {
+        for (round in rounds) {
+            for (pairing in round.pairings) {
+                put(pairing.whiteId to pairing.blackId, pairing)
+            }
+        }
+    }
+
+    return players.map { rowPlayer ->
+        players.map { colPlayer ->
+            if (rowPlayer.userId == colPlayer.userId) {
+                CrossTableResult.Diagonal
+            } else {
+                // La clave puede estar en cualquiera de las dos orientaciones
+                val pairing = pairingMap[rowPlayer.userId to colPlayer.userId]
+                    ?: pairingMap[colPlayer.userId to rowPlayer.userId]
+
+                when {
+                    pairing == null -> CrossTableResult.Pending
+                    pairing.status == TournamentGameStatus.PENDING -> CrossTableResult.Pending
+                    pairing.status == TournamentGameStatus.ACTIVE -> CrossTableResult.Active(pairing.gameId)
+                    else -> {
+                        val rowIsWhite = pairing.whiteId == rowPlayer.userId
+                        val score = when (pairing.result) {
+                            "white_wins" -> if (rowIsWhite) "1" else "0"
+                            "black_wins" -> if (rowIsWhite) "0" else "1"
+                            "draw" -> "½"
+                            else -> "?"
+                        }
+                        CrossTableResult.Completed(score, pairing.gameId)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CrossTable(
+    tournament: TournamentDetailDto,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)?,
+) {
+    val players = tournament.standings
+    if (players.size < 2) return
+
+    val matrix = remember(tournament) { buildCrossTable(players, tournament.rounds) }
+
+    val cellDp = 30.dp
+    val nameWidth = 108.dp
+    val scoreWidth = 44.dp
+
+    Box(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+        Column {
+            // ── Cabecera ─────────────────────────────────────────────────────
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.width(nameWidth))
+                players.forEachIndexed { index, _ ->
+                    Box(Modifier.size(cellDp), contentAlignment = Alignment.Center) {
+                        Text(
+                            "${index + 1}",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                Box(Modifier.width(scoreWidth), contentAlignment = Alignment.Center) {
+                    Text(
+                        "Pts",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            HorizontalDivider()
+
+            // ── Filas ────────────────────────────────────────────────────────
+            players.forEachIndexed { rowIndex, player ->
+                Row(
+                    modifier = Modifier.height(36.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // Columna de nombre: número + username con ellipsis
+                    Row(
+                        modifier = Modifier.width(nameWidth),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            "${rowIndex + 1}",
+                            modifier = Modifier.width(18.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.End,
+                        )
+                        Text(
+                            player.username,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+
+                    // Celdas de resultados
+                    matrix[rowIndex].forEach { cell ->
+                        CrossTableCell(
+                            cell = cell,
+                            modifier = Modifier.size(cellDp),
+                            onNavigateToGameDetails = onNavigateToGameDetails,
+                        )
+                    }
+
+                    // Puntuación total
+                    Box(Modifier.width(scoreWidth), contentAlignment = Alignment.Center) {
+                        Text(
+                            formatTournamentScore(player.score),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+                if (rowIndex < players.size - 1) {
+                    HorizontalDivider(thickness = 0.5.dp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CrossTableCell(
+    cell: CrossTableResult,
+    modifier: Modifier = Modifier,
+    onNavigateToGameDetails: ((gameId: String) -> Unit)?,
+) {
+    val cellModifier = when (cell) {
+        is CrossTableResult.Diagonal -> modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+        is CrossTableResult.Completed if cell.gameId != null && onNavigateToGameDetails != null ->
+            modifier.clickable { onNavigateToGameDetails(cell.gameId) }
+
+        else -> modifier
+    }
+    Box(cellModifier, contentAlignment = Alignment.Center) {
+        when (cell) {
+            is CrossTableResult.Diagonal -> Text(
+                "×",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            is CrossTableResult.Pending -> Text(
+                "·",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+            )
+
+            is CrossTableResult.Active -> Box(
+                Modifier.size(7.dp).background(Color(0xFF4CAF50), CircleShape)
+            )
+
+            is CrossTableResult.Completed -> {
+                val (color, weight) = when (cell.score) {
+                    "1" -> MaterialTheme.colorScheme.primary to FontWeight.Bold
+                    "0" -> MaterialTheme.colorScheme.error to FontWeight.Normal
+                    else -> MaterialTheme.colorScheme.onSurface to FontWeight.Normal
+                }
+                Text(
+                    cell.score,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = color,
+                    fontWeight = weight,
+                )
+            }
+        }
     }
 }
 

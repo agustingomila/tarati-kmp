@@ -482,6 +482,7 @@
     <string name="tournament_filter_all">All</string>
     <string name="tournament_recent_only">Recent</string>
     <string name="tournament_sort_most_players">Most players</string>
+    <string name="tournament_cross_table">Cross table</string>
     <string name="no_tournaments_match_filters">No tournaments match the current filters</string>
     <string name="clear_filters">Clear filters</string>
 
