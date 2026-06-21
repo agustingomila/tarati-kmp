@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -430,7 +431,7 @@ private fun EditableGameInfoRow(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -439,7 +440,7 @@ private fun EditableGameInfoRow(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -524,28 +525,34 @@ private fun HeaderTitleSection(
             fontWeight = FontWeight.SemiBold,
         )
 
-        Spacer(modifier = Modifier.weight(1f))
-
         if (!isEditing) {
-            // Resumen compacto visible solo cuando el panel está colapsado:
-            // jugadores, resultado y fecha en una sola línea.
-            if (!expanded) {
-                val summary = buildList {
-                    val white = header.white.takeIf { isValidValue(it) }
-                    val black = header.black.takeIf { isValidValue(it) }
-                    if (white != null && black != null) add("$white vs $black")
-                    if (isValidValue(header.result)) add(header.result)
-                    if (isValidValue(header.date)) add(header.date)
-                }.joinToString("  ·  ")
-                if (summary.isNotEmpty()) {
-                    Text(
-                        text = summary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(end = 8.dp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+            // Zona ponderada central: absorbe el ancho sobrante y cede siempre
+            // el espacio del IconButton, evitando que el resumen lo empuje fuera
+            // de la vista en paneles angostos.
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                // Resumen compacto visible solo cuando el panel está colapsado:
+                // jugadores, resultado y fecha en una sola línea.
+                if (!expanded) {
+                    val summary = buildList {
+                        val white = header.white.takeIf { isValidValue(it) }
+                        val black = header.black.takeIf { isValidValue(it) }
+                        if (white != null && black != null) add("$white vs $black")
+                        if (isValidValue(header.result)) add(header.result)
+                        if (isValidValue(header.date)) add(header.date)
+                    }.joinToString("  ·  ")
+                    if (summary.isNotEmpty()) {
+                        Text(
+                            text = summary,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(end = 8.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
 
@@ -560,6 +567,8 @@ private fun HeaderTitleSection(
                     modifier = Modifier.graphicsLayer { rotationZ = chevronRotation },
                 )
             }
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
