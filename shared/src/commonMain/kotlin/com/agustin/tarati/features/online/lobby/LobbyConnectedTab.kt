@@ -49,6 +49,8 @@ import com.agustin.tarati.services.localization.LocalizedText
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.cancel
+import com.agustin.tarati.shared.generated.resources.lobby_count_online
+import com.agustin.tarati.shared.generated.resources.lobby_count_playing
 import com.agustin.tarati.shared.generated.resources.lobby_filter_all
 import com.agustin.tarati.shared.generated.resources.lobby_filter_registered_only
 import com.agustin.tarati.shared.generated.resources.lobby_no_players_match_filters
@@ -60,6 +62,7 @@ import com.agustin.tarati.shared.generated.resources.social_challenge
 import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.you
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
 
 // ── Tab: Conectados ───────────────────────────────────────────────────────────
@@ -104,6 +107,20 @@ internal fun ConnectedUsersTab(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        LobbyStatsRow(
+            stats = listOf(
+                StatChip(
+                    icon = TaratiIcons.Group,
+                    text = localizedString(Res.string.lobby_count_online)
+                        .replace($$"%1$s", "${users.size}"),
+                ),
+                StatChip(
+                    icon = TaratiIcons.PlayArrow,
+                    text = localizedString(Res.string.lobby_count_playing)
+                        .replace($$"%1$s", "${users.count { it.status == OnlineUserStatus.PLAYING }}"),
+                ),
+            ),
+        )
         ConnectedUsersFilterBar(
             statusFilter = statusFilter,
             onStatusFilter = { statusFilter = it },
@@ -157,7 +174,7 @@ private fun ConnectedUsersFilterBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf<OnlineUserStatus?>(null, OnlineUserStatus.PLAYING, OnlineUserStatus.IN_LOBBY)
+            listOf(null, OnlineUserStatus.PLAYING, OnlineUserStatus.IN_LOBBY)
                 .forEach { status ->
                     FilterChip(
                         selected = statusFilter == status,
@@ -283,6 +300,9 @@ private fun ConnectedUserChallengeDialog(
                             selected = selectedTc == tc,
                             onClick = { selectedTc = tc },
                             label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                            leadingIcon = {
+                                Icon(timeControlIcon(tc), null, Modifier.size(16.dp))
+                            },
                         )
                     }
                 }

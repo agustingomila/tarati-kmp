@@ -162,6 +162,10 @@ class WasmSettingsRepository : SettingsRepository {
     private val _onlineSpectating = MutableStateFlow(bool(K_ONLINE_SPECTATING, true))
     override val onlineSpectatingAllowed = _onlineSpectating.asStateFlow()
 
+    private val _companionPanelWidth =
+        MutableStateFlow(float(K_COMPANION_PANEL_WIDTH, SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH))
+    override val companionPanelWidth = _companionPanelWidth.asStateFlow()
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     override suspend fun setTutorialSeen(seen: Boolean) {
@@ -292,6 +296,10 @@ class WasmSettingsRepository : SettingsRepository {
         _onlineSpectating.value = allowed; set(K_ONLINE_SPECTATING, allowed)
     }
 
+    override suspend fun setCompanionPanelWidth(width: Float) {
+        _companionPanelWidth.value = width; set(K_COMPANION_PANEL_WIDTH, width)
+    }
+
     companion object {
         private const val K_DARK_THEME = "w_dark_theme"
         private const val K_DIFFICULTY = "w_difficulty"
@@ -322,6 +330,7 @@ class WasmSettingsRepository : SettingsRepository {
         private const val K_ONLINE_TC = "w_online_tc"
         private const val K_ONLINE_RATED = "w_online_rated"
         private const val K_ONLINE_SPECTATING = "w_online_spectating"
+        private const val K_COMPANION_PANEL_WIDTH = "w_companion_panel_width"
         private const val K_APP_THEME = "w_app_theme"
     }
 }

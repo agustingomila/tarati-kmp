@@ -127,6 +127,15 @@ interface SettingsRepository {
      */
     val onlineSpectatingAllowed: Flow<Boolean>
 
+    // ── Companion panel layout ─────────────────────────────────────────────────
+
+    /**
+     * Ancho en dp del panel lateral (companion) en layouts anchos (Expanded).
+     * El usuario puede arrastrar el divisor para redimensionarlo; el valor se
+     * persiste para restaurarlo entre sesiones. Default: [COMPANION_PANEL_DEFAULT_WIDTH].
+     */
+    val companionPanelWidth: Flow<Float>
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     suspend fun setTutorialSeen(seen: Boolean)
@@ -188,4 +197,20 @@ interface SettingsRepository {
 
     /** Persiste si la última búsqueda online permitió espectadores. */
     suspend fun setOnlineSpectatingAllowed(allowed: Boolean)
+
+    // ── Companion panel setters ────────────────────────────────────────────────
+
+    /** Persiste el ancho (dp) del panel lateral elegido por el usuario. */
+    suspend fun setCompanionPanelWidth(width: Float)
+
+    companion object {
+        /** Ancho por defecto del panel lateral, en dp. */
+        const val COMPANION_PANEL_DEFAULT_WIDTH: Float = 380f
+
+        /** Ancho mínimo permitido al redimensionar el panel, en dp. */
+        const val COMPANION_PANEL_MIN_WIDTH: Float = 300f
+
+        /** Ancho máximo permitido al redimensionar el panel, en dp. */
+        const val COMPANION_PANEL_MAX_WIDTH: Float = 640f
+    }
 }

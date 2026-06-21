@@ -63,6 +63,8 @@ import com.agustin.tarati.shared.generated.resources.allow_spectators
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.casual_info_card
 import com.agustin.tarati.shared.generated.resources.join
+import com.agustin.tarati.shared.generated.resources.lobby_count_live_games
+import com.agustin.tarati.shared.generated.resources.lobby_count_searching
 import com.agustin.tarati.shared.generated.resources.lobby_filter_live_games
 import com.agustin.tarati.shared.generated.resources.lobby_filter_open_searches
 import com.agustin.tarati.shared.generated.resources.lobby_in_live
@@ -82,6 +84,8 @@ import com.agustin.tarati.shared.generated.resources.watch_game
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.icon
+import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import kotlin.time.Clock
@@ -153,7 +157,23 @@ internal fun LobbyTab(
         )
     }
 
+    val searchingCount = searchesState.searches.size + (if (ownTicket != null) 1 else 0)
+
     Column(modifier = Modifier.fillMaxSize()) {
+        LobbyStatsRow(
+            stats = listOf(
+                StatChip(
+                    icon = TaratiIcons.Public,
+                    text = localizedString(Res.string.lobby_count_live_games)
+                        .replace($$"%1$s", "${gamesState.games.size}"),
+                ),
+                StatChip(
+                    icon = TaratiIcons.Search,
+                    text = localizedString(Res.string.lobby_count_searching)
+                        .replace($$"%1$s", "$searchingCount"),
+                ),
+            ),
+        )
         LobbyFilterBar(filters = filters, viewModel = viewModel)
         Box(modifier = Modifier.weight(1f)) {
             when {
@@ -284,7 +304,7 @@ private fun LiveGameCard(game: LiveGameDto, onSpectate: (() -> Unit)? = null) {
         leadingContent = boardState?.let { state ->
             { StaticBoardRenderer(modifier = Modifier.fillMaxSize(), gameState = state) }
         },
-        leadingIcon = if (boardState == null) TaratiIcons.Timer else null,
+        leadingIcon = if (boardState == null) game.timeControl.type.icon else null,
         badge = localizedString(Res.string.lobby_in_live),
         badgeColor = MaterialTheme.colorScheme.error,
         badgeTrailingContent = if (onSpectate != null) {
@@ -435,7 +455,7 @@ private fun OpenSearchCard(search: OpenSearchDto, onJoin: (() -> Unit)?) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = TaratiIcons.Search,
+                imageVector = search.timeControl.type.icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.size(24.dp),
@@ -610,6 +630,9 @@ internal fun NewSearchSheet(
                                 scope.launch { settings.setOnlineTimeControl(tc) }
                             },
                             label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                            leadingIcon = {
+                                Icon(timeControlIcon(tc), null, Modifier.size(16.dp))
+                            },
                         )
                     }
                 }

@@ -155,6 +155,11 @@ class DesktopSettingsRepository : SettingsRepository {
     private val _onlineSpectatingAllowed = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_SPECTATING_ALLOWED, true))
     override val onlineSpectatingAllowed = _onlineSpectatingAllowed.asStateFlow()
 
+    private val _companionPanelWidth = MutableStateFlow(
+        prefs.getFloat(KEY_COMPANION_PANEL_WIDTH, SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH)
+    )
+    override val companionPanelWidth = _companionPanelWidth.asStateFlow()
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     override suspend fun setTutorialSeen(seen: Boolean) {
@@ -337,6 +342,12 @@ class DesktopSettingsRepository : SettingsRepository {
         flush()
     }
 
+    override suspend fun setCompanionPanelWidth(width: Float) {
+        _companionPanelWidth.value = width
+        prefs.putFloat(KEY_COMPANION_PANEL_WIDTH, width)
+        flush()
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     /**
@@ -387,5 +398,6 @@ class DesktopSettingsRepository : SettingsRepository {
         private const val KEY_ONLINE_TIME_CONTROL = "online_time_control"
         private const val KEY_ONLINE_RATED = "online_rated"
         private const val KEY_ONLINE_SPECTATING_ALLOWED = "online_spectating_allowed"
+        private const val KEY_COMPANION_PANEL_WIDTH = "companion_panel_width"
     }
 }

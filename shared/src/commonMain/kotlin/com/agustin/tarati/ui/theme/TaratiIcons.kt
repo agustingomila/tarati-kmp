@@ -133,6 +133,22 @@ object TaratiIcons {
         )
     }
 
+    // ── B ────────────────────────────────────────────────────────────────────
+
+    /** ⚡ rayo (modo de juego Blitz). */
+    val Bolt: ImageVector by lazy {
+        icon("Bolt", "M7 2v11h3v9l7-12h-4l4-8z")
+    }
+
+    /** 🔫 bala / proyectil (modo de juego Bullet). Path custom 24×24. */
+    val Bullet: ImageVector by lazy {
+        icon(
+            name = "Bullet",
+            pathData = "M14.5 8.5C14.5 5.5 13.5 3 12 1.5 10.5 3 9.5 5.5 9.5 8.5V16h5V8.5z" +
+                    "M9.5 17.5h5v2H13v1.5h-2V19.5H9.5z",
+        )
+    }
+
     // ── C ────────────────────────────────────────────────────────────────────
 
     /** ✕ cancelar (círculo con X). */
@@ -378,6 +394,15 @@ object TaratiIcons {
         icon(
             name = "Save",
             pathData = "M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z",
+        )
+    }
+
+    /** 🕐 reloj analógico (modo de juego Classical). */
+    val Schedule: ImageVector by lazy {
+        icon(
+            name = "Schedule",
+            pathData = "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2z" +
+                    "M12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
         )
     }
 

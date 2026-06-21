@@ -502,6 +502,12 @@
     <string name="lobby_online_users_section">Online now</string>
     <string name="lobby_status_playing">Playing</string>
     <string name="lobby_status_in_lobby">In lobby</string>
+    <string name="lobby_count_online">%1$s online</string>
+    <string name="lobby_count_playing">%1$s playing</string>
+    <string name="lobby_count_live_games">%1$s live</string>
+    <string name="lobby_count_searching">%1$s searching</string>
+    <string name="lobby_count_tournaments_active">%1$s ongoing</string>
+    <string name="lobby_count_tournaments_registering">%1$s open</string>
 
     <!-- ── API error codes (server → client localization) ──────────────── -->
     <string name="api_error_invalid_credentials">Incorrect username or password</string>

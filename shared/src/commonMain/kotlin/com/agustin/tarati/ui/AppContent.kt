@@ -1,14 +1,23 @@
 package com.agustin.tarati.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,6 +37,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.play.GameStatus
 import com.agustin.tarati.core.utils.FeatureFlags
@@ -55,6 +67,7 @@ import com.agustin.tarati.features.online.social.PublicProfileScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
+import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.features.settings.OnlineSettingsScreen
 import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
@@ -128,6 +141,16 @@ fun AppContent(
 
     val companion = remember { CompanionPanelController() }
 
+    // Ancho redimensionable del panel lateral (Expanded). El valor persistido se
+    // adopta mientras el usuario no esté arrastrando; al soltar, se guarda.
+    val settingsRepo: SettingsRepository = koinInject()
+    val persistedPanelWidth by settingsRepo.companionPanelWidth
+        .collectAsState(SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH)
+    var draggedPanelWidth by remember { mutableStateOf<Float?>(null) }
+    val panelWidth = draggedPanelWidth ?: persistedPanelWidth
+    val density = LocalDensity.current
+    val panelScope = rememberCoroutineScope()
+
     val authViewModel: IAuthViewModel = koinInject()
     val connectionViewModel: IConnectionViewModel = koinInject()
     val authState by authViewModel.authState.collectAsState()
@@ -177,8 +200,23 @@ fun AppContent(
                                     )
                                 }
                                 if (companion.isOpen) {
-                                    VerticalDivider()
-                                    Box(modifier = Modifier.width(380.dp).fillMaxHeight()) {
+                                    ResizablePanelDivider(
+                                        onDrag = { deltaPx ->
+                                            val deltaDp = with(density) { deltaPx.toDp().value }
+                                            // El panel está a la derecha: arrastrar hacia la
+                                            // izquierda (delta negativo) lo ensancha.
+                                            draggedPanelWidth = (panelWidth - deltaDp).coerceIn(
+                                                SettingsRepository.COMPANION_PANEL_MIN_WIDTH,
+                                                SettingsRepository.COMPANION_PANEL_MAX_WIDTH,
+                                            )
+                                        },
+                                        onDragStopped = {
+                                            draggedPanelWidth?.let { w ->
+                                                panelScope.launch { settingsRepo.setCompanionPanelWidth(w) }
+                                            }
+                                        },
+                                    )
+                                    Box(modifier = Modifier.width(panelWidth.dp).fillMaxHeight()) {
                                         CompanionPane(
                                             controller = companion,
                                             settingsViewModel = settingsViewModel,
@@ -233,6 +271,57 @@ fun AppContent(
 }
 
 // ── Companion panel ───────────────────────────────────────────────────────────
+
+/**
+ * Divisor vertical arrastrable entre el área principal y el panel lateral.
+ *
+ * Expone una zona de agarre más ancha que la línea visible para facilitar el
+ * arrastre. [onDrag] recibe el delta horizontal en píxeles; [onDragStopped] se
+ * invoca al soltar para persistir el ancho resultante.
+ */
+@Composable
+private fun ResizablePanelDivider(
+    onDrag: (deltaPx: Float) -> Unit,
+    onDragStopped: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(12.dp)
+            .pointerHoverIcon(PointerIcon.Hand)
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { delta -> onDrag(delta) },
+                onDragStopped = { onDragStopped() },
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        VerticalDivider()
+        // Grip central: pastilla con tres puntos que indica que el panel es redimensionable.
+        Box(
+            modifier = Modifier
+                .size(width = 6.dp, height = 40.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(3.dp),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .size(2.dp)
+                            .background(MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
+                    )
+                }
+            }
+        }
+    }
+}
 
 /**
  * Renderiza el destino activo del panel lateral.
@@ -417,8 +506,8 @@ private fun ChallengeNotificationEffect(
                     val tcDisplay = event.timeControl.replaceFirstChar { it.titlecase() }
                     val ratedDisplay = if (event.rated) "·" else ""
                     bus.alert { dismiss ->
-                        androidx.compose.foundation.layout.Column(
-                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(16.dp),
                         ) {
                             Text(
@@ -433,7 +522,7 @@ private fun ChallengeNotificationEffect(
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Row(
-                                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Button(onClick = {
                                     scope.launch {

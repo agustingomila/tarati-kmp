@@ -512,6 +512,12 @@
     <string name="lobby_online_users_section">En línea</string>
     <string name="lobby_status_playing">Jugando</string>
     <string name="lobby_status_in_lobby">En el lobby</string>
+    <string name="lobby_count_online">%1$s en línea</string>
+    <string name="lobby_count_playing">%1$s jugando</string>
+    <string name="lobby_count_live_games">%1$s en vivo</string>
+    <string name="lobby_count_searching">%1$s buscando</string>
+    <string name="lobby_count_tournaments_active">%1$s en curso</string>
+    <string name="lobby_count_tournaments_registering">%1$s abiertos</string>
 
     <!-- ── Códigos de error de API (servidor → localización en cliente) ── -->
     <string name="api_error_invalid_credentials">Usuario o contraseña incorrectos</string>

@@ -89,6 +89,8 @@ import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.icon
+import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -429,7 +431,7 @@ private fun RatingsGrid(ratings: ProfileRatingsDto, stats: ProfileStatsDto) {
             val (current, peak) = ratingPair
             val tcStats = statEntries[index].second
             RatingCard(
-                tcLabel = tc.key.replaceFirstChar { it.titlecase() },
+                tc = tc,
                 rating = current,
                 peak = peak,
                 stats = tcStats,
@@ -441,7 +443,7 @@ private fun RatingsGrid(ratings: ProfileRatingsDto, stats: ProfileStatsDto) {
 
 @Composable
 private fun RatingCard(
-    tcLabel: String,
+    tc: TimeControl,
     rating: Int,
     peak: Int,
     stats: ProfileTimeControlStatsDto,
@@ -459,11 +461,22 @@ private fun RatingCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text(
-                text = tcLabel,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Icon(
+                    imageVector = tc.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = tc.key.replaceFirstChar { it.titlecase() },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 text = "$rating",
                 style = MaterialTheme.typography.titleMedium,
@@ -506,6 +519,9 @@ private fun ProfileHistoryFilters(
                         viewModel.setTimeControlFilter(if (filters.timeControl == tc) null else tc)
                     },
                     label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                    leadingIcon = {
+                        Icon(timeControlIcon(tc), null, Modifier.size(16.dp))
+                    },
                 )
             }
         }
@@ -617,6 +633,9 @@ private fun ChallengeDialog(
                             selected = selectedTc == tc,
                             onClick = { selectedTc = tc },
                             label = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                            leadingIcon = {
+                                Icon(timeControlIcon(tc), null, Modifier.size(16.dp))
+                            },
                         )
                     }
                 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -63,6 +64,8 @@ import com.agustin.tarati.shared.generated.resources.allow_spectators
 import com.agustin.tarati.shared.generated.resources.cancel
 import com.agustin.tarati.shared.generated.resources.clear_filters
 import com.agustin.tarati.shared.generated.resources.create
+import com.agustin.tarati.shared.generated.resources.lobby_count_tournaments_active
+import com.agustin.tarati.shared.generated.resources.lobby_count_tournaments_registering
 import com.agustin.tarati.shared.generated.resources.create_tournament
 import com.agustin.tarati.shared.generated.resources.max_players
 import com.agustin.tarati.shared.generated.resources.min_players
@@ -93,6 +96,7 @@ import com.agustin.tarati.shared.generated.resources.validation_max_players_coun
 import com.agustin.tarati.shared.generated.resources.validation_min_players_count
 import com.agustin.tarati.shared.generated.resources.validation_players_number
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -185,6 +189,20 @@ internal fun TournamentsTab(
 
             else -> {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    LobbyStatsRow(
+                        stats = listOf(
+                            StatChip(
+                                icon = TaratiIcons.EmojiEvents,
+                                text = localizedString(Res.string.lobby_count_tournaments_active)
+                                    .replace($$"%1$s", "${state.active.size}"),
+                            ),
+                            StatChip(
+                                icon = TaratiIcons.Group,
+                                text = localizedString(Res.string.lobby_count_tournaments_registering)
+                                    .replace($$"%1$s", "${state.registering.size}"),
+                            ),
+                        ),
+                    )
                     TournamentFilterBar(
                         statusFilter = statusFilter,
                         onStatusFilter = { statusFilter = it },
@@ -307,7 +325,7 @@ private fun TournamentFilterBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf<TournamentStatus?>(
+            listOf(
                 null,
                 TournamentStatus.REGISTERING,
                 TournamentStatus.ACTIVE,
@@ -419,11 +437,20 @@ private fun TournamentCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(
-                    tournament.timeControl.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        timeControlIcon(tournament.timeControl),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        tournament.timeControl.replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
                     localizedString(Res.string.tournament_players_of)
@@ -519,6 +546,9 @@ private fun CreateTournamentDialog(
                             selected = selectedTc == tc,
                             onClick = { selectedTc = tc },
                             label = { Text(tc.replaceFirstChar { it.uppercase() }) },
+                            leadingIcon = {
+                                Icon(timeControlIcon(tc), null, Modifier.size(16.dp))
+                            },
                         )
                     }
                 }

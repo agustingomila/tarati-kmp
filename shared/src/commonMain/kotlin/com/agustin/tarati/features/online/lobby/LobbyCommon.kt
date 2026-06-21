@@ -50,6 +50,46 @@ internal fun formatMs(ms: Long): String {
     return "$min:${sec.toString().padStart(2, '0')}"
 }
 
+// ── Estadísticas de pestaña ─────────────────────────────────────────────────────
+
+/** Una métrica con su ícono y texto ya formateado, para mostrar en [LobbyStatsRow]. */
+internal data class StatChip(
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val text: String,
+)
+
+/**
+ * Fila compacta de estadísticas en la cabecera de una pestaña del lobby.
+ * Cada [StatChip] se renderiza como ícono + texto en estilo discreto.
+ */
+@Composable
+internal fun LobbyStatsRow(stats: List<StatChip>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 2.dp),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        stats.forEach { stat ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    stat.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    stat.text,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
 // ── Sesión invitado ───────────────────────────────────────────────────────────
 
 @Composable

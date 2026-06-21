@@ -44,6 +44,7 @@ import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.timeControlIcon
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,6 +94,13 @@ fun LeaderboardScreen(
                             selected = selectedTc == tc,
                             onClick = { viewModel.selectTimeControl(tc) },
                             text = { Text(tc.replaceFirstChar { it.titlecase() }) },
+                            icon = {
+                                Icon(
+                                    timeControlIcon(tc),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            },
                         )
                     }
                 }

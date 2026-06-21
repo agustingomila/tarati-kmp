@@ -128,6 +128,11 @@ class AndroidSettingsRepository(
     override val onlineSpectatingAllowed: Flow<Boolean> =
         dataStore.data.map { prefs -> prefs[ONLINE_SPECTATING_ALLOWED_KEY] ?: ONLINE_SPECTATING_ALLOWED_DEFAULT }
 
+    override val companionPanelWidth: Flow<Float> =
+        dataStore.data.map { prefs ->
+            prefs[COMPANION_PANEL_WIDTH_KEY] ?: SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH
+        }
+
     // ── Setters ────────────────────────────────────────────────────────────────
 
     override suspend fun setDarkTheme(enabled: Boolean) {
@@ -250,6 +255,10 @@ class AndroidSettingsRepository(
         dataStore.edit { it[ONLINE_SPECTATING_ALLOWED_KEY] = allowed }
     }
 
+    override suspend fun setCompanionPanelWidth(width: Float) {
+        dataStore.edit { it[COMPANION_PANEL_WIDTH_KEY] = width }
+    }
+
     // ── Keys ───────────────────────────────────────────────────────────────────
 
     companion object {
@@ -288,6 +297,9 @@ class AndroidSettingsRepository(
         val ONLINE_TIME_CONTROL_KEY = stringPreferencesKey("online_time_control")
         val ONLINE_RATED_KEY = booleanPreferencesKey("online_rated")
         val ONLINE_SPECTATING_ALLOWED_KEY = booleanPreferencesKey("online_spectating_allowed")
+
+        // Companion panel layout
+        val COMPANION_PANEL_WIDTH_KEY = floatPreferencesKey("companion_panel_width")
 
         private const val DARK_THEME_DEFAULT = true
         private const val LABELS_VISIBILITY_DEFAULT = false
