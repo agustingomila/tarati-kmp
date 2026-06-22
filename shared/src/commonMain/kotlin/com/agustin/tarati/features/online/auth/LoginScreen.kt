@@ -559,7 +559,7 @@ private fun LoginSheetContent(
                     onClick = {
                         val name = guestUsername.trim()
                         if (name.isNotBlank()) {
-                            if (name.length < 3 || name.length > 20 || !name.matches(Regex("[A-Za-z0-9_]+"))) {
+                            if (name.length !in 3..20 || !name.matches(Regex("[A-Za-z0-9_]+"))) {
                                 guestUsernameError = errGuestUsername
                                 return@OutlinedButton
                             }

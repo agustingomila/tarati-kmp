@@ -48,7 +48,7 @@ import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
-import com.agustin.tarati.features.library.StaticBoardRenderer
+import com.agustin.tarati.ui.components.library.StaticBoardRenderer
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.back

@@ -1,4 +1,4 @@
-package com.agustin.tarati.features.library
+package com.agustin.tarati.ui.components.library
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable

@@ -31,7 +31,7 @@ import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
  */
 class AndroidSettingsViewModel(
     repository: SettingsRepository,
-    private val achievementsRepository: IAchievementsRepository,
+    achievementsRepository: IAchievementsRepository,
     private val billingManager: IBillingManager,
 ) : SettingsViewModel(repository) {
 

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.initialGameState
-import com.agustin.tarati.features.library.StaticBoardRenderer
+import com.agustin.tarati.ui.components.library.StaticBoardRenderer
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.ui.theme.BoardPalette
 import com.agustin.tarati.ui.theme.LocalBoardPalette

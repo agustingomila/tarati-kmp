@@ -39,7 +39,6 @@ import com.agustin.tarati.ui.components.game.highlights.sequences.HighlightDurat
  *
  * @see GameOverSequenceProvider
  */
-@Suppress("UNUSED_PARAMETER")
 fun createDrawSequence(matchState: MatchState): List<List<HighlightAnimation>> {
     val sequences = mutableListOf<List<HighlightAnimation>>()
     sequences.addAll(createCircumferenceClockwiseSequence())

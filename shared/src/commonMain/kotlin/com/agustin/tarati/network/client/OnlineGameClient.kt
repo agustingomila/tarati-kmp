@@ -314,7 +314,7 @@ class OnlineGameClient(
         pendingSpectate = deferred
         return try {
             wsClient.send(ClientMessage.SpectateGame(gameId))
-            withTimeoutOrNull(5_000) { deferred.await() } ?: false
+            withTimeoutOrNull(5_000.milliseconds) { deferred.await() } ?: false
         } finally {
             pendingSpectate = null
         }

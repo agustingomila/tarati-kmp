@@ -127,7 +127,6 @@ object EvaluationConfigBuilder {
                 .scaleRepetition(1.5),
         )
 
-    @Suppress("unused")
     fun custom(block: EvaluationConfig.() -> EvaluationConfig): EvaluationConfig = baseline().block()
 
     @Suppress("unused")

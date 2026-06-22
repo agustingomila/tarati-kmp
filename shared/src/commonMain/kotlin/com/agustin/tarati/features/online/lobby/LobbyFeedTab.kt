@@ -185,7 +185,7 @@ private fun FeedFilterBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf<String?>(null, "win", "loss", "draw").forEach { result ->
+            listOf(null, "win", "loss", "draw").forEach { result ->
                 FilterChip(
                     selected = resultFilter == result,
                     onClick = {
@@ -220,7 +220,7 @@ private fun FeedFilterBar(
                     trailingIcon = { Icon(TaratiIcons.ArrowDropDown, null, Modifier.size(14.dp)) },
                 )
                 DropdownMenu(expanded = showTcMenu, onDismissRequest = { showTcMenu = false }) {
-                    listOf<TimeControl?>(
+                    listOf(
                         null,
                         TimeControl.BULLET,
                         TimeControl.BLITZ,

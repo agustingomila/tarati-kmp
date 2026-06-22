@@ -55,7 +55,7 @@ import kotlinx.coroutines.tasks.await
  * ```
  */
 class GamesAuthManager(
-    private val activity: Activity
+    activity: Activity
 ) {
     private val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
 

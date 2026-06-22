@@ -29,6 +29,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Verifica que [GameEvents.dialogRequest] emite los eventos correctos para
@@ -131,7 +132,7 @@ class GameEventsDialogRequestTest {
         events.gameOver(scope = this)
 
         // Advance just short of the delay
-        advanceTimeBy(2_499L)
+        advanceTimeBy(2_499L.milliseconds)
 
         assertTrue("No request before delay expires", collected.isEmpty())
         collectJob.cancel()
@@ -144,7 +145,7 @@ class GameEventsDialogRequestTest {
 
         events.gameOver(scope = this)
 
-        advanceTimeBy(2_501L)
+        advanceTimeBy(2_501L.milliseconds)
 
         assertEquals(1, collected.size)
         assertEquals(DialogRequest.GameOver(CobColor.WHITE), collected[0])

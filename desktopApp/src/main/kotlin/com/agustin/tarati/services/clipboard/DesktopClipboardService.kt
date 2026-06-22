@@ -1,6 +1,9 @@
 package com.agustin.tarati.services.clipboard
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 
 /**
@@ -22,7 +25,9 @@ class DesktopClipboardService : IClipboardService {
     override suspend fun getText(): String? {
         return try {
             val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-            clipboard.getData(java.awt.datatransfer.DataFlavor.stringFlavor) as? String
+            withContext(Dispatchers.IO) {
+                clipboard.getData(DataFlavor.stringFlavor)
+            } as? String
         } catch (e: Exception) {
             null
         }

@@ -80,6 +80,7 @@ import com.agustin.tarati.shared.generated.resources.saved_games
 import com.agustin.tarati.shared.generated.resources.search_games
 import com.agustin.tarati.shared.generated.resources.select_games
 import com.agustin.tarati.ui.components.TooltipIconButton
+import com.agustin.tarati.ui.components.library.StaticBoardRenderer
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground

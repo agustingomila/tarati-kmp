@@ -27,7 +27,7 @@ import com.agustin.tarati.features.library.GameInfoRow
 import com.agustin.tarati.features.library.GamesLibraryScreen
 import com.agustin.tarati.features.library.IGamesLibraryViewModel
 import com.agustin.tarati.features.library.SavedGameItem
-import com.agustin.tarati.features.library.StaticBoardRenderer
+import com.agustin.tarati.ui.components.library.StaticBoardRenderer
 import com.agustin.tarati.ui.theme.ChristmasPalette
 import com.agustin.tarati.ui.theme.ClassicPalette
 import com.agustin.tarati.ui.theme.DarkPalette

@@ -1096,8 +1096,8 @@ class SettingsViewModelTest {
             coEvery { mockSettingsRepository.setSeasonalAutoAppliedDate(any()) } returns Unit
             coEvery { mockSettingsRepository.setPreSeasonalPalette(any()) } returns Unit
 
-            val seasonalPalette = SeasonalThemeManager.getSeasonalPaletteForToday()
-            if (seasonalPalette == null) return@runTest  // no es día estacional, skip
+            val seasonalPalette = SeasonalThemeManager.getSeasonalPaletteForToday() ?: return@runTest
+            // no es día estacional, skip
 
             (viewModel as AndroidSettingsViewModel).applySeasonalThemeIfNeeded(
                 repository = mockSettingsRepository,

@@ -46,7 +46,7 @@ import com.agustin.tarati.core.domain.game.pieces.CobColor
 import com.agustin.tarati.core.domain.game.pieces.cobColorByDescription
 import com.agustin.tarati.core.domain.game.play.GameState.Companion.parseBoardNotation
 import com.agustin.tarati.core.domain.game.time.TimeControl
-import com.agustin.tarati.features.library.StaticBoardRenderer
+import com.agustin.tarati.ui.components.library.StaticBoardRenderer
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.features.online.auth.UserInfo
 import com.agustin.tarati.features.settings.SettingsRepository

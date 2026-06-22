@@ -30,7 +30,7 @@ import com.agustin.tarati.core.domain.ai.evaluator.MoveEval
  * en dispositivos con RAM limitada sin lógica adicional.
  */
 class TranspositionTable(
-    private val maxSize: Int = 10000,
+    maxSize: Int = 10000,
 ) {
     private val table = LruCache<String, TranspositionEntry>(maxSize)
 

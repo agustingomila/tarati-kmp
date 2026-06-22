@@ -35,8 +35,8 @@ import com.agustin.tarati.core.domain.game.play.GameState
  * la búsqueda completa; un hit aquí evita recomputar la evaluación del nodo.
  */
 class HybridEvaluationCache(
-    private val maxSize: Int = 2000,
-    private val quickCacheSize: Int = 500,
+    maxSize: Int = 2000,
+    quickCacheSize: Int = 500,
     val positionHistory: Map<String, Int> = emptyMap(),
 ) {
     private val fullEvaluationCache = LruCache<String, Double>(maxSize)
