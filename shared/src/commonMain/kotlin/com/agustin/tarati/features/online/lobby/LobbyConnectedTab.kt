@@ -23,7 +23,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -61,6 +60,7 @@ import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.social_challenge
 import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.you
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
@@ -259,7 +259,11 @@ private fun ConnectedUserRow(
             )
         }
         if (onChallenge != null) {
-            IconButton(onClick = onChallenge, modifier = Modifier.size(36.dp)) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.social_challenge),
+                onClick = onChallenge,
+                modifier = Modifier.size(36.dp),
+            ) {
                 Icon(
                     TaratiIcons.PlayArrow,
                     contentDescription = localizedString(Res.string.social_challenge),

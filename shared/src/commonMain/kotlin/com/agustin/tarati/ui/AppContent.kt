@@ -408,7 +408,7 @@ private fun CompanionPane(
 
         Settings -> LanguageAwareSettingsScreen(
             viewModel = settingsViewModel,
-            events = settingsEvents(settingsViewModel),
+            events = remember(settingsViewModel) { settingsEvents(settingsViewModel) },
             isGameActive = gameStatus == GameStatus.PLAYING,
             onNavigateBack = controller::close,
             loggedInUsername = loggedInUsername,

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,6 +58,7 @@ import com.agustin.tarati.shared.generated.resources.go_to_end
 import com.agustin.tarati.shared.generated.resources.move_n_of_n
 import com.agustin.tarati.shared.generated.resources.next
 import com.agustin.tarati.shared.generated.resources.observations
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
@@ -204,7 +204,8 @@ fun CreateCardBoard(
         ) {
             // Botón Anterior
             if (currentMoveIndex > -1) {
-                IconButton(
+                TooltipIconButton(
+                    tooltip = stringResource(Res.string.back),
                     onClick = {
                         if (currentMoveIndex > -1) {
                             val next = currentMoveIndex - 1
@@ -285,7 +286,8 @@ fun CreateCardBoard(
 
             // Botón Siguiente
             if (currentMoveIndex < moves.lastIndex) {
-                IconButton(
+                TooltipIconButton(
+                    tooltip = stringResource(Res.string.next),
                     onClick = {
                         if (currentMoveIndex < moves.lastIndex) {
                             val next = currentMoveIndex + 1
@@ -335,7 +337,8 @@ fun CreateCardBoard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     // Botón Inicio
-                    IconButton(
+                    TooltipIconButton(
+                        tooltip = stringResource(Res.string.go_to_begin),
                         onClick = {
                             onMoveIndexChange(0)
                             updateBoardState(matchDto, 0, initialState) { currentBoardState = it }
@@ -364,7 +367,8 @@ fun CreateCardBoard(
                     )
 
                     // Botón Fin
-                    IconButton(
+                    TooltipIconButton(
+                        tooltip = stringResource(Res.string.go_to_end),
                         onClick = {
                             onMoveIndexChange(moves.lastIndex)
                             updateBoardState(matchDto, moves.lastIndex, initialState) { currentBoardState = it }

@@ -1,10 +1,12 @@
 package com.agustin.tarati.features.library
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.core.data.repositories.SavedGame
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
+@Stable
 interface IGamesLibraryViewModel {
     /**
      * Lista de partidas actualmente visible, ya filtrada por [searchQuery].

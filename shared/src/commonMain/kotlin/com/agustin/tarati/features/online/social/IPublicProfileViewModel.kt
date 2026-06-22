@@ -1,17 +1,21 @@
 package com.agustin.tarati.features.online.social
 
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.features.online.lobby.GameHistoryUiState
 import com.agustin.tarati.network.models.PublicProfileDto
 import com.agustin.tarati.network.models.ServerAchievementDto
 import kotlinx.coroutines.flow.StateFlow
 
+@Immutable
 data class PublicProfileUiState(
     val profile: PublicProfileDto? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
 
+@Immutable
 data class FollowStatusUiState(
     val isFollowing: Boolean = false,
     val followersCount: Long = 0,
@@ -19,6 +23,7 @@ data class FollowStatusUiState(
     val isLoading: Boolean = false,
 )
 
+@Stable
 interface IPublicProfileViewModel {
     val profileState: StateFlow<PublicProfileUiState>
     val historyState: StateFlow<GameHistoryUiState>

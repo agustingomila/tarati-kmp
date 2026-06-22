@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.components.game.animation
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.core.domain.game.board.Vertex
@@ -12,6 +13,7 @@ import com.agustin.tarati.ui.components.game.highlights.HighlightAnimation
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@Stable
 interface IBoardAnimationViewModel {
     val soundService: ISoundService
 

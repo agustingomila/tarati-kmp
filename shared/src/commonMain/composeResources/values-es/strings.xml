@@ -300,6 +300,7 @@
     <string name="connecting">Conectando…</string>
     <string name="reconnecting">Reconectando…</string>
     <string name="retry">Reintentar</string>
+    <string name="refresh">Actualizar</string>
     <string name="disconnect">Desconectar</string>
     <string name="confirm_disconnect">¿Querés desconectarte del servidor?</string>
     <string name="connected_as">Conectado como %1$s</string>

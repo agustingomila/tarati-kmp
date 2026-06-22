@@ -18,7 +18,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
@@ -40,6 +39,8 @@ import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.error
 import com.agustin.tarati.shared.generated.resources.profile_leaderboard
 import com.agustin.tarati.shared.generated.resources.profile_no_leaderboard_data
+import com.agustin.tarati.shared.generated.resources.refresh
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
@@ -68,10 +69,13 @@ fun LeaderboardScreen(
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onBack,
                     actions = {
-                        IconButton(onClick = viewModel::refresh) {
+                        TooltipIconButton(
+                            tooltip = localizedString(Res.string.refresh),
+                            onClick = viewModel::refresh,
+                        ) {
                             Icon(
                                 imageVector = TaratiIcons.Replay,
-                                contentDescription = null,
+                                contentDescription = localizedString(Res.string.refresh),
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(20.dp),
                             )

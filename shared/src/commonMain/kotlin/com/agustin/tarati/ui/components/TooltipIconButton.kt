@@ -1,6 +1,7 @@
 package com.agustin.tarati.ui.components
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
@@ -46,6 +47,46 @@ fun TooltipIconButton(
         state = rememberTooltipState(),
     ) {
         IconButton(
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * Variante de [TooltipIconButton] que usa [FilledTonalIconButton] como botón base.
+ *
+ * Idéntica semántica de tooltip, pero conserva el estilo tonal relleno del botón
+ * (fondo de color), usado cuando se quiere mayor prominencia visual que un
+ * [IconButton] plano.
+ *
+ * @param tooltip Texto del tooltip (normalmente el mismo que contentDescription).
+ * @param onClick Acción del botón.
+ * @param modifier Modifier aplicado al [FilledTonalIconButton].
+ * @param enabled Si false, el botón está deshabilitado y el tooltip no aparece.
+ * @param content Slot interior del botón (Icon).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TooltipFilledTonalIconButton(
+    tooltip: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above,
+            spacingBetweenTooltipAndAnchor = 4.dp
+        ),
+        tooltip = { PlainTooltip { Text(tooltip) } },
+        state = rememberTooltipState(),
+    ) {
+        FilledTonalIconButton(
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,

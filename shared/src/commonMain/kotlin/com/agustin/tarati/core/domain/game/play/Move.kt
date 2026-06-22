@@ -4,6 +4,7 @@ import com.agustin.tarati.core.domain.game.board.GameBoard.adjacencyMap
 import com.agustin.tarati.core.domain.game.board.GameBoard.homeBases
 import com.agustin.tarati.core.domain.game.board.Vertex
 import com.agustin.tarati.core.domain.game.board.Vertex.Companion.parseVertex
+import androidx.compose.runtime.Immutable
 import com.agustin.tarati.core.domain.game.pieces.opponent
 import kotlinx.serialization.Serializable
 
@@ -22,6 +23,7 @@ import kotlinx.serialization.Serializable
  * El constructor secundario `constructor(Pair<Vertex, Vertex>)` mantiene la
  * sintaxis existente `Move(A1 to B1)` en todo el código sin cambios.
  */
+@Immutable
 @Serializable
 data class Move(
     val from: Vertex,

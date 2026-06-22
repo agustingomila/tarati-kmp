@@ -53,6 +53,7 @@ import com.agustin.tarati.shared.generated.resources.offline
 import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.reconnecting
 import com.agustin.tarati.shared.generated.resources.retry
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 
 /**
@@ -83,7 +84,8 @@ fun SpectatingPill(
                 modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onTertiaryContainer,
             )
-            IconButton(
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.exit_spectator),
                 onClick = onStop,
                 modifier = Modifier.size(24.dp),
             ) {
@@ -194,7 +196,8 @@ private fun SearchingPill(
             }
 
             if (!matchFound) {
-                IconButton(
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.cancel_search),
                     onClick = onCancel,
                     modifier = Modifier.size(24.dp),
                 ) {
@@ -249,7 +252,10 @@ fun SearchButton(
             }
 
             is ConnectionState.Error -> {
-                IconButton(onClick = onClick) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.retry),
+                    onClick = onClick,
+                ) {
                     Icon(
                         imageVector = TaratiIcons.Error,
                         contentDescription = localizedString(Res.string.retry),
@@ -259,7 +265,10 @@ fun SearchButton(
             }
 
             else -> {
-                IconButton(onClick = onClick) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.find_match),
+                    onClick = onClick,
+                ) {
                     Icon(
                         imageVector = TaratiIcons.Search,
                         contentDescription = localizedString(Res.string.find_match),

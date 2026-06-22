@@ -290,6 +290,7 @@
     <string name="connecting">Connecting…</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="retry">Retry</string>
+    <string name="refresh">Refresh</string>
     <string name="disconnect">Disconnect</string>
     <string name="confirm_disconnect">Are you sure you want to disconnect from the server?</string>
     <string name="connected_as">Connected as %1$s</string>

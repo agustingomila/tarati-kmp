@@ -29,7 +29,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -95,6 +94,7 @@ import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
 import com.agustin.tarati.shared.generated.resources.validation_max_players_count
 import com.agustin.tarati.shared.generated.resources.validation_min_players_count
 import com.agustin.tarati.shared.generated.resources.validation_players_number
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
@@ -365,7 +365,11 @@ private fun TournamentFilterBar(
                 leadingIcon = { Icon(TaratiIcons.Timer, null, Modifier.size(14.dp)) },
             )
             Box {
-                IconButton(onClick = { showSortMenu = true }, modifier = Modifier.size(32.dp)) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.sort),
+                    onClick = { showSortMenu = true },
+                    modifier = Modifier.size(32.dp),
+                ) {
                     Icon(
                         TaratiIcons.Sort,
                         contentDescription = localizedString(Res.string.sort),

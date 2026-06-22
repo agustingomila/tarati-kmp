@@ -1,8 +1,10 @@
 package com.agustin.tarati.features.settings
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.theme.AppTheme
 
+@Stable
 interface SettingsEvents {
     fun onThemeChange(theme: AppTheme)
 

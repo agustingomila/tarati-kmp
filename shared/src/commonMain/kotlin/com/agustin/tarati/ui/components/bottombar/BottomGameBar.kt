@@ -28,10 +28,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -58,6 +56,8 @@ import com.agustin.tarati.shared.generated.resources.move_controls
 import com.agustin.tarati.shared.generated.resources.move_history
 import com.agustin.tarati.shared.generated.resources.redo
 import com.agustin.tarati.shared.generated.resources.undo
+import com.agustin.tarati.ui.components.TooltipFilledTonalIconButton
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.movelist.MoveHistoryList
 import com.agustin.tarati.ui.theme.TaratiIcons
 
@@ -390,7 +390,10 @@ fun ControlStrip(
             }
 
             // Toggle historial
-            FilledTonalIconButton(onClick = onHistoryToggle) {
+            TooltipFilledTonalIconButton(
+                tooltip = localizedString(Res.string.move_history),
+                onClick = onHistoryToggle,
+            ) {
                 Icon(
                     imageVector = if (isHistoryOpen) TaratiIcons.KeyboardArrowDown
                     else TaratiIcons.MenuBook,
@@ -399,7 +402,10 @@ fun ControlStrip(
             }
 
             // Cerrar (colapsar volviendo al FAB)
-            IconButton(onClick = onClose) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.close),
+                onClick = onClose,
+            ) {
                 Icon(
                     imageVector = TaratiIcons.Close,
                     contentDescription = localizedString(Res.string.close),

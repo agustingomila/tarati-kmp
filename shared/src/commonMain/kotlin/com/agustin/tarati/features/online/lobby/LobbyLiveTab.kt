@@ -25,7 +25,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -81,6 +80,7 @@ import com.agustin.tarati.shared.generated.resources.sort_newest
 import com.agustin.tarati.shared.generated.resources.tournament
 import com.agustin.tarati.shared.generated.resources.turn
 import com.agustin.tarati.shared.generated.resources.watch_game
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
 import com.agustin.tarati.ui.theme.TaratiIcons
@@ -250,7 +250,11 @@ private fun LobbyFilterBar(filters: LobbyFilters, viewModel: IOnlineLobbyViewMod
         )
         Spacer(Modifier.weight(1f))
         Box {
-            IconButton(onClick = { showSortMenu = true }, modifier = Modifier.size(32.dp)) {
+            TooltipIconButton(
+                tooltip = localizedString(Res.string.sort),
+                onClick = { showSortMenu = true },
+                modifier = Modifier.size(32.dp),
+            ) {
                 Icon(
                     TaratiIcons.Sort,
                     contentDescription = localizedString(Res.string.sort),

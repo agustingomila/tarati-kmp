@@ -138,7 +138,7 @@ fun NavGraph(
             val currentUser by authViewModel.authState.collectAsState()
             LanguageAwareSettingsScreen(
                 viewModel = settingsViewModel,
-                events = settingsEvents(settingsViewModel),
+                events = remember(settingsViewModel) { settingsEvents(settingsViewModel) },
                 isGameActive = gameStatus == GameStatus.PLAYING,
                 onNavigateBack = { navController.popBackStack() },
                 loggedInUsername = (currentUser as? AuthState.Authenticated)

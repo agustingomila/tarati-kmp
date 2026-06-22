@@ -592,8 +592,10 @@ fun MainContent(
                         currentTurn = gameState.currentTurn,
                         turnState = turnState,
                         logoVisible = transitionDone,
-                        indicatorEvents = object : IndicatorEvents {
-                            override fun onTouch() = onTouchIndicator()
+                        indicatorEvents = remember(onTouchIndicator) {
+                            object : IndicatorEvents {
+                                override fun onTouch() = onTouchIndicator()
+                            }
                         },
                         onCopyPositionToClipboard = onCopyPositionToClipboard,
                         showNotation = showNotation,

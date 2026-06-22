@@ -26,7 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -61,6 +60,7 @@ import com.agustin.tarati.shared.generated.resources.termination
 import com.agustin.tarati.shared.generated.resources.time_control
 import com.agustin.tarati.shared.generated.resources.toggle_details
 import com.agustin.tarati.shared.generated.resources.white
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
@@ -556,7 +556,8 @@ private fun HeaderTitleSection(
                 }
             }
 
-            IconButton(
+            TooltipIconButton(
+                tooltip = stringResource(Res.string.toggle_details),
                 onClick = { onExpandedChange(!expanded) },
                 modifier = Modifier.size(24.dp),
             ) {

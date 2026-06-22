@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +33,8 @@ import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.a_board_game_by_george_spencer_brown
 import com.agustin.tarati.shared.generated.resources.copy_position
+import com.agustin.tarati.shared.generated.resources.toggle_details
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,7 +98,8 @@ fun NotationTurnControl(
                 )
             }
 
-            IconButton(
+            TooltipIconButton(
+                tooltip = stringResource(Res.string.toggle_details),
                 onClick = { expanded = !expanded },
                 modifier = Modifier.size(24.dp),
             ) {
@@ -107,7 +109,7 @@ fun NotationTurnControl(
                     } else {
                         TaratiIcons.KeyboardArrowLeft
                     },
-                    contentDescription = null,
+                    contentDescription = stringResource(Res.string.toggle_details),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.size(20.dp),
                 )
@@ -168,7 +170,8 @@ private fun PositionNotationLabel(
                     modifier = Modifier.clickable { onShowGameState(false) },
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
+                TooltipIconButton(
+                    tooltip = stringResource(Res.string.copy_position),
                     onClick = onCopyPositionToClipboard,
                     modifier = Modifier.size(16.dp),
                 ) {

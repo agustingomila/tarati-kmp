@@ -1,6 +1,7 @@
 package com.agustin.tarati.features.online.game
 
 
+import androidx.compose.runtime.Immutable
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.network.models.MatchmakingState
@@ -389,6 +390,7 @@ sealed class TournamentEvent {
     data class Cancelled(val tournamentId: String) : TournamentEvent()
 }
 
+@Immutable
 data class SpectatingState(
     val gameId: String,
     val whitePlayer: PlayerInfo,

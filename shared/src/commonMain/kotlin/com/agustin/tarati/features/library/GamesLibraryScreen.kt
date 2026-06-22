@@ -79,6 +79,7 @@ import com.agustin.tarati.shared.generated.resources.result
 import com.agustin.tarati.shared.generated.resources.saved_games
 import com.agustin.tarati.shared.generated.resources.search_games
 import com.agustin.tarati.shared.generated.resources.select_games
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
@@ -152,7 +153,8 @@ fun GamesLibraryScreen(
                     },
                     actions = {
                         if (isMultiSelectMode && selectedGames.isNotEmpty()) {
-                            IconButton(
+                            TooltipIconButton(
+                                tooltip = localizedString(Res.string.delete_selected),
                                 onClick = { gamesToDelete = selectedGames },
                             ) {
                                 Icon(
@@ -162,7 +164,8 @@ fun GamesLibraryScreen(
                                 )
                             }
                         } else if (!isMultiSelectMode && savedGames.isNotEmpty()) {
-                            IconButton(
+                            TooltipIconButton(
+                                tooltip = localizedString(Res.string.select_games),
                                 onClick = { isMultiSelectMode = true },
                             ) {
                                 Icon(
@@ -529,7 +532,8 @@ fun SavedGameItem(
 
             if (!isMultiSelectMode) {
                 Spacer(modifier = Modifier.width(16.dp))
-                IconButton(
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.delete_game),
                     onClick = onDelete,
                     modifier = Modifier.size(48.dp),
                 ) {

@@ -1,9 +1,11 @@
 package com.agustin.tarati.ui.components.game.behaviors
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.domain.game.board.Vertex
 import com.agustin.tarati.core.domain.game.play.Move
 import kotlinx.coroutines.flow.StateFlow
 
+@Stable
 interface IBoardSelectionViewModel {
 
     // ── Selección normal (turno del humano) ──────────────────────────────────

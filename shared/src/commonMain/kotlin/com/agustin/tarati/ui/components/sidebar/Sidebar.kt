@@ -31,7 +31,6 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -58,6 +57,8 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -108,6 +109,7 @@ import com.agustin.tarati.shared.generated.resources.player_ai
 import com.agustin.tarati.shared.generated.resources.player_human
 import com.agustin.tarati.shared.generated.resources.player_wins
 import com.agustin.tarati.shared.generated.resources.redo
+import com.agustin.tarati.shared.generated.resources.rotate_board
 import com.agustin.tarati.shared.generated.resources.save_game
 import com.agustin.tarati.shared.generated.resources.saved_games
 import com.agustin.tarati.shared.generated.resources.settings
@@ -486,7 +488,8 @@ private fun GameControlsSection(
         else MaterialTheme.colorScheme.surfaceVariant
         val editTint = if (isEditing) MaterialTheme.colorScheme.onPrimary
         else MaterialTheme.colorScheme.onSurfaceVariant
-        IconButton(
+        TooltipIconButton(
+            tooltip = stringResource(Res.string.edit),
             onClick = onEditBoard,
             modifier = Modifier
                 .size(46.dp)
@@ -527,7 +530,9 @@ private fun RotateBoardButton(
         .let { if (enabled) it else it.copy(alpha = disabledAlpha) }
     val bgColor = MaterialTheme.colorScheme.surfaceVariant
         .let { if (enabled) it else it.copy(alpha = disabledAlpha) }
-    IconButton(
+    val rotateLabel = stringResource(Res.string.rotate_board)
+    TooltipIconButton(
+        tooltip = rotateLabel,
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
@@ -535,7 +540,13 @@ private fun RotateBoardButton(
             .clip(RoundedCornerShape(10.dp))
             .background(bgColor),
     ) {
-        Canvas(Modifier.size(20.dp)) { drawDirectionArrow(iconColor, deg) }
+        // El botón solo dibuja una flecha en Canvas (sin Icon), por lo que la
+        // descripción accesible se aporta vía semantics para lectores de pantalla.
+        Canvas(
+            Modifier
+                .size(20.dp)
+                .semantics { contentDescription = rotateLabel }
+        ) { drawDirectionArrow(iconColor, deg) }
     }
 }
 

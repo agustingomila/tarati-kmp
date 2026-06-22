@@ -1,6 +1,7 @@
 package com.agustin.tarati.features.online.lobby
 
 
+import androidx.compose.runtime.Stable
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.network.models.OnlineUserDto
 import kotlinx.coroutines.flow.StateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
  * Consumido por [OnlineLobbyScreen] y [NavGraph]. Permite
  * test doubles sin depender del ViewModel concreto.
  */
+@Stable
 interface IOnlineLobbyViewModel {
 
     // ── State ──────────────────────────────────────────────────────────────────

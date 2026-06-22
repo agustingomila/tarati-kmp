@@ -26,7 +26,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +52,7 @@ import com.agustin.tarati.shared.generated.resources.Res
 import com.agustin.tarati.shared.generated.resources.move_history
 import com.agustin.tarati.shared.generated.resources.toggle_move_history
 import com.agustin.tarati.shared.generated.resources.total_moves
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.movelist.MoveHistoryList
 import com.agustin.tarati.ui.theme.TaratiIcons
 
@@ -341,7 +341,8 @@ fun CollapsibleMoveHistoryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     )
 
-                    IconButton(
+                    TooltipIconButton(
+                        tooltip = localizedString(Res.string.toggle_move_history),
                         onClick = { onExpandedChange(!isExpanded) },
                         modifier = Modifier.size(24.dp),
                     ) {

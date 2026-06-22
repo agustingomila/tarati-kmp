@@ -4,7 +4,6 @@ package com.agustin.tarati.features.detail
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import com.agustin.tarati.core.data.database.dto.MatchDto
 import com.agustin.tarati.services.localization.localizedString
@@ -14,6 +13,7 @@ import com.agustin.tarati.shared.generated.resources.copy_move_history
 import com.agustin.tarati.shared.generated.resources.edit
 import com.agustin.tarati.shared.generated.resources.game_details
 import com.agustin.tarati.shared.generated.resources.save
+import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiIcons
@@ -35,7 +35,8 @@ fun DetailsTopAppBar(
         actions = {
             // Botón de copiar historial de movimientos
             if (!isEditing) {
-                IconButton(
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.copy_move_history),
                     onClick = onCopyMoveHistory,
                 ) {
                     Icon(
@@ -46,7 +47,9 @@ fun DetailsTopAppBar(
             }
 
             // Botón de edición/guardar
-            IconButton(
+            val editSaveLabel = if (isEditing) localizedString(Res.string.save) else localizedString(Res.string.edit)
+            TooltipIconButton(
+                tooltip = editSaveLabel,
                 onClick = {
                     if (isEditing) {
                         // Guardar cambios
@@ -60,13 +63,14 @@ fun DetailsTopAppBar(
             ) {
                 Icon(
                     imageVector = if (isEditing) TaratiIcons.Save else TaratiIcons.Edit,
-                    contentDescription = if (isEditing) localizedString(Res.string.save) else localizedString(Res.string.edit),
+                    contentDescription = editSaveLabel,
                 )
             }
 
             // Botón de cancelar edición
             if (isEditing) {
-                IconButton(
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.cancel),
                     onClick = {
                         viewModel.setEditing(false)
                         // Recargar datos originales
