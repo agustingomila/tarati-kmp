@@ -735,7 +735,7 @@ fun PreviewCobDrawing(
                     radius = pieceRadius,
                     selectedVertex = if (isSelected) A1 else null,
                     vertex = A1,
-                    cob = Cob(color, false),
+                    cob = Cob(color),
                     colors = boardColors,
                 )
             }
@@ -845,7 +845,6 @@ fun PreviewConvertingCobDrawing(
                             cob = Cob(color, true),
                             currentPos = A1,
                             targetPos = A1,
-                            animationProgress = 1.0f,
                             upgradeProgress = 0.0f,
                             conversionProgress = 0.6f,
                             isConverting = true,
@@ -905,7 +904,6 @@ fun PreviewAnimatedCobVariants(
                                     cob = Cob(color, true),
                                     currentPos = A1,
                                     targetPos = A1,
-                                    animationProgress = 1.0f,
                                     upgradeProgress = 0.5f,
                                     conversionProgress = 0.0f,
                                 ),
@@ -939,7 +937,6 @@ fun PreviewAnimatedCobVariants(
                                     cob = Cob(color, true),
                                     currentPos = A1,
                                     targetPos = A1,
-                                    animationProgress = 1.0f,
                                     upgradeProgress = 0.8f,
                                     conversionProgress = 0.0f,
                                 ),
@@ -981,10 +978,9 @@ fun PreviewAnimatedCobVariants(
                             animatedCob =
                                 AnimatedCob(
                                     vertex = A1,
-                                    cob = Cob(color, false),
+                                    cob = Cob(color),
                                     currentPos = A1,
                                     targetPos = A1,
-                                    animationProgress = 1.0f,
                                     upgradeProgress = 0.0f,
                                     conversionProgress = 0.3f,
                                     isConverting = true,
@@ -1015,10 +1011,9 @@ fun PreviewAnimatedCobVariants(
                             animatedCob =
                                 AnimatedCob(
                                     vertex = A1,
-                                    cob = Cob(color, false),
+                                    cob = Cob(color),
                                     currentPos = A1,
                                     targetPos = A1,
-                                    animationProgress = 1.0f,
                                     upgradeProgress = 0.0f,
                                     conversionProgress = 0.7f,
                                     isConverting = true,

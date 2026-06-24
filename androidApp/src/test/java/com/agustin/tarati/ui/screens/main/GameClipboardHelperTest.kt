@@ -6,12 +6,13 @@ import com.agustin.tarati.services.clipboard.IClipboardService
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class GameClipboardHelperTest {
     @Test
-    fun `should copy board position`() =
+    fun `should copy board position`(): TestResult =
         runTest {
             val mockService = mockk<IClipboardService>()
             val helper = GameClipboardHelper(mockService)

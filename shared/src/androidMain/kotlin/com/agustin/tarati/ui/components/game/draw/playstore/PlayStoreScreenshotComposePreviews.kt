@@ -117,7 +117,7 @@ internal fun PlayStoreComposeScreenshot(
             val py = phoneYDp.toPx()
             val pw = phoneWDp.toPx()
             val ph = phoneHDp.toPx()
-            drawPhoneShadow(px, py, pw, ph, 1f, boardColors)
+            drawPhoneShadow(px, py, pw, ph, colors = boardColors)
             drawPhoneBody(Offset(px, py), Size(pw, ph))
             drawRimLight(px, py, pw, ph)
         }

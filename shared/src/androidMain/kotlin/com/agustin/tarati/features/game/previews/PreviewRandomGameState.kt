@@ -89,8 +89,8 @@ private fun previewRandomMidGameState(): GameState {
     val cobs = buildMap {
         whiteVertices.forEachIndexed { i, v -> put(v, Cob(WHITE, i < whiteUpgradeCount)) }
         blackVertices.forEachIndexed { i, v -> put(v, Cob(BLACK, i < blackUpgradeCount)) }
-        put(neutralVertices[0], Cob(WHITE, false))
-        put(neutralVertices[1], Cob(BLACK, false))
+        put(neutralVertices[0], Cob(WHITE))
+        put(neutralVertices[1], Cob(BLACK))
     }
     return GameState(cobs = cobs, currentTurn = if (Random.nextBoolean()) WHITE else BLACK)
 }

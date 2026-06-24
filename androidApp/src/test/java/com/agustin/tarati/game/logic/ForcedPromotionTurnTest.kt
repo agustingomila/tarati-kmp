@@ -169,7 +169,7 @@ class ForcedPromotionTurnTest {
 
         val rok = postPromotion.cobs[B3]
         assertNotNull("White's Rok must exist at B3 after promotion", rok)
-        assertEquals("Piece at B3 belongs to White", WHITE, rok!!.color)
+        assertEquals("Piece at B3 belongs to White", WHITE, (rok ?: return).color)
         assertTrue("Piece at B3 is now a Rok (upgraded = true)", rok.isUpgraded)
 
         val normalMoves = postPromotion.normalMovesForTurn()
@@ -323,7 +323,7 @@ class ForcedPromotionTurnTest {
 
         val rok = postPromotion.cobs[D1]
         assertNotNull("White's Rok must exist at D1 after promotion", rok)
-        assertEquals("Piece at D1 belongs to White", WHITE, rok!!.color)
+        assertEquals("Piece at D1 belongs to White", WHITE, (rok ?: return).color)
         assertTrue("Piece at D1 is now a Rok (upgraded = true)", rok.isUpgraded)
 
         val normalMoves = postPromotion.normalMovesForTurn()
@@ -383,7 +383,7 @@ class ForcedPromotionTurnTest {
             result.move,
         )
 
-        val move = result.move!!
+        val move = result.move ?: return
         assertFalse(
             "AI's move must NOT be an in-place promotion (piece is already a Rok)",
             move.isPromotion(),
@@ -433,7 +433,7 @@ class ForcedPromotionTurnTest {
             result.move,
         )
 
-        val move = result.move!!
+        val move = result.move ?: return
         assertFalse(
             "AI's move must NOT be an in-place promotion (piece is already a Rok)",
             move.isPromotion(),
@@ -549,7 +549,7 @@ class ForcedPromotionTurnTest {
 
         val rok = postPromotion.cobs[C11]
         assertNotNull("White's Rok must exist at C11 after promotion", rok)
-        assertTrue("Piece at C11 must be a Rok (upgraded)", rok!!.isUpgraded)
+        assertTrue("Piece at C11 must be a Rok (upgraded)", (rok ?: return).isUpgraded)
 
         val normalMoves = postPromotion.normalMovesForTurn()
         assertTrue(
@@ -582,7 +582,7 @@ class ForcedPromotionTurnTest {
             result.move,
         )
 
-        val move = result.move!!
+        val move = result.move ?: return
         assertFalse(
             "AI's move must NOT be an in-place promotion (piece is already a Rok)",
             move.isPromotion(),

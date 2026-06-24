@@ -22,6 +22,7 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +40,7 @@ class GameRepositoryTest {
     }
 
     @Test
-    fun `should save game successfully`() =
+    fun `should save game successfully`(): TestResult =
         runTest {
             // Given
             val gameState = mockk<GameState>(relaxed = true)
@@ -53,7 +54,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should delete game by id`() =
+    fun `should delete game by id`(): TestResult =
         runTest {
             // Given
             val gameId = "test-id"
@@ -66,7 +67,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should return null when loading non-existent game`() =
+    fun `should return null when loading non-existent game`(): TestResult =
         runTest {
             // Given
             val gameId = "non-existent-id"
@@ -80,7 +81,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should load game successfully`() =
+    fun `should load game successfully`(): TestResult =
         runTest {
             // Given
             val gameId = "should_load_game_successfully"
@@ -96,7 +97,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should load game successfully with match dto`() =
+    fun `should load game successfully with match dto`(): TestResult =
         runTest {
             // Given
             val gameId = "test-id"
@@ -136,7 +137,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should save game with match dto`() =
+    fun `should save game with match dto`(): TestResult =
         runTest {
             // Given
             val gameState = createRealGameState()
@@ -169,7 +170,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should handle parsing errors in match dto gracefully`() =
+    fun `should handle parsing errors in match dto gracefully`(): TestResult =
         runTest {
             // Given
             val gameId = "should_handle_parsing_errors_gracefully"
@@ -189,7 +190,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should convert game state to and from position notation`() =
+    fun `should convert game state to and from position notation`(): TestResult =
         runTest {
             // Given - Crear un GameState con datos reales
             val originalGameState = createRealGameState()
@@ -204,7 +205,7 @@ class GameRepositoryTest {
         }
 
     @Test
-    fun `should complete save and load cycle`() =
+    fun `should complete save and load cycle`(): TestResult =
         runTest {
             // Given
             val gameId = "cycle-test"
@@ -243,8 +244,8 @@ class GameRepositoryTest {
         // Crear un estado de juego real con datos concretos
         val cobs =
             mapOf(
-                GameBoard.A1 to Cob(CobColor.WHITE, false),
-                GameBoard.B1 to Cob(CobColor.BLACK, false),
+                GameBoard.A1 to Cob(CobColor.WHITE),
+                GameBoard.B1 to Cob(CobColor.BLACK),
                 GameBoard.C1 to Cob(CobColor.WHITE, true),
             )
 

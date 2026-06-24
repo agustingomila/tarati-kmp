@@ -6,6 +6,7 @@ import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.services.achievements.AchievementId
 import com.agustin.tarati.services.achievements.IAchievementsManager
+import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
@@ -41,13 +42,14 @@ import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
 class DesktopSettingsViewModel(
     private val repository: SettingsRepository,
     private val achievementsManager: IAchievementsManager,
+    entitlementsRepository: EntitlementsRepository,
 ) : ViewModel(), ISettingsViewModel {
 
     private val _hasTutorialBeenSeen = MutableStateFlow(false)
     override val hasTutorialBeenSeen: StateFlow<Boolean> = _hasTutorialBeenSeen
 
-    // En Desktop: sin compras
-    override val purchasedProductIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    // Ownership cross-platform leído del servidor (Desktop no tiene billing local).
+    override val purchasedProductIds: StateFlow<Set<String>> = entitlementsRepository.entitlements
 
     // ── settingsState ─────────────────────────────────────────────────────────
 
@@ -231,7 +233,7 @@ class DesktopSettingsViewModel(
     }
 
     /** No-op en Desktop — no hay Google Play Billing. */
-    override fun launchPurchaseFlow(productId: String) = Unit
+    override fun launchPurchaseFlow(productId: String): Unit = Unit
 
     override fun setTimeControl(mode: TimeControlMode) {
         viewModelScope.launch { repository.setTimeControl(mode) }

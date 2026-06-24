@@ -76,14 +76,12 @@ class SocialRepository(
         httpClient.post("$baseUrl/api/users/$userId/follow") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 
     suspend fun unfollowUser(token: String, userId: String): Result<Unit> = runCatching {
         httpClient.delete("$baseUrl/api/users/$userId/follow") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 
     suspend fun getFollowers(

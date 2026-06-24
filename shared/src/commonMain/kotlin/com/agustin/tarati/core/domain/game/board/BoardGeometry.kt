@@ -20,7 +20,7 @@ import kotlin.math.sqrt
 
 private const val REFERENCE_BOARD_SIZE = 1100f
 private const val VERTEX_WIDTH = 250f
-const val BOARD_MARGIN_PERCENT = 0.8f
+const val BOARD_MARGIN_PERCENT: Float = 0.8f
 
 // ========== Data Classes de Renderizado ==========
 
@@ -41,8 +41,8 @@ data class NormalizedBounds(
     val minY: Float,
     val maxY: Float,
 ) {
-    val width get() = maxX - minX
-    val height get() = maxY - minY
+    val width: Float get() = maxX - minX
+    val height: Float get() = maxY - minY
 }
 
 // ========== Posiciones Normalizadas ==========
@@ -51,7 +51,7 @@ data class NormalizedBounds(
  * Posiciones normalizadas de todos los vértices (0.0 a 1.0).
  * Calculadas una vez y cachéadas.
  */
-val normalizedPositions by lazy {
+val normalizedPositions: Map<Vertex, NormalizedBoard> by lazy {
     GameBoard.vertices.associateWith { vertex ->
         val position = getPosition(vertex, REFERENCE_BOARD_SIZE to REFERENCE_BOARD_SIZE, VERTEX_WIDTH)
         NormalizedBoard(
@@ -64,7 +64,7 @@ val normalizedPositions by lazy {
 /**
  * Bounds normalizados para cada orientación del tablero.
  */
-val normalizedBoundsPerOrientation by lazy {
+val normalizedBoundsPerOrientation: Map<BoardOrientation, NormalizedBounds> by lazy {
     BoardOrientation.entries.associateWith { orientation ->
         val rotated = normalizedPositions.mapValues { (_, pos) -> pos.rotate(orientation) }
         NormalizedBounds(

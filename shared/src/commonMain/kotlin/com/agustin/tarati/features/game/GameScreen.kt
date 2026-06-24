@@ -263,7 +263,7 @@ fun GameScreen(
                 if (token == null) {
                     Result.failure(Exception(connectToServerFirstMsg))
                 } else {
-                    connectionViewModel.connectToServer(devServerUrl, token).map { Unit }
+                    connectionViewModel.connectToServer(devServerUrl, token).map { }
                 }
             }
         }
@@ -644,7 +644,6 @@ fun GameScreen(
                         onDeclineDraw = {
                             scope.launch { onlineGameViewModel.respondToDraw(false) }
                         },
-                        visible = true,
                         spectatingState = spectatingState,
                     )
                 }) else null,

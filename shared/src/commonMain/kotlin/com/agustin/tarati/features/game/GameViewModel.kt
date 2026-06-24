@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
  * [playerSettings] — overridden by [AndroidGameViewModel] and [DesktopGameViewModel].
  */
 abstract class GameViewModel(
-    protected val sr: SettingsRepository,
+    private val sr: SettingsRepository,
     protected val aiEngine: IAIEngine,
 ) : ViewModel(),
     IGameModel {
@@ -115,7 +115,7 @@ abstract class GameViewModel(
 
     // ── IGameService ──────────────────────────────────────────────────────────
 
-    override fun updateAIEnabled(newAIEnabled: Boolean) =
+    override fun updateAIEnabled(newAIEnabled: Boolean): Unit =
         playerSettings.updateAIEnabled(newAIEnabled)
 
     override fun boardPositionCopied() {
@@ -133,10 +133,10 @@ abstract class GameViewModel(
 
     // ── IPlayerManager ────────────────────────────────────────────────────────
 
-    override fun updatePlayerType(color: CobColor, isAI: Boolean) =
+    override fun updatePlayerType(color: CobColor, isAI: Boolean): Unit =
         playerSettings.updatePlayerType(color, isAI)
 
-    override fun updateDifficulty(color: CobColor, difficulty: Difficulty) =
+    override fun updateDifficulty(color: CobColor, difficulty: Difficulty): Unit =
         playerSettings.updateDifficulty(color, difficulty)
 
     // ── Board moves ───────────────────────────────────────────────────────────
@@ -145,21 +145,21 @@ abstract class GameViewModel(
         move: Move,
         nextState: GameState,
         onMoveRecord: () -> Unit,
-    ) = gameManager.addMove(move, nextState, onMoveRecord)
+    ): Unit = gameManager.addMove(move, nextState, onMoveRecord)
 
-    override fun undoMove() = gameManager.undoMove()
+    override fun undoMove(): Unit = gameManager.undoMove()
 
-    override fun redoMove() = gameManager.redoMove()
+    override fun redoMove(): Unit = gameManager.redoMove()
 
-    override fun moveToCurrentState() = gameManager.moveToCurrentState()
+    override fun moveToCurrentState(): Unit = gameManager.moveToCurrentState()
 
-    override fun moveToIndex(index: Int) = gameManager.moveToIndex(index)
+    override fun moveToIndex(index: Int): Unit = gameManager.moveToIndex(index)
 
     // ── History helpers ───────────────────────────────────────────────────────
 
     private fun clearHistory() = gameManager.clearHistory()
 
-    override fun updateHistory(moves: List<Move>, initialState: GameState) =
+    override fun updateHistory(moves: List<Move>, initialState: GameState): Unit =
         gameManager.updateHistory(moves, initialState)
 
     override fun setGame(gameState: GameState) {
@@ -187,13 +187,13 @@ abstract class GameViewModel(
         persistEditingState(editBoardManager.isEditing.value)
     }
 
-    override fun toggleEditColor() = editBoardManager.toggleEditColor()
+    override fun toggleEditColor(): Unit = editBoardManager.toggleEditColor()
 
-    override fun toggleEditTurn() = editBoardManager.toggleEditTurn()
+    override fun toggleEditTurn(): Unit = editBoardManager.toggleEditTurn()
 
-    override fun rotateEditBoard() = editBoardManager.rotateEditBoard()
+    override fun rotateEditBoard(): Unit = editBoardManager.rotateEditBoard()
 
-    override fun togglePlayerSide() = playerSettings.togglePlayerSide()
+    override fun togglePlayerSide(): Unit = playerSettings.togglePlayerSide()
 
     override fun clearEditBoard() {
         val cleanState = editBoardManager.clearEditBoard()
@@ -230,20 +230,20 @@ abstract class GameViewModel(
         _showLogoTransition.update { false }
     }
 
-    override fun gameOver() = gameManager.updateGameStatus(GameStatus.GAME_OVER)
+    override fun gameOver(): Unit = gameManager.updateGameStatus(GameStatus.GAME_OVER)
 
     override fun stopGame() {
         gameManager.updateGameStatus(GameStatus.NO_PLAYING)
     }
 
-    override fun resumeGame() = gameManager.updateGameStatus(GameStatus.PLAYING)
+    override fun resumeGame(): Unit = gameManager.updateGameStatus(GameStatus.PLAYING)
 
     override fun endEditing() {
         editBoardManager.endEditing()
         persistEditingState(false)
     }
 
-    override fun updateGameState(gameState: GameState) = gameManager.updateGameState(gameState)
+    override fun updateGameState(gameState: GameState): Unit = gameManager.updateGameState(gameState)
 
     override fun startGame(playerSide: CobColor) {
         _showLogoTransition.update { true }

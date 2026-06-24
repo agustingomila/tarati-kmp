@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun Context.wrapContext(locale: Locale): Context {
+    private fun Context.wrapContext(locale: Locale): Context {
         val config =
             Configuration(resources.configuration).apply {
                 setLocale(locale)

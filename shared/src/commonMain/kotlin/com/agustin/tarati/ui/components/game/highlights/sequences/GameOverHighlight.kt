@@ -59,7 +59,7 @@ fun createGameOverSequence(matchState: MatchState): List<List<HighlightAnimation
     // Secuencia 3: Destello secuencial y concéntrico de regiones
     sequences.addAll(createRegionsSequence(domesticRegions, DOMESTIC_SEQUENCE))
     sequences.addAll(createRegionsSequence(circumferenceRegions, CIRCUMFERENCE_PAIR_SEQUENCE))
-    sequences.addAll(createRegionsSequence(centralRegions, REGION_SEQUENCE))
+    sequences.addAll(createRegionsSequence(centralRegions))
 
     // Secuencia 4: Rayos simultáneos
     sequences.addAll(createSimultaneousRaysSequence())

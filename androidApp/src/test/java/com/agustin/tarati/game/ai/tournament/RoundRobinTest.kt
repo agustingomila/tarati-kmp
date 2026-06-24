@@ -53,9 +53,6 @@ class RoundRobinTest {
     private val quickConfig = TournamentConfig(
         gamesPerMatch = gamesPerMatch,
         maxMovesPerGame = maxMovesPerGame,
-        verbose = false,
-        showProgress = true,
-        collectMetrics = true,
     )
 
     // ─── all personality variants at DEFAULT difficulty ──────────────────────
@@ -201,7 +198,7 @@ class RoundRobinTest {
             val result = results.find { it.engine.name == engine.name }
             assertTrue("${engine.name} should be in results", result != null)
             assertTrue(
-                "${engine.name} (score ${result!!.score}) should outperform random (score ${randomResult!!.score})",
+                "${engine.name} (score ${(result ?: return@forEach).score}) should outperform random (score ${(randomResult ?: return@forEach).score})",
                 result.score > randomResult.score * 0.5,
             )
         }
@@ -251,7 +248,7 @@ class RoundRobinTest {
         assertTrue("Hard engine should be in results", hardResult != null)
         assertTrue("Easy engine should be in results", easyResult != null)
         assertTrue(
-            "Hard (score ${hardResult!!.score}) should outperform Easy (score ${easyResult!!.score})",
+            "Hard (score ${(hardResult ?: return).score}) should outperform Easy (score ${(easyResult ?: return).score})",
             hardResult.score >= easyResult.score,
         )
     }
@@ -287,19 +284,19 @@ class RoundRobinTest {
     // ════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun test_head_to_head_easy_difficulty_matrix_four_personalities() =
+    fun test_head_to_head_easy_difficulty_matrix_four_personalities(): Unit =
         runPersonalityMatrix(Difficulty.EASY, gamesPerMatch = 100)
 
     @Test
-    fun test_head_to_head_medium_difficulty_matrix_four_personalities() =
+    fun test_head_to_head_medium_difficulty_matrix_four_personalities(): Unit =
         runPersonalityMatrix(Difficulty.MEDIUM, gamesPerMatch = 50)
 
     @Test
-    fun test_head_to_hard_difficulty_head_matrix_four_personalities() =
+    fun test_head_to_hard_difficulty_head_matrix_four_personalities(): Unit =
         runPersonalityMatrix(Difficulty.HARD, gamesPerMatch = 30)
 
     @Test
-    fun test_head_to_champion_difficulty_head_matrix_four_personalities() =
+    fun test_head_to_champion_difficulty_head_matrix_four_personalities(): Unit =
         runPersonalityMatrix(Difficulty.CHAMPION, gamesPerMatch = 10)
 
     /**

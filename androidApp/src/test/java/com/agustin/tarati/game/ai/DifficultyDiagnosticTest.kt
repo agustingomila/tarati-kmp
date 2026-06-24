@@ -57,22 +57,22 @@ class DifficultyDiagnosticTest {
         clearAIHistory()
     }
 
-    fun setEvaluationConfig(config: EvaluationConfig) {
+    private fun setEvaluationConfig(config: EvaluationConfig) {
         engine.setConfig(config)
     }
 
-    fun clearAIHistory() {
+    private fun clearAIHistory() {
         engine.clearHistory()
     }
 
-    fun recordRealMove(
+    private fun recordRealMove(
         gameState: GameState,
         currentPlayer: CobColor,
     ) {
         engine.putState(gameState, currentPlayer)
     }
 
-    fun getNextBestMove(
+    private fun getNextBestMove(
         gameState: GameState,
         difficulty: Difficulty,
     ): MoveEval {
@@ -268,7 +268,7 @@ class DifficultyDiagnosticTest {
                 val afterWhiteResponse =
                     afterMove
                         .applyMove(
-                            whiteResponse.move!!,
+                            whiteResponse.move ?: return@forEach,
                         ).copy(currentTurn = afterMove.currentTurn.opponent)
 
                 val finalEval = boardEvaluator.evaluate(afterWhiteResponse, evalConfig)
@@ -740,7 +740,7 @@ class DifficultyDiagnosticTest {
                     println("SUCCESS: Pieces flipped (captured and converted): $flippedPieces")
                     flippedPieces.forEach { vertex ->
                         val beforeCob = previousState.cobs[vertex]
-                        val afterCob = gameState.cobs[vertex]!!
+                        val afterCob = gameState.cobs[vertex] ?: return@forEach
                         println("  $vertex: ${beforeCob?.color}->${afterCob.color} (${if (afterCob.isUpgraded) "Rok" else "Cob"})")
                     }
                 }

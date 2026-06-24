@@ -65,7 +65,6 @@ class GameConverterTest {
         moves = 0,
         startedAt = earlier,
         endedAt = now,
-        isRated = true,
     )
 
     /** PGN con 3 movimientos normales y token de resultado. */
@@ -159,7 +158,7 @@ class GameConverterTest {
 
     @Test
     fun `empty pgn produces empty move history`() {
-        val dto = makeGame(pgn = "").toMatchDto()
+        val dto = makeGame().toMatchDto()
         assertTrue(dto.game.moveHistory.isEmpty())
     }
 

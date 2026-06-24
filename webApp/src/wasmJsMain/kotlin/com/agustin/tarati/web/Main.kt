@@ -42,7 +42,7 @@ fun main() {
         } else null
     }.getOrNull()
 
-    ComposeViewport(document.body!!) {
+    ComposeViewport(document.body ?: return) {
         KoinApplication(
             configuration = koinConfiguration(declaration = { modules(webModules) }),
         ) {

@@ -214,8 +214,6 @@ private fun GameScreenPreviewContent(config: GameScreenPreviewConfig = GameScree
                                         colorEvents = EditColorEvents(),
                                         actionState = EditActionState(
                                             pieceCounts = PieceCounts(4, 4),
-                                            isValidDistribution = true,
-                                            isCompletedDistribution = true,
                                         ),
                                         actionEvents = EditActionEvents(),
                                     )
@@ -375,383 +373,383 @@ fun GameScreenPreview_DrawerClosed_Landscape(palette: BoardPalette = ClassicPale
 // Dark
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_DarkPalette() = GameScreenPreview_WithDrawer_Portrait(DarkPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_DarkPalette(): Unit = GameScreenPreview_WithDrawer_Portrait(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_DarkPalette() = GameScreenPreview_WithDrawer_Portrait_Dark(DarkPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Dark_DarkPalette(): Unit = GameScreenPreview_WithDrawer_Portrait_Dark(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_DarkPalette() = GameScreenPreview_Drawer_Closed_Portrait(DarkPalette)
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_DarkPalette(): Unit = GameScreenPreview_Drawer_Closed_Portrait(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_DarkPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_DarkPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_DarkPalette() = GameScreenPreview_DrawerClosed_Portrait(DarkPalette)
+fun GameScreenPreview_DrawerClosed_Portrait_Light_DarkPalette(): Unit = GameScreenPreview_DrawerClosed_Portrait(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_DarkPalette() = GameScreenPreview_GameInProgress(DarkPalette)
+fun GameScreenPreview_GameInProgress_DarkPalette(): Unit = GameScreenPreview_GameInProgress(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkPalette() = GameScreenPreview_WithDrawer_Landscape(DarkPalette)
+fun GameScreenPreview_WithDrawer_Landscape_DarkPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_Dark_DarkPalette() = GameScreenPreview_WithDrawer_Landscape_Dark(DarkPalette)
+fun GameScreenPreview_WithDrawer_Landscape_Dark_DarkPalette(): Unit = GameScreenPreview_WithDrawer_Landscape_Dark(DarkPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_DarkPalette() = GameScreenPreview_DrawerClosed_Landscape(DarkPalette)
+fun GameScreenPreview_DrawerClosed_Landscape_DarkPalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(DarkPalette)
 
 // Nature
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_NaturePalette() = GameScreenPreview_WithDrawer_Portrait(NaturePalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_NaturePalette(): Unit = GameScreenPreview_WithDrawer_Portrait(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_NaturePalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_NaturePalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_NaturePalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_NaturePalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_NaturePalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_NaturePalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_NaturePalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_NaturePalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_NaturePalette() = GameScreenPreview_GameInProgress(NaturePalette)
+fun GameScreenPreview_GameInProgress_NaturePalette(): Unit = GameScreenPreview_GameInProgress(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_NaturePalette() = GameScreenPreview_WithDrawer_Landscape(NaturePalette)
+fun GameScreenPreview_WithDrawer_Landscape_NaturePalette(): Unit = GameScreenPreview_WithDrawer_Landscape(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_Dark_NaturePalette() =
+fun GameScreenPreview_WithDrawer_Landscape_Dark_NaturePalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(NaturePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_NaturePalette() = GameScreenPreview_DrawerClosed_Landscape(NaturePalette)
+fun GameScreenPreview_DrawerClosed_Landscape_NaturePalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(NaturePalette)
 
 // Grayscale
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_GrayscalePalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Light_GrayscalePalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_GrayscalePalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_GrayscalePalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_GrayscalePalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_GrayscalePalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_GrayscalePalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_GrayscalePalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_GrayscalePalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_GrayscalePalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_GrayscalePalette() = GameScreenPreview_GameInProgress(GrayscalePalette)
+fun GameScreenPreview_GameInProgress_GrayscalePalette(): Unit = GameScreenPreview_GameInProgress(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_GrayscalePalette() =
+fun GameScreenPreview_WithDrawer_Landscape_GrayscalePalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_Dark_GrayscalePalette() =
+fun GameScreenPreview_WithDrawer_Landscape_Dark_GrayscalePalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(GrayscalePalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_GrayscalePalette() =
+fun GameScreenPreview_DrawerClosed_Landscape_GrayscalePalette(): Unit =
     GameScreenPreview_DrawerClosed_Landscape(GrayscalePalette)
 
 // Halloween
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_HalloweenPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Light_HalloweenPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_HalloweenPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_HalloweenPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_HalloweenPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_HalloweenPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_HalloweenPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_HalloweenPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_HalloweenPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_HalloweenPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_HalloweenPalette() = GameScreenPreview_GameInProgress(HalloweenPalette)
+fun GameScreenPreview_GameInProgress_HalloweenPalette(): Unit = GameScreenPreview_GameInProgress(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_HalloweenPalette() = GameScreenPreview_WithDrawer_Landscape(HalloweenPalette)
+fun GameScreenPreview_WithDrawer_Landscape_HalloweenPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_Dark_HalloweenPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_Dark_HalloweenPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(HalloweenPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_HalloweenPalette() =
+fun GameScreenPreview_DrawerClosed_Landscape_HalloweenPalette(): Unit =
     GameScreenPreview_DrawerClosed_Landscape(HalloweenPalette)
 
 // Christmas
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_ChristmasPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Light_ChristmasPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_ChristmasPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_ChristmasPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_ChristmasPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_ChristmasPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_ChristmasPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_ChristmasPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_ChristmasPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_ChristmasPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_ChristmasPalette() = GameScreenPreview_GameInProgress(ChristmasPalette)
+fun GameScreenPreview_GameInProgress_ChristmasPalette(): Unit = GameScreenPreview_GameInProgress(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_ChristmasPalette() = GameScreenPreview_WithDrawer_Landscape(ChristmasPalette)
+fun GameScreenPreview_WithDrawer_Landscape_ChristmasPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkChristmasPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_DarkChristmasPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(ChristmasPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_ChristmasPalette() =
+fun GameScreenPreview_DrawerClosed_Landscape_ChristmasPalette(): Unit =
     GameScreenPreview_DrawerClosed_Landscape(ChristmasPalette)
 
 // Classic
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_ClassicPalette() = GameScreenPreview_WithDrawer_Portrait(ClassicPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_ClassicPalette(): Unit = GameScreenPreview_WithDrawer_Portrait(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_ClassicPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_ClassicPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_ClassicPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_ClassicPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_ClassicPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_ClassicPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_ClassicPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_ClassicPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_ClassicPalette() = GameScreenPreview_GameInProgress(ClassicPalette)
+fun GameScreenPreview_GameInProgress_ClassicPalette(): Unit = GameScreenPreview_GameInProgress(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_ClassicPalette() = GameScreenPreview_WithDrawer_Landscape(ClassicPalette)
+fun GameScreenPreview_WithDrawer_Landscape_ClassicPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkClassicPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_DarkClassicPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(ClassicPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_ClassicPalette() = GameScreenPreview_DrawerClosed_Landscape(ClassicPalette)
+fun GameScreenPreview_DrawerClosed_Landscape_ClassicPalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(ClassicPalette)
 
 // Ember
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_EmberPalette() = GameScreenPreview_WithDrawer_Portrait(EmberPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_EmberPalette(): Unit = GameScreenPreview_WithDrawer_Portrait(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_EmberPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_EmberPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_EmberPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_EmberPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_EmberPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_EmberPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_EmberPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_EmberPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_EmberPalette() = GameScreenPreview_GameInProgress(EmberPalette)
+fun GameScreenPreview_GameInProgress_EmberPalette(): Unit = GameScreenPreview_GameInProgress(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_EmberPalette() = GameScreenPreview_WithDrawer_Landscape(EmberPalette)
+fun GameScreenPreview_WithDrawer_Landscape_EmberPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkEmberPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_DarkEmberPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(EmberPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_EmberPalette() = GameScreenPreview_DrawerClosed_Landscape(EmberPalette)
+fun GameScreenPreview_DrawerClosed_Landscape_EmberPalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(EmberPalette)
 
 // Gilded
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_GildedPalette() = GameScreenPreview_WithDrawer_Portrait(GildedPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_GildedPalette(): Unit = GameScreenPreview_WithDrawer_Portrait(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_GildedPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_GildedPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_GildedPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_GildedPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_GildedPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_GildedPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_GildedPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_GildedPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_GildedPalette() = GameScreenPreview_GameInProgress(GildedPalette)
+fun GameScreenPreview_GameInProgress_GildedPalette(): Unit = GameScreenPreview_GameInProgress(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_GildedPalette() = GameScreenPreview_WithDrawer_Landscape(GildedPalette)
+fun GameScreenPreview_WithDrawer_Landscape_GildedPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkGildedPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_DarkGildedPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(GildedPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_GildedPalette() = GameScreenPreview_DrawerClosed_Landscape(GildedPalette)
+fun GameScreenPreview_DrawerClosed_Landscape_GildedPalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(GildedPalette)
 
 // Aurora
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Light_AuroraPalette() = GameScreenPreview_WithDrawer_Portrait(AuroraPalette)
+fun GameScreenPreview_WithDrawer_Portrait_Light_AuroraPalette(): Unit = GameScreenPreview_WithDrawer_Portrait(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Portrait_Dark_AuroraPalette() =
+fun GameScreenPreview_WithDrawer_Portrait_Dark_AuroraPalette(): Unit =
     GameScreenPreview_WithDrawer_Portrait_Dark(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Light_AuroraPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Light_AuroraPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_Drawer_Closed_Portrait_Dark_AuroraPalette() =
+fun GameScreenPreview_Drawer_Closed_Portrait_Dark_AuroraPalette(): Unit =
     GameScreenPreview_Drawer_Closed_Portrait_Dark(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Portrait_Light_AuroraPalette() =
+fun GameScreenPreview_DrawerClosed_Portrait_Light_AuroraPalette(): Unit =
     GameScreenPreview_DrawerClosed_Portrait(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_GameInProgress_AuroraPalette() = GameScreenPreview_GameInProgress(AuroraPalette)
+fun GameScreenPreview_GameInProgress_AuroraPalette(): Unit = GameScreenPreview_GameInProgress(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_AuroraPalette() = GameScreenPreview_WithDrawer_Landscape(AuroraPalette)
+fun GameScreenPreview_WithDrawer_Landscape_AuroraPalette(): Unit = GameScreenPreview_WithDrawer_Landscape(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_WithDrawer_Landscape_DarkAuroraPalette() =
+fun GameScreenPreview_WithDrawer_Landscape_DarkAuroraPalette(): Unit =
     GameScreenPreview_WithDrawer_Landscape_Dark(AuroraPalette)
 
 @Preview(showBackground = true, device = "spec:width=891dp,height=411dp")
 @Composable
-fun GameScreenPreview_DrawerClosed_Landscape_AuroraPalette() = GameScreenPreview_DrawerClosed_Landscape(AuroraPalette)
+fun GameScreenPreview_DrawerClosed_Landscape_AuroraPalette(): Unit = GameScreenPreview_DrawerClosed_Landscape(AuroraPalette)
 
 // ── Helpers de eventos ────────────────────────────────────────────────────────
 

@@ -29,13 +29,14 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-val webServiceModule = module {
+val webServiceModule: Module = module {
     single {
         HttpClient(Js) {
             install(WebSockets) {
@@ -58,15 +59,15 @@ val webServiceModule = module {
     single<IAchievementsManager> { ServerAchievementsManager(get(), get(), get()) }
 }
 
-val webDataModule = module {
+val webDataModule: Module = module {
     single<SettingsRepository> { WasmSettingsRepository() }
     single<AuthRepository> { WasmAuthRepository() }
     single<GameRepository> { NoOpGameRepository() }
 }
 
-val webViewModelModule = module {
-    viewModel { WasmSettingsViewModel(get(), get()) }
+val webViewModelModule: Module = module {
+    viewModel { WasmSettingsViewModel(get(), get(), get()) }
     viewModel { WasmGameViewModel(get(), get()) } bind IGameModel::class
 }
 
-val webModules = listOf(webServiceModule) + sharedModules + listOf(webDataModule, webViewModelModule)
+val webModules: List<Module> = listOf(webServiceModule) + sharedModules + listOf(webDataModule, webViewModelModule)

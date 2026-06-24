@@ -114,8 +114,6 @@ fun DrawScope.drawPreMoveArrow(
         strokeWidth = pieceRadius * ARROW_STROKE_RATIO,
         arrowSize = pieceRadius * ARROW_TIP_SIZE_RATIO,
         arrowWidth = pieceRadius * ARROW_TIP_SIZE_RATIO * ARROW_TIP_WIDTH_RATIO,
-        arrowAtStart = false,
-        arrowAtEnd = true,
         arrowStyle = ArrowTipStyle.ARROW,
         alpha = PRE_MOVE_ALPHA,
     )

@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -45,7 +46,6 @@ class ConnectionViewModelTest {
         userId = "user-123",
         username = "test_player",
         displayName = "Test Player",
-        rating = 1500,
     )
 
     @Before
@@ -79,7 +79,7 @@ class ConnectionViewModelTest {
     }
 
     @Test
-    fun `connectToServer updates state to Connecting then Online`() = runTest {
+    fun `connectToServer updates state to Connecting then Online`(): TestResult = runTest {
         coEvery { mockWsClient.connect(any()) } returns Unit
 
         val result = viewModel.connectToServer(
@@ -99,7 +99,7 @@ class ConnectionViewModelTest {
     }
 
     @Test
-    fun `connectToServer with error updates state to Error`() = runTest {
+    fun `connectToServer with error updates state to Error`(): TestResult = runTest {
         coEvery { mockWsClient.connect(any()) } throws Exception("Connection failed")
 
         val result = viewModel.connectToServer(
@@ -117,7 +117,7 @@ class ConnectionViewModelTest {
     }
 
     @Test
-    fun `disconnect updates state to Offline`() = runTest {
+    fun `disconnect updates state to Offline`(): TestResult = runTest {
         coEvery { mockWsClient.connect(any()) } returns Unit
         viewModel.connectToServer("localhost:8080", "test_token")
         advanceUntilIdle()
@@ -130,7 +130,7 @@ class ConnectionViewModelTest {
     }
 
     @Test
-    fun `retryConnection uses cached credentials`() = runTest {
+    fun `retryConnection uses cached credentials`(): TestResult = runTest {
         coEvery { mockWsClient.connect(any()) } throws Exception("First attempt failed")
         viewModel.connectToServer("localhost:8080", "test_token")
         advanceUntilIdle()
@@ -145,7 +145,7 @@ class ConnectionViewModelTest {
     }
 
     @Test
-    fun `isConnected returns true when Online`() = runTest {
+    fun `isConnected returns true when Online`(): TestResult = runTest {
         coEvery { mockWsClient.connect(any()) } returns Unit
 
         viewModel.connectToServer("localhost:8080", "test_token")

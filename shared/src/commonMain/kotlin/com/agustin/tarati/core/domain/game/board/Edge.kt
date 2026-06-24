@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 data class Edge(
     val pair: Pair<Vertex, Vertex>,
 ) {
-    val from get() = this.pair.first
-    val to get() = this.pair.second
-    val name get() = "${from.name}-${to.name}"
+    val from: Vertex get() = this.pair.first
+    val to: Vertex get() = this.pair.second
+    val name: String get() = "${from.name}-${to.name}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

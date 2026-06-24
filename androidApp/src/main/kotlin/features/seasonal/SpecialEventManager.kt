@@ -117,7 +117,7 @@ class SpecialEventManager(
      * [SpecialEventOverlay] vía LaunchedEffect al entrar en composición, para
      * que el ícono aparezca sin reiniciar si la fecha cambió en la misma sesión.
      */
-    override suspend fun refreshIfNeeded() = refreshActiveEvents()
+    override suspend fun refreshIfNeeded(): Unit = refreshActiveEvents()
 
     /**
      * Returns `true` if the user has already tapped the gift icon for [event] this year.

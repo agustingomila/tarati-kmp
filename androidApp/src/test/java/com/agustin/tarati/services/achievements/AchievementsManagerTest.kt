@@ -19,6 +19,7 @@ import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.features.online.auth.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -85,7 +86,7 @@ class AchievementsManagerTest {
     // ── onMoveApplied ─────────────────────────────────────────────────────────
 
     @Test
-    fun onMoveApplied_withCapture_unlocksFirstCapture() = runTest {
+    fun onMoveApplied_withCapture_unlocksFirstCapture(): TestResult = runTest {
         val oldState = GameState.createGameState {
             setTurn(WHITE)
             setCob(C3, WHITE)
@@ -100,7 +101,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onMoveApplied_withCapture_updatesFlipperSteps() = runTest {
+    fun onMoveApplied_withCapture_updatesFlipperSteps(): TestResult = runTest {
         val oldState = GameState.createGameState {
             setTurn(WHITE)
             setCob(C3, WHITE)
@@ -116,7 +117,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onMoveApplied_noCapture_doesNotUnlockFirstCapture() = runTest {
+    fun onMoveApplied_noCapture_doesNotUnlockFirstCapture(): TestResult = runTest {
         // WHITE en C3 mueve a B2, pero no hay pieza negra adyacente a B2
         val oldState = GameState.createGameState {
             setTurn(WHITE)
@@ -131,10 +132,10 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onMoveApplied_withPromotion_unlocksFirstPromotion() = runTest {
+    fun onMoveApplied_withPromotion_unlocksFirstPromotion(): TestResult = runTest {
         val oldState = GameState.createGameState {
             setTurn(WHITE)
-            setCob(C7, WHITE, isUpgraded = false)
+            setCob(C7, WHITE)
         }
         val move = Move(C7 to D3)
         val newState = oldState.applyMove(move)
@@ -147,7 +148,7 @@ class AchievementsManagerTest {
     // ── onGameOver ────────────────────────────────────────────────────────────
 
     @Test
-    fun onGameOver_humanWins_unlocksFirstVictory() = runTest {
+    fun onGameOver_humanWins_unlocksFirstVictory(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -161,7 +162,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanLoses_doesNotUnlockFirstVictory() = runTest {
+    fun onGameOver_humanLoses_doesNotUnlockFirstVictory(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -175,7 +176,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsByMit_unlocksMit() = runTest {
+    fun onGameOver_humanWinsByMit_unlocksMit(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -189,7 +190,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsByStalemit_unlocksStalemit() = runTest {
+    fun onGameOver_humanWinsByStalemit_unlocksStalemit(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.STALEMIT,
@@ -203,7 +204,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsByTriple_unlocksEternalLoop() = runTest {
+    fun onGameOver_humanWinsByTriple_unlocksEternalLoop(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.TRIPLE,
@@ -217,7 +218,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnChampion_unlocksChampion() = runTest {
+    fun onGameOver_humanWinsOnChampion_unlocksChampion(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -231,7 +232,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnNonChampion_doesNotUnlockChampion() = runTest {
+    fun onGameOver_humanWinsOnNonChampion_doesNotUnlockChampion(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -245,7 +246,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_draw_doesNotUnlockVictoryAchievements() = runTest {
+    fun onGameOver_draw_doesNotUnlockVictoryAchievements(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.FIFTY_MOVES,
@@ -260,7 +261,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_fiftyMoveDraw_unlocksFiftyMoveRule() = runTest {
+    fun onGameOver_fiftyMoveDraw_unlocksFiftyMoveRule(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.FIFTY_MOVES,
@@ -274,7 +275,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_doesNotUnlockPlay10GamesBeforeReaching10() = runTest {
+    fun onGameOver_doesNotUnlockPlay10GamesBeforeReaching10(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -291,7 +292,7 @@ class AchievementsManagerTest {
     // ── Difficulty achievements ───────────────────────────────────────────────
 
     @Test
-    fun onGameOver_humanWinsOnEasy_unlocksApprentice() = runTest {
+    fun onGameOver_humanWinsOnEasy_unlocksApprentice(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -305,7 +306,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnMedium_unlocksStrategist() = runTest {
+    fun onGameOver_humanWinsOnMedium_unlocksStrategist(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -319,7 +320,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnHard_unlocksTactician() = runTest {
+    fun onGameOver_humanWinsOnHard_unlocksTactician(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -333,7 +334,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnEasy_doesNotUnlockStrategistOrTactician() = runTest {
+    fun onGameOver_humanWinsOnEasy_doesNotUnlockStrategistOrTactician(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -348,7 +349,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanWinsOnMedium_doesNotUnlockApprenticeOrTactician() = runTest {
+    fun onGameOver_humanWinsOnMedium_doesNotUnlockApprenticeOrTactician(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -363,7 +364,7 @@ class AchievementsManagerTest {
     }
 
     @Test
-    fun onGameOver_humanLoses_doesNotUnlockDifficultyAchievements() = runTest {
+    fun onGameOver_humanLoses_doesNotUnlockDifficultyAchievements(): TestResult = runTest {
         val matchState = MatchState(
             gameState = mockk(relaxed = true),
             gameEndReason = GameEndReason.MIT,
@@ -381,7 +382,7 @@ class AchievementsManagerTest {
     // ── onTutorialCompleted ───────────────────────────────────────────────────
 
     @Test
-    fun onTutorialCompleted_unlocksWelcomeToTarati() = runTest {
+    fun onTutorialCompleted_unlocksWelcomeToTarati(): TestResult = runTest {
         manager.onTutorialCompleted()
 
         assertTrue(reporter.wasUnlocked(R.string.achievement_welcome_to_tarati))
@@ -390,7 +391,7 @@ class AchievementsManagerTest {
     // ── setSteps cache guard ──────────────────────────────────────────────────
 
     @Test
-    fun setSteps_doesNotReportWhenNoCacheProgress() = runTest {
+    fun setSteps_doesNotReportWhenNoCacheProgress(): TestResult = runTest {
         coEvery { repository.getCachedSteps(R.string.achievement_the_flipper) } returns 10
         coEvery { repository.incrementTotalCaptures(any()) } returns 10 // same as cached
 

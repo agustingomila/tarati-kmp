@@ -12,13 +12,13 @@ package com.agustin.tarati.services.billing
  */
 object PieceProducts {
 
-    const val HEXAGON = "piece_hexagon"
-    const val SQUARE = "piece_square"
-    const val TRIANGLE = "piece_triangle"
-    const val DIAMOND = "piece_diamond"
-    const val PENTAGON = "piece_pentagon"
-    const val CAPSULE = "piece_capsule"
+    const val HEXAGON: String = "piece_hexagon"
+    const val SQUARE: String = "piece_square"
+    const val TRIANGLE: String = "piece_triangle"
+    const val DIAMOND: String = "piece_diamond"
+    const val PENTAGON: String = "piece_pentagon"
+    const val CAPSULE: String = "piece_capsule"
 
     /** Lista completa de IDs — usada para pre-cargar ProductDetails en BillingManager. */
-    val ALL_PRODUCT_IDS = listOf(HEXAGON, SQUARE, TRIANGLE, DIAMOND, PENTAGON, CAPSULE)
+    val ALL_PRODUCT_IDS: List<String> = listOf(HEXAGON, SQUARE, TRIANGLE, DIAMOND, PENTAGON, CAPSULE)
 }

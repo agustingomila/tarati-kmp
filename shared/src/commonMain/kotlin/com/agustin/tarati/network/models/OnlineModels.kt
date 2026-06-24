@@ -108,16 +108,16 @@ sealed class OnlineGameStatus {
  */
 @Serializable
 data class RoomInfo(
-    val roomId: String,
+    private val roomId: String,
     val name: String,
     val type: RoomType,
-    val playerCount: Int,
+    private val playerCount: Int,
     val maxPlayers: Int,
-    val spectatorCount: Int = 0,
-    val isPrivate: Boolean = false,
+    private val spectatorCount: Int = 0,
+    private val isPrivate: Boolean = false,
     val timeControl: TimeControlInfo,
     val isRated: Boolean = true,
-    val createdBy: String
+    private val createdBy: String
 )
 
 /**
@@ -209,7 +209,7 @@ sealed class MatchmakingState {
 data class SpectatorInfo(
     val userId: String,
     val username: String,
-    val joinedAt: Long
+    private val joinedAt: Long
 )
 
 
@@ -230,9 +230,9 @@ data class PlayerStats(
     val userId: String,
     val username: String,
     val rating: Int,
-    val gamesPlayed: Int,
+    private val gamesPlayed: Int,
     val wins: Int,
     val losses: Int,
     val draws: Int,
-    val winRate: Float
+    private val winRate: Float
 )

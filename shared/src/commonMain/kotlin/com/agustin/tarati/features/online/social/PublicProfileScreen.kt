@@ -152,14 +152,14 @@ fun PublicProfileScreen(
                 }
 
                 profileState.profile != null -> ProfileContent(
-                    profile = profileState.profile!!,
+                    profile = profileState.profile ?: return@Scaffold,
                     historyState = historyState,
                     followStatusState = followStatusState,
                     isOwnProfile = viewModel.isOwnProfile,
                     onToggleFollow = viewModel::toggleFollow,
                     onSendChallenge = { tc, rated -> viewModel.sendChallenge(tc, rated) },
                     onNavigateToGameDetails = onNavigateToGameDetails,
-                    forceNonRated = isCurrentUserGuest || profileState.profile!!.isGuest,
+                    forceNonRated = isCurrentUserGuest || (profileState.profile ?: return@Scaffold).isGuest,
                     viewModel = viewModel,
                     modifier = Modifier.padding(padding),
                 )

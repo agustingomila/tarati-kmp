@@ -23,7 +23,7 @@ class GameStateHelpersTest {
 
         val cob = newState.cobs[C1]
         assertNotNull("Should add new cob", cob)
-        assertEquals("Cob color should be WHITE", CobColor.WHITE, cob!!.color)
+        assertEquals("Cob color should be WHITE", CobColor.WHITE, (cob ?: return).color)
         assertFalse("Cob should not be upgraded", cob.isUpgraded)
     }
 
@@ -31,7 +31,7 @@ class GameStateHelpersTest {
     fun modifyCob_updateExistingCob() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -39,7 +39,7 @@ class GameStateHelpersTest {
 
         val cob = newState.cobs[C1]
         assertNotNull("Cob should exist", cob)
-        assertEquals("Cob color should be updated", CobColor.BLACK, cob!!.color)
+        assertEquals("Cob color should be updated", CobColor.BLACK, (cob ?: return).color)
         assertTrue("Cob should be upgraded", cob.isUpgraded)
     }
 
@@ -47,20 +47,20 @@ class GameStateHelpersTest {
     fun modifyCob_partialUpdate() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
         // Only update color
         val state1 = initialState.modifyCob(C1, CobColor.BLACK)
         val cob1 = state1.cobs[C1]
-        assertEquals("Color should be updated", CobColor.BLACK, cob1!!.color)
+        assertEquals("Color should be updated", CobColor.BLACK, (cob1 ?: return).color)
         assertFalse("Upgrade status should remain", cob1.isUpgraded)
 
         // Only update upgrade status
         val state2 = initialState.modifyCob(C1, isUpgraded = true)
         val cob2 = state2.cobs[C1]
-        assertEquals("Color should remain", CobColor.WHITE, cob2!!.color)
+        assertEquals("Color should remain", CobColor.WHITE, (cob2 ?: return).color)
         assertTrue("Upgrade status should be updated", cob2.isUpgraded)
     }
 
@@ -68,7 +68,7 @@ class GameStateHelpersTest {
     fun modifyCob_removeCob() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -81,7 +81,7 @@ class GameStateHelpersTest {
     fun moveCob_successfulMove() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -91,7 +91,7 @@ class GameStateHelpersTest {
         assertTrue("New position should have cob", newState.cobs.containsKey(B1))
 
         val movedCob = newState.cobs[B1]
-        assertEquals("Cob should retain color", CobColor.WHITE, movedCob!!.color)
+        assertEquals("Cob should retain color", CobColor.WHITE, (movedCob ?: return).color)
         assertFalse("Cob should retain upgrade status", movedCob.isUpgraded)
     }
 
@@ -99,7 +99,7 @@ class GameStateHelpersTest {
     fun moveCob_nonExistentCob() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -114,7 +114,7 @@ class GameStateHelpersTest {
     fun withTurn_changesTurn() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -129,7 +129,7 @@ class GameStateHelpersTest {
         val state =
             createGameState {
                 setTurn(CobColor.BLACK)
-                setCob(C1, CobColor.WHITE, false)
+                setCob(C1, CobColor.WHITE)
                 setCob(C7, CobColor.BLACK, true)
                 moveCob(Move(C1 to B1))
             }
@@ -140,10 +140,10 @@ class GameStateHelpersTest {
         assertTrue("C7 should have upgraded cob", state.cobs.containsKey(C7))
 
         val b1Cob = state.cobs[B1]
-        assertEquals("B1 cob should be WHITE", CobColor.WHITE, b1Cob!!.color)
+        assertEquals("B1 cob should be WHITE", CobColor.WHITE, (b1Cob ?: return).color)
 
         val c7Cob = state.cobs[C7]
-        assertTrue("C7 cob should be upgraded", c7Cob!!.isUpgraded)
+        assertTrue("C7 cob should be upgraded", (c7Cob ?: return).isUpgraded)
     }
 
     @Test
@@ -162,7 +162,7 @@ class GameStateHelpersTest {
     fun helpers_areImmutable() {
         val initialState =
             GameState(
-                mapOf(C1 to Cob(CobColor.WHITE, false)),
+                mapOf(C1 to Cob(CobColor.WHITE)),
                 currentTurn = CobColor.WHITE,
             )
 
@@ -174,7 +174,7 @@ class GameStateHelpersTest {
         // Original state should remain unchanged
         assertEquals(
             "Original state should be unchanged",
-            mapOf(C1 to Cob(CobColor.WHITE, false)),
+            mapOf(C1 to Cob(CobColor.WHITE)),
             initialState.cobs,
         )
         assertEquals(

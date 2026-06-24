@@ -84,15 +84,15 @@ class NormalMovesBaselineTest {
     private val midGamePosition: GameState = GameState(
         cobs = mapOf(
             // WHITE — departed home, crossing neutral toward BLACK
-            C3 to Cob(WHITE, false), // still on white half, just advanced
-            B1 to Cob(WHITE, false), // white half bridge
-            B2 to Cob(WHITE, false), // neutral — pushing toward center
-            B3 to Cob(WHITE, false), // neutral — threatening A1
+            C3 to Cob(WHITE), // still on white half, just advanced
+            B1 to Cob(WHITE), // white half bridge
+            B2 to Cob(WHITE), // neutral — pushing toward center
+            B3 to Cob(WHITE), // neutral — threatening A1
             // BLACK — departed home, crossing neutral toward WHITE
-            C9 to Cob(BLACK, false), // still on black half, just advanced
-            B4 to Cob(BLACK, false), // black half bridge
-            B5 to Cob(BLACK, false), // neutral — pushing toward center
-            B6 to Cob(BLACK, false), // neutral — threatening A1
+            C9 to Cob(BLACK), // still on black half, just advanced
+            B4 to Cob(BLACK), // black half bridge
+            B5 to Cob(BLACK), // neutral — pushing toward center
+            B6 to Cob(BLACK), // neutral — threatening A1
         ),
         currentTurn = WHITE,
     )
@@ -108,12 +108,12 @@ class NormalMovesBaselineTest {
             A1 to Cob(WHITE, true),  // center rok
             B5 to Cob(WHITE, true),  // neutral rok
             C8 to Cob(WHITE, true),  // deep in BLACK half
-            D3 to Cob(WHITE, false), // in BLACK home, still cob
+            D3 to Cob(WHITE), // in BLACK home, still cob
             // BLACK — spread across the board, mostly upgraded
             B2 to Cob(BLACK, true),  // neutral rok
             C3 to Cob(BLACK, true),  // deep in WHITE half
             C12 to Cob(BLACK, true),  // deep in WHITE half
-            D2 to Cob(BLACK, false), // in WHITE home, still cob
+            D2 to Cob(BLACK), // in WHITE home, still cob
         ),
         currentTurn = BLACK,
     )

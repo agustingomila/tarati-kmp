@@ -6,7 +6,7 @@ package com.agustin.tarati.services.pwa
 private external fun jsPwaCanInstall(): JsBoolean
 
 @JsFun("() => { if (typeof globalThis.__pwaInstall === 'function') globalThis.__pwaInstall(); }")
-private external fun jsPwaInstall(): Unit
+private external fun jsPwaInstall()
 
 actual fun pwaInstallAvailable(): Boolean = jsPwaCanInstall().toBoolean()
 

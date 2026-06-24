@@ -95,7 +95,7 @@ fun CobConversionPreview() {
     }
 
     val animatedCob = AnimatedCob(
-        vertex = A1, cob = Cob(CobColor.WHITE, isUpgraded = false),
+        vertex = A1, cob = Cob(CobColor.WHITE),
         currentPos = A1, targetPos = B1, targetColor = CobColor.WHITE,
         animationProgress = 0f, upgradeProgress = 0f,
         conversionProgress = animationState.conversionProgress, isConverting = animationState.isConverting,
@@ -204,7 +204,7 @@ fun CobConversionComparisonPreview() {
         ) {
             Canvas(modifier = Modifier.matchParentSize()) {
                 val animatedCob = AnimatedCob(
-                    vertex = A1, cob = Cob(CobColor.WHITE, isUpgraded = false),
+                    vertex = A1, cob = Cob(CobColor.WHITE),
                     currentPos = A1, targetPos = B1, targetColor = CobColor.BLACK,
                     animationProgress = 0f, upgradeProgress = 0f,
                     conversionProgress = animationState.conversionProgress,
@@ -465,7 +465,7 @@ fun CobFlipShadowHoursPreview() {
         listOf(
             ShadowCell(hourOfDay = 6f, line1 = "06:00", line2 = "Sombra fina"),
             ShadowCell(hourOfDay = 9f, line1 = "09:00", line2 = "Sombra ~45°"),
-            ShadowCell(hourOfDay = 12f, line1 = "12:00", line2 = "Sombra ancha"),
+            ShadowCell(line1 = "12:00", line2 = "Sombra ancha"),
         )
     )
     Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(4.dp)) {
@@ -477,9 +477,9 @@ fun CobFlipShadowHoursPreview() {
 // ── Estado compartido ─────────────────────────────────────────────────────────
 
 class PreviewAnimationState {
-    var upgradeProgress by mutableFloatStateOf(0f)
-    var conversionProgress by mutableFloatStateOf(0f)
-    var isConverting by mutableStateOf(false)
+    var upgradeProgress: Float by mutableFloatStateOf(0f)
+    var conversionProgress: Float by mutableFloatStateOf(0f)
+    var isConverting: Boolean by mutableStateOf(false)
 }
 
 // ── Extensión local ───────────────────────────────────────────────────────────

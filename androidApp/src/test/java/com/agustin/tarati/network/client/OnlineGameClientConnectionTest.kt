@@ -17,6 +17,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -92,13 +93,13 @@ class OnlineGameClientConnectionTest {
     // ── Tests 10.1 — OpponentDisconnected / OpponentReconnected ──────────────
 
     @Test
-    fun `game status is InProgress after GameStarted`() = runTest(dispatcher) {
+    fun `game status is InProgress after GameStarted`(): TestResult = runTest(dispatcher) {
         startGame()
         assertEquals(OnlineGameStatus.InProgress, client.currentGame.value?.status)
     }
 
     @Test
-    fun `OpponentDisconnected sets opponentConnected to false`() = runTest(dispatcher) {
+    fun `OpponentDisconnected sets opponentConnected to false`(): TestResult = runTest(dispatcher) {
         startGame()
         assertEquals(client.currentGame.value?.opponentConnected, true)
 
@@ -108,7 +109,7 @@ class OnlineGameClientConnectionTest {
     }
 
     @Test
-    fun `OpponentDisconnected stores gracePeriodSec from server message`() = runTest(dispatcher) {
+    fun `OpponentDisconnected stores gracePeriodSec from server message`(): TestResult = runTest(dispatcher) {
         startGame()
 
         fakeMessages.emit(ServerMessage.OpponentDisconnected(gameId, gracePeriod = 45))
@@ -117,7 +118,7 @@ class OnlineGameClientConnectionTest {
     }
 
     @Test
-    fun `OpponentDisconnected stores client-side timestamp`() = runTest(dispatcher) {
+    fun `OpponentDisconnected stores client-side timestamp`(): TestResult = runTest(dispatcher) {
         startGame()
         val before = System.currentTimeMillis()
 
@@ -130,7 +131,7 @@ class OnlineGameClientConnectionTest {
     }
 
     @Test
-    fun `OpponentReconnected restores opponentConnected and clears timestamp`() = runTest(dispatcher) {
+    fun `OpponentReconnected restores opponentConnected and clears timestamp`(): TestResult = runTest(dispatcher) {
         startGame()
         fakeMessages.emit(ServerMessage.OpponentDisconnected(gameId, gracePeriod = 60))
         assertFalse(client.currentGame.value?.opponentConnected ?: true)
@@ -145,7 +146,7 @@ class OnlineGameClientConnectionTest {
     // ── Tests 10.3 — serverErrors ─────────────────────────────────────────────
 
     @Test
-    fun `ServerMessage Error emits GenericError to serverErrors`() = runTest(dispatcher) {
+    fun `ServerMessage Error emits GenericError to serverErrors`(): TestResult = runTest(dispatcher) {
         // La colección empieza ANTES de la emisión para no perder el evento.
         // Con el dispatcher compartido, async arranca en el mismo scheduler y
         // first() suspende hasta que serverErrors emite.
@@ -160,7 +161,7 @@ class OnlineGameClientConnectionTest {
     }
 
     @Test
-    fun `ServerMessage InvalidMove emits InvalidMove to serverErrors`() = runTest(dispatcher) {
+    fun `ServerMessage InvalidMove emits InvalidMove to serverErrors`(): TestResult = runTest(dispatcher) {
         val deferred = async { client.serverErrors.first() }
 
         fakeMessages.emit(ServerMessage.InvalidMove(gameId = gameId, reason = "not_your_turn"))
@@ -171,7 +172,7 @@ class OnlineGameClientConnectionTest {
     }
 
     @Test
-    fun `HeartbeatAck does not emit to serverErrors`() = runTest(dispatcher) {
+    fun `HeartbeatAck does not emit to serverErrors`(): TestResult = runTest(dispatcher) {
         var received = false
         val collector = async {
             client.serverErrors.first()

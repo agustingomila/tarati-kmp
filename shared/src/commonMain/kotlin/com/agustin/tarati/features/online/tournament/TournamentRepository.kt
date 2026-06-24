@@ -63,27 +63,23 @@ class TournamentRepository(private val httpClient: HttpClient) {
         httpClient.post("$baseUrl/api/tournaments/$id/register") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 
     suspend fun unregister(token: String, id: String): Result<Unit> = runCatching {
         httpClient.delete("$baseUrl/api/tournaments/$id/register") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 
     suspend fun start(token: String, id: String): Result<Unit> = runCatching {
         httpClient.post("$baseUrl/api/tournaments/$id/start") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 
     suspend fun cancel(token: String, id: String): Result<Unit> = runCatching {
         httpClient.post("$baseUrl/api/tournaments/$id/cancel") {
             header("Authorization", "Bearer $token")
         }
-        Unit
     }
 }

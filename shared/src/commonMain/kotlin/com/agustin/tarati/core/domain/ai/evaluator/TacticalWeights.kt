@@ -11,9 +11,9 @@ data class TacticalWeights(
     val quickThreatWeight: Double = 15.0,
     val quickAttackWeight: Double = 25.0,
 ) {
-    fun scaleThreats(factor: Double) = copy(quickThreatWeight = quickThreatWeight * factor)
-    fun scaleAttack(factor: Double) = copy(quickAttackWeight = quickAttackWeight * factor)
-    fun scale(threat: Double = 1.0, attack: Double = 1.0) = copy(
+    fun scaleThreats(factor: Double): TacticalWeights = copy(quickThreatWeight = quickThreatWeight * factor)
+    fun scaleAttack(factor: Double): TacticalWeights = copy(quickAttackWeight = quickAttackWeight * factor)
+    fun scale(threat: Double = 1.0, attack: Double = 1.0): TacticalWeights = copy(
         quickThreatWeight = quickThreatWeight * threat,
         quickAttackWeight = quickAttackWeight * attack,
     )

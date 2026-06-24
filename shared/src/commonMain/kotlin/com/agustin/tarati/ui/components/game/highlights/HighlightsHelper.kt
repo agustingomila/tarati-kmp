@@ -194,15 +194,15 @@ fun Vertex.createHighlight(
     duration: Long = 100L,
     pulse: Boolean = false,
     persistent: Boolean = false,
-) = createVertexAnimation(this, duration, 0L, pulse, persistent)
+): HighlightAnimation = createVertexAnimation(this, duration, pulse = pulse, persistent = persistent)
 
-fun Region.createHighlight(duration: Long = 100L) = createRegionAnimation(this, duration)
+fun Region.createHighlight(duration: Long = 100L): HighlightAnimation = createRegionAnimation(this, duration)
 
 fun Edge.createElectricHighlight(
     duration: Long = 100L,
     pulse: Boolean = false,
     persistent: Boolean = false,
-) = createElectricEdgeAnimation(this, duration, 0L, pulse, persistent)
+): HighlightAnimation = createElectricEdgeAnimation(this, duration, pulse = pulse, persistent = persistent)
 
 fun createElectricEdgeAnimation(
     edge: Edge,
@@ -224,7 +224,7 @@ fun createElectricEdgeAnimation(
 fun Edge.createForceArcHighlight(
     duration: Long = 300L,
     pulse: Boolean = false,
-) = createForceArcEdgeAnimation(this, duration, pulse)
+): HighlightAnimation = createForceArcEdgeAnimation(this, duration, pulse)
 
 fun createForceArcEdgeAnimation(
     edge: Edge,

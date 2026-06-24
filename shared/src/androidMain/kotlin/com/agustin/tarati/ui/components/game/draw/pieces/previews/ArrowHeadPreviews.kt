@@ -64,11 +64,9 @@ fun PreviewPencilTip() {
                 sweepAngle = 90f,
                 useCenter = false,
                 style = Stroke(width = 4f),
-                arrowSize = 20f,
                 arrowWidth = 5f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }
@@ -108,8 +106,7 @@ fun PreviewArrowTip() {
                 arrowSize = 24f,
                 arrowWidth = 16f,
                 arrowStyle = ArrowTipStyle.ARROW,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }
@@ -149,8 +146,7 @@ fun PreviewChevronTip() {
                 arrowSize = 18f,
                 arrowWidth = 14f,
                 arrowStyle = ArrowTipStyle.CHEVRON,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }
@@ -190,8 +186,7 @@ fun PreviewDiamondTip() {
                 arrowSize = 16f,
                 arrowWidth = 12f,
                 arrowStyle = ArrowTipStyle.DIAMOND,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }
@@ -282,8 +277,7 @@ fun PreviewAllTipsComparison() {
                         else -> 9f
                     },
                     arrowStyle = style,
-                    arrowAtStart = true,
-                    arrowAtEnd = true
+                    arrowAtStart = true
                 )
             }
 
@@ -368,8 +362,7 @@ fun PreviewAnimatedSelectionStyle() {
                 arrowSize = diffuseStrokeWidth * 2f,
                 arrowWidth = diffuseStrokeWidth * 1f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
 
             // Arco principal
@@ -386,8 +379,7 @@ fun PreviewAnimatedSelectionStyle() {
                 arrowSize = innerStrokeWidth * 3f,
                 arrowWidth = innerStrokeWidth * 1f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
 
             // Punto de brillo
@@ -434,8 +426,7 @@ fun PreviewLinePencilHorizontal() {
                 arrowSize = 24f,
                 arrowWidth = 6f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }
@@ -481,8 +472,6 @@ fun PreviewLineAllTipsVertical() {
                     start = start,
                     end = end,
                     brush = SolidColor(color),
-                    strokeWidth = 4f,
-                    arrowSize = 20f,
                     arrowWidth = when (style) {
                         ArrowTipStyle.PENCIL -> 4f
                         ArrowTipStyle.ARROW -> 12f
@@ -490,8 +479,7 @@ fun PreviewLineAllTipsVertical() {
                         else -> 9f
                     },
                     arrowStyle = style,
-                    arrowAtStart = true,
-                    arrowAtEnd = true
+                    arrowAtStart = true
                 )
             }
         }
@@ -539,9 +527,7 @@ fun PreviewLineDiagonalDirections() {
                     strokeWidth = 3f,
                     arrowSize = 16f,
                     arrowWidth = 8f,
-                    arrowStyle = ArrowTipStyle.ARROW,
-                    arrowAtStart = false,
-                    arrowAtEnd = true
+                    arrowStyle = ArrowTipStyle.ARROW
                 )
             }
         }
@@ -590,8 +576,7 @@ fun PreviewLineStrokeWidths() {
                     arrowSize = arrowS,
                     arrowWidth = arrowW,
                     arrowStyle = ArrowTipStyle.PENCIL,
-                    arrowAtStart = true,
-                    arrowAtEnd = true
+                    arrowAtStart = true
                 )
             }
         }
@@ -632,9 +617,7 @@ fun PreviewLineSingleArrows() {
                 strokeWidth = 5f,
                 arrowSize = 18f,
                 arrowWidth = 5f,
-                arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = false,
-                arrowAtEnd = true
+                arrowStyle = ArrowTipStyle.PENCIL
             )
 
             // Ambas (default)
@@ -646,8 +629,7 @@ fun PreviewLineSingleArrows() {
                 arrowSize = 18f,
                 arrowWidth = 5f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
 
             // Ninguna (línea pura)
@@ -659,8 +641,8 @@ fun PreviewLineSingleArrows() {
                 arrowSize = 18f,
                 arrowWidth = 5f,
                 arrowStyle = ArrowTipStyle.NONE,
-                arrowAtStart = true,  // Ignorado por NONE
-                arrowAtEnd = true     // Ignorado por NONE
+                arrowAtStart = true  // Ignorado por NONE
+                // Ignorado por NONE
             )
         }
     }
@@ -697,9 +679,7 @@ fun PreviewLineConnectedGraph() {
                     strokeWidth = 3f,
                     arrowSize = 14f,
                     arrowWidth = 6f,
-                    arrowStyle = ArrowTipStyle.PENCIL,
-                    arrowAtStart = false,
-                    arrowAtEnd = true
+                    arrowStyle = ArrowTipStyle.PENCIL
                 )
             }
 
@@ -739,11 +719,9 @@ fun PreviewLineChevronDetail() {
                 end = Offset(size.width - 50f, y1),
                 brush = SolidColor(Color.Cyan),
                 strokeWidth = 5f,
-                arrowSize = 20f,
                 arrowWidth = 5f,
                 arrowStyle = ArrowTipStyle.PENCIL,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
 
             // Chevron abajo (mismo tamaño para comparar)
@@ -752,11 +730,9 @@ fun PreviewLineChevronDetail() {
                 end = Offset(size.width - 50f, y2),
                 brush = SolidColor(Color.Yellow),
                 strokeWidth = 5f,
-                arrowSize = 20f,
                 arrowWidth = 12f,  // Chevron se ve mejor más ancho
                 arrowStyle = ArrowTipStyle.CHEVRON,
-                arrowAtStart = true,
-                arrowAtEnd = true
+                arrowAtStart = true
             )
         }
     }

@@ -243,7 +243,7 @@ fun MorphFlipShadowHoursPreview() {
         listOf(
             MorphShadowCell(shape, B2, 6f, "06:00", "Sombra fina"),
             MorphShadowCell(shape, B2, 9f, "09:00", "Sombra ~45°"),
-            MorphShadowCell(shape, B2, 12f, "12:00", "Sombra ancha"),
+            MorphShadowCell(shape, B2, line1 = "12:00", line2 = "Sombra ancha"),
         )
     )
     Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(4.dp)) {

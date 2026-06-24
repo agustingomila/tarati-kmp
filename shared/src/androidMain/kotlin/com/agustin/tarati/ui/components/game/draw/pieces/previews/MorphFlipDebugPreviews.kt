@@ -263,7 +263,6 @@ fun MorphFlipSlowMotionAllPiecesPreview() {
                             isUpgraded = false,
                             vertex = B2,
                             sizeDp = 110,
-                            cycleDurationMs = 20_000L,
                         )
                         Spacer(Modifier.height(2.dp))
                         DebugLabel(pieceType.id)
@@ -316,7 +315,6 @@ fun MorphFlipSlowMotionAllPiecesUpgradedPreview() {
                             isUpgraded = true,
                             vertex = B2,
                             sizeDp = 110,
-                            cycleDurationMs = 20_000L,
                         )
                         Spacer(Modifier.height(2.dp))
                         DebugLabel(pieceType.id)
@@ -579,7 +577,6 @@ fun MorphFlipBorderPatternIsolationPreview() {
                             isUpgraded = false,
                             vertex = B2,
                             sizeDp = 110,
-                            cycleDurationMs = 20_000L,
                         )
                         Spacer(Modifier.height(2.dp))
                         DebugLabel(sample.label)

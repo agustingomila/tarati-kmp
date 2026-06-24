@@ -114,7 +114,7 @@ fun computeMorphFlipShadowParams(
     // ── Cálculo de la matriz de transformación ────────────────────────────────
     val distMulti = 1f + sinA * 2.8f
 
-    val fullFacePath = projection.createPath(pathSize, scale = 1f)
+    val fullFacePath = projection.createPath(pathSize)
     // Para Desktop: getBounds() es suficiente para aproximar
     val fullBounds = fullFacePath.getBounds()
     val sRy = (fullBounds.bottom - radius).coerceAtLeast(1f)

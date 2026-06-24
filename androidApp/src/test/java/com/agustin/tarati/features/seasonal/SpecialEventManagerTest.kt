@@ -25,6 +25,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -154,7 +155,7 @@ class SpecialEventManagerTest {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `on April 4 only first light is active`() = runTest {
+    fun `on April 4 only first light is active`(): TestResult = runTest {
         fakeDate = 4 to 4
         val active = manager().activeEvents.value
         Assert.assertEquals(1, active.size)
@@ -162,7 +163,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `on April 5 only dark side is active`() = runTest {
+    fun `on April 5 only dark side is active`(): TestResult = runTest {
         fakeDate = 4 to 5
         val active = manager().activeEvents.value
         Assert.assertEquals(1, active.size)
@@ -170,13 +171,13 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `on April 6 both events are active`() = runTest {
+    fun `on April 6 both events are active`(): TestResult = runTest {
         fakeDate = 4 to 6
         Assert.assertEquals(2, manager().activeEvents.value.size)
     }
 
     @Test
-    fun `on a non-event day no events are active`() = runTest {
+    fun `on a non-event day no events are active`(): TestResult = runTest {
         fakeDate = 1 to 1
         Assert.assertTrue(manager().activeEvents.value.isEmpty())
     }
@@ -186,7 +187,7 @@ class SpecialEventManagerTest {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `first light unlocks on April 4 when human wins as White`() = runTest {
+    fun `first light unlocks on April 4 when human wins as White`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
 
@@ -198,7 +199,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light unlocks on April 6 when human wins as White`() = runTest {
+    fun `first light unlocks on April 6 when human wins as White`(): TestResult = runTest {
         fakeDate = 4 to 6
         val m = manager()
 
@@ -209,7 +210,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light does not unlock on April 5 - not its active day`() = runTest {
+    fun `first light does not unlock on April 5 - not its active day`(): TestResult = runTest {
         fakeDate = 4 to 5
         val m = manager()
 
@@ -220,7 +221,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light does not unlock when human plays as Black`() = runTest {
+    fun `first light does not unlock when human plays as Black`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
 
@@ -231,7 +232,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light does not unlock when AI wins`() = runTest {
+    fun `first light does not unlock when AI wins`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
 
@@ -242,7 +243,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light does not unlock on a draw`() = runTest {
+    fun `first light does not unlock on a draw`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
 
@@ -253,7 +254,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `first light excluded from active events when already unlocked`() = runTest {
+    fun `first light excluded from active events when already unlocked`(): TestResult = runTest {
         auroraUnlockedFlow.value = true
         fakeDate = 4 to 4
         Assert.assertTrue(manager().activeEvents.value.none { it.id == "first_light" })
@@ -264,7 +265,7 @@ class SpecialEventManagerTest {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `dark side unlocks on April 5 when human wins as Black`() = runTest {
+    fun `dark side unlocks on April 5 when human wins as Black`(): TestResult = runTest {
         fakeDate = 4 to 5
         val m = manager()
 
@@ -276,7 +277,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side unlocks on April 6 when human wins as Black`() = runTest {
+    fun `dark side unlocks on April 6 when human wins as Black`(): TestResult = runTest {
         fakeDate = 4 to 6
         val m = manager()
 
@@ -287,7 +288,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side does not unlock on April 4 - not its active day`() = runTest {
+    fun `dark side does not unlock on April 4 - not its active day`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
 
@@ -298,7 +299,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side does not unlock when human plays as White`() = runTest {
+    fun `dark side does not unlock when human plays as White`(): TestResult = runTest {
         fakeDate = 4 to 5
         val m = manager()
 
@@ -309,7 +310,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side does not unlock when AI wins`() = runTest {
+    fun `dark side does not unlock when AI wins`(): TestResult = runTest {
         fakeDate = 4 to 5
         val m = manager()
 
@@ -320,7 +321,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side does not unlock on a draw`() = runTest {
+    fun `dark side does not unlock on a draw`(): TestResult = runTest {
         fakeDate = 4 to 5
         val m = manager()
 
@@ -331,7 +332,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dark side excluded from active events when already unlocked`() = runTest {
+    fun `dark side excluded from active events when already unlocked`(): TestResult = runTest {
         emberUnlockedFlow.value = true
         fakeDate = 4 to 5
         Assert.assertTrue(manager().activeEvents.value.none { it.id == "dark_side" })
@@ -342,7 +343,7 @@ class SpecialEventManagerTest {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `dark side unlocks after first light was unlocked earlier in the same session`() = runTest {
+    fun `dark side unlocks after first light was unlocked earlier in the same session`(): TestResult = runTest {
         // Day 4: first light active, dark side not active yet
         fakeDate = 4 to 4
         val m = manager()
@@ -377,7 +378,7 @@ class SpecialEventManagerTest {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `winning as White on April 6 unlocks only Aurora`() = runTest {
+    fun `winning as White on April 6 unlocks only Aurora`(): TestResult = runTest {
         fakeDate = 4 to 6
         val m = manager()
 
@@ -388,7 +389,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `winning as Black on April 6 unlocks only Ember`() = runTest {
+    fun `winning as Black on April 6 unlocks only Ember`(): TestResult = runTest {
         fakeDate = 4 to 6
         val m = manager()
 
@@ -399,7 +400,7 @@ class SpecialEventManagerTest {
     }
 
     @Test
-    fun `dismissCelebration clears pending celebration`() = runTest {
+    fun `dismissCelebration clears pending celebration`(): TestResult = runTest {
         fakeDate = 4 to 4
         val m = manager()
         m.onGameResult(winBy(CobColor.WHITE), CobColor.WHITE)

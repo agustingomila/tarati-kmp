@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.layout
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -65,4 +66,4 @@ class CompanionPanelController {
     }
 }
 
-val LocalCompanionPanelController = compositionLocalOf { CompanionPanelController() }
+val LocalCompanionPanelController: ProvidableCompositionLocal<CompanionPanelController> = compositionLocalOf { CompanionPanelController() }

@@ -47,7 +47,7 @@ data class Move(
      * - Normal move:               "B6-B1"
      * - Forced in-place promotion: "C12=R"  (Cob promoted to Rok in place)
      */
-    val name get() = if (isPromotion()) "${from.name}=R" else "${from.name}$MOVE_SEPARATOR${to.name}"
+    val name: String get() = if (isPromotion()) "${from.name}=R" else "${from.name}$MOVE_SEPARATOR${to.name}"
 
     /**
      * Returns true if this move is a forced in-place promotion (from == to).
@@ -116,10 +116,10 @@ data class Move(
     }
 
     companion object {
-        const val MOVE_SEPARATOR = "-"
+        const val MOVE_SEPARATOR: String = "-"
 
         /** Separador usado en partidas guardadas antes del cambio a ASCII. */
-        const val LEGACY_SEPARATOR = "→"
+        const val LEGACY_SEPARATOR: String = "→"
 
         fun parseMoveHistory(moveHistory: String): List<Move> =
             if (moveHistory.isNotEmpty()) {

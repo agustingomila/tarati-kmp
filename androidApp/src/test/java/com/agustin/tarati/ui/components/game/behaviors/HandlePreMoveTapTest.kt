@@ -82,7 +82,7 @@ class HandlePreMoveTapTest {
             logger = logger,
         )
 
-        val expectedTargets = state.getValidVertex(humanPiece, state.cobs[humanPiece]!!)
+        val expectedTargets = state.getValidVertex(humanPiece, state.cobs[humanPiece] ?: return)
         verify(exactly = 1) { tapEvents.onPreMoveSelected(humanPiece, expectedTargets) }
         verify(exactly = 0) { tapEvents.onPreMoveSet(any()) }
         verify(exactly = 0) { tapEvents.onPreMoveCancel() }
@@ -159,7 +159,7 @@ class HandlePreMoveTapTest {
             logger = logger,
         )
 
-        val expectedTargets = state.getValidVertex(secondSelected, state.cobs[secondSelected]!!)
+        val expectedTargets = state.getValidVertex(secondSelected, state.cobs[secondSelected] ?: return)
         verify(exactly = 1) { tapEvents.onPreMoveSelected(secondSelected, expectedTargets) }
         verify(exactly = 0) { tapEvents.onPreMoveSet(any()) }
         verify(exactly = 0) { tapEvents.onPreMoveCancel() }
@@ -187,7 +187,7 @@ class HandlePreMoveTapTest {
     @Test
     fun `preselected - tap on valid target triggers onPreMoveSet with correct move`() {
         val preSelected = C1
-        val cob = state.cobs[preSelected]!!
+        val cob = state.cobs[preSelected] ?: return
         val ctx = context.copy(preMoveFrom = preSelected)
 
         // Elegir dinámicamente un target válido vacío para que el test no
@@ -200,7 +200,7 @@ class HandlePreMoveTapTest {
         handlePreMoveTap(
             gameState = state,
             context = ctx,
-            to = emptyValidTarget!!,
+            to = emptyValidTarget ?: return,
             tapEvents = tapEvents,
             logger = logger,
         )
@@ -214,7 +214,7 @@ class HandlePreMoveTapTest {
     fun `preselected - tap on non-adjacent empty vertex triggers onPreMoveCancel`() {
         val preSelected = C1
         val farEmpty = B1  // adyacente pero no-destino válido para WHITE en C1
-        val cob = state.cobs[preSelected]!!
+        val cob = state.cobs[preSelected] ?: return
         val ctx = context.copy(preMoveFrom = preSelected)
 
         // Precondición: B1 está vacío y NO es target válido desde C1 para
@@ -232,7 +232,7 @@ class HandlePreMoveTapTest {
             handlePreMoveTap(
                 gameState = state,
                 context = ctx,
-                to = nonValid!!,
+                to = nonValid ?: return,
                 tapEvents = tapEvents,
                 logger = logger,
             )
@@ -258,14 +258,14 @@ class HandlePreMoveTapTest {
         // aún no reaccionó). handlePreMoveTap debe cancelar sin intentar move.
         val stateMissingPiece = GameState(
             cobs = mapOf(
-                C2 to Cob(WHITE, false),
-                C3 to Cob(WHITE, false),
-                D1 to Cob(WHITE, false),
-                D2 to Cob(WHITE, false),
-                C7 to Cob(BLACK, false),
-                C8 to Cob(BLACK, false),
-                D3 to Cob(BLACK, false),
-                D4 to Cob(BLACK, false),
+                C2 to Cob(WHITE),
+                C3 to Cob(WHITE),
+                D1 to Cob(WHITE),
+                D2 to Cob(WHITE),
+                C7 to Cob(BLACK),
+                C8 to Cob(BLACK),
+                D3 to Cob(BLACK),
+                D4 to Cob(BLACK),
             ),
             currentTurn = BLACK,
         )
@@ -292,14 +292,14 @@ class HandlePreMoveTapTest {
         // de la IA (no está previsto que ocurra, pero el guard lo cubre).
         val stateCaptured = GameState(
             cobs = mapOf(
-                C1 to Cob(BLACK, false),  // antes WHITE, ahora BLACK (hipotético)
-                C2 to Cob(WHITE, false),
-                C3 to Cob(WHITE, false),
-                D1 to Cob(WHITE, false),
-                D2 to Cob(WHITE, false),
-                C7 to Cob(BLACK, false),
-                C8 to Cob(BLACK, false),
-                D3 to Cob(BLACK, false),
+                C1 to Cob(BLACK),  // antes WHITE, ahora BLACK (hipotético)
+                C2 to Cob(WHITE),
+                C3 to Cob(WHITE),
+                D1 to Cob(WHITE),
+                D2 to Cob(WHITE),
+                C7 to Cob(BLACK),
+                C8 to Cob(BLACK),
+                D3 to Cob(BLACK),
             ),
             currentTurn = BLACK,
         )
@@ -321,7 +321,7 @@ class HandlePreMoveTapTest {
     @Test
     fun `sequence - select then confirm emits onPreMoveSelected then onPreMoveSet`() {
         val preSelected = C1
-        val cob = state.cobs[preSelected]!!
+        val cob = state.cobs[preSelected] ?: return
         val validTargets = state.getValidVertex(preSelected, cob)
         val target = validTargets.firstOrNull { it != preSelected && state.cobs[it] == null }
         assertNotNull_(target, "Need a valid empty target from C1")
@@ -339,7 +339,7 @@ class HandlePreMoveTapTest {
         handlePreMoveTap(
             gameState = state,
             context = context.copy(preMoveFrom = preSelected),
-            to = target!!,
+            to = target ?: return,
             tapEvents = tapEvents,
             logger = logger,
         )

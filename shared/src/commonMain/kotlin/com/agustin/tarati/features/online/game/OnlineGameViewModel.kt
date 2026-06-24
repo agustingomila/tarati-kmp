@@ -266,7 +266,7 @@ class OnlineGameViewModel(
      * llama a `events.applyMove(...)`. Este diseño mantiene la lógica de UI en la
      * capa de UI y evita el acoplamiento entre OnlineGameViewModel y GameViewModel.
      */
-    override fun syncOnlineStateToLocal(onlineState: GameState) = Unit
+    override fun syncOnlineStateToLocal(onlineState: GameState): Unit = Unit
 
     override fun clearOnlineGame(gameId: String) {
         logger.debug("clearOnlineGame: $gameId")

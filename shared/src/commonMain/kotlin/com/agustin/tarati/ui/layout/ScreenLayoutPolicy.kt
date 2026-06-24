@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.layout
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,8 +28,8 @@ enum class ScreenLayout {
 
 /** Breakpoints en dp. Modificar aquí afecta a todos los consumidores. */
 object ScreenLayoutBreakpoints {
-    val Medium = 600.dp
-    val Expanded = 840.dp
+    val Medium: Dp = 600.dp
+    val Expanded: Dp = 840.dp
 }
 
 /** Derivación pura: ancho → categoría de layout. */
@@ -42,4 +43,4 @@ fun screenLayoutFor(width: Dp): ScreenLayout = when {
  * CompositionLocal que expone la categoría de layout activa.
  * Default: [ScreenLayout.Compact] (conservador — no asume pantalla grande).
  */
-val LocalScreenLayout = compositionLocalOf { ScreenLayout.Compact }
+val LocalScreenLayout: ProvidableCompositionLocal<ScreenLayout> = compositionLocalOf { ScreenLayout.Compact }

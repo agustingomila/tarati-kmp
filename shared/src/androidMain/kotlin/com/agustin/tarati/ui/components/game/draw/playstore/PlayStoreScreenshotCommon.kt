@@ -54,8 +54,8 @@ import kotlin.math.roundToInt
 //  A densidad xxhdpi (×3): 360 × 640 dp → 1080 × 1920 px exactos.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const val STORE_W_DP = 360
-const val STORE_H_DP = 640
+const val STORE_W_DP: Int = 360
+const val STORE_H_DP: Int = 640
 
 // ══════════════════════════════════════════════════════════════════════════════
 //  CONVENCIÓN DE NOMBRES PARA ASSETS
@@ -87,25 +87,25 @@ const val STORE_H_DP = 640
 // ── Geometría del teléfono (dp; convertidos a px dentro del DrawScope) ─────────
 
 /** El teléfono ocupa el 75.5 % del ancho del canvas. */
-const val PHONE_W_DP = 272f
+const val PHONE_W_DP: Float = 272f
 
 /** Relación de aspecto de un teléfono moderno: 19.5 : 9. */
-const val PHONE_ASPECT_RATIO = 19.5f / 9f
+const val PHONE_ASPECT_RATIO: Float = 19.5f / 9f
 
 /** Radio de esquina del cuerpo exterior del teléfono. */
-const val PHONE_CORNER_DP = 34f
+const val PHONE_CORNER_DP: Float = 34f
 
 /** Radio de esquina del área de pantalla (ligeramente menor que el cuerpo). */
-const val SCREEN_CORNER_DP = 20f
+const val SCREEN_CORNER_DP: Float = 20f
 
 /** Bezeles laterales (izquierdo y derecho). */
-const val BEZEL_SIDE_DP = 10f
+const val BEZEL_SIDE_DP: Float = 10f
 
 /** Bezel superior; aloja la cámara frontal. */
-const val BEZEL_TOP_DP = 24f
+const val BEZEL_TOP_DP: Float = 24f
 
 /** Bezel inferior; aloja el indicador de inicio (home bar). */
-const val BEZEL_BOTTOM_DP = 28f
+const val BEZEL_BOTTOM_DP: Float = 28f
 
 /**
  * Tamaño lógico del contenido renderizado dentro de la pantalla del teléfono.
@@ -117,14 +117,14 @@ const val BEZEL_BOTTOM_DP = 28f
  * captura de pantalla de alta densidad — idéntico al resultado de tomar un
  * screenshot real de un teléfono moderno y escalarla al tamaño del frame.
  */
-const val CONTENT_W_DP = 411f
-const val CONTENT_H_DP = 891f
+const val CONTENT_W_DP: Float = 411f
+const val CONTENT_H_DP: Float = 891f
 
 /**
  * Fracción reservada para el título (zona superior) y el subtítulo (zona inferior).
  * 13 % × 2 = 26 % en total; el 74 % restante queda para el teléfono + márgenes.
  */
-const val CENTERED_TEXT_FRACTION = 0.13f
+const val CENTERED_TEXT_FRACTION: Float = 0.13f
 
 /**
  * Altura de la barra de estado simulada en coordenadas de pantalla (dp).
@@ -146,14 +146,14 @@ private const val STATUS_BAR_H_DP = 26f
  * distancia que ocupa la barra de estado, simulando el efecto de
  * `showSystemUi = true` con `WindowInsets.statusBars`.
  */
-const val STATUS_BAR_CONTENT_OFFSET_DP = 43f
+const val STATUS_BAR_CONTENT_OFFSET_DP: Float = 43f
 
 /**
  * Fracción de la altura del canvas reservada para el bloque de texto (~24.5 %).
  * El teléfono ocupa el 75.5 % restante visible (~82 % de su altura total,
  * quedando el 18 % cortado fuera del borde opuesto al texto).
  */
-const val TEXT_AREA_FRACTION = 0.245f
+const val TEXT_AREA_FRACTION: Float = 0.245f
 
 // ── Posición del texto ────────────────────────────────────────────────────────
 

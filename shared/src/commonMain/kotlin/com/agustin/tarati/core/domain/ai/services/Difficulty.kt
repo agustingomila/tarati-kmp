@@ -1,5 +1,7 @@
 package com.agustin.tarati.core.domain.ai.services
 
+import kotlin.enums.EnumEntries
+
 enum class Difficulty(val depth: Int) {
     EASY(2),
     MEDIUM(3),
@@ -7,10 +9,10 @@ enum class Difficulty(val depth: Int) {
     CHAMPION(7);
 
     companion object {
-        val ALL = entries
-        val MIN = EASY
-        val DEFAULT = MEDIUM
-        val MAX = CHAMPION
+        val ALL: EnumEntries<Difficulty> = entries
+        val MIN: Difficulty = EASY
+        val DEFAULT: Difficulty = MEDIUM
+        val MAX: Difficulty = CHAMPION
 
         fun getByOrdinal(ordinal: Int): Difficulty = ALL.getOrElse(ordinal) { DEFAULT }
     }

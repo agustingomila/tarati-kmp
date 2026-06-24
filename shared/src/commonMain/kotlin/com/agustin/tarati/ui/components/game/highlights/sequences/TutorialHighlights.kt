@@ -124,7 +124,6 @@ fun createBridgeAnimations(duration: Long = 2200L): List<List<HighlightAnimation
             createElectricEdgeAnimation(
                 edge = Edge(edge),
                 duration = (duration * 1.2).toLong(),
-                startDelay = 0,
                 pulse = true,
             )
         },
@@ -143,7 +142,6 @@ fun createBridgeAnimations(duration: Long = 2200L): List<List<HighlightAnimation
                 createElectricEdgeAnimation(
                     edge = Edge(edge),
                     duration = (duration * 0.8).toLong(),
-                    startDelay = 0,
                     pulse = true,
                 )
             },
@@ -195,7 +193,6 @@ fun createCircumferenceAnimations(duration: Long = 2800L): List<List<HighlightAn
             createElectricEdgeAnimation(
                 edge = Edge(edge),
                 duration = (duration * 1.5).toLong(),
-                startDelay = 0,
                 pulse = true,
             )
         },
@@ -307,8 +304,8 @@ fun createMoveAnimations(duration: Long = 3000L): List<List<HighlightAnimation>>
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(C1 to B1), 2000L, baseDelay * 2, true),
-            createArrowAnimation(Edge(C1 to C12), 2000L, baseDelay * 2, true),
+            createArrowAnimation(Edge(C1 to B1), startDelay = baseDelay * 2, pulse = true),
+            createArrowAnimation(Edge(C1 to C12), startDelay = baseDelay * 2, pulse = true),
         ),
     )
 
@@ -324,8 +321,8 @@ fun createMoveAnimations(duration: Long = 3000L): List<List<HighlightAnimation>>
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(C2 to B1), 2000L, baseDelay * 5, true),
-            createArrowAnimation(Edge(C2 to C3), 2000L, baseDelay * 5, true),
+            createArrowAnimation(Edge(C2 to B1), startDelay = baseDelay * 5, pulse = true),
+            createArrowAnimation(Edge(C2 to C3), startDelay = baseDelay * 5, pulse = true),
         ),
     )
 
@@ -358,7 +355,7 @@ fun createCaptureAnimations(duration: Long = 2000L): List<List<HighlightAnimatio
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(C1 to B1), 2000L, baseDelay * 2, true),
+            createArrowAnimation(Edge(C1 to B1), startDelay = baseDelay * 2, pulse = true),
             createVertexAnimation(B1, duration / 2, baseDelay * 2, true),
         ),
     )
@@ -378,7 +375,7 @@ fun createUpgradeAnimations(duration: Long = 2500L): List<List<HighlightAnimatio
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(B4 to C7), 2000L, baseDelay * 2, true),
+            createArrowAnimation(Edge(B4 to C7), startDelay = baseDelay * 2, pulse = true),
             createVertexAnimation(C7, duration / 3, baseDelay * 2, true),
         ),
     )
@@ -387,7 +384,7 @@ fun createUpgradeAnimations(duration: Long = 2500L): List<List<HighlightAnimatio
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(B4 to C8), 2000L, baseDelay * 3, true),
+            createArrowAnimation(Edge(B4 to C8), startDelay = baseDelay * 3, pulse = true),
             createVertexAnimation(C8, duration / 3, baseDelay * 3, true),
         ),
     )
@@ -423,7 +420,7 @@ fun createPreAdjacencyAnimations(duration: Long = 3000L): List<List<HighlightAni
 
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(C3 to B2), 2000L, baseDelay * 1, true),
+            createArrowAnimation(Edge(C3 to B2), startDelay = baseDelay * 1, pulse = true),
             createVertexAnimation(B2, duration / 2, baseDelay * 2, true),
         ),
     )
@@ -467,14 +464,14 @@ fun createEndConditionsAnimations(duration: Long = 3000L): List<List<HighlightAn
     // All 8 starting vertices pulse together — "one side converts all → game over"
     sequences.add(
         listOf(
-            createVertexAnimation(D1, duration / 3, 0, true),
-            createVertexAnimation(D2, duration / 3, 0, true),
-            createVertexAnimation(C1, duration / 3, 0, true),
-            createVertexAnimation(C2, duration / 3, 0, true),
-            createVertexAnimation(D3, duration / 3, 0, true),
-            createVertexAnimation(D4, duration / 3, 0, true),
-            createVertexAnimation(C7, duration / 3, 0, true),
-            createVertexAnimation(C8, duration / 3, 0, true),
+            createVertexAnimation(D1, duration / 3, pulse = true),
+            createVertexAnimation(D2, duration / 3, pulse = true),
+            createVertexAnimation(C1, duration / 3, pulse = true),
+            createVertexAnimation(C2, duration / 3, pulse = true),
+            createVertexAnimation(D3, duration / 3, pulse = true),
+            createVertexAnimation(D4, duration / 3, pulse = true),
+            createVertexAnimation(C7, duration / 3, pulse = true),
+            createVertexAnimation(C8, duration / 3, pulse = true),
         ),
     )
 
@@ -553,8 +550,8 @@ fun createDomesticCaptureAnimations(duration: Long = 2000L): List<List<Highlight
     // Show both valid non-forward move edges simultaneously
     sequences.add(
         listOf(
-            createArrowAnimation(Edge(D2 to C2), 2000L, baseDelay * 2, true),
-            createArrowAnimation(Edge(D2 to D1), 2000L, baseDelay * 2, true),
+            createArrowAnimation(Edge(D2 to C2), startDelay = baseDelay * 2, pulse = true),
+            createArrowAnimation(Edge(D2 to D1), startDelay = baseDelay * 2, pulse = true),
         ),
     )
 

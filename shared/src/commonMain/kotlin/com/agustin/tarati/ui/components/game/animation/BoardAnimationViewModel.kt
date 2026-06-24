@@ -549,7 +549,7 @@ class BoardAnimationViewModel(
         onHighlightsChanged = ::updateCurrentHighlights,
     )
 
-    override fun stopHighlights() = highlightQueue.stopHighlights()
+    override fun stopHighlights(): Unit = highlightQueue.stopHighlights()
 
     override fun reset() {
         forceSync()
@@ -571,22 +571,22 @@ class BoardAnimationViewModel(
     override fun animateParallel(
         highlights: List<HighlightAnimation>,
         source: String,
-    ) = highlightQueue.animateParallel(highlights, source, _currentHighlights.value)
+    ): Unit = highlightQueue.animateParallel(highlights, source, _currentHighlights.value)
 
     override fun animateSerie(
         sequences: List<List<HighlightAnimation>>,
         source: String,
         mode: SequenceLoadMode,
-    ) = highlightQueue.animateSerie(sequences, source, mode)
+    ): Unit = highlightQueue.animateSerie(sequences, source, mode)
 
-    override fun clearQueue() = highlightQueue.clearQueue()
+    override fun clearQueue(): Unit = highlightQueue.clearQueue()
 
     override fun loadTutorialStep(
         sequences: List<List<HighlightAnimation>>,
         source: String,
-    ) = highlightQueue.loadTutorialStep(sequences, source)
+    ): Unit = highlightQueue.loadTutorialStep(sequences, source)
 
-    override fun animateGameOver(matchState: MatchState) = highlightQueue.animateGameOver(matchState)
+    override fun animateGameOver(matchState: MatchState): Unit = highlightQueue.animateGameOver(matchState)
 
     // ── Logging ───────────────────────────────────────────────────────────────
     private fun nowIso(): String = Clock.System.now().toString()

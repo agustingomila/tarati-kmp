@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.services.achievements.IAchievementsRepository
+import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.IBillingManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.PaletteProducts
@@ -33,11 +34,20 @@ class AndroidSettingsViewModel(
     repository: SettingsRepository,
     achievementsRepository: IAchievementsRepository,
     private val billingManager: IBillingManager,
-) : SettingsViewModel(repository) {
+    entitlementsRepository: EntitlementsRepository,
+) : SettingsViewModel(repository, entitlementsRepository) {
 
     // ── Billing ───────────────────────────────────────────────────────────────
 
-    override val purchasedProductIds: StateFlow<Set<String>> = billingManager.purchasedProductIds
+    // Compras locales de Google Play (billing) ∪ entitlements del servidor (cross-platform).
+    override val purchasedProductIds: StateFlow<Set<String>> = combine(
+        billingManager.purchasedProductIds,
+        entitlementsRepository.entitlements,
+    ) { local, server -> local + server }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptySet(),
+    )
 
     // Derivado del billing: true si Gilded está entre los productos comprados.
     private val gildedPurchasedFlow = billingManager.purchasedProductIds

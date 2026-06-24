@@ -28,8 +28,8 @@ class GameIntegrationTest {
         var state =
             GameState(
                 mapOf(
-                    C1 to Cob(CobColor.WHITE, false),
-                    C7 to Cob(CobColor.BLACK, false),
+                    C1 to Cob(CobColor.WHITE),
+                    C7 to Cob(CobColor.BLACK),
                 ),
                 currentTurn = CobColor.WHITE,
             )
@@ -39,7 +39,7 @@ class GameIntegrationTest {
         assertNotNull("White should have a valid move", whiteMove.move)
 
         // Apply white move
-        state = state.applyMove(whiteMove.move!!)
+        state = state.applyMove(whiteMove.move ?: return)
         state = state.copy(currentTurn = CobColor.BLACK)
 
         // Black makes a move
@@ -47,7 +47,7 @@ class GameIntegrationTest {
         assertNotNull("Black should have a valid move", blackMove.move)
 
         // Apply black move
-        state = state.applyMove(blackMove.move!!)
+        state = state.applyMove(blackMove.move ?: return)
         state = state.copy(currentTurn = CobColor.WHITE)
 
         // Game should not be over yet
@@ -62,10 +62,10 @@ class GameIntegrationTest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(CobColor.WHITE, false),
-                    C2 to Cob(CobColor.WHITE, false),
-                    C7 to Cob(CobColor.BLACK, false),
-                    C8 to Cob(CobColor.BLACK, false),
+                    C1 to Cob(CobColor.WHITE),
+                    C2 to Cob(CobColor.WHITE),
+                    C7 to Cob(CobColor.BLACK),
+                    C8 to Cob(CobColor.BLACK),
                 ),
                 currentTurn = CobColor.WHITE,
             )
@@ -81,7 +81,7 @@ class GameIntegrationTest {
             assertNotNull("AI should return a move at depth $depth", result.move)
             assertTrue(
                 "Move should be valid",
-                isValidMove(state, result.move!!),
+                isValidMove(state, result.move ?: return@forEach),
             )
 
             println("Depth $depth took ${endTime - startTime}ms")

@@ -22,6 +22,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -77,7 +78,7 @@ class GameEventsDialogRequestTest {
     // ── showNewGameDialog ─────────────────────────────────────────────────────
 
     @Test
-    fun `showNewGameDialog emits NewGame request with correct color`() = runTest {
+    fun `showNewGameDialog emits NewGame request with correct color`(): TestResult = runTest {
         val collected = mutableListOf<DialogRequest>()
         val job = launch(UnconfinedTestDispatcher()) {
             events.dialogRequest.collect { collected.add(it) }
@@ -91,7 +92,7 @@ class GameEventsDialogRequestTest {
     }
 
     @Test
-    fun `showNewGameDialog emits for each call`() = runTest {
+    fun `showNewGameDialog emits for each call`(): TestResult = runTest {
         val collected = mutableListOf<DialogRequest>()
         val job = launch(UnconfinedTestDispatcher()) {
             events.dialogRequest.collect { collected.add(it) }
@@ -109,7 +110,7 @@ class GameEventsDialogRequestTest {
     // ── showAboutDialog ───────────────────────────────────────────────────────
 
     @Test
-    fun `showAboutDialog emits About request`() = runTest {
+    fun `showAboutDialog emits About request`(): TestResult = runTest {
         val collected = mutableListOf<DialogRequest>()
         val job = launch(UnconfinedTestDispatcher()) {
             events.dialogRequest.collect { collected.add(it) }
@@ -125,7 +126,7 @@ class GameEventsDialogRequestTest {
     // ── gameOver ──────────────────────────────────────────────────────────────
 
     @Test
-    fun `gameOver emits nothing before 2500ms delay`() = runTest(StandardTestDispatcher()) {
+    fun `gameOver emits nothing before 2500ms delay`(): TestResult = runTest(StandardTestDispatcher()) {
         val collected = mutableListOf<DialogRequest>()
         val collectJob = launch { events.dialogRequest.collect { collected.add(it) } }
 
@@ -139,7 +140,7 @@ class GameEventsDialogRequestTest {
     }
 
     @Test
-    fun `gameOver emits GameOver request after 2500ms delay`() = runTest(StandardTestDispatcher()) {
+    fun `gameOver emits GameOver request after 2500ms delay`(): TestResult = runTest(StandardTestDispatcher()) {
         val collected = mutableListOf<DialogRequest>()
         val collectJob = launch { events.dialogRequest.collect { collected.add(it) } }
 
@@ -155,7 +156,7 @@ class GameEventsDialogRequestTest {
     // ── mixed sequence ────────────────────────────────────────────────────────
 
     @Test
-    fun `different request types are emitted in order`() = runTest {
+    fun `different request types are emitted in order`(): TestResult = runTest {
         val collected = mutableListOf<DialogRequest>()
         val job = launch(UnconfinedTestDispatcher()) {
             events.dialogRequest.collect { collected.add(it) }

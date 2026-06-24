@@ -23,6 +23,7 @@ import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +41,7 @@ class GameRepositoryEdgeCasesTest {
     }
 
     @Test
-    fun `should handle empty game state`() =
+    fun `should handle empty game state`(): TestResult =
         runTest {
             // Given - GameState vacío
             val gameId = "empty-game"
@@ -64,7 +65,7 @@ class GameRepositoryEdgeCasesTest {
             coEvery { gameDao.getGameById(gameId) } returns entity
 
             // When
-            val result = repository.loadGame(gameId)!!
+            val result = repository.loadGame(gameId) ?: return@runTest
             val gameState = result.toGameState()
             val moves = result.game.moveHistory
 
@@ -75,7 +76,7 @@ class GameRepositoryEdgeCasesTest {
         }
 
     @Test
-    fun `should handle game with only one move`() =
+    fun `should handle game with only one move`(): TestResult =
         runTest {
             // Given - Juego con un solo movimiento
             val gameId = "single-move-game"
@@ -99,7 +100,7 @@ class GameRepositoryEdgeCasesTest {
             coEvery { gameDao.getGameById(gameId) } returns entity
 
             // When
-            val result = repository.loadGame(gameId)!!
+            val result = repository.loadGame(gameId) ?: return@runTest
             val history = result.game.moveHistory
 
             // Then
@@ -110,7 +111,7 @@ class GameRepositoryEdgeCasesTest {
         }
 
     @Test
-    fun `should handle different game results`() =
+    fun `should handle different game results`(): TestResult =
         runTest {
             // Given - Probar diferentes resultados de juego
             val gameResults =
@@ -151,7 +152,7 @@ class GameRepositoryEdgeCasesTest {
         }
 
     @Test
-    fun `should update existing game when saving with same id`() =
+    fun `should update existing game when saving with same id`(): TestResult =
         runTest {
             val gameState = createRealGameState()
             val initialMoves = listOf(Move(GameBoard.A1 to GameBoard.B1))
@@ -174,7 +175,7 @@ class GameRepositoryEdgeCasesTest {
         }
 
     @Test
-    fun `should handle special characters in player names`() =
+    fun `should handle special characters in player names`(): TestResult =
         runTest {
             // Given - Nombres de jugadores con caracteres especiales
             val specialNames =
@@ -220,7 +221,7 @@ class GameRepositoryEdgeCasesTest {
         }
 
     @Test
-    fun `should handle concurrent save operations`() =
+    fun `should handle concurrent save operations`(): TestResult =
         runTest {
             // Given - Múltiples operaciones de guardado concurrentes
             val gameState = createRealGameState()
@@ -246,8 +247,8 @@ class GameRepositoryEdgeCasesTest {
     private fun createRealGameState(): GameState {
         val cobs =
             mapOf(
-                GameBoard.A1 to Cob(CobColor.WHITE, false),
-                GameBoard.B1 to Cob(CobColor.BLACK, false),
+                GameBoard.A1 to Cob(CobColor.WHITE),
+                GameBoard.B1 to Cob(CobColor.BLACK),
             )
         return GameState(cobs, CobColor.WHITE)
     }

@@ -98,7 +98,6 @@ fun SidebarPreview_ExpandedDropdown() {
         var uiState by remember {
             mutableStateOf(
                 SidebarUIState(
-                    isDifficultyExpandedWhite = false,
                     isDifficultyExpandedBlack = true
                 )
             )

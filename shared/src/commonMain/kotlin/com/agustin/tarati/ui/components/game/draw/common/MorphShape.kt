@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
@@ -52,10 +53,10 @@ class MorphShape(
         else buildPath(cx, cy, rx, ry)
     }
 
-    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density) =
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline =
         GenericShape { s, _ -> addPath(createPath(s)) }.createOutline(size, layoutDirection, density)
 
-    fun computeVertices(cx: Float, cy: Float, rx: Float, ry: Float): Array<Offset> {
+    private fun computeVertices(cx: Float, cy: Float, rx: Float, ry: Float): Array<Offset> {
         val rotRad = rotationDeg * PI / 180.0
         return Array(sides) { i ->
             val a = rotRad + i * 2.0 * PI / sides

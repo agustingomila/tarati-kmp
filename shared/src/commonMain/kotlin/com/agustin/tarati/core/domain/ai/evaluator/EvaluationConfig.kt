@@ -31,58 +31,57 @@ data class EvaluationConfig(
     val behavior: BehaviorConfig = BehaviorConfig(),
 ) {
     // ── MaterialWeights accessors ────────────────────────────────────────────
-    val cobScore get() = material.cobScore
-    val rocScore get() = material.rocScore
-    val flipCobBonus get() = material.flipCobBonus
-    val flipRocBonus get() = material.flipRocBonus
-    val cobFlipMultiplier get() = material.cobFlipMultiplier
-    val rocFlipMultiplier get() = material.rocFlipMultiplier
+    val cobScore: Double get() = material.cobScore
+    val rocScore: Double get() = material.rocScore
+    val flipCobBonus: Double get() = material.flipCobBonus
+    val flipRocBonus: Double get() = material.flipRocBonus
+    val cobFlipMultiplier: Double get() = material.cobFlipMultiplier
+    val rocFlipMultiplier: Double get() = material.rocFlipMultiplier
 
     // ── PositionalWeights accessors ──────────────────────────────────────────
-    val controlCenterScore get() = positional.controlCenterScore
-    val controlCenterMultiplier get() = positional.controlCenterMultiplier
-    val mobilityScore get() = positional.mobilityScore
-    val mobilityImprovementMultiplier get() = positional.mobilityImprovementMultiplier
-    val domesticControlScore get() = positional.domesticControlScore
-    val opponentDomesticPressureScore get() = positional.opponentDomesticPressureScore
-    val upgradeScore get() = positional.upgradeScore
-    val upgradeBonusMultiplier get() = positional.upgradeBonusMultiplier
-    val forcedPromotionScore get() = positional.forcedPromotionScore
-    val isolationPenalty get() = positional.isolationPenalty
+    val controlCenterScore: Double get() = positional.controlCenterScore
+    val controlCenterMultiplier: Double get() = positional.controlCenterMultiplier
+    val mobilityScore: Double get() = positional.mobilityScore
+    val mobilityImprovementMultiplier: Double get() = positional.mobilityImprovementMultiplier
+    val domesticControlScore: Double get() = positional.domesticControlScore
+    val opponentDomesticPressureScore: Double get() = positional.opponentDomesticPressureScore
+    val upgradeScore: Double get() = positional.upgradeScore
+    val upgradeBonusMultiplier: Double get() = positional.upgradeBonusMultiplier
+    val forcedPromotionScore: Double get() = positional.forcedPromotionScore
+    val isolationPenalty: Double get() = positional.isolationPenalty
 
     // ── SearchWeights accessors ──────────────────────────────────────────────
-    val killerMoveBaseBonus get() = search.killerMoveBaseBonus
-    val historyHeuristicMultiplier get() = search.historyHeuristicMultiplier
-    val lateMoveReductionPenalty get() = search.lateMoveReductionPenalty
-    val lateMoveReductionDepth get() = search.lateMoveReductionDepth
-    val lmrBranchingThreshold get() = search.lmrBranchingThreshold
-    val lmrDepthReduction get() = search.lmrDepthReduction
-    val lmrMoveIndexThreshold get() = search.lmrMoveIndexThreshold
+    val killerMoveBaseBonus: Double get() = search.killerMoveBaseBonus
+    val historyHeuristicMultiplier: Double get() = search.historyHeuristicMultiplier
+    val lateMoveReductionPenalty: Double get() = search.lateMoveReductionPenalty
+    val lateMoveReductionDepth: Int get() = search.lateMoveReductionDepth
+    val lmrBranchingThreshold: Int get() = search.lmrBranchingThreshold
+    val lmrDepthReduction: Int get() = search.lmrDepthReduction
+    val lmrMoveIndexThreshold: Int get() = search.lmrMoveIndexThreshold
 
     // ── TacticalWeights accessors ────────────────────────────────────────────
-    val quickThreatWeight get() = tactical.quickThreatWeight
-    val quickAttackWeight get() = tactical.quickAttackWeight
+    val quickThreatWeight: Double get() = tactical.quickThreatWeight
+    val quickAttackWeight: Double get() = tactical.quickAttackWeight
 
     // ── BehaviorConfig accessors ─────────────────────────────────────────────
-    val winningScore get() = behavior.winningScore
-    val winningThreshold get() = behavior.winningThreshold
-    val winningPositionThreshold get() = behavior.winningPositionThreshold
-    val repetitionPenaltyMultiplier get() = behavior.repetitionPenaltyMultiplier
-    val immediateWinBonusMultiplier get() = behavior.immediateWinBonusMultiplier
-    val stallingPenalty get() = behavior.stallingPenalty
-    val stallingThreshold get() = behavior.stallingThreshold
-    val randomMoveChance get() = behavior.randomMoveChance
-    val evalNoise get() = behavior.evalNoise
+    val winningScore: Double get() = behavior.winningScore
+    val winningThreshold: Double get() = behavior.winningThreshold
+    val winningPositionThreshold: Double get() = behavior.winningPositionThreshold
+    val repetitionPenaltyMultiplier: Double get() = behavior.repetitionPenaltyMultiplier
+    val immediateWinBonusMultiplier: Double get() = behavior.immediateWinBonusMultiplier
+    val stallingPenalty: Double get() = behavior.stallingPenalty
+    val stallingThreshold: Int get() = behavior.stallingThreshold
+    val randomMoveChance: Double get() = behavior.randomMoveChance
+    val evalNoise: Double get() = behavior.evalNoise
 
     companion object {
-        val DEFAULT = EvaluationConfig()
+        val DEFAULT: EvaluationConfig = EvaluationConfig()
 
         // EASY: entiende solo conteo de piezas. Ignora flips, centro, movilidad y
         // territorio. Pierde porque no comprende el tablero, no por azar.
-        val EASY = EvaluationConfig(
+        val EASY: EvaluationConfig = EvaluationConfig(
             difficulty = Difficulty.EASY,
             material = MaterialWeights(
-                cobScore = 100.0,
                 rocScore = 150.0,
                 flipCobBonus = 0.0,
                 flipRocBonus = 0.0,
@@ -103,7 +102,7 @@ data class EvaluationConfig(
 
         // MEDIUM: comprende material completo y el valor de los flips.
         // No valora territorio ni amenazas posicionales avanzadas.
-        val MEDIUM = EvaluationConfig(
+        val MEDIUM: EvaluationConfig = EvaluationConfig(
             difficulty = Difficulty.MEDIUM,
             material = MaterialWeights(
                 cobScore = 190.0,
@@ -122,7 +121,7 @@ data class EvaluationConfig(
 
         // HARD: comprende material, flips, centro y presión territorial.
         // No explota piezas aisladas ni oportunidades de promoción forzada.
-        val HARD = EvaluationConfig(
+        val HARD: EvaluationConfig = EvaluationConfig(
             difficulty = Difficulty.HARD,
             material = MaterialWeights(
                 cobScore = 206.0,
@@ -142,7 +141,7 @@ data class EvaluationConfig(
         // CHAMPION: hereda la base calibrada de HARD y la extiende con conocimiento
         // táctico más profundo. Los pesos posicionales se escalan moderadamente sobre
         // HARD en lugar de introducir valores desconectados que distorsionen la búsqueda.
-        val CHAMPION = EvaluationConfig(
+        val CHAMPION: EvaluationConfig = EvaluationConfig(
             difficulty = Difficulty.CHAMPION,
             material = MaterialWeights(
                 cobScore = 216.0,

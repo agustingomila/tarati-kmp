@@ -112,8 +112,6 @@ fun DrawScope.drawArrowEdgeHighlightFromVertex(
         strokeWidth = strokeWidth,
         arrowSize = arrowSize,
         arrowWidth = arrowWidth,
-        arrowAtStart = false,
-        arrowAtEnd = true,
         arrowStyle = ArrowTipStyle.ARROW,
         alpha = pulseAlpha,
     )

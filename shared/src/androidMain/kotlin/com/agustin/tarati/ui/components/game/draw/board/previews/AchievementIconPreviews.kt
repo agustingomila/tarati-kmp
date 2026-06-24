@@ -201,7 +201,6 @@ private fun DrawScope.iconAnimatedCob(
             cob = cob,
             currentPos = vertex,
             targetPos = vertex,
-            animationProgress = 1f,
             upgradeProgress = upgradeProgress,
         ),
         hourOfDay = 20f,
@@ -227,19 +226,19 @@ private fun DrawScope.iconCenterRok(targets: List<Vertex>, colors: BoardColors) 
 
 private fun DrawScope.iconRegion(region: Region, colors: BoardColors) =
     drawRegionHighlight(
-        RegionHighlight(region = region, duration = 500L, pulse = false),
+        RegionHighlight(region = region, pulse = false),
         canvasSize = size, orientation = ORIENTATION, colors = colors,
     )
 
 private fun DrawScope.iconVertex(vertex: Vertex, action: HighlightAction, colors: BoardColors) =
     drawVertexHighlight(
-        VertexHighlight(vertex = vertex, action = action, pulse = false),
+        VertexHighlight(vertex = vertex, action = action),
         canvasSize = size, orientation = ORIENTATION, colors = colors,
     )
 
 private fun DrawScope.iconEdge(edge: Edge, colors: BoardColors) =
     drawFireballEdgeHighlightFromVertex(
-        EdgeHighlight(edge = edge, pulse = false),
+        EdgeHighlight(edge = edge),
         canvasSize = size, orientation = ORIENTATION, colors = colors,
     )
 
@@ -251,8 +250,8 @@ private fun DrawScope.iconEdge(edge: Edge, colors: BoardColors) =
 @Composable
 fun IconWelcomeToTarati() {
     AchievementIcon(palette = ClassicPalette) { colors, _ ->
-        iconCobs(listOf(C1, C2, D1, D2), Cob(WHITE, false), colors)
-        iconCobs(listOf(C7, C8, D3, D4), Cob(BLACK, false), colors)
+        iconCobs(listOf(C1, C2, D1, D2), Cob(WHITE), colors)
+        iconCobs(listOf(C7, C8, D3, D4), Cob(BLACK), colors)
         iconVertex(A1, HighlightAction.MOVE, colors)
     }
 }
@@ -266,18 +265,18 @@ fun IconWelcomeToTarati() {
 fun IconFirstCapture() {
     AchievementIcon(palette = ClassicPalette) { colors, _ ->
         // Black cob about to be captured
-        iconCob(B4, Cob(BLACK, false), colors, scale = 1.2f)
+        iconCob(B4, Cob(BLACK), colors, scale = 1.2f)
         drawVertexHighlight(
-            highlight = VertexHighlight(vertex = B4, action = HighlightAction.CAPTURE, pulse = false),
+            highlight = VertexHighlight(vertex = B4, action = HighlightAction.CAPTURE),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
         // FireballEdge showing capture path
         drawFireballEdgeHighlightFromVertex(
-            highlight = EdgeHighlight(edge = Edge(B1 to A1), pulse = false),
+            highlight = EdgeHighlight(edge = Edge(B1 to A1)),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
         // White cob making the capture
-        iconCob(B1, Cob(WHITE, false), colors, scale = 1.3f)
+        iconCob(B1, Cob(WHITE), colors, scale = 1.3f)
     }
 }
 
@@ -289,9 +288,9 @@ fun IconFirstCapture() {
 @Composable
 fun IconFirstPromotion() {
     AchievementIcon(palette = ClassicPalette) { colors, _ ->
-        iconCobs(listOf(C3, B2, B6, C12), Cob(WHITE, false), colors)
-        iconCobs(listOf(C4, A1, C11), Cob(BLACK, false), colors)
-        iconAnimatedCob(C7, Cob(WHITE, false), upgradeProgress = 0.6f, colors = colors, scale = 1.4f)
+        iconCobs(listOf(C3, B2, B6, C12), Cob(WHITE), colors)
+        iconCobs(listOf(C4, A1, C11), Cob(BLACK), colors)
+        iconAnimatedCob(C7, Cob(WHITE), upgradeProgress = 0.6f, colors = colors, scale = 1.4f)
         iconVertex(C7, HighlightAction.UPGRADE, colors)
     }
 }
@@ -307,7 +306,7 @@ fun IconFirstVictory() {
         // Dominant white rok at the absolute center
         iconCob(A1, Cob(WHITE, true), colors, scale = 1.6f)
         drawVertexHighlight(
-            highlight = VertexHighlight(vertex = A1, action = HighlightAction.MOVE, pulse = false),
+            highlight = VertexHighlight(vertex = A1, action = HighlightAction.MOVE),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
     }
@@ -323,14 +322,14 @@ fun IconPlay10Games() {
     AchievementIcon(palette = ClassicPalette) { colors, _ ->
         iconCobPairs(
             listOf(
-                B2 to Cob(WHITE, false),
+                B2 to Cob(WHITE),
                 B3 to Cob(WHITE, true),
-                B5 to Cob(BLACK, false),
+                B5 to Cob(BLACK),
                 B6 to Cob(BLACK, true),
                 C9 to Cob(BLACK, true),
-                C10 to Cob(BLACK, false),
+                C10 to Cob(BLACK),
                 C11 to Cob(BLACK, true),
-                C12 to Cob(BLACK, false),
+                C12 to Cob(BLACK),
             ), colors
         )
     }
@@ -398,8 +397,8 @@ fun IconChampion() {
 @Composable
 fun IconMit() {
     AchievementIcon(palette = NaturePalette) { colors, _ ->
-        iconCobs(listOf(C4, C10, C3, C5, C11, C12), Cob(WHITE, false), colors)
-        iconCob(B4, Cob(BLACK, false), colors, scale = 1.1f)
+        iconCobs(listOf(C4, C10, C3, C5, C11, C12), Cob(WHITE), colors)
+        iconCob(B4, Cob(BLACK), colors, scale = 1.1f)
         iconVertex(B4, HighlightAction.CAPTURE, colors)
         iconEdge(Edge(B1 to A1), colors)
         iconCob(B1, Cob(WHITE, true), colors, scale = 1.3f)
@@ -415,8 +414,8 @@ fun IconMit() {
 fun IconStalemit() {
     AchievementIcon(palette = DarkPalette) { colors, _ ->
         listOf(2, 3).forEach { iconRegion(centralRegions[it], colors) }
-        iconCobs(listOf(B3, B5), Cob(BLACK, false), colors)
-        iconCobs(listOf(C4, B2, B6, C11), Cob(WHITE, false), colors, scale = 1.1f)
+        iconCobs(listOf(B3, B5), Cob(BLACK), colors)
+        iconCobs(listOf(C4, B2, B6, C11), Cob(WHITE), colors, scale = 1.1f)
         iconCobs(listOf(B1, A1), Cob(WHITE, true), colors, scale = 1.1f)
     }
 }
@@ -432,9 +431,9 @@ fun IconEternalLoop() {
         bridgeEdges.forEach { iconEdge(it, colors) }
         iconCobPairs(
             listOf(
-                B1 to Cob(WHITE, false),
-                B3 to Cob(BLACK, false),
-                B5 to Cob(WHITE, false),
+                B1 to Cob(WHITE),
+                B3 to Cob(BLACK),
+                B5 to Cob(WHITE),
             ), colors
         )
         iconCob(A1, Cob(BLACK, true), colors, scale = 1.4f)
@@ -468,31 +467,31 @@ fun IconDeadButDangerous() {
     AchievementIcon(palette = DarkPalette) { colors, _ ->
         // Black home base region highlighted
         drawRegionHighlight(
-            highlight = RegionHighlight(region = domesticRegions[1], duration = 500L, pulse = false),
+            highlight = RegionHighlight(region = domesticRegions[1], pulse = false),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
         // Last black piece about to be captured
-        iconCob(D4, Cob(BLACK, false), colors, scale = 1.1f)
+        iconCob(D4, Cob(BLACK), colors, scale = 1.1f)
         // White cob promoting from dead vertex D3
-        iconAnimatedCob(vertex = D3, cob = Cob(WHITE, false), upgradeProgress = 0.75f, colors = colors, scale = 1.5f)
+        iconAnimatedCob(vertex = D3, cob = Cob(WHITE), upgradeProgress = 0.75f, colors = colors, scale = 1.5f)
         // Upgrade highlight on dead vertex
         drawVertexHighlight(
-            highlight = VertexHighlight(vertex = D3, action = HighlightAction.UPGRADE, pulse = false),
+            highlight = VertexHighlight(vertex = D3, action = HighlightAction.UPGRADE),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
 
         // White home base region highlighted
         drawRegionHighlight(
-            highlight = RegionHighlight(region = domesticRegions[0], duration = 500L, pulse = false),
+            highlight = RegionHighlight(region = domesticRegions[0], pulse = false),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
         // Last white piece about to be captured
-        iconCob(D2, Cob(WHITE, false), colors, scale = 1.1f)
+        iconCob(D2, Cob(WHITE), colors, scale = 1.1f)
         // Black cob promoting from dead vertex D1
-        iconAnimatedCob(vertex = D1, cob = Cob(BLACK, false), upgradeProgress = 0.75f, colors = colors, scale = 1.5f)
+        iconAnimatedCob(vertex = D1, cob = Cob(BLACK), upgradeProgress = 0.75f, colors = colors, scale = 1.5f)
         // Upgrade highlight on dead vertex
         drawVertexHighlight(
-            highlight = VertexHighlight(vertex = D1, action = HighlightAction.UPGRADE, pulse = false),
+            highlight = VertexHighlight(vertex = D1, action = HighlightAction.UPGRADE),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
     }
@@ -511,8 +510,8 @@ fun IconGrandmaster() {
         iconAnimatedCob(A1, Cob(WHITE, true), upgradeProgress = 1f, colors = colors, scale = 1.6f)
         listOf(B1, B2, B3).forEach { iconCob(it, Cob(WHITE, true), colors) }
         listOf(B4, B5, B6).forEach { iconCob(it, Cob(BLACK, true), colors) }
-        listOf(D1, D2).forEach { iconCob(it, Cob(WHITE, false), colors) }
-        listOf(D3, D4).forEach { iconCob(it, Cob(BLACK, false), colors) }
+        listOf(D1, D2).forEach { iconCob(it, Cob(WHITE), colors) }
+        listOf(D3, D4).forEach { iconCob(it, Cob(BLACK), colors) }
     }
 }
 
@@ -526,9 +525,9 @@ fun IconHalloweenTheme() {
     AchievementIcon(palette = HalloweenPalette) { colors, _ ->
         bridgeVertices.forEach { iconVertex(it, HighlightAction.CAPTURE, colors) }
         iconCob(C2, Cob(WHITE, true), colors)
-        iconCob(C5, Cob(WHITE, false), colors)
+        iconCob(C5, Cob(WHITE), colors)
         iconCob(C8, Cob(WHITE, true), colors)
-        iconCob(C11, Cob(WHITE, false), colors)
+        iconCob(C11, Cob(WHITE), colors)
         iconAnimatedCob(A1, Cob(BLACK, true), upgradeProgress = 1f, colors = colors, scale = 2f)
     }
 }
@@ -542,16 +541,16 @@ fun IconHalloweenTheme() {
 fun IconChristmasTheme() {
     AchievementIcon(palette = ChristmasPalette) { colors, _ ->
         // Black cobs and roks forming a star
-        iconCob(C1, Cob(BLACK, false), colors)
+        iconCob(C1, Cob(BLACK), colors)
         iconCob(C3, Cob(BLACK, true), colors)
-        iconCob(C5, Cob(BLACK, false), colors)
+        iconCob(C5, Cob(BLACK), colors)
         iconCob(C7, Cob(BLACK, true), colors)
-        iconCob(C9, Cob(BLACK, false), colors)
+        iconCob(C9, Cob(BLACK), colors)
         iconCob(C11, Cob(BLACK, true), colors)
         // Middle branches — white roks on bridge ring
         GameBoard.centerVertices.forEach { v ->
             drawVertexHighlight(
-                highlight = VertexHighlight(vertex = v, action = HighlightAction.UPGRADE, pulse = false),
+                highlight = VertexHighlight(vertex = v, action = HighlightAction.UPGRADE),
                 canvasSize = size, orientation = ORIENTATION, colors = colors,
             )
             iconCob(v, Cob(WHITE, true), colors)
@@ -559,7 +558,7 @@ fun IconChristmasTheme() {
         // Star at the top — fully upgraded white rok at absolute center
         iconAnimatedCob(vertex = A1, cob = Cob(WHITE, true), upgradeProgress = 1f, colors = colors, scale = 2f)
         drawVertexHighlight(
-            highlight = VertexHighlight(vertex = A1, action = HighlightAction.UPGRADE, pulse = false),
+            highlight = VertexHighlight(vertex = A1, action = HighlightAction.UPGRADE),
             canvasSize = size, orientation = ORIENTATION, colors = colors,
         )
     }
@@ -575,12 +574,12 @@ fun IconApprentice() {
     AchievementIcon(palette = ClassicPalette) { colors, _ ->
         listOf(0, 2, 4).forEach {
             drawRegionHighlight(
-                highlight = RegionHighlight(region = centralRegions[it], duration = 500L, pulse = false),
+                highlight = RegionHighlight(region = centralRegions[it], pulse = false),
                 canvasSize = size, orientation = ORIENTATION, colors = colors,
             )
         }
-        iconCob(C1, Cob(WHITE, false), colors)
-        iconCob(C7, Cob(BLACK, false), colors)
+        iconCob(C1, Cob(WHITE), colors)
+        iconCob(C7, Cob(BLACK), colors)
         iconCenterRok(listOf(C1, C7), colors)
     }
 }
@@ -595,12 +594,12 @@ fun IconStrategist() {
     AchievementIcon(palette = NaturePalette) { colors, _ ->
         listOf(0, 4, 8).forEach {
             drawRegionHighlight(
-                highlight = RegionHighlight(region = circumferenceRegions[it], duration = 500L, pulse = false),
+                highlight = RegionHighlight(region = circumferenceRegions[it], pulse = false),
                 canvasSize = size, orientation = ORIENTATION, colors = colors,
             )
         }
-        listOf(B1, B3, B5).forEach { iconCob(it, Cob(WHITE, false), colors) }
-        listOf(B2, B4, B6).forEach { iconCob(it, Cob(BLACK, false), colors) }
+        listOf(B1, B3, B5).forEach { iconCob(it, Cob(WHITE), colors) }
+        listOf(B2, B4, B6).forEach { iconCob(it, Cob(BLACK), colors) }
         iconCenterRok(listOf(B1, B3, B5), colors)
     }
 }
@@ -615,12 +614,12 @@ fun IconTactician() {
     AchievementIcon(palette = DarkPalette) { colors, _ ->
         listOf(2, 6, 10).forEach {
             drawRegionHighlight(
-                highlight = RegionHighlight(region = circumferenceRegions[it], duration = 500L, pulse = false),
+                highlight = RegionHighlight(region = circumferenceRegions[it], pulse = false),
                 canvasSize = size, orientation = ORIENTATION, colors = colors,
             )
         }
-        listOf(C1, C2, C5, C6, C9, C10).forEach { iconCob(it, Cob(WHITE, false), colors) }
-        listOf(B2, B4, B6).forEach { iconCob(it, Cob(BLACK, false), colors) }
+        listOf(C1, C2, C5, C6, C9, C10).forEach { iconCob(it, Cob(WHITE), colors) }
+        listOf(B2, B4, B6).forEach { iconCob(it, Cob(BLACK), colors) }
         iconCenterRok(listOf(C1, C2, C5, C6, C9, C10), colors)
     }
 }
@@ -643,17 +642,17 @@ fun IconFirstLight() {
         // Piezas negras en los bridge restantes con highlight de captura — oscuridad retrocediendo
         listOf(B2, B4, B6).forEach { v ->
             iconVertex(v, HighlightAction.CAPTURE, colors)
-            iconCob(v, Cob(BLACK, false), colors, scale = 0.9f)
+            iconCob(v, Cob(BLACK), colors, scale = 0.9f)
         }
 
         // Piezas negras en D3/D4 — últimas en pie, siendo capturadas
         listOf(D3, D4).forEach { v ->
             iconVertex(v, HighlightAction.CAPTURE, colors)
-            iconCob(v, Cob(BLACK, false), colors)
+            iconCob(v, Cob(BLACK), colors)
         }
 
         // Roks blancos seguros en la base blanca
-        listOf(D1, D2).forEach { iconCob(it, Cob(WHITE, false), colors) }
+        listOf(D1, D2).forEach { iconCob(it, Cob(WHITE), colors) }
 
         // Rok blanco animado en el centro absoluto — la primera luz, plenamente expandida
         iconAnimatedCob(
@@ -693,14 +692,14 @@ fun IconDarkSide() {
         // Roks negros dominando la base negra
         listOf(D3, C8).forEach { v ->
             iconVertex(v, HighlightAction.CAPTURE, colors)
-            iconCob(v, Cob(BLACK, false), colors, scale = 0.9f)
+            iconCob(v, Cob(BLACK), colors, scale = 0.9f)
         }
         iconCob(D4, Cob(BLACK, true), colors)
 
         // Roks blancos dominando la base blanca
         listOf(C2, D1).forEach { v ->
             iconVertex(v, HighlightAction.CAPTURE, colors)
-            iconCob(v, Cob(WHITE, false), colors)
+            iconCob(v, Cob(WHITE), colors)
         }
         iconCob(D2, Cob(WHITE, true), colors)
 

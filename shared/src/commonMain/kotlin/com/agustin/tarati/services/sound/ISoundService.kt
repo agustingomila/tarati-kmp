@@ -1,5 +1,6 @@
 package com.agustin.tarati.services.sound
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
@@ -21,6 +22,6 @@ interface ISoundService {
     fun setVolume(volume: Float)
 }
 
-val LocalSoundService = staticCompositionLocalOf<ISoundService> {
+val LocalSoundService: ProvidableCompositionLocal<ISoundService> = staticCompositionLocalOf<ISoundService> {
     error("No ISoundService provided")
 }

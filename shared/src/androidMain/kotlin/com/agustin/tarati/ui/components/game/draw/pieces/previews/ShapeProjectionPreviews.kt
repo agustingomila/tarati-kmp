@@ -144,7 +144,7 @@ private val horizontalSubjects = listOf(
         Color(0xFF4ECBE6) to Color(0xFFE6A44E),
     ),
     Triple(
-        MorphShape(sides = 4, cornerRadius = 18f, rotationDeg = 0f),
+        MorphShape(sides = 4, cornerRadius = 18f),
         "Diamante  N=4 r=18  (Caso 2: apoyado en vértice)",
         Color(0xFF4EE68C) to Color(0xFFB84EE6),
     ),
@@ -211,7 +211,7 @@ private fun ProjectionSquareCasesPreview() {
     // Caso 2: rotationDeg=0° → apoyado en vértice (B arriba, D abajo)
     // En 90° solo B-D quedan superpuestos → línea horizontal más fina
     val case2 = MorphShapeProjection.horizontalProj(
-        MorphShape(sides = 4, cornerRadius = 14f, rotationDeg = 0f),
+        MorphShape(sides = 4, cornerRadius = 14f),
     )
 
     MaterialTheme {

@@ -68,7 +68,7 @@ fun PreviewFireballEdgeHighlightsClassic(
     boardColors: BoardColors = getBoardColors(ClassicPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -113,7 +113,7 @@ fun PreviewFireballEdgeHighlightsDark(
     boardColors: BoardColors = getBoardColors(DarkPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -158,7 +158,7 @@ fun PreviewFireballEdgeHighlightsNature(
     boardColors: BoardColors = getBoardColors(NaturePalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -202,7 +202,7 @@ fun PreviewFireballEdgeHighlightsGrayscale(
     boardColors: BoardColors = getBoardColors(GrayscalePalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -247,7 +247,7 @@ fun PreviewFireballEdgeHighlightsChristmas(
     boardColors: BoardColors = getBoardColors(ChristmasPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -292,7 +292,7 @@ fun PreviewFireballEdgeHighlightsHalloween(
     boardColors: BoardColors = getBoardColors(HalloweenPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -337,7 +337,7 @@ fun PreviewFireballEdgeHighlightsGilded(
     boardColors: BoardColors = getBoardColors(GildedPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -382,7 +382,7 @@ fun PreviewFireballEdgeHighlightsAurora(
     boardColors: BoardColors = getBoardColors(AuroraPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)
@@ -428,7 +428,7 @@ fun PreviewFireballEdgeHighlightsEmber(
     boardColors: BoardColors = getBoardColors(EmberPalette),
     boardOrientation: BoardOrientation = BoardOrientation.PORTRAIT_WHITE,
 ) {
-    PreviewElectricEdgeHighlights(boardColors, boardOrientation, false)
+    PreviewElectricEdgeHighlights(boardColors, boardOrientation)
 }
 
 @Preview(group = "Edges", showBackground = true, widthDp = 200, heightDp = 250)

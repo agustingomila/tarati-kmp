@@ -20,11 +20,11 @@ sealed class ScreenDestinations(
     object LeaderboardDest : ScreenDestinations(route = "leaderboard")
 
     object PublicProfileDest : ScreenDestinations(route = "public_profile/{userId}") {
-        fun createRoute(userId: String) = "public_profile/$userId"
+        fun createRoute(userId: String): String = "public_profile/$userId"
     }
 
     object TournamentDetailDest : ScreenDestinations(route = "tournament/{tournamentId}") {
-        fun createRoute(tournamentId: String) = "tournament/$tournamentId"
+        fun createRoute(tournamentId: String): String = "tournament/$tournamentId"
     }
 
     object AchievementsDest : ScreenDestinations(route = "achievements")

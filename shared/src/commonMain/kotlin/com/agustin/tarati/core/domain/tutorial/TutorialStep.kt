@@ -83,7 +83,7 @@ abstract class InteractiveTutorialStep(
     animations: List<List<HighlightAnimation>> = emptyList(),
     gameState: GameState,
     val expectedMoves: List<Move> = listOf(),
-    val validateMove: ((Move) -> Boolean) = { true },
+    private val validateMove: ((Move) -> Boolean) = { true },
     onStepStart: (() -> Unit)? = null,
 ) : TutorialStep(
     titleRes = titleRes,
@@ -194,10 +194,10 @@ class CobsStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(C1, Cob(WHITE, false))
-                setCob(C2, Cob(WHITE, false))
-                setCob(D1, Cob(WHITE, false))
-                setCob(D2, Cob(WHITE, false))
+                setCob(C1, Cob(WHITE))
+                setCob(C2, Cob(WHITE))
+                setCob(D1, Cob(WHITE))
+                setCob(D2, Cob(WHITE))
             },
         autoAdvanceDelay = 6000L,
     )
@@ -212,10 +212,10 @@ class BasicMovesStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(C1, Cob(WHITE, false))
-                setCob(C2, Cob(WHITE, false))
-                setCob(D1, Cob(WHITE, false))
-                setCob(D2, Cob(WHITE, false))
+                setCob(C1, Cob(WHITE))
+                setCob(C2, Cob(WHITE))
+                setCob(D1, Cob(WHITE))
+                setCob(D2, Cob(WHITE))
             },
         expectedMoves =
             listOf(
@@ -236,8 +236,8 @@ class CapturesStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(C1, Cob(WHITE, false))
-                setCob(A1, Cob(BLACK, false))
+                setCob(C1, Cob(WHITE))
+                setCob(A1, Cob(BLACK))
             },
         expectedMoves = listOf(Move(C1 to B1)),
     )
@@ -264,9 +264,9 @@ class PreAdjacencyStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(C3, Cob(WHITE, false))  // attacker
-                setCob(C4, Cob(BLACK, false))  // pre-adjacent — NOT captured
-                setCob(B3, Cob(BLACK, false))  // not pre-adjacent — WILL be captured
+                setCob(C3, Cob(WHITE))  // attacker
+                setCob(C4, Cob(BLACK))  // pre-adjacent — NOT captured
+                setCob(B3, Cob(BLACK))  // not pre-adjacent — WILL be captured
             },
         expectedMoves = listOf(Move(C3 to B2)),
     )
@@ -281,7 +281,7 @@ class UpgradeStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(B4, Cob(WHITE, false))
+                setCob(B4, Cob(WHITE))
             },
         expectedMoves =
             listOf(
@@ -317,10 +317,10 @@ class DeadPieceStep :
             createGameState {
                 clearCobs()
                 // White cob at D3 — primary dead vertex for white (deepest inside black base)
-                setCob(D3, Cob(WHITE, false))
+                setCob(D3, Cob(WHITE))
                 // Black cobs seal both exits — D4 and C7 are D3's only neighbors
-                setCob(D4, Cob(BLACK, false))
-                setCob(C7, Cob(BLACK, false))
+                setCob(D4, Cob(BLACK))
+                setCob(C7, Cob(BLACK))
             },
         // The only legal move is the in-place promotion: D3 → D3
         expectedMoves = listOf(Move(D3 to D3)),
@@ -336,8 +336,8 @@ class DomesticCaptureStep :
         gameState =
             createGameState {
                 clearCobs()
-                setCob(D2, Cob(WHITE, false))
-                setCob(C1, Cob(BLACK, false))
+                setCob(D2, Cob(WHITE))
+                setCob(C1, Cob(BLACK))
             },
         expectedMoves = listOf(Move(D2 to C2), Move(D2 to D1)),
     )

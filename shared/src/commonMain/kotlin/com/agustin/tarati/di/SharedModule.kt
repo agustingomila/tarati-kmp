@@ -17,6 +17,7 @@ import com.agustin.tarati.ui.components.game.behaviors.BoardSelectionViewModel
 import com.agustin.tarati.ui.components.tutorial.ITutorialService
 import com.agustin.tarati.ui.components.tutorial.TutorialService
 import com.agustin.tarati.ui.components.tutorial.TutorialViewModel
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -37,23 +38,23 @@ import org.koin.dsl.module
  * - Achievements/Billing → androidModule
  * - SavedStateHandle → eliminado de ViewModels KMP
  */
-val sharedAiModule = module {
+val sharedAiModule: Module = module {
     single<IAIEngine> { TaratiAI.instance }
 }
 
-val sharedAnimationModule = module {
+val sharedAnimationModule: Module = module {
     single<AnimationCoordinator> { AnimationCoordinator(get()) }
 }
 
-val sharedNotificationModule = module {
+val sharedNotificationModule: Module = module {
     single { UIMessageBus() }
 }
 
-val sharedTutorialModule = module {
+val sharedTutorialModule: Module = module {
     single<ITutorialService> { TutorialService(get()) }
 }
 
-val sharedViewModelModule = module {
+val sharedViewModelModule: Module = module {
     viewModel { GamesLibraryViewModel(get()) }
     viewModel { GameDetailsViewModel(get()) }
 
@@ -70,7 +71,7 @@ val sharedViewModelModule = module {
 /**
  * Lista de módulos compartidos para usar en todas las plataformas.
  */
-val sharedModules = listOf(
+val sharedModules: List<Module> = listOf(
     sharedAiModule,
     sharedAnimationModule,
     sharedNotificationModule,

@@ -43,11 +43,11 @@ class ZobristHashTest {
     @Test
     fun `two independently constructed identical states hash equally`() {
         val a = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
         val b = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
         assertEquals("Identical states must produce the same hash", a.hashBoard(), b.hashBoard())
@@ -58,7 +58,7 @@ class ZobristHashTest {
     @Test
     fun `same pieces different turn produce different hashes`() {
         val whiteTurn = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
         val blackTurn = whiteTurn.withTurn(BLACK)
@@ -74,7 +74,7 @@ class ZobristHashTest {
     @Test
     fun `cob and rok at the same vertex produce different hashes`() {
         val withCob = GameState(
-            cobs = mapOf(B1 to Cob(WHITE, false)),
+            cobs = mapOf(B1 to Cob(WHITE)),
             currentTurn = WHITE,
         )
         val withRok = GameState(
@@ -90,8 +90,8 @@ class ZobristHashTest {
 
     @Test
     fun `white and black cob at same vertex produce different hashes`() {
-        val white = GameState(cobs = mapOf(B1 to Cob(WHITE, false)), currentTurn = WHITE)
-        val black = GameState(cobs = mapOf(B1 to Cob(BLACK, false)), currentTurn = WHITE)
+        val white = GameState(cobs = mapOf(B1 to Cob(WHITE)), currentTurn = WHITE)
+        val black = GameState(cobs = mapOf(B1 to Cob(BLACK)), currentTurn = WHITE)
         assertNotEquals(white.hashBoard(), black.hashBoard())
     }
 
@@ -100,7 +100,7 @@ class ZobristHashTest {
     @Test
     fun `moving a piece changes the hash`() {
         val before = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
         val after = before.applyMove(Move(C1 to B1))
@@ -116,7 +116,7 @@ class ZobristHashTest {
     @Test
     fun `moving piece away and back restores original hash`() {
         val original = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
         // WHITE moves C1->B1, BLACK moves C7->B4, WHITE moves B1->C1 (back)
@@ -132,7 +132,7 @@ class ZobristHashTest {
     fun `two move sequences reaching the same board produce the same hash`() {
         // Start: WHITE at C1, BLACK at C7
         val start = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
         )
 
@@ -144,7 +144,7 @@ class ZobristHashTest {
         // Path B: different starting state shaped to reach same result
         // Build the end state directly to verify the hash equals pathA
         val directEnd = GameState(
-            cobs = mapOf(B1 to Cob(WHITE, false), B4 to Cob(BLACK, false)),
+            cobs = mapOf(B1 to Cob(WHITE), B4 to Cob(BLACK)),
             currentTurn = WHITE,  // after two half-moves it's WHITE's turn again
         )
 
@@ -208,7 +208,7 @@ class ZobristHashTest {
     @Test
     fun `domestic vertex pieces are correctly included in hash`() {
         val withDomestic = GameState(
-            cobs = mapOf(D1 to Cob(WHITE, false)),
+            cobs = mapOf(D1 to Cob(WHITE)),
             currentTurn = WHITE,
         )
         val withoutDomestic = GameState(

@@ -51,7 +51,7 @@ internal class TiltStateMap {
     fun snapshot(): Map<Vertex, Float> = HashMap(tilts)
 
     companion object {
-        const val MAX_TILT_DEG = 10f
+        private const val MAX_TILT_DEG = 10f
 
         fun randomTilt(): Float = (Random.nextFloat() * 2f - 1f) * MAX_TILT_DEG
     }

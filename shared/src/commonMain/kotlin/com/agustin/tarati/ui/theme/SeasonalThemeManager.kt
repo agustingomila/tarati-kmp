@@ -38,13 +38,13 @@ import kotlin.time.Clock
  */
 object SeasonalThemeManager {
 
-    const val HALLOWEEN_PALETTE = "Halloween"
-    const val CHRISTMAS_PALETTE = "Christmas"
+    const val HALLOWEEN_PALETTE: String = "Halloween"
+    const val CHRISTMAS_PALETTE: String = "Christmas"
 
     // Paletas de eventos especiales — solo disponibles al desbloquearlas,
     // sin acceso temporal por fecha (a diferencia de Halloween/Christmas).
-    const val AURORA_PALETTE = "Aurora"
-    const val EMBER_PALETTE = "Ember"
+    const val AURORA_PALETTE: String = "Aurora"
+    const val EMBER_PALETTE: String = "Ember"
 
     private const val HALLOWEEN_MONTH = 10  // October (1-indexed)
     private const val HALLOWEEN_DAY = 31

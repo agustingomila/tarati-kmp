@@ -70,8 +70,6 @@ class PublicProfileViewModel(
             repository.getUserGames(
                 token = token,
                 userId = userId,
-                page = 0,
-                limit = PAGE_SIZE,
                 timeControl = _historyState.value.filters.timeControl,
                 result = _historyState.value.filters.result,
                 rated = _historyState.value.filters.rated,
@@ -102,7 +100,6 @@ class PublicProfileViewModel(
                 token = token,
                 userId = userId,
                 page = nextPage,
-                limit = PAGE_SIZE,
                 timeControl = state.filters.timeControl,
                 result = state.filters.result,
                 rated = state.filters.rated,

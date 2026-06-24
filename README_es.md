@@ -4,7 +4,7 @@
 
 <img src="screenshots/logo.png" alt="Logo" style="display: block; margin: 0 auto;">
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-purple.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-purple.svg)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.10.3-blue.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![Room](https://img.shields.io/badge/Room-2.8.4-red.svg)](https://developer.android.com/jetpack/androidx/releases/room)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://www.android.com)
@@ -224,10 +224,12 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 - **Tipos de pieza personalizables** — selector visual con animación
 - **Biblioteca de partidas** — historial completo con navegación por movimientos
 - **Tutorial interactivo** — burbujas de guía superpuestas al tablero
-- **Logros** — integración con Google Play Games (Android)
+- **Logros** — cross-platform, sincronizados al servidor; integración Google Play Games en Android
 - **Soporte bilingüe** — español e inglés con selector in-app
-- **Multijugador online** — matchmaking, rating Glicko-2, clasificación, seguidos, desafíos y modo espectador
-  en [tarati.tech](https://tarati.tech)
+- **Multijugador online** — matchmaking, rating Glicko-2, clasificación, perfiles públicos, seguidos, desafíos,
+  modo espectador, revanchas, reconexión y torneos (Round Robin y Swiss) en [tarati.tech](https://tarati.tech)
+- **Acceso como invitado** — jugá online sin registrarte
+- **Panel lateral adaptativo** — en pantallas anchas, lobby, configuración y biblioteca coexisten junto al tablero
 - **Multiplataforma** — mismo código compartido entre Android, Desktop y Web
 
 ---
@@ -236,12 +238,12 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 
 | Componente                | Librería / Versión                                                            |
 |---------------------------|-------------------------------------------------------------------------------|
-| Lenguaje                  | Kotlin 2.3.21                                                                 |
+| Lenguaje                  | Kotlin 2.4.0                                                                 |
 | Arquitectura              | Kotlin Multiplatform (KMP)                                                    |
 | UI                        | Compose Multiplatform 1.10.3, Material Design 3                               |
-| Inyección de dependencias | Koin 4.2.1                                                                    |
+| Inyección de dependencias | Koin 4.2.2                                                                    |
 | Almacenamiento local      | Room 2.8.4 (Android/Desktop), DataStore 1.2.1 (Android)                       |
-| Tests                     | JUnit 4.13.2, MockK 1.14.9, Coroutines Test 1.11.0                            |
+| Tests                     | JUnit 4.13.2, MockK 1.14.11, Coroutines Test 1.11.0                           |
 | Concurrencia              | Kotlin Coroutines 1.11.0                                                      |
 | Networking                | Ktor 3.5.0 (cliente + servidor, online en tarati.tech)                        |
 | Cliente Redis             | Kreds 0.9.1 (Kotlin-nativo, coroutines-first)                                 |
@@ -356,7 +358,7 @@ webApp/
     └── di/                    # Módulos Koin web, implementaciones de plataforma
 ```
 
-Más de 400 tests unitarios y previews de Compose.
+Más de 500 tests (400+ cliente · 114 servidor) y previews de Compose.
 
 ---
 

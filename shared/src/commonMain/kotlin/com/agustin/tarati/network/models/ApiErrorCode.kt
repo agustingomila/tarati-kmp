@@ -16,16 +16,16 @@ import org.jetbrains.compose.resources.getString
 
 /** Códigos de error canónicos devueltos por el servidor en el campo `code` del JSON de error. */
 object ApiErrorCode {
-    const val INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
-    const val USERNAME_TAKEN = "USERNAME_TAKEN"
-    const val EMAIL_TAKEN = "EMAIL_TAKEN"
-    const val ACCOUNT_BANNED = "ACCOUNT_BANNED"
-    const val RATE_LIMITED = "RATE_LIMITED"
-    const val INVALID_RESET_TOKEN = "INVALID_RESET_TOKEN"
-    const val INVALID_USERNAME = "INVALID_USERNAME"
-    const val INVALID_REQUEST = "INVALID_REQUEST"
-    const val INTERNAL_ERROR = "INTERNAL_ERROR"
-    const val USER_NOT_FOUND = "USER_NOT_FOUND"
+    const val INVALID_CREDENTIALS: String = "INVALID_CREDENTIALS"
+    const val USERNAME_TAKEN: String = "USERNAME_TAKEN"
+    const val EMAIL_TAKEN: String = "EMAIL_TAKEN"
+    const val ACCOUNT_BANNED: String = "ACCOUNT_BANNED"
+    const val RATE_LIMITED: String = "RATE_LIMITED"
+    const val INVALID_RESET_TOKEN: String = "INVALID_RESET_TOKEN"
+    const val INVALID_USERNAME: String = "INVALID_USERNAME"
+    const val INVALID_REQUEST: String = "INVALID_REQUEST"
+    const val INTERNAL_ERROR: String = "INTERNAL_ERROR"
+    const val USER_NOT_FOUND: String = "USER_NOT_FOUND"
 }
 
 /**

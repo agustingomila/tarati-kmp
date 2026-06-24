@@ -3,6 +3,7 @@ package com.agustin.tarati.ui.screens.main
 import com.agustin.tarati.services.notifications.MessageAction
 import com.agustin.tarati.services.notifications.UIMessage
 import com.agustin.tarati.services.notifications.UIMessageBus
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -24,7 +25,7 @@ class UIMessageBusTest {
     // ── Toast ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `toast sends message to channel`() = runTest {
+    fun `toast sends message to channel`(): TestResult = runTest {
         val toast = UIMessage.Toast("Hello")
 
         bus.toast(toast)
@@ -33,7 +34,7 @@ class UIMessageBusTest {
     }
 
     @Test
-    fun `multiple toasts are buffered in order`() = runTest {
+    fun `multiple toasts are buffered in order`(): TestResult = runTest {
         val t1 = UIMessage.Toast("first")
         val t2 = UIMessage.Toast("second")
         val t3 = UIMessage.Toast("third")
@@ -48,7 +49,7 @@ class UIMessageBusTest {
     }
 
     @Test
-    fun `toast preserves message and duration`() = runTest {
+    fun `toast preserves message and duration`(): TestResult = runTest {
         val toast = UIMessage.Toast(message = "rating update", duration = 6.seconds)
 
         bus.toast(toast)
@@ -59,7 +60,7 @@ class UIMessageBusTest {
     }
 
     @Test
-    fun `toast preserves actions`() = runTest {
+    fun `toast preserves actions`(): TestResult = runTest {
         var clicked = false
         val toast = UIMessage.Toast(
             message = "Rematch?",

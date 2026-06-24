@@ -19,7 +19,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.koinConfiguration
 import org.jetbrains.skia.Image as SkiaImage
 
-fun main() = application {
+fun main(): Unit = application {
     // Ícono de la ventana (barra de título / taskbar) en runtime. Sin esto, la
     // ventana muestra el ícono por defecto de Java. Se carga desde el classpath
     // (src/main/resources/icons/tarati.png) vía Skia para no depender de las APIs

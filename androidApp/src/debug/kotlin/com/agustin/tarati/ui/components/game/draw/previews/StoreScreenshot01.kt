@@ -29,7 +29,7 @@ import com.agustin.tarati.ui.theme.NaturePalette
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_ES_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot01_ES_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_es_classic,
     title = "Tarati", subtitle = "El juego de estrategia de\nGeorge Spencer Brown",
     textPosition = TOP, palette = ClassicPalette,
@@ -37,7 +37,7 @@ fun StoreScreenshot01_ES_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_ES_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot01_ES_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_es_dark,
     title = "Tarati", subtitle = "El juego de estrategia de\nGeorge Spencer Brown",
     textPosition = TOP, palette = DarkPalette,
@@ -45,7 +45,7 @@ fun StoreScreenshot01_ES_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_ES_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot01_ES_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_es_nature,
     title = "Tarati", subtitle = "El juego de estrategia de\nGeorge Spencer Brown",
     textPosition = TOP, palette = NaturePalette,
@@ -53,7 +53,7 @@ fun StoreScreenshot01_ES_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_ES_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot01_ES_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_es_grayscale,
     title = "Tarati", subtitle = "El juego de estrategia de\nGeorge Spencer Brown",
     textPosition = TOP, palette = GrayscalePalette,
@@ -61,7 +61,7 @@ fun StoreScreenshot01_ES_Grayscale() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_EN_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot01_EN_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_en_classic,
     title = "Tarati", subtitle = "The strategy game by\nGeorge Spencer Brown",
     textPosition = TOP, palette = ClassicPalette,
@@ -69,7 +69,7 @@ fun StoreScreenshot01_EN_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_EN_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot01_EN_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_en_dark,
     title = "Tarati", subtitle = "The strategy game by\nGeorge Spencer Brown",
     textPosition = TOP, palette = DarkPalette,
@@ -77,7 +77,7 @@ fun StoreScreenshot01_EN_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_EN_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot01_EN_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_en_nature,
     title = "Tarati", subtitle = "The strategy game by\nGeorge Spencer Brown",
     textPosition = TOP, palette = NaturePalette,
@@ -85,7 +85,7 @@ fun StoreScreenshot01_EN_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot01_EN_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot01_EN_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_01_en_grayscale,
     title = "Tarati", subtitle = "The strategy game by\nGeorge Spencer Brown",
     textPosition = TOP, palette = GrayscalePalette,

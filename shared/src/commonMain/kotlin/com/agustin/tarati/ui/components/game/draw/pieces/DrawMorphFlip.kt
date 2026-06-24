@@ -158,7 +158,7 @@ fun DrawScope.drawMorphFlip(
                     borderWidth = borderInsetWidth,
                     borderColor = visibleColors.border,
                     accentColor = organicFill,
-                    flatFacePath = projection.createPath(pathSize, scale = 1f),
+                    flatFacePath = projection.createPath(pathSize),
                     shape = cobShape.shape,
                 )
 
@@ -186,7 +186,7 @@ fun DrawScope.drawMorphFlip(
                 accentColor = organicFill,
                 projectionScale = scale,
                 projectionAxisAngleDeg = projection.axisAngleDeg,
-                flatFacePath = projection.createPath(pathSize, scale = 1f),
+                flatFacePath = projection.createPath(pathSize),
                 shape = cobShape.shape,
             )
 

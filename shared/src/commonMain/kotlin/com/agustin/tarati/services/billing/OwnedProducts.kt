@@ -34,6 +34,6 @@ data class OwnedProducts(val ids: Set<String>) {
 
     companion object {
         /** Instancia vacía reutilizable — sin productos comprados. */
-        val None = OwnedProducts(emptySet())
+        val None: OwnedProducts = OwnedProducts(emptySet())
     }
 }

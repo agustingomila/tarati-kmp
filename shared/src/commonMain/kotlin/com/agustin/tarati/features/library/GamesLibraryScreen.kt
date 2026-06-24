@@ -273,8 +273,8 @@ fun GamesLibraryScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            viewModel.deleteGame(gameToDelete!!)
-                            removedGames = removedGames + gameToDelete!!
+                            viewModel.deleteGame(gameToDelete ?: return@TextButton)
+                            removedGames = removedGames + (gameToDelete ?: return@TextButton)
                             gameToDelete = null
                             scope.launch { snackbarHostState.showSnackbar(snackbarText) }
                         },

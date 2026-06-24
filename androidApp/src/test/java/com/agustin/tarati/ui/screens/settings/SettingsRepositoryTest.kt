@@ -14,6 +14,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,7 +23,7 @@ import org.junit.Test
 
 class SettingsRepositoryTest {
     @Test
-    fun isDarkTheme_returnsStoredValue() =
+    fun isDarkTheme_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -37,7 +38,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun isDarkTheme_returnsTrueWhenNotSet() =
+    fun isDarkTheme_returnsTrueWhenNotSet(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -52,7 +53,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun difficulty_returnsStoredValue() =
+    fun difficulty_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -67,7 +68,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun difficulty_returnsDefaultWhenNotSet() =
+    fun difficulty_returnsDefaultWhenNotSet(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -82,7 +83,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun userName_returnsStoredValue() =
+    fun userName_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -97,7 +98,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun userName_returnsDefaultWhenNotSet() =
+    fun userName_returnsDefaultWhenNotSet(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -112,7 +113,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun language_returnsStoredValue() =
+    fun language_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -127,7 +128,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun language_returnsDefaultWhenNotSet() =
+    fun language_returnsDefaultWhenNotSet(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -142,7 +143,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun labelsVisibility_returnsStoredValue() =
+    fun labelsVisibility_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -157,7 +158,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun labelsVisibility_returnsDefaultWhenNotSet() =
+    fun labelsVisibility_returnsDefaultWhenNotSet(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -174,7 +175,7 @@ class SettingsRepositoryTest {
     // ── conversionAnimationStyle ──────────────────────────────────────────────
 
     @Test
-    fun conversionAnimationStyle_returnsTransformation() =
+    fun conversionAnimationStyle_returnsTransformation(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -194,7 +195,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun conversionAnimationStyle_returnsFlip() =
+    fun conversionAnimationStyle_returnsFlip(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -210,7 +211,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun conversionAnimationStyle_returnsSurpriseByDefault() =
+    fun conversionAnimationStyle_returnsSurpriseByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -229,7 +230,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun conversionAnimationStyle_returnsSurpriseOnUnknownValue() =
+    fun conversionAnimationStyle_returnsSurpriseOnUnknownValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -249,7 +250,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setConversionAnimationStyle_savesValue() =
+    fun setConversionAnimationStyle_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -267,7 +268,7 @@ class SettingsRepositoryTest {
     // ── Tests de escritura ────────────────────────────────────────────────────
 
     @Test
-    fun setDarkTheme_savesValue() =
+    fun setDarkTheme_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -283,7 +284,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setDifficulty_savesValue() =
+    fun setDifficulty_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -299,7 +300,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setLabelsVisibility_savesValue() =
+    fun setLabelsVisibility_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -315,7 +316,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setVerticesVisibility_savesValue() =
+    fun setVerticesVisibility_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -331,7 +332,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setEdgesVisibility_savesValue() =
+    fun setEdgesVisibility_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -347,7 +348,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setRegionsVisibility_savesValue() =
+    fun setRegionsVisibility_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -363,7 +364,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setPerimeterVisibility_savesValue() =
+    fun setPerimeterVisibility_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -379,7 +380,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setAnimateEffects_savesValue() =
+    fun setAnimateEffects_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -397,7 +398,7 @@ class SettingsRepositoryTest {
     // --- tutorialSeen ---
 
     @Test
-    fun tutorialSeen_returnsFalseByDefault() =
+    fun tutorialSeen_returnsFalseByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -412,7 +413,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun tutorialSeen_returnsStoredValue() =
+    fun tutorialSeen_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -427,7 +428,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setTutorialSeen_savesValue() =
+    fun setTutorialSeen_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -445,7 +446,7 @@ class SettingsRepositoryTest {
     // --- seasonal theme ---
 
     @Test
-    fun seasonalAutoAppliedDate_returnsEmptyStringByDefault() =
+    fun seasonalAutoAppliedDate_returnsEmptyStringByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -460,7 +461,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun seasonalAutoAppliedDate_returnsStoredValue() =
+    fun seasonalAutoAppliedDate_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -475,7 +476,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setSeasonalAutoAppliedDate_savesValue() =
+    fun setSeasonalAutoAppliedDate_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -491,7 +492,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun preSeasonalPalette_returnsEmptyStringByDefault() =
+    fun preSeasonalPalette_returnsEmptyStringByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -506,7 +507,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun preSeasonalPalette_returnsStoredValue() =
+    fun preSeasonalPalette_returnsStoredValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -521,7 +522,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setPreSeasonalPalette_savesValue() =
+    fun setPreSeasonalPalette_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -537,7 +538,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun clearPreSeasonalPalette_removesValue() =
+    fun clearPreSeasonalPalette_removesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -555,7 +556,7 @@ class SettingsRepositoryTest {
     // ── timeControl ───────────────────────────────────────────────────────────
 
     @Test
-    fun timeControl_returnsUnlimitedByDefault() =
+    fun timeControl_returnsUnlimitedByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -574,7 +575,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsStoredFischerMode() =
+    fun timeControl_returnsStoredFischerMode(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -593,7 +594,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsStoredSuddenDeathMode() =
+    fun timeControl_returnsStoredSuddenDeathMode(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -611,7 +612,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsStoredBronsteinMode() =
+    fun timeControl_returnsStoredBronsteinMode(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -629,7 +630,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsStoredByoyomiMode() =
+    fun timeControl_returnsStoredByoyomiMode(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -647,7 +648,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsUnlimitedOnMalformedString() =
+    fun timeControl_returnsUnlimitedOnMalformedString(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -666,7 +667,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun timeControl_returnsUnlimitedOnIncompleteFischerString() =
+    fun timeControl_returnsUnlimitedOnIncompleteFischerString(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -686,7 +687,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setTimeControl_savesValue() =
+    fun setTimeControl_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -706,7 +707,7 @@ class SettingsRepositoryTest {
     // ── preMovesEnabled ───────────────────────────────────────────────────────
 
     @Test
-    fun preMovesEnabled_returnsTrueByDefault() =
+    fun preMovesEnabled_returnsTrueByDefault(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -721,7 +722,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun preMovesEnabled_returnsStoredFalse() =
+    fun preMovesEnabled_returnsStoredFalse(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -736,7 +737,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun preMovesEnabled_returnsStoredTrue() =
+    fun preMovesEnabled_returnsStoredTrue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)
@@ -751,7 +752,7 @@ class SettingsRepositoryTest {
         }
 
     @Test
-    fun setPreMovesEnabled_savesValue() =
+    fun setPreMovesEnabled_savesValue(): TestResult =
         runTest {
             val mockDataStore = mockk<DataStore<Preferences>>()
             val mockPreferences = mockk<Preferences>(relaxed = true)

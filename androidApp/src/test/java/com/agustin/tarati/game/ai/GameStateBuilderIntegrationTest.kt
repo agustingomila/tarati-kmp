@@ -34,10 +34,10 @@ class GameStateBuilderIntegrationTest {
         val state =
             createGameState {
                 setTurn(CobColor.WHITE)
-                setCob(C1, CobColor.WHITE, false)
-                setCob(C2, CobColor.WHITE, false)
+                setCob(C1, CobColor.WHITE)
+                setCob(C2, CobColor.WHITE)
                 setCob(C7, CobColor.BLACK, true)
-                setCob(C8, CobColor.BLACK, false)
+                setCob(C8, CobColor.BLACK)
             }
 
         // AI should be able to analyze this state
@@ -55,12 +55,12 @@ class GameStateBuilderIntegrationTest {
                 setTurn(CobColor.WHITE)
                 // Set up white pieces
                 setCob(B1, CobColor.WHITE, true)
-                setCob(C3, CobColor.WHITE, false)
-                setCob(C4, CobColor.WHITE, false)
+                setCob(C3, CobColor.WHITE)
+                setCob(C4, CobColor.WHITE)
                 // Set up black pieces
                 setCob(B4, CobColor.BLACK, true)
-                setCob(C9, CobColor.BLACK, false)
-                setCob(C10, CobColor.BLACK, false)
+                setCob(C9, CobColor.BLACK)
+                setCob(C10, CobColor.BLACK)
             }
 
         // Verify the state
@@ -78,7 +78,7 @@ class GameStateBuilderIntegrationTest {
             GameStateBuilder()
                 .setTurn(CobColor.BLACK)
                 .setCob(A1, CobColor.WHITE, true) // White king in center
-                .setCob(C7, CobColor.BLACK, false) // Black piece nearby
+                .setCob(C7, CobColor.BLACK) // Black piece nearby
                 .build()
 
         // Now test specific functionality with this controlled state

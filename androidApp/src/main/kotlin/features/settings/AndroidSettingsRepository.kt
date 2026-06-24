@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class AndroidSettingsRepository(
-    var dataStore: DataStore<Preferences>,
+    private var dataStore: DataStore<Preferences>,
 ) : SettingsRepository {
     // ── Flows ──────────────────────────────────────────────────────────────────
 
@@ -262,44 +262,44 @@ class AndroidSettingsRepository(
     // ── Keys ───────────────────────────────────────────────────────────────────
 
     companion object {
-        val DARK_THEME_KEY = booleanPreferencesKey("dark_theme_enabled")
-        val DIFFICULTY_KEY = intPreferencesKey("difficulty")
-        val DIFFICULTY_BLACK_KEY = intPreferencesKey("difficulty_black")
-        val DIFFICULTY_WHITE_KEY = intPreferencesKey("difficulty_white")
-        val USER_NAME_KEY = stringPreferencesKey("user_name")
-        val LANGUAGE_KEY = stringPreferencesKey("app_language")
-        val PALETTE_KEY = stringPreferencesKey("app_palette")
-        val LABELS_VISIBILITY_KEY = booleanPreferencesKey("labels_visibles")
-        val VERTICES_VISIBILITY_KEY = booleanPreferencesKey("vertices_visibles")
-        val EDGES_VISIBILITY_KEY = booleanPreferencesKey("edges_visibles")
-        val REGIONS_VISIBILITY_KEY = booleanPreferencesKey("regions_visibles")
-        val PERIMETER_VISIBILITY_KEY = booleanPreferencesKey("perimeter_visible")
-        val ANIMATE_EFFECTS_KEY = booleanPreferencesKey("animate_effects")
-        val CONVERSION_ANIMATION_STYLE_KEY = stringPreferencesKey("conversion_animation_style")
-        val SOUND_ENABLED_KEY = booleanPreferencesKey("sound_enabled")
-        val SOUND_VOLUME_KEY = floatPreferencesKey("sound_volume")
-        val TUTORIAL_SEEN_KEY = booleanPreferencesKey("tutorial_seen")
-        val SEASONAL_AUTO_APPLIED_DATE_KEY = stringPreferencesKey("seasonal_auto_applied_date")
-        val PRE_SEASONAL_PALETTE_KEY = stringPreferencesKey("pre_seasonal_palette")
-        val PIECE_TYPE_ID_KEY = stringPreferencesKey("piece_type_id")
+        val DARK_THEME_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("dark_theme_enabled")
+        val DIFFICULTY_KEY: Preferences.Key<Int> = intPreferencesKey("difficulty")
+        val DIFFICULTY_BLACK_KEY: Preferences.Key<Int> = intPreferencesKey("difficulty_black")
+        val DIFFICULTY_WHITE_KEY: Preferences.Key<Int> = intPreferencesKey("difficulty_white")
+        val USER_NAME_KEY: Preferences.Key<String> = stringPreferencesKey("user_name")
+        val LANGUAGE_KEY: Preferences.Key<String> = stringPreferencesKey("app_language")
+        val PALETTE_KEY: Preferences.Key<String> = stringPreferencesKey("app_palette")
+        val LABELS_VISIBILITY_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("labels_visibles")
+        val VERTICES_VISIBILITY_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("vertices_visibles")
+        val EDGES_VISIBILITY_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("edges_visibles")
+        val REGIONS_VISIBILITY_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("regions_visibles")
+        val PERIMETER_VISIBILITY_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("perimeter_visible")
+        val ANIMATE_EFFECTS_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("animate_effects")
+        val CONVERSION_ANIMATION_STYLE_KEY: Preferences.Key<String> = stringPreferencesKey("conversion_animation_style")
+        val SOUND_ENABLED_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("sound_enabled")
+        val SOUND_VOLUME_KEY: Preferences.Key<Float> = floatPreferencesKey("sound_volume")
+        val TUTORIAL_SEEN_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("tutorial_seen")
+        val SEASONAL_AUTO_APPLIED_DATE_KEY: Preferences.Key<String> = stringPreferencesKey("seasonal_auto_applied_date")
+        val PRE_SEASONAL_PALETTE_KEY: Preferences.Key<String> = stringPreferencesKey("pre_seasonal_palette")
+        val PIECE_TYPE_ID_KEY: Preferences.Key<String> = stringPreferencesKey("piece_type_id")
 
         // Game session
-        val WHITE_IS_AI_KEY = booleanPreferencesKey("white_is_ai")
-        val BLACK_IS_AI_KEY = booleanPreferencesKey("black_is_ai")
-        val BOARD_ORIENTATION_KEY = stringPreferencesKey("board_orientation_pref")
-        val IS_MANUALLY_ROTATED_KEY = booleanPreferencesKey("is_manually_rotated")
+        val WHITE_IS_AI_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("white_is_ai")
+        val BLACK_IS_AI_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("black_is_ai")
+        val BOARD_ORIENTATION_KEY: Preferences.Key<String> = stringPreferencesKey("board_orientation_pref")
+        val IS_MANUALLY_ROTATED_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("is_manually_rotated")
 
         // Time control & pre-moves
-        val TIME_CONTROL_KEY = stringPreferencesKey("time_control")
-        val PRE_MOVES_ENABLED_KEY = booleanPreferencesKey("pre_moves_enabled")
+        val TIME_CONTROL_KEY: Preferences.Key<String> = stringPreferencesKey("time_control")
+        val PRE_MOVES_ENABLED_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("pre_moves_enabled")
 
         // Online matchmaking
-        val ONLINE_TIME_CONTROL_KEY = stringPreferencesKey("online_time_control")
-        val ONLINE_RATED_KEY = booleanPreferencesKey("online_rated")
-        val ONLINE_SPECTATING_ALLOWED_KEY = booleanPreferencesKey("online_spectating_allowed")
+        val ONLINE_TIME_CONTROL_KEY: Preferences.Key<String> = stringPreferencesKey("online_time_control")
+        val ONLINE_RATED_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("online_rated")
+        val ONLINE_SPECTATING_ALLOWED_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("online_spectating_allowed")
 
         // Companion panel layout
-        val COMPANION_PANEL_WIDTH_KEY = floatPreferencesKey("companion_panel_width")
+        val COMPANION_PANEL_WIDTH_KEY: Preferences.Key<Float> = floatPreferencesKey("companion_panel_width")
 
         private const val DARK_THEME_DEFAULT = true
         private const val LABELS_VISIBILITY_DEFAULT = false
@@ -317,11 +317,11 @@ class AndroidSettingsRepository(
         private val BOARD_ORIENTATION_DEFAULT = BoardOrientation.PORTRAIT_WHITE.name
 
         // Time control & pre-moves defaults
-        const val PRE_MOVES_ENABLED_DEFAULT = true
+        const val PRE_MOVES_ENABLED_DEFAULT: Boolean = true
 
         // Online matchmaking defaults
-        const val ONLINE_TIME_CONTROL_DEFAULT = "blitz"
-        const val ONLINE_RATED_DEFAULT = true
-        const val ONLINE_SPECTATING_ALLOWED_DEFAULT = true
+        const val ONLINE_TIME_CONTROL_DEFAULT: String = "blitz"
+        const val ONLINE_RATED_DEFAULT: Boolean = true
+        const val ONLINE_SPECTATING_ALLOWED_DEFAULT: Boolean = true
     }
 }

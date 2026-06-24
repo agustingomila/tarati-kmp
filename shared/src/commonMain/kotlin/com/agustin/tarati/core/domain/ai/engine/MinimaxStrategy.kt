@@ -65,7 +65,7 @@ import kotlin.time.Clock
  *
  * ## Cooperative scheduling (WASM)
  * [searchBestMove] calls [yieldForAnimation] after each root-level move when
- * [YIELD_INTERVAL_MS] has elapsed. In WASM this dispatches a macrotask via
+ * [yieldIntervalMs] has elapsed. In WASM this dispatches a macrotask via
  * setTimeout, allowing requestAnimationFrame to fire between root moves and
  * keeping the animation smooth during deep searches.
  */
@@ -83,7 +83,7 @@ class MinimaxStrategy(
     private val timeLimitMs = 10_000L
 
     // Minimum elapsed time (ms) between animation yields at the root search level.
-    private val YIELD_INTERVAL_MS = 12L
+    private val yieldIntervalMs = 12L
 
     override suspend fun getNextMove(
         gameState: GameState,
@@ -270,7 +270,7 @@ class MinimaxStrategy(
             // preventing animation freeze during deep searches.
             if (isRoot) {
                 val now = Clock.System.now().toEpochMilliseconds()
-                if (now - context.lastYieldTimeMs >= YIELD_INTERVAL_MS) {
+                if (now - context.lastYieldTimeMs >= yieldIntervalMs) {
                     yieldForAnimation()
                     context.lastYieldTimeMs = Clock.System.now().toEpochMilliseconds()
                 }

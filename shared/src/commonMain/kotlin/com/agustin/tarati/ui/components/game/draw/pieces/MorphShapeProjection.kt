@@ -68,8 +68,8 @@ class MorphShapeProjection(
      * [horizontalProj] → axisAngleDeg = 0°   (comprime Y)
      */
     companion object {
-        fun verticalProj(shape: MorphShape) = MorphShapeProjection(shape, 90f)
-        fun horizontalProj(shape: MorphShape) = MorphShapeProjection(shape, 0f)
+        fun verticalProj(shape: MorphShape): MorphShapeProjection = MorphShapeProjection(shape)
+        fun horizontalProj(shape: MorphShape): MorphShapeProjection = MorphShapeProjection(shape, 0f)
     }
 
     // ── Proyección affine de cara ──────────────────────────────────────────────
@@ -225,7 +225,7 @@ class MorphShapeProjection(
      * comprimida. El canto es la franja entre cara frontal y cara trasera con
      * desplazamiento [rimW] hacia el lado [ns].
      */
-    fun circleEdgePath(cx: Float, cy: Float, re: Float, scale: Float, rimW: Float): Path {
+    private fun circleEdgePath(cx: Float, cy: Float, re: Float, scale: Float, rimW: Float): Path {
         val ns = if (scale >= 0f) 1f else -1f
         val rd = ns * rimW
         val ctX = cx + scale * re * (4f / 3f)

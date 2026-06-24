@@ -28,81 +28,81 @@ object GameBoard {
 
     // ========== Zones ==========
 
-    val ABSOLUTE = Zone('A')
-    val BRIDGE = Zone('B')
-    val CIRCUMFERENCE = Zone('C')
-    val DOMESTIC = Zone('D')
+    val ABSOLUTE: Zone = Zone('A')
+    val BRIDGE: Zone = Zone('B')
+    val CIRCUMFERENCE: Zone = Zone('C')
+    val DOMESTIC: Zone = Zone('D')
 
     // ========== Vertex Collections ==========
 
-    val A1 = Vertex(ABSOLUTE, 1)
+    val A1: Vertex = Vertex(ABSOLUTE, 1)
 
-    val bridgeVertices = (1..6).map { Vertex(BRIDGE, it) }
-    val circumferenceVertices = (1..12).map { Vertex(CIRCUMFERENCE, it) }
-    val domesticVertices = (1..4).map { Vertex(DOMESTIC, it) }
+    val bridgeVertices: List<Vertex> = (1..6).map { Vertex(BRIDGE, it) }
+    val circumferenceVertices: List<Vertex> = (1..12).map { Vertex(CIRCUMFERENCE, it) }
+    val domesticVertices: List<Vertex> = (1..4).map { Vertex(DOMESTIC, it) }
 
     // Named vertices for convenience
-    val B1 get() = bridgeVertices[0]
-    val B2 get() = bridgeVertices[1]
-    val B3 get() = bridgeVertices[2]
-    val B4 get() = bridgeVertices[3]
-    val B5 get() = bridgeVertices[4]
-    val B6 get() = bridgeVertices[5]
+    val B1: Vertex get() = bridgeVertices[0]
+    val B2: Vertex get() = bridgeVertices[1]
+    val B3: Vertex get() = bridgeVertices[2]
+    val B4: Vertex get() = bridgeVertices[3]
+    val B5: Vertex get() = bridgeVertices[4]
+    val B6: Vertex get() = bridgeVertices[5]
 
-    val C1 get() = circumferenceVertices[0]
-    val C2 get() = circumferenceVertices[1]
-    val C3 get() = circumferenceVertices[2]
-    val C4 get() = circumferenceVertices[3]
-    val C5 get() = circumferenceVertices[4]
-    val C6 get() = circumferenceVertices[5]
-    val C7 get() = circumferenceVertices[6]
-    val C8 get() = circumferenceVertices[7]
-    val C9 get() = circumferenceVertices[8]
-    val C10 get() = circumferenceVertices[9]
-    val C11 get() = circumferenceVertices[10]
-    val C12 get() = circumferenceVertices[11]
+    val C1: Vertex get() = circumferenceVertices[0]
+    val C2: Vertex get() = circumferenceVertices[1]
+    val C3: Vertex get() = circumferenceVertices[2]
+    val C4: Vertex get() = circumferenceVertices[3]
+    val C5: Vertex get() = circumferenceVertices[4]
+    val C6: Vertex get() = circumferenceVertices[5]
+    val C7: Vertex get() = circumferenceVertices[6]
+    val C8: Vertex get() = circumferenceVertices[7]
+    val C9: Vertex get() = circumferenceVertices[8]
+    val C10: Vertex get() = circumferenceVertices[9]
+    val C11: Vertex get() = circumferenceVertices[10]
+    val C12: Vertex get() = circumferenceVertices[11]
 
-    val D1 get() = domesticVertices[0]
-    val D2 get() = domesticVertices[1]
-    val D3 get() = domesticVertices[2]
-    val D4 get() = domesticVertices[3]
+    val D1: Vertex get() = domesticVertices[0]
+    val D2: Vertex get() = domesticVertices[1]
+    val D3: Vertex get() = domesticVertices[2]
+    val D4: Vertex get() = domesticVertices[3]
 
     // All vertices
-    val centerVertices = listOf(A1) + bridgeVertices
-    val vertices = centerVertices + circumferenceVertices + domesticVertices
+    val centerVertices: List<Vertex> = listOf(A1) + bridgeVertices
+    val vertices: List<Vertex> = centerVertices + circumferenceVertices + domesticVertices
 
-    val externalBoundary =
+    val externalBoundary: List<Vertex> =
         listOf(C1, D1, D2, C2, C3, C4, C5, C6, C7, D3, D4, C8, C9, C10, C11, C12)
 
     // ========== Edge Definitions ==========
 
-    val whiteDomesticEdges =
+    private val whiteDomesticEdges: List<Edge> =
         listOf(
             Edge(D1 to D2),
             Edge(D1 to C1),
             Edge(D2 to C2),
         )
 
-    val blackDomesticEdges =
+    private val blackDomesticEdges: List<Edge> =
         listOf(
             Edge(D3 to D4),
             Edge(D3 to C7),
             Edge(D4 to C8),
         )
 
-    val domesticEdges = whiteDomesticEdges + blackDomesticEdges
+    val domesticEdges: List<Edge> = whiteDomesticEdges + blackDomesticEdges
 
-    val bridgeEdges =
+    val bridgeEdges: List<Edge> =
         (0..5).map { index ->
             Edge(bridgeVertices[index] to bridgeVertices[(index + 1) % 6])
         }
 
-    val circumferenceEdges =
+    val circumferenceEdges: List<Edge> =
         (0..11).map { index ->
             Edge(circumferenceVertices[index] to circumferenceVertices[(index + 1) % 12])
         }
 
-    val bridgeToCircumferenceEdges =
+    val bridgeToCircumferenceEdges: List<Edge> =
         listOf(
             Edge(C1 to B1),
             Edge(C2 to B1),
@@ -118,14 +118,14 @@ object GameBoard {
             Edge(C12 to B6),
         )
 
-    val absoluteCenterToBridgeEdges = bridgeVertices.map { Edge(it to A1) }
+    val absoluteCenterToBridgeEdges: List<Edge> = bridgeVertices.map { Edge(it to A1) }
 
-    val edges =
+    val edges: List<Edge> =
         domesticEdges + bridgeEdges + circumferenceEdges + bridgeToCircumferenceEdges + absoluteCenterToBridgeEdges
 
     // ========== Game Areas ==========
 
-    val homeBases =
+    val homeBases: Map<CobColor, List<Vertex>> =
         mapOf(
             CobColor.WHITE to listOf(C1, C2, D1, D2),
             CobColor.BLACK to listOf(C7, C8, D3, D4),
@@ -144,7 +144,7 @@ object GameBoard {
      * or D1/D2 (for black). A cob that MOVES forward onto a D-ring vertex is promoted
      * immediately and becomes a rok, which is never dead.
      */
-    val upgradeVertices =
+    val upgradeVertices: Map<CobColor, List<Vertex>> =
         mapOf(
             CobColor.WHITE to listOf(C7, C8, D3, D4),
             CobColor.BLACK to listOf(C1, C2, D1, D2),
@@ -155,7 +155,7 @@ object GameBoard {
      * These are the D-ring (outermost) vertices of the opponent's home base.
      * A cob can only reach these via capture (flip), never via forward movement.
      */
-    val deadVertices =
+    val deadVertices: Map<CobColor, List<Vertex>> =
         mapOf(
             CobColor.WHITE to listOf(D3, D4),
             CobColor.BLACK to listOf(D1, D2),
@@ -163,12 +163,12 @@ object GameBoard {
 
     // ========== Regions ==========
 
-    val centralRegions =
+    val centralRegions: List<Region> =
         (0..5).map { index ->
             Region(listOf(A1, bridgeVertices[index], bridgeVertices[(index + 1) % 6]))
         }
 
-    val circumferenceRegions =
+    val circumferenceRegions: List<Region> =
         listOf(
             Region(listOf(B1, C1, C2)),
             Region(listOf(B1, C2, C3, B2)),
@@ -184,15 +184,15 @@ object GameBoard {
             Region(listOf(B6, C12, C1, B1)),
         )
 
-    val domesticRegions =
+    val domesticRegions: List<Region> =
         listOf(
             Region(listOf(C1, C2, D2, D1)),
             Region(listOf(C7, C8, D4, D3)),
         )
 
-    val allRegions = domesticRegions + centralRegions + circumferenceRegions
+    private val allRegions: List<Region> = domesticRegions + centralRegions + circumferenceRegions
 
-    val vertexToRegions by lazy {
+    val vertexToRegions: Map<Vertex, List<Region>> by lazy {
         allRegions
             .flatMap { region ->
                 region.vertices.map { vertex -> vertex to region }
@@ -203,7 +203,7 @@ object GameBoard {
      * Mapa de adyacencias del tablero.
      * CRÍTICO: Usado por el motor de IA para generar movimientos válidos.
      */
-    val adjacencyMap by lazy {
+    val adjacencyMap: MutableMap<Vertex, MutableList<Vertex>> by lazy {
         edges.fold(mutableMapOf<Vertex, MutableList<Vertex>>()) { map, edge ->
             map.apply {
                 getOrPut(edge.from) { mutableListOf() }.add(edge.to)

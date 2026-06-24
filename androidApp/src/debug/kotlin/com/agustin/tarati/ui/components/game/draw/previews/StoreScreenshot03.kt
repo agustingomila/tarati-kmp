@@ -17,7 +17,7 @@ import com.agustin.tarati.ui.theme.NaturePalette
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_ES_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot03_ES_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_es_classic,
     title = "Revisá cada jugada", subtitle = "Historial completo con navegación\npaso a paso por la partida",
     textPosition = BOTTOM, palette = ClassicPalette,
@@ -25,7 +25,7 @@ fun StoreScreenshot03_ES_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_ES_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot03_ES_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_es_dark,
     title = "Revisá cada jugada", subtitle = "Historial completo con navegación\npaso a paso por la partida",
     textPosition = BOTTOM, palette = DarkPalette,
@@ -33,7 +33,7 @@ fun StoreScreenshot03_ES_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_ES_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot03_ES_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_es_nature,
     title = "Revisá cada jugada", subtitle = "Historial completo con navegación\npaso a paso por la partida",
     textPosition = BOTTOM, palette = NaturePalette,
@@ -41,7 +41,7 @@ fun StoreScreenshot03_ES_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_ES_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot03_ES_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_es_grayscale,
     title = "Revisá cada jugada", subtitle = "Historial completo con navegación\npaso a paso por la partida",
     textPosition = BOTTOM, palette = GrayscalePalette,
@@ -49,7 +49,7 @@ fun StoreScreenshot03_ES_Grayscale() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_EN_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot03_EN_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_en_classic,
     title = "Review every move", subtitle = "Full game history with\nstep-by-step navigation",
     textPosition = BOTTOM, palette = ClassicPalette,
@@ -57,7 +57,7 @@ fun StoreScreenshot03_EN_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_EN_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot03_EN_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_en_dark,
     title = "Review every move", subtitle = "Full game history with\nstep-by-step navigation",
     textPosition = BOTTOM, palette = DarkPalette,
@@ -65,7 +65,7 @@ fun StoreScreenshot03_EN_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_EN_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot03_EN_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_en_nature,
     title = "Review every move", subtitle = "Full game history with\nstep-by-step navigation",
     textPosition = BOTTOM, palette = NaturePalette,
@@ -73,7 +73,7 @@ fun StoreScreenshot03_EN_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot03_EN_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot03_EN_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_03_en_grayscale,
     title = "Review every move", subtitle = "Full game history with\nstep-by-step navigation",
     textPosition = BOTTOM, palette = GrayscalePalette,

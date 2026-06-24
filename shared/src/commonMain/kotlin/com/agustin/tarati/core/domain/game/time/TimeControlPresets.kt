@@ -21,31 +21,31 @@ object TimeControlPresets {
 
     val Unlimited: TimeControlMode = TimeControlMode.Unlimited
 
-    val Blitz3Plus2: TimeControlMode = TimeControlMode.Fischer(
+    private val Blitz3Plus2: TimeControlMode = TimeControlMode.Fischer(
         baseMs = 3 * 60_000L,
         incrementMs = 2_000L,
     )
 
-    val Blitz5Plus0: TimeControlMode = TimeControlMode.SuddenDeath(
+    private val Blitz5Plus0: TimeControlMode = TimeControlMode.SuddenDeath(
         totalMs = 5 * 60_000L,
     )
 
-    val Rapid10Plus5: TimeControlMode = TimeControlMode.Fischer(
+    private val Rapid10Plus5: TimeControlMode = TimeControlMode.Fischer(
         baseMs = 10 * 60_000L,
         incrementMs = 5_000L,
     )
 
-    val Classical30Plus30: TimeControlMode = TimeControlMode.Fischer(
+    private val Classical30Plus30: TimeControlMode = TimeControlMode.Fischer(
         baseMs = 30 * 60_000L,
         incrementMs = 30_000L,
     )
 
-    val Bronstein5Plus3: TimeControlMode = TimeControlMode.Bronstein(
+    private val Bronstein5Plus3: TimeControlMode = TimeControlMode.Bronstein(
         baseMs = 5 * 60_000L,
         delayMs = 3_000L,
     )
 
-    val Byoyomi5Plus3x30: TimeControlMode = TimeControlMode.Byoyomi(
+    private val Byoyomi5Plus3x30: TimeControlMode = TimeControlMode.Byoyomi(
         baseMs = 5 * 60_000L,
         periodMs = 30_000L,
         periods = 3,

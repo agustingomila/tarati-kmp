@@ -55,8 +55,8 @@ class DRingPromotionTest {
     fun whiteCob_advancingFromC8ToD4_promotesToRok() {
         val state = GameState(
             cobs = mapOf(
-                C8 to Cob(WHITE, false),
-                B1 to Cob(BLACK, false), // keep at least one black piece
+                C8 to Cob(WHITE),
+                B1 to Cob(BLACK), // keep at least one black piece
             ),
             currentTurn = WHITE,
         )
@@ -66,7 +66,7 @@ class DRingPromotionTest {
         val pieceAtD4 = next.cobs[D4]
         assertFalse("Original C8 should be vacated", next.cobs.containsKey(C8))
         assertTrue("D4 must contain a piece after the move", pieceAtD4 != null)
-        assertEquals("Piece at D4 must be WHITE", WHITE, pieceAtD4!!.color)
+        assertEquals("Piece at D4 must be WHITE", WHITE, (pieceAtD4 ?: return).color)
         assertTrue("White cob advancing to D4 must be promoted to rok", pieceAtD4.isUpgraded)
     }
 
@@ -74,8 +74,8 @@ class DRingPromotionTest {
     fun whiteCob_advancingFromC7ToD3_promotesToRok() {
         val state = GameState(
             cobs = mapOf(
-                C7 to Cob(WHITE, false),
-                B1 to Cob(BLACK, false),
+                C7 to Cob(WHITE),
+                B1 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
@@ -85,7 +85,7 @@ class DRingPromotionTest {
         val pieceAtD3 = next.cobs[D3]
         assertFalse("Original C7 should be vacated", next.cobs.containsKey(C7))
         assertTrue("D3 must contain a piece after the move", pieceAtD3 != null)
-        assertEquals("Piece at D3 must be WHITE", WHITE, pieceAtD3!!.color)
+        assertEquals("Piece at D3 must be WHITE", WHITE, (pieceAtD3 ?: return).color)
         assertTrue("White cob advancing to D3 must be promoted to rok", pieceAtD3.isUpgraded)
     }
 
@@ -97,8 +97,8 @@ class DRingPromotionTest {
     fun blackCob_advancingFromC2ToD2_promotesToRok() {
         val state = GameState(
             cobs = mapOf(
-                C2 to Cob(BLACK, false),
-                C8 to Cob(WHITE, false),
+                C2 to Cob(BLACK),
+                C8 to Cob(WHITE),
             ),
             currentTurn = BLACK,
         )
@@ -108,7 +108,7 @@ class DRingPromotionTest {
         val pieceAtD2 = next.cobs[D2]
         assertFalse("Original C2 should be vacated", next.cobs.containsKey(C2))
         assertTrue("D2 must contain a piece after the move", pieceAtD2 != null)
-        assertEquals("Piece at D2 must be BLACK", BLACK, pieceAtD2!!.color)
+        assertEquals("Piece at D2 must be BLACK", BLACK, (pieceAtD2 ?: return).color)
         assertTrue("Black cob advancing to D2 must be promoted to rok", pieceAtD2.isUpgraded)
     }
 
@@ -116,8 +116,8 @@ class DRingPromotionTest {
     fun blackCob_advancingFromC1ToD1_promotesToRok() {
         val state = GameState(
             cobs = mapOf(
-                C1 to Cob(BLACK, false),
-                C8 to Cob(WHITE, false),
+                C1 to Cob(BLACK),
+                C8 to Cob(WHITE),
             ),
             currentTurn = BLACK,
         )
@@ -127,7 +127,7 @@ class DRingPromotionTest {
         val pieceAtD1 = next.cobs[D1]
         assertFalse("Original C1 should be vacated", next.cobs.containsKey(C1))
         assertTrue("D1 must contain a piece after the move", pieceAtD1 != null)
-        assertEquals("Piece at D1 must be BLACK", BLACK, pieceAtD1!!.color)
+        assertEquals("Piece at D1 must be BLACK", BLACK, (pieceAtD1 ?: return).color)
         assertTrue("Black cob advancing to D1 must be promoted to rok", pieceAtD1.isUpgraded)
     }
 
@@ -153,9 +153,9 @@ class DRingPromotionTest {
         // and B4 is NOT adjacent to D4.
         val state = GameState(
             cobs = mapOf(
-                B4 to Cob(WHITE, false),  // moves to C8
-                D4 to Cob(BLACK, false),  // will be captured and become white
-                B5 to Cob(BLACK, false),  // filler
+                B4 to Cob(WHITE),  // moves to C8
+                D4 to Cob(BLACK),  // will be captured and become white
+                B5 to Cob(BLACK),  // filler
             ),
             currentTurn = WHITE,
         )
@@ -164,7 +164,7 @@ class DRingPromotionTest {
 
         val pieceAtD4 = next.cobs[D4]
         assertTrue("D4 must still contain a piece (the captured cob)", pieceAtD4 != null)
-        assertEquals("Captured piece at D4 must be WHITE (flipped)", WHITE, pieceAtD4!!.color)
+        assertEquals("Captured piece at D4 must be WHITE (flipped)", WHITE, (pieceAtD4 ?: return).color)
         assertFalse(
             "Cob captured onto D4 via flip must NOT be promoted to rok — it is dead",
             pieceAtD4.isUpgraded,
@@ -190,7 +190,7 @@ class DRingPromotionTest {
         val afterMove1 = start.applyMove(Move(B5 to B4))
         val whiteAtC8 = afterMove1.cobs[C8]
         assertTrue("After B5→B4, C8 must contain a white cob (captured)", whiteAtC8 != null)
-        assertEquals("C8 piece must be WHITE", WHITE, whiteAtC8!!.color)
+        assertEquals("C8 piece must be WHITE", WHITE, (whiteAtC8 ?: return).color)
         assertFalse("C8 piece must be a cob, not a rok", whiteAtC8.isUpgraded)
 
         // 2. BLACK C9→B5 (captures B4 → black)
@@ -207,13 +207,13 @@ class DRingPromotionTest {
         // We test the promotion step directly using the intermediate state:
         val stateBeforePromotion = GameState(
             cobs = mapOf(
-                B1 to Cob(WHITE, false),
-                C1 to Cob(WHITE, false),
-                C10 to Cob(WHITE, false), // C10 is actually B6 area — use as-is
-                C4 to Cob(WHITE, false),
-                C8 to Cob(WHITE, false), // the captured cob now white
-                C5 to Cob(BLACK, false),
-                B5 to Cob(BLACK, false), // C9 moved here
+                B1 to Cob(WHITE),
+                C1 to Cob(WHITE),
+                C10 to Cob(WHITE), // C10 is actually B6 area — use as-is
+                C4 to Cob(WHITE),
+                C8 to Cob(WHITE), // the captured cob now white
+                C5 to Cob(BLACK),
+                B5 to Cob(BLACK), // C9 moved here
             ),
             currentTurn = WHITE,
         )
@@ -223,7 +223,7 @@ class DRingPromotionTest {
 
         val rokAtD4 = afterPromotion.cobs[D4]
         assertTrue("D4 must contain a piece after C8→D4", rokAtD4 != null)
-        assertEquals("Piece at D4 must be WHITE", WHITE, rokAtD4!!.color)
+        assertEquals("Piece at D4 must be WHITE", WHITE, (rokAtD4 ?: return).color)
         assertTrue(
             "White cob advancing from C8 to D4 must be promoted to a rok",
             rokAtD4.isUpgraded,

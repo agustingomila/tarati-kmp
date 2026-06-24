@@ -52,6 +52,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -61,7 +62,7 @@ import kotlin.time.toDuration
 
 // ── Database ──────────────────────────────────────────────────────────────────
 
-val databaseModule = module {
+val databaseModule: Module = module {
     single {
         Room.databaseBuilder(
             get(),
@@ -76,7 +77,7 @@ val databaseModule = module {
 
 // ── DataStore ─────────────────────────────────────────────────────────────────
 
-val dataStoreModule = module {
+val dataStoreModule: Module = module {
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create(
             produceFile = {
@@ -88,14 +89,14 @@ val dataStoreModule = module {
 
 // ── Settings + Auth ───────────────────────────────────────────────────────────
 
-val appStateModule = module {
+val appStateModule: Module = module {
     single<SettingsRepository> { AndroidSettingsRepository(get()) }
     single<AuthRepository> { AndroidAuthRepository(get()) }
 }
 
 // ── Achievements ──────────────────────────────────────────────────────────────
 
-val achievementsModule = module {
+val achievementsModule: Module = module {
     single { ActivityProvider() }
     single { AchievementsRepository(get()) }
     single<IAchievementsReporter> { PlayGamesAchievementsReporter(get(), get()) }
@@ -138,7 +139,7 @@ val achievementsModule = module {
 
 // ── Special Events ────────────────────────────────────────────────────────────
 
-val specialEventModule = module {
+val specialEventModule: Module = module {
     single { SpecialEventRepository(get()) }
     single<ISpecialEventManager> {
         SpecialEventManager(
@@ -154,13 +155,19 @@ val specialEventModule = module {
 
 // ── Billing ───────────────────────────────────────────────────────────────────
 
-val billingModule = module {
-    single<IBillingManager> { BillingManager(context = get(), activityProvider = get()) }
+val billingModule: Module = module {
+    single<IBillingManager> {
+        BillingManager(
+            context = get(),
+            activityProvider = get(),
+            entitlementsRepository = get()
+        )
+    }
 }
 
 // ── Services ──────────────────────────────────────────────────────────────────
 
-val androidServiceModule = module {
+val androidServiceModule: Module = module {
     // HttpClient con engine Android (OkHttp) para WebSockets y REST
     single {
         HttpClient(OkHttp) {
@@ -184,18 +191,18 @@ val androidServiceModule = module {
 
 // ── Sound ─────────────────────────────────────────────────────────────────────
 
-val soundModule = module {
+val soundModule: Module = module {
     single<SoundManager> { SoundManager(get()) }
     single<ISoundService> { SoundServiceImpl(get()) }
 }
 
 // ── ViewModels ────────────────────────────────────────────────────────────────
 
-val androidViewModelModule = module {
+val androidViewModelModule: Module = module {
     // GameViewModel con SavedStateHandle (Android-specific)
     viewModel { params -> AndroidGameViewModel(params.get(), get(), get()) } bind IGameModel::class
 
-    viewModel { AndroidSettingsViewModel(get(), get(), get()) }
+    viewModel { AndroidSettingsViewModel(get(), get(), get(), get()) }
 }
 
 // ── Lista completa de módulos Android ────────────────────────────────────────
@@ -211,7 +218,7 @@ val androidViewModelModule = module {
  * startKoin { modules(androidModules) }
  * ```
  */
-val androidModules = listOf(
+val androidModules: List<Module> = listOf(
     androidServiceModule,  // PRIMERO: Crear HttpClient
 ) + sharedModules + listOf(
     databaseModule,

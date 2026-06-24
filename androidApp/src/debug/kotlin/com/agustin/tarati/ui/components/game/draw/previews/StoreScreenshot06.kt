@@ -17,7 +17,7 @@ import com.agustin.tarati.ui.theme.NaturePalette
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_ES_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot06_ES_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_es_classic,
     title = "Guardá tus partidas", subtitle = "Explorá y reanudá cualquier\npartida anterior cuando quieras",
     textPosition = TOP, palette = ClassicPalette,
@@ -25,7 +25,7 @@ fun StoreScreenshot06_ES_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_ES_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot06_ES_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_es_dark,
     title = "Guardá tus partidas", subtitle = "Explorá y reanudá cualquier\npartida anterior cuando quieras",
     textPosition = TOP, palette = DarkPalette,
@@ -33,7 +33,7 @@ fun StoreScreenshot06_ES_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_ES_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot06_ES_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_es_nature,
     title = "Guardá tus partidas", subtitle = "Explorá y reanudá cualquier\npartida anterior cuando quieras",
     textPosition = TOP, palette = NaturePalette,
@@ -41,7 +41,7 @@ fun StoreScreenshot06_ES_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_ES_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot06_ES_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_es_grayscale,
     title = "Guardá tus partidas", subtitle = "Explorá y reanudá cualquier\npartida anterior cuando quieras",
     textPosition = TOP, palette = GrayscalePalette,
@@ -49,7 +49,7 @@ fun StoreScreenshot06_ES_Grayscale() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_EN_Classic() = PlayStoreScreenshot(
+fun StoreScreenshot06_EN_Classic(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_en_classic,
     title = "Save your games", subtitle = "Browse and resume any\nprevious game whenever you want",
     textPosition = TOP, palette = ClassicPalette,
@@ -57,7 +57,7 @@ fun StoreScreenshot06_EN_Classic() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_EN_Dark() = PlayStoreScreenshot(
+fun StoreScreenshot06_EN_Dark(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_en_dark,
     title = "Save your games", subtitle = "Browse and resume any\nprevious game whenever you want",
     textPosition = TOP, palette = DarkPalette,
@@ -65,7 +65,7 @@ fun StoreScreenshot06_EN_Dark() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_EN_Nature() = PlayStoreScreenshot(
+fun StoreScreenshot06_EN_Nature(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_en_nature,
     title = "Save your games", subtitle = "Browse and resume any\nprevious game whenever you want",
     textPosition = TOP, palette = NaturePalette,
@@ -73,7 +73,7 @@ fun StoreScreenshot06_EN_Nature() = PlayStoreScreenshot(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot06_EN_Grayscale() = PlayStoreScreenshot(
+fun StoreScreenshot06_EN_Grayscale(): Unit = PlayStoreScreenshot(
     screenshotRes = R.drawable.ss_06_en_grayscale,
     title = "Save your games", subtitle = "Browse and resume any\nprevious game whenever you want",
     textPosition = TOP, palette = GrayscalePalette,

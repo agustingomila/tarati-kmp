@@ -17,9 +17,9 @@ class NoOpSpecialEventManager : ISpecialEventManager {
     override val pendingCelebration: StateFlow<SpecialEvent?> =
         MutableStateFlow(null)
 
-    override suspend fun refreshIfNeeded() = Unit
+    override suspend fun refreshIfNeeded(): Unit = Unit
     override suspend fun isGiftSeen(event: SpecialEvent): Boolean = true
-    override suspend fun markGiftSeen(event: SpecialEvent) = Unit
-    override fun dismissCelebration() = Unit
-    override suspend fun onGameResult(matchState: MatchState, playerSide: CobColor) = Unit
+    override suspend fun markGiftSeen(event: SpecialEvent): Unit = Unit
+    override fun dismissCelebration(): Unit = Unit
+    override suspend fun onGameResult(matchState: MatchState, playerSide: CobColor): Unit = Unit
 }

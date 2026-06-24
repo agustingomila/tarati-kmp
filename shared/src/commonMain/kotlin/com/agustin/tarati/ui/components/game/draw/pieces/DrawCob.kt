@@ -157,7 +157,6 @@ fun DrawScope.drawSelection(
         arrowSize = strokeOuter * 2f,
         arrowWidth = 0f,
         arrowAtStart = true,
-        arrowAtEnd = true,
     )
 
     // Arco interior principal
@@ -175,7 +174,6 @@ fun DrawScope.drawSelection(
         arrowSize = strokeInner * 3f,
         arrowWidth = strokeInner * 1.2f,
         arrowAtStart = true,
-        arrowAtEnd = true,
     )
 
     // ── Punto de brillo ───────────────────────────────────────────────────────

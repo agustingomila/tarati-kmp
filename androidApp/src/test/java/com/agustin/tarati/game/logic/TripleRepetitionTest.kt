@@ -31,8 +31,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         engine.clearHistory()
@@ -53,8 +53,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(BLACK)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         engine.clearHistory()
@@ -76,8 +76,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         // Primera vez - no debería detectar
@@ -104,15 +104,15 @@ class TripleRepetitionTest {
         val state1 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         val state2 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C2, WHITE, false) // Diferente posición
-                setCob(C7, BLACK, false)
+                setCob(C2, WHITE) // Diferente posición
+                setCob(C7, BLACK)
             }
 
         // Registrar state1 dos veces
@@ -133,8 +133,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         // Verificar que inicialmente no causaría repetición
@@ -159,8 +159,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         // Registrar dos veces
@@ -186,15 +186,15 @@ class TripleRepetitionTest {
         val state1 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         val state2 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         val hash1 = state1.hashBoard()
@@ -206,8 +206,8 @@ class TripleRepetitionTest {
         val state3 =
             createGameState {
                 setTurn(BLACK) // Diferente turno
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         val hash3 = state3.hashBoard()
@@ -222,10 +222,10 @@ class TripleRepetitionTest {
         var gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(B1, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(B6, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(B1, WHITE)
+                setCob(C7, BLACK)
+                setCob(B6, BLACK)
             }
 
         var moves = 0
@@ -269,8 +269,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         engine.clearHistory()
@@ -285,7 +285,7 @@ class TripleRepetitionTest {
         assertNotNull("AI should find a move", result.move)
 
         // Aplicar el movimiento y verificar que no causa triple repetición
-        val newState = gameState.applyMove(result.move!!)
+        val newState = gameState.applyMove(result.move ?: return)
         val wouldCauseRepetition = newState.checkIfWouldCauseRepetition(engine.positionHistory)
 
         assertTrue("AI should avoid moves that cause triple repetition", !wouldCauseRepetition)
@@ -297,15 +297,15 @@ class TripleRepetitionTest {
         val state1 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         val state2 =
             createGameState {
                 setTurn(BLACK)
-                setCob(C2, WHITE, false) // Diferente posición
-                setCob(C7, BLACK, false)
+                setCob(C2, WHITE) // Diferente posición
+                setCob(C7, BLACK)
             }
 
         engine.clearHistory()
@@ -325,8 +325,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         // Registrar dos veces
@@ -359,7 +359,7 @@ class TripleRepetitionTest {
 
             if (result.move == null) break
 
-            val newState = gameState.applyMove(result.move!!)
+            val newState = gameState.applyMove(result.move ?: return)
             val nextState = newState.copy(currentTurn = gameState.currentTurn.opponent)
 
             // Registrar el movimiento
@@ -391,8 +391,8 @@ class TripleRepetitionTest {
         val gameState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C7, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C7, BLACK)
             }
 
         engine.clearHistory()
@@ -428,19 +428,19 @@ class TripleRepetitionTest {
         val state1 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(B1, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(B6, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(B1, WHITE)
+                setCob(C7, BLACK)
+                setCob(B6, BLACK)
             }
 
         val state2 =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(B1, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(B6, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(B1, WHITE)
+                setCob(C7, BLACK)
+                setCob(B6, BLACK)
             }
 
         val hash1 = state1.hashBoard()
@@ -463,10 +463,10 @@ class TripleRepetitionTest {
         val initialState =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(B1, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(B6, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(B1, WHITE)
+                setCob(C7, BLACK)
+                setCob(B6, BLACK)
             }
 
         engine.clearHistory()

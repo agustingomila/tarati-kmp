@@ -13,4 +13,4 @@ actual fun VertexLabelsOverlay(
     containerSize: Size,
     textSize: Float,
     textColor: Color,
-) = Unit
+): Unit = Unit

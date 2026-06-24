@@ -18,9 +18,9 @@ private external fun jsError(msg: String)
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class PlatformLogger actual constructor(private val tag: String) {
-    actual fun debug(message: String) = jsLog("[$tag] $message")
-    actual fun info(message: String) = jsInfo("[$tag] $message")
-    actual fun warn(message: String) = jsWarn("[$tag] $message")
+    actual fun debug(message: String): Unit = jsLog("[$tag] $message")
+    actual fun info(message: String): Unit = jsInfo("[$tag] $message")
+    actual fun warn(message: String): Unit = jsWarn("[$tag] $message")
     actual fun error(message: String, throwable: Throwable?) {
         jsError("[$tag] $message")
         throwable?.let { jsError(it.toString()) }

@@ -43,8 +43,8 @@ class DuplicateMoveTest {
     // Minimal board: White at C1, Black at C7
     private val initialState = GameState(
         cobs = mapOf(
-            C1 to Cob(WHITE, false),
-            C7 to Cob(BLACK, false),
+            C1 to Cob(WHITE),
+            C7 to Cob(BLACK),
         ),
         currentTurn = WHITE,
     )

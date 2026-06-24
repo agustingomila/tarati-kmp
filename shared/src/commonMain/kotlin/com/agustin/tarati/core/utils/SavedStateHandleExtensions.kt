@@ -9,7 +9,7 @@ import kotlinx.serialization.serializer
  *
  * Permite guardar/recuperar objetos @Serializable serializándolos como JSON strings.
  */
-val json = Json {
+val json: Json = Json {
     ignoreUnknownKeys = true
     prettyPrint = false
     allowStructuredMapKeys = true

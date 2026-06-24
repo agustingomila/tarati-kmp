@@ -177,43 +177,43 @@ object AchievementIds {
      * Achievement: Halloween Theme
      * Se desbloquea ganando en dificultad Champion el 31 de octubre.
      */
-    const val HALLOWEEN_PALETTE = "CgkIgobx5M4CEAIQEQ"
+    const val HALLOWEEN_PALETTE: String = "CgkIgobx5M4CEAIQEQ"
 
     /**
      * Achievement: Christmas Theme
      * Se desbloquea ganando en dificultad Champion el 25 de diciembre.
      */
-    const val CHRISTMAS_PALETTE = "CgkIgobx5M4CEAIQEg"
+    const val CHRISTMAS_PALETTE: String = "CgkIgobx5M4CEAIQEg"
 
     /**
      * Achievement: The First Light (Aurora Palette)
      * Criterio de desbloqueo definido por el juego.
      */
-    const val AURORA_PALETTE = "CgkIgobx5M4CEAIQFg"
+    const val AURORA_PALETTE: String = "CgkIgobx5M4CEAIQFg"
 
     /**
      * Achievement: The Dark Side (Ember Palette)
      * Criterio de desbloqueo definido por el juego.
      */
-    const val EMBER_PALETTE = "CgkIgobx5M4CEAIQFw"
+    const val EMBER_PALETTE: String = "CgkIgobx5M4CEAIQFw"
 
     // Otros achievements del juego
-    const val WELCOME_TO_TARATI = "CgkIgobx5M4CEAIQCQ"
-    const val FIRST_CAPTURE = "CgkIgobx5M4CEAIQAQ"
-    const val FIRST_PROMOTION = "CgkIgobx5M4CEAIQBw"
-    const val FIRST_VICTORY = "CgkIgobx5M4CEAIQDw"
-    const val PLAY_10_GAMES = "CgkIgobx5M4CEAIQCA"
-    const val THE_FLIPPER = "CgkIgobx5M4CEAIQAg"
-    const val ROK_MASTER = "CgkIgobx5M4CEAIQDg"
-    const val UNSTOPPABLE = "CgkIgobx5M4CEAIQAw"
-    const val CHAMPION = "CgkIgobx5M4CEAIQCg"
-    const val MIT = "CgkIgobx5M4CEAIQDA"
-    const val STALEMIT = "CgkIgobx5M4CEAIQBg"
-    const val ETERNAL_LOOP = "CgkIgobx5M4CEAIQBA"
-    const val FIFTY_MOVE_RULE = "CgkIgobx5M4CEAIQCw"
-    const val DEAD_BUT_DANGEROUS = "CgkIgobx5M4CEAIQDQ"
-    const val GRANDMASTER = "CgkIgobx5M4CEAIQBQ"
-    const val APPRENTICE = "CgkIgobx5M4CEAIQFQ"
-    const val STRATEGIST = "CgkIgobx5M4CEAIQFA"
-    const val TACTICIAN = "CgkIgobx5M4CEAIQEw"
+    const val WELCOME_TO_TARATI: String = "CgkIgobx5M4CEAIQCQ"
+    const val FIRST_CAPTURE: String = "CgkIgobx5M4CEAIQAQ"
+    const val FIRST_PROMOTION: String = "CgkIgobx5M4CEAIQBw"
+    const val FIRST_VICTORY: String = "CgkIgobx5M4CEAIQDw"
+    const val PLAY_10_GAMES: String = "CgkIgobx5M4CEAIQCA"
+    const val THE_FLIPPER: String = "CgkIgobx5M4CEAIQAg"
+    const val ROK_MASTER: String = "CgkIgobx5M4CEAIQDg"
+    const val UNSTOPPABLE: String = "CgkIgobx5M4CEAIQAw"
+    const val CHAMPION: String = "CgkIgobx5M4CEAIQCg"
+    const val MIT: String = "CgkIgobx5M4CEAIQDA"
+    const val STALEMIT: String = "CgkIgobx5M4CEAIQBg"
+    const val ETERNAL_LOOP: String = "CgkIgobx5M4CEAIQBA"
+    const val FIFTY_MOVE_RULE: String = "CgkIgobx5M4CEAIQCw"
+    const val DEAD_BUT_DANGEROUS: String = "CgkIgobx5M4CEAIQDQ"
+    const val GRANDMASTER: String = "CgkIgobx5M4CEAIQBQ"
+    const val APPRENTICE: String = "CgkIgobx5M4CEAIQFQ"
+    const val STRATEGIST: String = "CgkIgobx5M4CEAIQFA"
+    const val TACTICIAN: String = "CgkIgobx5M4CEAIQEw"
 }

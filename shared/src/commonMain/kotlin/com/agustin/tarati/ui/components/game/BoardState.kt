@@ -25,9 +25,7 @@ data class BoardState(
                 gameState = initialGameState(),
                 boardVisualState = BoardVisualState(),
                 boardOrientation = BoardOrientation.PORTRAIT_WHITE,
-                isEditing = false,
                 aiEnabled = false,
-                whiteIsAI = false,
                 blackIsAI = false,
                 newGame = true,
             )

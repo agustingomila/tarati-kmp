@@ -261,8 +261,6 @@ fun PreviewRegionHighlights(
                                 drawRegionHighlight(
                                     highlight = RegionHighlight(
                                         region = centralRegion,
-                                        duration = 500L,
-                                        pulse = true,
                                     ),
                                     canvasSize = size,
                                     orientation = boardOrientation,
@@ -298,7 +296,6 @@ fun PreviewRegionHighlights(
                                 drawRegionHighlight(
                                     highlight = RegionHighlight(
                                         region = domesticRegion,
-                                        duration = 500L,
                                         pulse = false,
                                     ),
                                     canvasSize = size,
@@ -335,8 +332,6 @@ fun PreviewRegionHighlights(
                                 drawRegionHighlight(
                                     highlight = RegionHighlight(
                                         region = circumferenceRegion,
-                                        duration = 500L,
-                                        pulse = true,
                                     ),
                                     canvasSize = size,
                                     orientation = boardOrientation,

@@ -68,10 +68,6 @@ class RegressionTest {
     private val tournamentConfig = TournamentConfig(
         gamesPerMatch = 100,
         maxMovesPerGame = 150,
-        alternateColors = true,
-        verbose = false,
-        showProgress = true,
-        collectMetrics = true,
     )
 
     // ── Fixed positions ───────────────────────────────────────────────────────
@@ -85,14 +81,14 @@ class RegressionTest {
      */
     private val midGamePosition: GameState = GameState(
         cobs = mapOf(
-            C3 to Cob(WHITE, false),
-            B1 to Cob(WHITE, false),
-            B2 to Cob(WHITE, false),
-            B3 to Cob(WHITE, false),
-            C9 to Cob(BLACK, false),
-            B4 to Cob(BLACK, false),
-            B5 to Cob(BLACK, false),
-            B6 to Cob(BLACK, false),
+            C3 to Cob(WHITE),
+            B1 to Cob(WHITE),
+            B2 to Cob(WHITE),
+            B3 to Cob(WHITE),
+            C9 to Cob(BLACK),
+            B4 to Cob(BLACK),
+            B5 to Cob(BLACK),
+            B6 to Cob(BLACK),
         ),
         currentTurn = WHITE,
     )
@@ -106,11 +102,11 @@ class RegressionTest {
             A1 to Cob(WHITE, true),
             B5 to Cob(WHITE, true),
             C8 to Cob(WHITE, true),
-            D3 to Cob(WHITE, false),
+            D3 to Cob(WHITE),
             B2 to Cob(BLACK, true),
             C3 to Cob(BLACK, true),
             C12 to Cob(BLACK, true),
-            D2 to Cob(BLACK, false),
+            D2 to Cob(BLACK),
         ),
         currentTurn = BLACK,
     )
@@ -191,7 +187,7 @@ class RegressionTest {
 
         val result = tournament.runEngineMatch(
             engineA = personalityEngine("New"),
-            engineB = legacyEngine("Legacy"),
+            engineB = legacyEngine(),
             configA = EvaluationConfig.CHAMPION,
             configB = EvaluationConfig.CHAMPION,
             tournamentConfig = tournamentConfig,
@@ -224,7 +220,7 @@ class RegressionTest {
 
         val result = tournament.runEngineMatch(
             engineA = personalityEngine("New"),
-            engineB = legacyEngine("Legacy"),
+            engineB = legacyEngine(),
             configA = EvaluationConfig.getByDifficulty(Difficulty.HARD),
             configB = EvaluationConfig.getByDifficulty(Difficulty.HARD),
             tournamentConfig = tournamentConfig,   // 100 games, same as CHAMPION

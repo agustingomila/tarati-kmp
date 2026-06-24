@@ -159,10 +159,10 @@ fun TournamentDetailScreen(
                 state.error != null && state.tournament == null -> Box(
                     Modifier.fillMaxSize().padding(padding),
                     contentAlignment = Alignment.Center,
-                ) { Text(state.error!!, color = MaterialTheme.colorScheme.error) }
+                ) { Text(state.error ?: return@Box, color = MaterialTheme.colorScheme.error) }
 
                 state.tournament != null -> TournamentDetailContent(
-                    tournament = state.tournament!!,
+                    tournament = state.tournament ?: return@Scaffold,
                     currentUserId = currentUserId,
                     contentPadding = padding,
                     onRegister = {

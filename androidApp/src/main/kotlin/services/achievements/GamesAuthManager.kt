@@ -60,7 +60,7 @@ class GamesAuthManager(
     private val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
 
     private val _isAuthenticated = MutableStateFlow(false)
-    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
+    private val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
     /**
      * Intenta autenticar silenciosamente (sin UI).

@@ -9,6 +9,7 @@ import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.prefs.Preferences
 
@@ -39,101 +40,101 @@ class DesktopSettingsRepository : SettingsRepository {
     // ── Theme & UI ─────────────────────────────────────────────────────────────
 
     private val _isDarkTheme = MutableStateFlow(prefs.getBoolean(KEY_DARK_THEME, false))
-    override val isDarkTheme = _isDarkTheme.asStateFlow()
+    override val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
 
     private val _labelsVisibility = MutableStateFlow(prefs.getBoolean(KEY_LABELS_VISIBLE, false))
-    override val labelsVisibility = _labelsVisibility.asStateFlow()
+    override val labelsVisibility: StateFlow<Boolean> = _labelsVisibility.asStateFlow()
 
     private val _verticesVisibility = MutableStateFlow(prefs.getBoolean(KEY_VERTICES_VISIBLE, true))
-    override val verticesVisibility = _verticesVisibility.asStateFlow()
+    override val verticesVisibility: StateFlow<Boolean> = _verticesVisibility.asStateFlow()
 
     private val _edgesVisibility = MutableStateFlow(prefs.getBoolean(KEY_EDGES_VISIBLE, false))
-    override val edgesVisibility = _edgesVisibility.asStateFlow()
+    override val edgesVisibility: StateFlow<Boolean> = _edgesVisibility.asStateFlow()
 
     private val _regionsVisibility = MutableStateFlow(prefs.getBoolean(KEY_REGIONS_VISIBLE, true))
-    override val regionsVisibility = _regionsVisibility.asStateFlow()
+    override val regionsVisibility: StateFlow<Boolean> = _regionsVisibility.asStateFlow()
 
     private val _perimeterVisibility = MutableStateFlow(prefs.getBoolean(KEY_PERIMETER_VISIBLE, true))
-    override val perimeterVisibility = _perimeterVisibility.asStateFlow()
+    override val perimeterVisibility: StateFlow<Boolean> = _perimeterVisibility.asStateFlow()
 
     private val _animateEffects = MutableStateFlow(prefs.getBoolean(KEY_ANIMATE_EFFECTS, true))
-    override val animateEffects = _animateEffects.asStateFlow()
+    override val animateEffects: StateFlow<Boolean> = _animateEffects.asStateFlow()
 
     // ── Difficulty ─────────────────────────────────────────────────────────────
 
     private val _difficulty = MutableStateFlow(
         Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY, null) } ?: Difficulty.DEFAULT
     )
-    override val difficulty = _difficulty.asStateFlow()
+    override val difficulty: StateFlow<Difficulty> = _difficulty.asStateFlow()
 
     private val _difficultyBlack = MutableStateFlow(
         Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY_BLACK, null) } ?: Difficulty.DEFAULT
     )
-    override val difficultyBlack = _difficultyBlack.asStateFlow()
+    override val difficultyBlack: StateFlow<Difficulty> = _difficultyBlack.asStateFlow()
 
     private val _difficultyWhite = MutableStateFlow(
         Difficulty.entries.find { it.name == prefs.get(KEY_DIFFICULTY_WHITE, null) } ?: Difficulty.DEFAULT
     )
-    override val difficultyWhite = _difficultyWhite.asStateFlow()
+    override val difficultyWhite: StateFlow<Difficulty> = _difficultyWhite.asStateFlow()
 
     // ── User & Localization ────────────────────────────────────────────────────
 
     private val _userName = MutableStateFlow(prefs.get(KEY_USER_NAME, ""))
-    override val userName = _userName.asStateFlow()
+    override val userName: StateFlow<String?> = _userName.asStateFlow()
 
     private val _language = MutableStateFlow(
         AppLanguage.entries.find { it.name == prefs.get(KEY_LANGUAGE, null) } ?: AppLanguage.SPANISH
     )
-    override val language = _language.asStateFlow()
+    override val language: StateFlow<AppLanguage> = _language.asStateFlow()
 
     // ── Visual Style ───────────────────────────────────────────────────────────
 
     private val _palette = MutableStateFlow(prefs.get(KEY_PALETTE, "Classic"))
-    override val palette = _palette.asStateFlow()
+    override val palette: StateFlow<String?> = _palette.asStateFlow()
 
     private val _conversionAnimationStyle = MutableStateFlow(
         ConversionAnimationStyle.entries.find { it.name == prefs.get(KEY_CONVERSION_STYLE, null) }
             ?: ConversionAnimationStyle.SURPRISE
     )
-    override val conversionAnimationStyle = _conversionAnimationStyle.asStateFlow()
+    override val conversionAnimationStyle: StateFlow<ConversionAnimationStyle> = _conversionAnimationStyle.asStateFlow()
 
     private val _pieceTypeId = MutableStateFlow(prefs.get(KEY_PIECE_TYPE_ID, PieceTypes.default.id))
-    override val pieceTypeId = _pieceTypeId.asStateFlow()
+    override val pieceTypeId: StateFlow<String?> = _pieceTypeId.asStateFlow()
 
     // ── Sound ──────────────────────────────────────────────────────────────────
 
     private val _soundEnabled = MutableStateFlow(prefs.getBoolean(KEY_SOUND_ENABLED, false))
-    override val soundEnabled = _soundEnabled.asStateFlow()
+    override val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
 
     private val _soundVolume = MutableStateFlow(prefs.getFloat(KEY_SOUND_VOLUME, 0.8f))
-    override val soundVolume = _soundVolume.asStateFlow()
+    override val soundVolume: StateFlow<Float> = _soundVolume.asStateFlow()
 
     // ── Tutorial & Seasonal ────────────────────────────────────────────────────
 
     private val _tutorialSeen = MutableStateFlow(prefs.getBoolean(KEY_TUTORIAL_SEEN, false))
-    override val tutorialSeen = _tutorialSeen.asStateFlow()
+    override val tutorialSeen: StateFlow<Boolean> = _tutorialSeen.asStateFlow()
 
     private val _seasonalAutoAppliedDate = MutableStateFlow(prefs.get(KEY_SEASONAL_DATE, ""))
-    override val seasonalAutoAppliedDate = _seasonalAutoAppliedDate.asStateFlow()
+    override val seasonalAutoAppliedDate: StateFlow<String?> = _seasonalAutoAppliedDate.asStateFlow()
 
     private val _preSeasonalPalette = MutableStateFlow(prefs.get(KEY_PRE_SEASONAL_PALETTE, ""))
-    override val preSeasonalPalette = _preSeasonalPalette.asStateFlow()
+    override val preSeasonalPalette: StateFlow<String?> = _preSeasonalPalette.asStateFlow()
 
     // ── Game Session ───────────────────────────────────────────────────────────
 
     private val _whiteIsAI = MutableStateFlow(prefs.getBoolean(KEY_WHITE_IS_AI, false))
-    override val whiteIsAI = _whiteIsAI.asStateFlow()
+    override val whiteIsAI: StateFlow<Boolean> = _whiteIsAI.asStateFlow()
 
     private val _blackIsAI = MutableStateFlow(prefs.getBoolean(KEY_BLACK_IS_AI, true))
-    override val blackIsAI = _blackIsAI.asStateFlow()
+    override val blackIsAI: StateFlow<Boolean> = _blackIsAI.asStateFlow()
 
     private val _boardOrientation = MutableStateFlow(
         prefs.get(KEY_BOARD_ORIENTATION, BoardOrientation.PORTRAIT_WHITE.name)
     )
-    override val boardOrientation = _boardOrientation.asStateFlow()
+    override val boardOrientation: StateFlow<String?> = _boardOrientation.asStateFlow()
 
     private val _isManuallyRotated = MutableStateFlow(prefs.getBoolean(KEY_MANUALLY_ROTATED, false))
-    override val isManuallyRotated = _isManuallyRotated.asStateFlow()
+    override val isManuallyRotated: StateFlow<Boolean> = _isManuallyRotated.asStateFlow()
 
     // ── Time Control & Pre-moves ───────────────────────────────────────────────
 
@@ -141,24 +142,24 @@ class DesktopSettingsRepository : SettingsRepository {
         prefs.get(KEY_TIME_CONTROL, null)?.let { TimeControlMode.deserialize(it) }
             ?: TimeControlMode.Unlimited
     )
-    override val timeControl = _timeControl.asStateFlow()
+    override val timeControl: StateFlow<TimeControlMode> = _timeControl.asStateFlow()
 
     private val _preMovesEnabled = MutableStateFlow(prefs.getBoolean(KEY_PRE_MOVES_ENABLED, true))
-    override val preMovesEnabled = _preMovesEnabled.asStateFlow()
+    override val preMovesEnabled: StateFlow<Boolean> = _preMovesEnabled.asStateFlow()
 
     private val _onlineTimeControl = MutableStateFlow(prefs.get(KEY_ONLINE_TIME_CONTROL, TimeControl.BLITZ.key))
-    override val onlineTimeControl = _onlineTimeControl.asStateFlow()
+    override val onlineTimeControl: StateFlow<String?> = _onlineTimeControl.asStateFlow()
 
     private val _onlineRated = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_RATED, true))
-    override val onlineRated = _onlineRated.asStateFlow()
+    override val onlineRated: StateFlow<Boolean> = _onlineRated.asStateFlow()
 
     private val _onlineSpectatingAllowed = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_SPECTATING_ALLOWED, true))
-    override val onlineSpectatingAllowed = _onlineSpectatingAllowed.asStateFlow()
+    override val onlineSpectatingAllowed: StateFlow<Boolean> = _onlineSpectatingAllowed.asStateFlow()
 
     private val _companionPanelWidth = MutableStateFlow(
         prefs.getFloat(KEY_COMPANION_PANEL_WIDTH, SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH)
     )
-    override val companionPanelWidth = _companionPanelWidth.asStateFlow()
+    override val companionPanelWidth: StateFlow<Float> = _companionPanelWidth.asStateFlow()
 
     // ── Setters ────────────────────────────────────────────────────────────────
 

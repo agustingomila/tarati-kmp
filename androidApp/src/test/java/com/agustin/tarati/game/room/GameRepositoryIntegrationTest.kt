@@ -15,6 +15,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +31,7 @@ class GameRepositoryIntegrationTest {
     }
 
     @Test
-    fun `should maintain data integrity through full lifecycle`() =
+    fun `should maintain data integrity through full lifecycle`(): TestResult =
         runTest {
             // Given - Datos complejos de prueba
             val complexGameState = createComplexGameState()
@@ -65,13 +66,13 @@ class GameRepositoryIntegrationTest {
         // Crear un estado de juego más complejo y realista
         val cobs =
             mapOf(
-                GameBoard.A1 to Cob(CobColor.WHITE, false),
+                GameBoard.A1 to Cob(CobColor.WHITE),
                 GameBoard.B1 to Cob(CobColor.WHITE, true),
-                GameBoard.B2 to Cob(CobColor.BLACK, false),
-                GameBoard.C1 to Cob(CobColor.WHITE, false),
+                GameBoard.B2 to Cob(CobColor.BLACK),
+                GameBoard.C1 to Cob(CobColor.WHITE),
                 GameBoard.C5 to Cob(CobColor.BLACK, true),
                 GameBoard.D1 to Cob(CobColor.WHITE, true),
-                GameBoard.D4 to Cob(CobColor.BLACK, false),
+                GameBoard.D4 to Cob(CobColor.BLACK),
             )
         return GameState(cobs, CobColor.BLACK)
     }

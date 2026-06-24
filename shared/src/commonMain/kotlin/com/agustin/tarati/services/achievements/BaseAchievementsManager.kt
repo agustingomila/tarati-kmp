@@ -39,7 +39,7 @@ abstract class BaseAchievementsManager(
 
     // ── Estado de paletas desbloqueadas ───────────────────────────────────────
 
-    protected val unlockedPalettes = MutableStateFlow<Set<AchievementId>>(emptySet())
+    protected val unlockedPalettes: MutableStateFlow<Set<AchievementId>> = MutableStateFlow<Set<AchievementId>>(emptySet())
     override val unlockedPaletteAchievements: StateFlow<Set<AchievementId>> =
         unlockedPalettes.asStateFlow()
 
@@ -160,7 +160,7 @@ abstract class BaseAchievementsManager(
     }
 
     /** No-op por defecto. Subclases sobreescriben con la UI de la plataforma. */
-    override fun showAchievementsUI(onNavigateToScreen: () -> Unit) = onNavigateToScreen()
+    override fun showAchievementsUI(onNavigateToScreen: () -> Unit): Unit = onNavigateToScreen()
 
     /**
      * Llamado en cada victoria en [Difficulty.CHAMPION].

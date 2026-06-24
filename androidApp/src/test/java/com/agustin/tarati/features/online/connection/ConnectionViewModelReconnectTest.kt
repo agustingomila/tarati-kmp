@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
@@ -50,7 +51,6 @@ class ConnectionViewModelReconnectTest {
         userId = "user-1",
         username = "player1",
         displayName = "Player 1",
-        rating = 1500,
     )
 
     @Before
@@ -89,7 +89,7 @@ class ConnectionViewModelReconnectTest {
     // ── Tests ─────────────────────────────────────────────────────────────────
 
     @Test
-    fun `unexpected WS drop while Online triggers Reconnecting on first attempt`() = runTest {
+    fun `unexpected WS drop while Online triggers Reconnecting on first attempt`(): TestResult = runTest {
         goOnline()
         coEvery { mockWsClient.connect(any()) } throws Exception("Server unreachable")
 
@@ -104,7 +104,7 @@ class ConnectionViewModelReconnectTest {
     }
 
     @Test
-    fun `reconnect succeeds on second attempt`() = runTest {
+    fun `reconnect succeeds on second attempt`(): TestResult = runTest {
         goOnline()
 
         var attempts = 0
@@ -136,7 +136,7 @@ class ConnectionViewModelReconnectTest {
     }
 
     @Test
-    fun `intentional disconnect cancels auto-reconnect and goes Offline`() = runTest {
+    fun `intentional disconnect cancels auto-reconnect and goes Offline`(): TestResult = runTest {
         goOnline()
         coEvery { mockWsClient.connect(any()) } throws Exception("Still down")
 
@@ -152,7 +152,7 @@ class ConnectionViewModelReconnectTest {
     }
 
     @Test
-    fun `all reconnect attempts exhausted transitions to Offline`() = runTest {
+    fun `all reconnect attempts exhausted transitions to Offline`(): TestResult = runTest {
         goOnline()
         coEvery { mockWsClient.connect(any()) } throws Exception("Server down")
 
@@ -169,7 +169,7 @@ class ConnectionViewModelReconnectTest {
     }
 
     @Test
-    fun `WS Disconnected event while already Offline does not trigger auto-reconnect`() = runTest {
+    fun `WS Disconnected event while already Offline does not trigger auto-reconnect`(): TestResult = runTest {
         // viewModel inicia Offline, nunca estuvo Online
         wsConnectionState.value = TaratiWebSocketClient.ConnectionState.Disconnected
         runCurrent()

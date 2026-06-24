@@ -11,4 +11,4 @@ actual fun DrawScope.drawVertexLabel(
     position: Offset,
     textSize: Float,
     color: Color,
-) = Unit
+): Unit = Unit

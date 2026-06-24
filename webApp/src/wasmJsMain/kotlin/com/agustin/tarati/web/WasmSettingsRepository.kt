@@ -11,6 +11,7 @@ import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.theme.AppTheme
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
@@ -38,42 +39,42 @@ class WasmSettingsRepository : SettingsRepository {
     // ── Theme & UI ─────────────────────────────────────────────────────────────
 
     private val _isDarkTheme = MutableStateFlow(bool(K_DARK_THEME, false))
-    override val isDarkTheme = _isDarkTheme.asStateFlow()
+    override val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
 
     private val _labelsVisibility = MutableStateFlow(bool(K_LABELS, false))
-    override val labelsVisibility = _labelsVisibility.asStateFlow()
+    override val labelsVisibility: StateFlow<Boolean> = _labelsVisibility.asStateFlow()
 
     private val _verticesVisibility = MutableStateFlow(bool(K_VERTICES, true))
-    override val verticesVisibility = _verticesVisibility.asStateFlow()
+    override val verticesVisibility: StateFlow<Boolean> = _verticesVisibility.asStateFlow()
 
     private val _edgesVisibility = MutableStateFlow(bool(K_EDGES, false))
-    override val edgesVisibility = _edgesVisibility.asStateFlow()
+    override val edgesVisibility: StateFlow<Boolean> = _edgesVisibility.asStateFlow()
 
     private val _regionsVisibility = MutableStateFlow(bool(K_REGIONS, true))
-    override val regionsVisibility = _regionsVisibility.asStateFlow()
+    override val regionsVisibility: StateFlow<Boolean> = _regionsVisibility.asStateFlow()
 
     private val _perimeterVisibility = MutableStateFlow(bool(K_PERIMETER, true))
-    override val perimeterVisibility = _perimeterVisibility.asStateFlow()
+    override val perimeterVisibility: StateFlow<Boolean> = _perimeterVisibility.asStateFlow()
 
     private val _animateEffects = MutableStateFlow(bool(K_ANIMATE, true))
-    override val animateEffects = _animateEffects.asStateFlow()
+    override val animateEffects: StateFlow<Boolean> = _animateEffects.asStateFlow()
 
     // ── Difficulty ─────────────────────────────────────────────────────────────
 
     private val _difficulty = MutableStateFlow(
         Difficulty.entries.find { it.name == str(K_DIFFICULTY) } ?: Difficulty.DEFAULT
     )
-    override val difficulty = _difficulty.asStateFlow()
+    override val difficulty: StateFlow<Difficulty> = _difficulty.asStateFlow()
 
     private val _difficultyBlack = MutableStateFlow(
         Difficulty.entries.find { it.name == str(K_DIFF_BLACK) } ?: Difficulty.DEFAULT
     )
-    override val difficultyBlack = _difficultyBlack.asStateFlow()
+    override val difficultyBlack: StateFlow<Difficulty> = _difficultyBlack.asStateFlow()
 
     private val _difficultyWhite = MutableStateFlow(
         Difficulty.entries.find { it.name == str(K_DIFF_WHITE) } ?: Difficulty.DEFAULT
     )
-    override val difficultyWhite = _difficultyWhite.asStateFlow()
+    override val difficultyWhite: StateFlow<Difficulty> = _difficultyWhite.asStateFlow()
 
     // ── Theme (tri-state) ──────────────────────────────────────────────────────
 
@@ -83,88 +84,88 @@ class WasmSettingsRepository : SettingsRepository {
         AppTheme.entries.find { it.name == str(K_APP_THEME) }
             ?: if (bool(K_DARK_THEME, false)) AppTheme.MODE_NIGHT else AppTheme.MODE_AUTO
     )
-    override val appTheme = _appTheme.asStateFlow()
+    override val appTheme: StateFlow<AppTheme> = _appTheme.asStateFlow()
 
     // ── User & Localization ────────────────────────────────────────────────────
 
     private val _userName = MutableStateFlow(str(K_USER_NAME, "") ?: "")
-    override val userName = _userName.asStateFlow()
+    override val userName: StateFlow<String> = _userName.asStateFlow()
 
     private val _language = MutableStateFlow(
         AppLanguage.entries.find { it.name == str(K_LANGUAGE) } ?: AppLanguage.SPANISH
     )
-    override val language = _language.asStateFlow()
+    override val language: StateFlow<AppLanguage> = _language.asStateFlow()
 
     // ── Visual Style ───────────────────────────────────────────────────────────
 
     private val _palette = MutableStateFlow(str(K_PALETTE, "Classic") ?: "Classic")
-    override val palette = _palette.asStateFlow()
+    override val palette: StateFlow<String> = _palette.asStateFlow()
 
     private val _conversionStyle = MutableStateFlow(
         ConversionAnimationStyle.entries.find { it.name == str(K_CONV_STYLE) } ?: ConversionAnimationStyle.SURPRISE
     )
-    override val conversionAnimationStyle = _conversionStyle.asStateFlow()
+    override val conversionAnimationStyle: StateFlow<ConversionAnimationStyle> = _conversionStyle.asStateFlow()
 
     private val _pieceTypeId = MutableStateFlow(str(K_PIECE_TYPE, PieceTypes.default.id) ?: PieceTypes.default.id)
-    override val pieceTypeId = _pieceTypeId.asStateFlow()
+    override val pieceTypeId: StateFlow<String> = _pieceTypeId.asStateFlow()
 
     // ── Sound ──────────────────────────────────────────────────────────────────
 
     private val _soundEnabled = MutableStateFlow(bool(K_SOUND_ENABLED, false))
-    override val soundEnabled = _soundEnabled.asStateFlow()
+    override val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
 
     private val _soundVolume = MutableStateFlow(float(K_SOUND_VOLUME, 0.8f))
-    override val soundVolume = _soundVolume.asStateFlow()
+    override val soundVolume: StateFlow<Float> = _soundVolume.asStateFlow()
 
     // ── Tutorial & Seasonal ────────────────────────────────────────────────────
 
     private val _tutorialSeen = MutableStateFlow(bool(K_TUTORIAL, false))
-    override val tutorialSeen = _tutorialSeen.asStateFlow()
+    override val tutorialSeen: StateFlow<Boolean> = _tutorialSeen.asStateFlow()
 
     private val _seasonalDate = MutableStateFlow(str(K_SEASONAL_DATE, "") ?: "")
-    override val seasonalAutoAppliedDate = _seasonalDate.asStateFlow()
+    override val seasonalAutoAppliedDate: StateFlow<String> = _seasonalDate.asStateFlow()
 
     private val _preSeasonalPalette = MutableStateFlow(str(K_PRE_SEASONAL, "") ?: "")
-    override val preSeasonalPalette = _preSeasonalPalette.asStateFlow()
+    override val preSeasonalPalette: StateFlow<String> = _preSeasonalPalette.asStateFlow()
 
     // ── Game Session ───────────────────────────────────────────────────────────
 
     private val _whiteIsAI = MutableStateFlow(bool(K_WHITE_AI, false))
-    override val whiteIsAI = _whiteIsAI.asStateFlow()
+    override val whiteIsAI: StateFlow<Boolean> = _whiteIsAI.asStateFlow()
 
     private val _blackIsAI = MutableStateFlow(bool(K_BLACK_AI, true))
-    override val blackIsAI = _blackIsAI.asStateFlow()
+    override val blackIsAI: StateFlow<Boolean> = _blackIsAI.asStateFlow()
 
     private val _boardOrientation = MutableStateFlow(
         str(K_ORIENTATION, BoardOrientation.PORTRAIT_WHITE.name) ?: BoardOrientation.PORTRAIT_WHITE.name
     )
-    override val boardOrientation = _boardOrientation.asStateFlow()
+    override val boardOrientation: StateFlow<String> = _boardOrientation.asStateFlow()
 
     private val _manuallyRotated = MutableStateFlow(bool(K_MANUALLY_ROTATED, false))
-    override val isManuallyRotated = _manuallyRotated.asStateFlow()
+    override val isManuallyRotated: StateFlow<Boolean> = _manuallyRotated.asStateFlow()
 
     // ── Time Control & Pre-moves ───────────────────────────────────────────────
 
     private val _timeControl = MutableStateFlow(
         str(K_TIME_CONTROL)?.let { TimeControlMode.deserialize(it) } ?: TimeControlMode.Unlimited
     )
-    override val timeControl = _timeControl.asStateFlow()
+    override val timeControl: StateFlow<TimeControlMode> = _timeControl.asStateFlow()
 
     private val _preMoves = MutableStateFlow(bool(K_PRE_MOVES, true))
-    override val preMovesEnabled = _preMoves.asStateFlow()
+    override val preMovesEnabled: StateFlow<Boolean> = _preMoves.asStateFlow()
 
     private val _onlineTc = MutableStateFlow(str(K_ONLINE_TC, TimeControl.BLITZ.key) ?: TimeControl.BLITZ.key)
-    override val onlineTimeControl = _onlineTc.asStateFlow()
+    override val onlineTimeControl: StateFlow<String> = _onlineTc.asStateFlow()
 
     private val _onlineRated = MutableStateFlow(bool(K_ONLINE_RATED, true))
-    override val onlineRated = _onlineRated.asStateFlow()
+    override val onlineRated: StateFlow<Boolean> = _onlineRated.asStateFlow()
 
     private val _onlineSpectating = MutableStateFlow(bool(K_ONLINE_SPECTATING, true))
-    override val onlineSpectatingAllowed = _onlineSpectating.asStateFlow()
+    override val onlineSpectatingAllowed: StateFlow<Boolean> = _onlineSpectating.asStateFlow()
 
     private val _companionPanelWidth =
         MutableStateFlow(float(K_COMPANION_PANEL_WIDTH, SettingsRepository.COMPANION_PANEL_DEFAULT_WIDTH))
-    override val companionPanelWidth = _companionPanelWidth.asStateFlow()
+    override val companionPanelWidth: StateFlow<Float> = _companionPanelWidth.asStateFlow()
 
     // ── Setters ────────────────────────────────────────────────────────────────
 

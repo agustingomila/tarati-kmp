@@ -44,7 +44,7 @@ fun BoardPreview_Classic_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -91,7 +91,7 @@ fun BoardPreview_Dark_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -122,8 +122,6 @@ fun BoardPreview_Dark_Landscape_Editing() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             isEditing = true,
@@ -143,7 +141,7 @@ fun BoardPreview_Nature_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -175,7 +173,6 @@ fun BoardPreview_Nature_Landscape_LabelsVisibles() {
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
                 labelsVisibles = true,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             boardColors = rememberBoardColors(),
@@ -194,7 +191,7 @@ fun BoardPreview_Grayscale_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_BLACK,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -225,7 +222,6 @@ fun BoardPreview_Grayscale_Landscape_EdgesVisibles() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
                 edgesVisibles = true,
                 verticesVisibles = false,
             ),
@@ -245,7 +241,7 @@ fun BoardPreview_Christmas_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -274,8 +270,8 @@ fun BoardPreview_Christmas_Landscape_Full() {
         setTurn(WHITE)
         setCob(C2, WHITE, true)
         setCob(C8, BLACK, true)
-        setCob(B1, WHITE, false)
-        setCob(B4, BLACK, false)
+        setCob(B1, WHITE)
+        setCob(B4, BLACK)
         setCob(C5, WHITE, true)
         setCob(C11, BLACK, true)
     }
@@ -287,7 +283,6 @@ fun BoardPreview_Christmas_Landscape_Full() {
             boardVisualState = BoardVisualState(
                 labelsVisibles = true,
                 edgesVisibles = true,
-                verticesVisibles = true,
             ),
             boardColors = rememberBoardColors(),
         ),
@@ -305,7 +300,7 @@ fun BoardPreview_Halloween_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -336,8 +331,6 @@ fun BoardPreview_Halloween_Landscape_Editing() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             isEditing = true,
@@ -357,7 +350,7 @@ fun BoardPreview_Gilded_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -388,8 +381,6 @@ fun BoardPreview_Gilded_Landscape_Editing() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             isEditing = true,
@@ -409,7 +400,7 @@ fun BoardPreview_Aurora_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -440,8 +431,6 @@ fun BoardPreview_Aurora_Landscape_Editing() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             isEditing = true,
@@ -461,7 +450,7 @@ fun BoardPreview_Ember_Portrait_VerticesVisible() {
             orientation = BoardOrientation.PORTRAIT_WHITE,
             gameState = initialGameState(BLACK),
             playerSide = BLACK,
-            boardVisualState = BoardVisualState(verticesVisibles = true),
+            boardVisualState = BoardVisualState(),
             boardColors = rememberBoardColors(),
         ),
     )
@@ -492,8 +481,6 @@ fun BoardPreview_Ember_Landscape_Editing() {
             gameState = initialGameState(),
             playerSide = BLACK,
             boardVisualState = BoardVisualState(
-                labelsVisibles = false,
-                edgesVisibles = false,
                 verticesVisibles = false,
             ),
             isEditing = true,

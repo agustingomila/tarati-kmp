@@ -250,7 +250,7 @@ class TournamentRunner(
             logInfo("Elo difference: ${matchResult.eloDifference}")
 
             synchronized(results) {
-                results[pair.nameA] = results[pair.nameA]!!.withResults(
+                results[pair.nameA] = (results[pair.nameA] ?: return@synchronized).withResults(
                     additionalWins = matchResult.winsA,
                     additionalLosses = matchResult.winsB,
                     additionalDraws = matchResult.draws,
@@ -258,7 +258,7 @@ class TournamentRunner(
                     additionalTimeouts = matchResult.timeoutsA,
                     additionalMetrics = matchResult.performanceMetrics,
                 )
-                results[pair.nameB] = results[pair.nameB]!!.withResults(
+                results[pair.nameB] = (results[pair.nameB] ?: return@synchronized).withResults(
                     additionalWins = matchResult.winsB,
                     additionalLosses = matchResult.winsA,
                     additionalDraws = matchResult.draws,
@@ -458,7 +458,7 @@ class TournamentRunner(
     /**
      * Imprime una tabla de enfrentamientos directos entre todos los engines
      */
-    fun printHeadToHeadResults(
+    private fun printHeadToHeadResults(
         headToHeadResults: Map<Pair<String, String>, HeadToHeadResult>,
         engines: List<IAIEngine>,
         logInfo: (String) -> Unit,

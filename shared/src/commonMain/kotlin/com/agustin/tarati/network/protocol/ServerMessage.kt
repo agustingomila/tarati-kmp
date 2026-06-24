@@ -65,7 +65,7 @@ sealed class ClientMessage {
      */
     @Serializable
     data class JoinRoom(
-        val roomId: String,
+        private val roomId: String,
         val password: String? = null
     ) : ClientMessage()
 
@@ -97,7 +97,7 @@ sealed class ClientMessage {
      */
     @Serializable
     data class SendChatMessage(
-        val roomId: String,
+        private val roomId: String,
         val message: String
     ) : ClientMessage()
 

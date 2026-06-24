@@ -34,7 +34,7 @@ class BoardLogicTest {
     @Test
     fun applyMoveToBoard_movesCobToNewPosition() {
         val initialState = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false)),
+            cobs = mapOf(C1 to Cob(WHITE)),
             currentTurn = WHITE,
         )
 
@@ -42,13 +42,13 @@ class BoardLogicTest {
 
         assertFalse("Original position should be empty", newState.cobs.containsKey(C1))
         assertTrue("New position should contain cob", newState.cobs.containsKey(B1))
-        assertEquals("Cob should retain color", WHITE, newState.cobs[B1]!!.color)
+        assertEquals("Cob should retain color", WHITE, (newState.cobs[B1] ?: return).color)
     }
 
     @Test
     fun applyMoveToBoard_returnsOriginalStateWhenFromNotFound() {
         val initialState = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false)),
+            cobs = mapOf(C1 to Cob(WHITE)),
             currentTurn = WHITE,
         )
 
@@ -63,7 +63,7 @@ class BoardLogicTest {
     fun applyMoveToBoard_upgradesWhiteInBlackHomeBase() {
         // White cob advances to C7 (upgrade vertex for white)
         val initialState = GameState(
-            cobs = mapOf(C6 to Cob(WHITE, false)),
+            cobs = mapOf(C6 to Cob(WHITE)),
             currentTurn = WHITE,
         )
 
@@ -71,14 +71,14 @@ class BoardLogicTest {
 
         val cob = newState.cobs[C7]
         assertNotNull("Cob should exist at C7", cob)
-        assertTrue("White cob advanced to C7 should be promoted to rok", cob!!.isUpgraded)
+        assertTrue("White cob advanced to C7 should be promoted to rok", (cob ?: return).isUpgraded)
     }
 
     @Test
     fun applyMoveToBoard_upgradesBlackInWhiteHomeBase() {
         // Black cob advances to C1 (upgrade vertex for black)
         val initialState = GameState(
-            cobs = mapOf(C2 to Cob(BLACK, false)),
+            cobs = mapOf(C2 to Cob(BLACK)),
             currentTurn = BLACK,
         )
 
@@ -86,7 +86,7 @@ class BoardLogicTest {
 
         val cob = newState.cobs[C1]
         assertNotNull("Cob should exist at C1", cob)
-        assertTrue("Black cob advanced to C1 should be promoted to rok", cob!!.isUpgraded)
+        assertTrue("Black cob advanced to C1 should be promoted to rok", (cob ?: return).isUpgraded)
     }
 
     @Test
@@ -95,8 +95,8 @@ class BoardLogicTest {
         // not an upgrade vertex. upgradeIfInEnemyBase only applies to C7/C8 for white.
         val initialState = GameState(
             cobs = mapOf(
-                B3 to Cob(WHITE, false),  // White advances to C5, capturing black at D3 via flip
-                D3 to Cob(BLACK, false),  // Will be flipped to white after a capture nearby
+                B3 to Cob(WHITE),  // White advances to C5, capturing black at D3 via flip
+                D3 to Cob(BLACK),  // Will be flipped to white after a capture nearby
             ),
             currentTurn = WHITE,
         )
@@ -106,7 +106,7 @@ class BoardLogicTest {
 
         val cob = stateWithWhiteAtD3.cobs[D3]
         assertNotNull("Cob should exist at D3", cob)
-        assertFalse("White cob at D3 should NOT be promoted (D3 is dead, not an upgrade vertex)", cob!!.isUpgraded)
+        assertFalse("White cob at D3 should NOT be promoted (D3 is dead, not an upgrade vertex)", (cob ?: return).isUpgraded)
     }
 
     @Test
@@ -115,7 +115,7 @@ class BoardLogicTest {
         // The rok just changes color.
         val initialState = GameState(
             cobs = mapOf(
-                B2 to Cob(WHITE, false),
+                B2 to Cob(WHITE),
                 C5 to Cob(BLACK, true), // Black rok adjacent to B3 (destination)
             ),
             currentTurn = WHITE,
@@ -128,7 +128,7 @@ class BoardLogicTest {
 
         val capturedRok = newState.cobs[C5]
         assertNotNull("Rok should still exist at C5", capturedRok)
-        assertEquals("Captured rok should flip to white", WHITE, capturedRok!!.color)
+        assertEquals("Captured rok should flip to white", WHITE, (capturedRok ?: return).color)
         assertTrue("Captured rok must retain rok status (isUpgraded)", capturedRok.isUpgraded)
     }
 
@@ -140,8 +140,8 @@ class BoardLogicTest {
         // BUT was already adjacent to C1 (origin) → must NOT be captured.
         val initialState = GameState(
             cobs = mapOf(
-                C1 to Cob(WHITE, false),
-                C2 to Cob(BLACK, false), // Adjacent to both C1 (origin) and B1 (destination)
+                C1 to Cob(WHITE),
+                C2 to Cob(BLACK), // Adjacent to both C1 (origin) and B1 (destination)
             ),
             currentTurn = WHITE,
         )
@@ -153,7 +153,7 @@ class BoardLogicTest {
         assertEquals(
             "C2 was adjacent to origin C1 → pre-adjacency rule protects it from capture",
             BLACK,
-            cob!!.color,
+            (cob ?: return).color,
         )
     }
 
@@ -164,32 +164,32 @@ class BoardLogicTest {
         // C5 and C6 are adjacent to B3 (destination) but NOT to B2 (origin) → must be captured.
         val initialState = GameState(
             cobs = mapOf(
-                B2 to Cob(WHITE, false),
-                C5 to Cob(BLACK, false), // New adjacent at destination
-                C6 to Cob(BLACK, false), // New adjacent at destination
+                B2 to Cob(WHITE),
+                C5 to Cob(BLACK), // New adjacent at destination
+                C6 to Cob(BLACK), // New adjacent at destination
             ),
             currentTurn = WHITE,
         )
 
         val newState = initialState.applyMove(Move(B2 to B3))
 
-        assertEquals("C5 must flip to white", WHITE, newState.cobs[C5]!!.color)
-        assertEquals("C6 must flip to white", WHITE, newState.cobs[C6]!!.color)
+        assertEquals("C5 must flip to white", WHITE, (newState.cobs[C5] ?: return).color)
+        assertEquals("C6 must flip to white", WHITE, (newState.cobs[C6] ?: return).color)
     }
 
     @Test
     fun preAdjacency_doesNotFlipSameColorCobs() {
         val initialState = GameState(
             cobs = mapOf(
-                B2 to Cob(WHITE, false),
-                C5 to Cob(WHITE, false), // Same color adjacent to destination
+                B2 to Cob(WHITE),
+                C5 to Cob(WHITE), // Same color adjacent to destination
             ),
             currentTurn = WHITE,
         )
 
         val newState = initialState.applyMove(Move(B2 to B3))
 
-        assertEquals("Same color cob should not flip", WHITE, newState.cobs[C5]!!.color)
+        assertEquals("Same color cob should not flip", WHITE, (newState.cobs[C5] ?: return).color)
     }
 
     @Test
@@ -198,21 +198,21 @@ class BoardLogicTest {
         // A1 is adjacent to both B2 and B3 → protected by pre-adjacency rule.
         val initialState = GameState(
             cobs = mapOf(
-                B2 to Cob(WHITE, false),
-                C5 to Cob(BLACK, false),
-                C6 to Cob(BLACK, false),
-                B4 to Cob(BLACK, false), // B4 is adjacent to B3, not to B2
-                A1 to Cob(BLACK, false), // A1 IS adjacent to B2 → protected
+                B2 to Cob(WHITE),
+                C5 to Cob(BLACK),
+                C6 to Cob(BLACK),
+                B4 to Cob(BLACK), // B4 is adjacent to B3, not to B2
+                A1 to Cob(BLACK), // A1 IS adjacent to B2 → protected
             ),
             currentTurn = WHITE,
         )
 
         val newState = initialState.applyMove(Move(B2 to B3))
 
-        assertEquals("C5 should flip", WHITE, newState.cobs[C5]!!.color)
-        assertEquals("C6 should flip", WHITE, newState.cobs[C6]!!.color)
-        assertEquals("B4 should flip", WHITE, newState.cobs[B4]!!.color)
-        assertEquals("A1 was adjacent to origin → protected, stays black", BLACK, newState.cobs[A1]!!.color)
+        assertEquals("C5 should flip", WHITE, (newState.cobs[C5] ?: return).color)
+        assertEquals("C6 should flip", WHITE, (newState.cobs[C6] ?: return).color)
+        assertEquals("B4 should flip", WHITE, (newState.cobs[B4] ?: return).color)
+        assertEquals("A1 was adjacent to origin → protected, stays black", BLACK, (newState.cobs[A1] ?: return).color)
     }
 
     // ==================== Home-base non-forward captures ====================
@@ -225,23 +225,23 @@ class BoardLogicTest {
         // → Moving D2→D1 captures black at C1.
         val initialState = GameState(
             cobs = mapOf(
-                D2 to Cob(WHITE, false),
-                C1 to Cob(BLACK, false),
+                D2 to Cob(WHITE),
+                C1 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
 
         val newState = initialState.applyMove(Move(D2 to D1))
 
-        assertEquals("White should be at D1 after move", WHITE, newState.cobs[D1]!!.color)
-        assertEquals("Black at C1 should flip to white (new adjacent at D1)", WHITE, newState.cobs[C1]!!.color)
+        assertEquals("White should be at D1 after move", WHITE, (newState.cobs[D1] ?: return).color)
+        assertEquals("Black at C1 should flip to white (new adjacent at D1)", WHITE, (newState.cobs[C1] ?: return).color)
     }
 
     @Test
     fun homeBaseCapture_nonForwardMoveIsInvalidWithoutCapture() {
         // D2→D1 with no capturable piece at C1: move should not appear in allMovesForTurn.
         val state = GameState(
-            cobs = mapOf(D2 to Cob(WHITE, false)),
+            cobs = mapOf(D2 to Cob(WHITE)),
             currentTurn = WHITE,
         )
 
@@ -254,37 +254,37 @@ class BoardLogicTest {
     @Test
     fun isDeadCob_primaryDead_whiteAtD3() {
         val state = GameState(
-            cobs = mapOf(D3 to Cob(WHITE, false)),
+            cobs = mapOf(D3 to Cob(WHITE)),
             currentTurn = WHITE,
         )
-        assertTrue("White cob at D3 (outermost enemy base) is primary dead", state.isDeadCob(D3, Cob(WHITE, false)))
+        assertTrue("White cob at D3 (outermost enemy base) is primary dead", state.isDeadCob(D3, Cob(WHITE)))
     }
 
     @Test
     fun isDeadCob_primaryDead_whiteAtD4() {
         val state = GameState(
-            cobs = mapOf(D4 to Cob(WHITE, false)),
+            cobs = mapOf(D4 to Cob(WHITE)),
             currentTurn = WHITE,
         )
-        assertTrue("White cob at D4 (outermost enemy base) is primary dead", state.isDeadCob(D4, Cob(WHITE, false)))
+        assertTrue("White cob at D4 (outermost enemy base) is primary dead", state.isDeadCob(D4, Cob(WHITE)))
     }
 
     @Test
     fun isDeadCob_primaryDead_blackAtD1() {
         val state = GameState(
-            cobs = mapOf(D1 to Cob(BLACK, false)),
+            cobs = mapOf(D1 to Cob(BLACK)),
             currentTurn = BLACK,
         )
-        assertTrue("Black cob at D1 (outermost enemy base) is primary dead", state.isDeadCob(D1, Cob(BLACK, false)))
+        assertTrue("Black cob at D1 (outermost enemy base) is primary dead", state.isDeadCob(D1, Cob(BLACK)))
     }
 
     @Test
     fun isDeadCob_primaryDead_blackAtD2() {
         val state = GameState(
-            cobs = mapOf(D2 to Cob(BLACK, false)),
+            cobs = mapOf(D2 to Cob(BLACK)),
             currentTurn = BLACK,
         )
-        assertTrue("Black cob at D2 (outermost enemy base) is primary dead", state.isDeadCob(D2, Cob(BLACK, false)))
+        assertTrue("Black cob at D2 (outermost enemy base) is primary dead", state.isDeadCob(D2, Cob(BLACK)))
     }
 
     @Test
@@ -303,15 +303,15 @@ class BoardLogicTest {
         // D3 has a primary-dead white cob → C7 white cob is dead by proxy.
         val state = GameState(
             cobs = mapOf(
-                C7 to Cob(WHITE, false),
-                D3 to Cob(WHITE, false),
+                C7 to Cob(WHITE),
+                D3 to Cob(WHITE),
             ),
             currentTurn = WHITE,
         )
-        assertTrue("White cob at D3 is primary dead", state.isDeadCob(D3, Cob(WHITE, false)))
+        assertTrue("White cob at D3 is primary dead", state.isDeadCob(D3, Cob(WHITE)))
         assertTrue(
             "White cob at C7 is dead by proxy (only forward neighbor D3 is dead)",
-            state.isDeadCob(C7, Cob(WHITE, false)),
+            state.isDeadCob(C7, Cob(WHITE)),
         )
     }
 
@@ -320,14 +320,14 @@ class BoardLogicTest {
         // A cob blocked by an enemy piece is NOT dead — the enemy could move away.
         val state = GameState(
             cobs = mapOf(
-                C7 to Cob(WHITE, false),
-                D3 to Cob(BLACK, false), // Enemy at the only forward neighbor
+                C7 to Cob(WHITE),
+                D3 to Cob(BLACK), // Enemy at the only forward neighbor
             ),
             currentTurn = WHITE,
         )
         assertFalse(
             "White cob at C7 is NOT dead when blocked by an enemy (enemy can move)",
-            state.isDeadCob(C7, Cob(WHITE, false)),
+            state.isDeadCob(C7, Cob(WHITE)),
         )
     }
 
@@ -336,14 +336,14 @@ class BoardLogicTest {
         // A cob blocked by a rok of any color is NOT dead — the rok can move away.
         val state = GameState(
             cobs = mapOf(
-                C7 to Cob(WHITE, false),
+                C7 to Cob(WHITE),
                 D3 to Cob(WHITE, true), // Own rok at the only forward neighbor
             ),
             currentTurn = WHITE,
         )
         assertFalse(
             "White cob at C7 is NOT dead when blocked by a rok (roks can move away)",
-            state.isDeadCob(C7, Cob(WHITE, false)),
+            state.isDeadCob(C7, Cob(WHITE)),
         )
     }
 
@@ -364,10 +364,10 @@ class BoardLogicTest {
     fun getDeadCobsForCurrentTurn_returnsOnlyCurrentPlayerDeadCobs() {
         val state = GameState(
             cobs = mapOf(
-                D3 to Cob(WHITE, false), // White primary dead
-                D4 to Cob(WHITE, false), // White primary dead
-                D1 to Cob(BLACK, false), // Black primary dead (not current turn)
-                C2 to Cob(WHITE, false), // White alive (in own base, but not dead)
+                D3 to Cob(WHITE), // White primary dead
+                D4 to Cob(WHITE), // White primary dead
+                D1 to Cob(BLACK), // Black primary dead (not current turn)
+                C2 to Cob(WHITE), // White alive (in own base, but not dead)
             ),
             currentTurn = WHITE,
         )

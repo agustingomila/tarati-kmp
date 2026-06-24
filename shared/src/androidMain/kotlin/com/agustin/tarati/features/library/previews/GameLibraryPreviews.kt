@@ -278,7 +278,6 @@ fun PreviewSavedGameItem_Multiselect() {
             )
             SavedGameItem(
                 savedGame = previewSavedGames[1],
-                isSelected = false,
                 isMultiSelectMode = true,
                 onLoadGame = PreviewGamesLibrary::loadGame
             )

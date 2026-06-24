@@ -167,7 +167,7 @@ fun OnlineLobbyScreen(
             val result = authViewModel.loginAsGuest(settingsName)
             if (result.isFailure && settingsName != null) {
                 // Nombre tomado o inválido — reintentar con nombre aleatorio
-                authViewModel.loginAsGuest(null)
+                authViewModel.loginAsGuest()
             }
         }
         val token = authViewModel.accessToken

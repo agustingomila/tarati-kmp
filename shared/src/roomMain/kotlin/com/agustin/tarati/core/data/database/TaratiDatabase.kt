@@ -17,14 +17,14 @@ abstract class TaratiDatabase : RoomDatabase() {
     abstract fun gameDao(): GameDao
 }
 
-val MIGRATION_1_2 =
+val MIGRATION_1_2: Migration =
     object : Migration(1, 2) {
         override fun migrate(connection: SQLiteConnection) {
             connection.execSQL("ALTER TABLE games ADD COLUMN observations TEXT NOT NULL DEFAULT ''")
         }
     }
 
-val MIGRATION_2_3 =
+val MIGRATION_2_3: Migration =
     object : Migration(2, 3) {
         override fun migrate(connection: SQLiteConnection) {
             // Las partidas existentes empezaron desde la posición estándar.
@@ -50,4 +50,4 @@ val MIGRATION_2_3 =
  * - iOS: DatabaseBuilder
  * - Desktop: DatabaseBuilder con path completo
  */
-const val DATABASE_NAME = "tarati.db"
+const val DATABASE_NAME: String = "tarati.db"

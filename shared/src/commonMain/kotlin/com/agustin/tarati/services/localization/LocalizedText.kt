@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
@@ -25,7 +26,7 @@ import org.jetbrains.compose.resources.stringResource
  * este CompositionLocal con el nuevo código. Todos los composables que observan
  * LocalAppLanguage.current se recomponen automáticamente.
  */
-val LocalAppLanguage = compositionLocalOf { "en" }
+val LocalAppLanguage: ProvidableCompositionLocal<String> = compositionLocalOf { "en" }
 
 /**
  * Normaliza espacios en blanco y procesa escapes XML en strings localizados.

@@ -49,7 +49,6 @@ import com.agustin.tarati.ui.theme.getBoardColors
 fun PreviewBoardRendererClassicVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(ClassicPalette),
-        verticesVisible = true,
     )
 }
 
@@ -95,7 +94,6 @@ fun PreviewBoardBackgroundClassicNoPerimeter() {
 fun PreviewBoardRendererDarkVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(DarkPalette),
-        verticesVisible = true,
     )
 }
 
@@ -141,7 +139,6 @@ fun PreviewBoardBackgroundDarkNoPerimeter() {
 fun PreviewBoardRendererNatureVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(NaturePalette),
-        verticesVisible = true,
     )
 }
 
@@ -187,7 +184,6 @@ fun PreviewBoardBackgroundNatureNoPerimeter() {
 fun PreviewBoardRendererGrayscaleVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(GrayscalePalette),
-        verticesVisible = true,
     )
 }
 
@@ -233,7 +229,6 @@ fun PreviewBoardBackgroundGrayscaleNoPerimeter() {
 fun PreviewBoardRendererChristmasVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(ChristmasPalette),
-        verticesVisible = true,
     )
 }
 
@@ -279,7 +274,6 @@ fun PreviewBoardBackgroundChristmasNoPerimeter() {
 fun PreviewBoardRendererHalloweenVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(HalloweenPalette),
-        verticesVisible = true,
     )
 }
 
@@ -325,7 +319,6 @@ fun PreviewBoardBackgroundHalloweenNoPerimeter() {
 fun PreviewBoardRendererGildedVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(GildedPalette),
-        verticesVisible = true,
     )
 }
 
@@ -371,7 +364,6 @@ fun PreviewBoardBackgroundGildedNoPerimeter() {
 fun PreviewBoardRendererEmberVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(EmberPalette),
-        verticesVisible = true,
     )
 }
 
@@ -417,7 +409,6 @@ fun PreviewBoardBackgroundEmberNoPerimeter() {
 fun PreviewBoardRendererAuroraVerticesVisible() {
     PreviewBoardRenderer(
         boardColors = getBoardColors(AuroraPalette),
-        verticesVisible = true,
     )
 }
 
@@ -592,17 +583,17 @@ fun PreviewBoardBackgroundNoPerimeter(
 }
 
 object PreviewStates {
-    val emptyBoardState = createInitialBoardState()
+    val emptyBoardState: BoardState = createInitialBoardState()
 
-    val populatedBoardState =
+    val populatedBoardState: BoardState =
         BoardState(
             gameState =
                 GameState(
                     cobs =
                         mapOf(
-                            A1 to Cob(CobColor.WHITE, false),
+                            A1 to Cob(CobColor.WHITE),
                             B2 to Cob(CobColor.WHITE, true),
-                            C3 to Cob(CobColor.BLACK, false),
+                            C3 to Cob(CobColor.BLACK),
                             D4 to Cob(CobColor.BLACK, true),
                         ),
                     currentTurn = CobColor.BLACK,
@@ -610,25 +601,19 @@ object PreviewStates {
             boardVisualState =
                 BoardVisualState(
                     labelsVisibles = true,
-                    verticesVisibles = true,
                     edgesVisibles = true,
-                    regionsVisibles = true,
-                    perimeterVisible = true,
-                    animateEffects = true,
                 ),
             boardOrientation = BoardOrientation.PORTRAIT_WHITE,
-            isEditing = false,
             aiEnabled = false,
-            newGame = false,
         )
 
-    val editingBoardState =
+    val editingBoardState: BoardState =
         BoardState(
             gameState =
                 GameState(
                     cobs =
                         mapOf(
-                            A1 to Cob(CobColor.WHITE, false),
+                            A1 to Cob(CobColor.WHITE),
                             B5 to Cob(CobColor.BLACK, true),
                         ),
                     currentTurn = CobColor.WHITE,
@@ -637,6 +622,5 @@ object PreviewStates {
             boardOrientation = BoardOrientation.PORTRAIT_WHITE,
             isEditing = true,
             aiEnabled = false,
-            newGame = false,
         )
 }

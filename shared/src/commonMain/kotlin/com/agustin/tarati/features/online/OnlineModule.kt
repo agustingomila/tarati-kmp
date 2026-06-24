@@ -23,6 +23,10 @@ import com.agustin.tarati.features.online.tournament.TournamentRepository
 import com.agustin.tarati.features.online.tournament.TournamentViewModel
 import com.agustin.tarati.network.client.OnlineGameClient
 import com.agustin.tarati.network.client.TaratiWebSocketClient
+import com.agustin.tarati.services.billing.EntitlementSyncService
+import com.agustin.tarati.services.billing.EntitlementsRepository
+import com.agustin.tarati.services.billing.EntitlementsRepositoryImpl
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -77,7 +81,7 @@ import org.koin.dsl.module
  * const val AUTH_TOKEN = "..." // Token JWT del usuario
  * ```
  */
-val onlineModule = module {
+val onlineModule: Module = module {
 
     // ============ HTTP Client with WebSocket support ============
 
@@ -99,7 +103,7 @@ val onlineModule = module {
     // TaratiWebSocketClient: serverUrl = devServerUrl (platform-specific para dev/staging).
     // El token JWT se obtiene dinámicamente de authRepository en cada conexión.
     single {
-        println("🔧 [Koin] Creating TaratiWebSocketClient...")
+        logger.info("🔧 [Koin] Creating TaratiWebSocketClient...")
         try {
             val serverUrl = devServerUrl
                 .replace("https://", "wss://")
@@ -110,10 +114,10 @@ val onlineModule = module {
                 serverUrl = serverUrl,
                 authRepository = get()  // ✅ Obtiene token dinámicamente
             ).also {
-                println("✅ [Koin] TaratiWebSocketClient created successfully")
+                logger.info("✅ [Koin] TaratiWebSocketClient created successfully")
             }
         } catch (e: Exception) {
-            println("❌ [Koin] Failed to create TaratiWebSocketClient: ${e.message}")
+            logger.error("❌ [Koin] Failed to create TaratiWebSocketClient: ${e.message}")
             e.printStackTrace()
             throw e
         }
@@ -130,15 +134,15 @@ val onlineModule = module {
      * Singleton compartido por todos los ViewModels.
      */
     single {
-        println("🔧 [Koin] Creating OnlineGameClient...")
+        logger.info("🔧 [Koin] Creating OnlineGameClient...")
         try {
             OnlineGameClient(
                 wsClient = get()
             ).also {
-                println("✅ [Koin] OnlineGameClient created successfully")
+                logger.info("✅ [Koin] OnlineGameClient created successfully")
             }
         } catch (e: Exception) {
-            println("❌ [Koin] Failed to create OnlineGameClient: ${e.message}")
+            logger.error("❌ [Koin] Failed to create OnlineGameClient: ${e.message}")
             e.printStackTrace()
             throw e
         }
@@ -163,7 +167,15 @@ val onlineModule = module {
      * Inyectar con `koinInject<IAuthViewModel>()` en composables.
      */
     single<IAuthViewModel> {
-        AuthViewModel(authRepository = get(), httpClient = get())
+        AuthViewModel(authRepository = get(), httpClient = get(), entitlementsRepository = get())
+    }
+
+    // ============ Entitlements (ownership cross-platform C2) ============
+
+    single { EntitlementSyncService(httpClient = get()) }
+
+    single<EntitlementsRepository> {
+        EntitlementsRepositoryImpl(syncService = get(), authRepository = get())
     }
 
     /**
@@ -192,15 +204,15 @@ val onlineModule = module {
      * Para inyectarlo en composables: `koinInject<IOnlineGameViewModel>()`.
      */
     single {
-        println("🔧 [Koin] Creating OnlineGameViewModel...")
+        logger.info("🔧 [Koin] Creating OnlineGameViewModel...")
         try {
             OnlineGameViewModel(
                 onlineClient = get(),
             ).also {
-                println("✅ [Koin] OnlineGameViewModel created successfully")
+                logger.info("✅ [Koin] OnlineGameViewModel created successfully")
             }
         } catch (e: Exception) {
-            println("❌ [Koin] Failed to create OnlineGameViewModel: ${e.message}")
+            logger.error("❌ [Koin] Failed to create OnlineGameViewModel: ${e.message}")
             e.printStackTrace()
             throw e
         }
@@ -274,7 +286,7 @@ val onlineModule = module {
 fun onlineDevModule(
     serverUrl: String,
     authRepository: AuthRepository
-) = module {
+): Module = module {
 // Override del WebSocketClient con configuración custom
     single {
         TaratiWebSocketClient(

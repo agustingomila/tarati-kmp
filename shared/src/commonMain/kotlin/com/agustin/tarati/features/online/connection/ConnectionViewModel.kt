@@ -49,7 +49,7 @@ class ConnectionViewModel(
     private var reconnectJob: Job? = null
 
     /** Delays entre intentos de reconexión (ms). Backoff exponencial, capped en 30s. */
-    val reconnectDelays = listOf(2_000L, 4_000L, 8_000L, 16_000L, 30_000L)
+    private val reconnectDelays: List<Long> = listOf(2_000L, 4_000L, 8_000L, 16_000L, 30_000L)
 
     init {
         // Sincronizar con el estado de bajo nivel del WebSocketClient.
@@ -82,7 +82,6 @@ class ConnectionViewModel(
             logger.error("Connection failed: ${e.message}")
             _connectionState.value = ConnectionState.Error(
                 message = e.message ?: "Unknown error",
-                isRecoverable = true,
             )
             Result.failure(e)
         }
@@ -172,7 +171,6 @@ class ConnectionViewModel(
                 if (_connectionState.value == ConnectionState.Offline) return
                 _connectionState.value = ConnectionState.Error(
                     message = wsState.message,
-                    isRecoverable = true,
                 )
             }
         }
@@ -217,7 +215,7 @@ class ConnectionViewModel(
                 rating = user.rating,
             )
         } else {
-            OnlineUserInfo(userId = "", username = "Unknown", rating = 1500)
+            OnlineUserInfo(userId = "", username = "Unknown")
         }
     }
 

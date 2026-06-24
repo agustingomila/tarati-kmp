@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flowOf
 class NoOpGameRepository : GameRepository {
     override val savedGames: Flow<List<SavedGame>> = flowOf(emptyList())
     override fun searchGames(query: String): Flow<List<SavedGame>> = flowOf(emptyList())
-    override suspend fun saveGame(dto: MatchDto) = Unit
+    override suspend fun saveGame(dto: MatchDto): Unit = Unit
     override suspend fun loadGame(gameId: String): MatchDto? = null
-    override suspend fun deleteGame(gameId: String) = Unit
+    override suspend fun deleteGame(gameId: String): Unit = Unit
 }

@@ -109,7 +109,7 @@ internal class LegacyTaratiAI : IAIEngine {
         }
     }
 
-    fun putState(gameState: GameState): Int {
+    private fun putState(gameState: GameState): Int {
         val hash = gameState.hashBoard()
         val count = (positionHistory[hash] ?: 0) + 1
         positionHistory[hash] = count

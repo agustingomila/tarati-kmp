@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.domain.game.play.GameState
 import com.agustin.tarati.core.domain.game.play.Move
 import com.agustin.tarati.core.domain.tutorial.TutorialManager
+import com.agustin.tarati.core.domain.tutorial.TutorialProgress
 import com.agustin.tarati.core.domain.tutorial.TutorialState
 import com.agustin.tarati.core.domain.tutorial.isCompleted
 import com.agustin.tarati.services.sound.ISoundService
@@ -13,13 +14,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class TutorialViewModel(
-    val animationCoordinator: AnimationCoordinator,
+    private val animationCoordinator: AnimationCoordinator,
     override val soundService: ISoundService,
 ) : ViewModel(),
     ITutorialViewModel {
     override val tutorialManager: TutorialManager by lazy { TutorialManager(animationCoordinator) }
     override val tutorialState: StateFlow<TutorialState> = tutorialManager.tutorialState
-    override val progress get() = tutorialManager.progress
+    override val progress: TutorialProgress get() = tutorialManager.progress
 
     override fun onMoveAttempted(
         move: Move,
@@ -46,21 +47,21 @@ class TutorialViewModel(
 
     override fun isCompleted(): Boolean = tutorialManager.progress.isCompleted()
 
-    override fun nextStep() = tutorialManager.nextStep(::onStep)
+    override fun nextStep(): Unit = tutorialManager.nextStep(::onStep)
 
-    override fun previousStep() = tutorialManager.previousStep(::onStep)
+    override fun previousStep(): Unit = tutorialManager.previousStep(::onStep)
 
-    override fun endTutorial() = tutorialManager.endTutorial()
+    override fun endTutorial(): Unit = tutorialManager.endTutorial()
 
-    override fun repeatCurrentStep() = tutorialManager.repeatCurrentStep(::onStep)
+    override fun repeatCurrentStep(): Unit = tutorialManager.repeatCurrentStep(::onStep)
 
     override fun getCurrentGameState(): GameState? = tutorialManager.getCurrentGameState()
 
-    override fun requestUserInteraction(moves: List<Move>) = tutorialManager.requestUserInteraction(moves)
+    override fun requestUserInteraction(moves: List<Move>): Unit = tutorialManager.requestUserInteraction(moves)
 
-    override fun resetTutorial() = tutorialManager.reset()
+    override fun resetTutorial(): Unit = tutorialManager.reset()
 
-    override fun closeTutorial() = tutorialManager.closeTutorial()
+    override fun closeTutorial(): Unit = tutorialManager.closeTutorial()
 
     override fun startTutorial() {
         viewModelScope.launch {

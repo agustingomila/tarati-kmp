@@ -65,8 +65,6 @@ fun EditingModePreviewContent(
                 boardOrientation = boardOrientation,
                 boardVisualState =
                     BoardVisualState(
-                        labelsVisibles = false,
-                        verticesVisibles = true,
                         edgesVisibles = true,
                     ),
                 isEditing = isEditing,
@@ -155,8 +153,6 @@ fun EditControlsPreview_CompletedDistribution() {
             actionState =
                 EditActionState(
                     pieceCounts = PieceCounts(7, 1),
-                    isValidDistribution = true,
-                    isCompletedDistribution = true,
                 ),
         )
     }
@@ -219,8 +215,6 @@ fun RightControlsPreview() {
             state =
                 EditActionState(
                     pieceCounts = PieceCounts(4, 4),
-                    isValidDistribution = true,
-                    isCompletedDistribution = true,
                 ),
             events = EditActionEvents(),
         )
@@ -251,8 +245,6 @@ fun BottomControlsPreview() {
             state =
                 EditActionState(
                     pieceCounts = PieceCounts(4, 4),
-                    isValidDistribution = true,
-                    isCompletedDistribution = true,
                 ),
             events = EditActionEvents(),
         )

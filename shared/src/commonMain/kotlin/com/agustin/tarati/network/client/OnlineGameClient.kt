@@ -365,7 +365,6 @@ class OnlineGameClient(
                     gameId = message.gameId,
                     opponentInfo = message.opponentInfo,
                     yourColor = message.yourColor,
-                    gameState = null,
                     status = OnlineGameStatus.Starting,
                     timeControl = message.timeControl,
                     isRated = message.rated,
@@ -395,7 +394,7 @@ class OnlineGameClient(
             is ServerMessage.GameStateUpdate -> {
                 // Spectating: update spectating state if this gameId matches
                 if (_spectatingState.value?.gameId == message.gameId) {
-                    val current = _spectatingState.value!!
+                    val current = _spectatingState.value ?: return
                     _spectatingState.value = current.copy(
                         currentGameState = message.newState,
                         timeRemaining = message.timeLeft,

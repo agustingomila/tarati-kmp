@@ -8,7 +8,7 @@ package com.agustin.tarati.services.billing
  */
 object PaletteProducts {
 
-    const val GILDED = "palette_gilded"
+    const val GILDED: String = "palette_gilded"
 
-    val ALL_PRODUCT_IDS = listOf(GILDED)
+    val ALL_PRODUCT_IDS: List<String> = listOf(GILDED)
 }

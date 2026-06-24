@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
+import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
@@ -31,6 +32,7 @@ import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
  */
 open class SettingsViewModel(
     private val repository: SettingsRepository,
+    entitlementsRepository: EntitlementsRepository,
 ) : ViewModel(), ISettingsViewModel {
 
     // ── Estado persistido ─────────────────────────────────────────────────────
@@ -38,8 +40,9 @@ open class SettingsViewModel(
     private val _hasTutorialBeenSeen = MutableStateFlow(false)
     override val hasTutorialBeenSeen: StateFlow<Boolean> = _hasTutorialBeenSeen
 
-    // No-op por defecto (override en AndroidSettingsViewModel)
-    override val purchasedProductIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    // Ownership cross-platform leído del servidor (override en AndroidSettingsViewModel
+    // para mergear con las compras locales de Google Play Billing).
+    override val purchasedProductIds: StateFlow<Set<String>> = entitlementsRepository.entitlements
 
     // ── settingsState: combina todos los flows del repositorio ─────────────────
     //
@@ -266,7 +269,7 @@ open class SettingsViewModel(
     /**
      * No-op por defecto. Override en AndroidSettingsViewModel.
      */
-    override fun launchPurchaseFlow(productId: String) = Unit
+    override fun launchPurchaseFlow(productId: String): Unit = Unit
 
     override fun setTimeControl(mode: TimeControlMode) {
         viewModelScope.launch { repository.setTimeControl(mode) }

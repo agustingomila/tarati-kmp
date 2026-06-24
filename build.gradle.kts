@@ -1,22 +1,24 @@
 plugins {
+    // Versiones centralizadas en gradle/libs.versions.toml (fuente única de verdad).
+
     // Android
-    id("com.android.application") version "8.13.2" apply false
-    id("com.android.library") version "8.13.2" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
 
     // Kotlin
-    id("org.jetbrains.kotlin.android") version "2.3.21" apply false
-    id("org.jetbrains.kotlin.multiplatform") version "2.3.21" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.3.21" apply false
-    id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.21" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21" apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.kotlin.parcelize) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
 
     // Room & KSP
-    id("androidx.room") version "2.8.4" apply false
-    id("com.google.devtools.ksp") version "2.2.21-2.0.5" apply false
+    alias(libs.plugins.room) apply false
+    alias(libs.plugins.ksp) apply false
 
     // Quality
-    id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
-    kotlin("jvm")
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.kotlin.jvm)
 }
 
 // Forzar ws 8.20.1 para evitar CVE-2026-45736 (uninitialized memory disclosure en websocket.close).

@@ -77,7 +77,7 @@ class GameManager(
         _moveIndex.update { historyEntries.lastIndex }
     }
 
-    fun getCurrentState() =
+    fun getCurrentState(): GameManagerState =
         GameManagerState(
             gameState = _gameState.value,
             history = _history.value,

@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 
 actual object NoiseTexture {
-    actual fun DrawScope.applyNoise(path: Path, alpha: Float) = Unit
-    actual fun DrawScope.applyNoise(center: Offset, radius: Float, alpha: Float) = Unit
-    actual fun DrawScope.applyNoise(topLeft: Offset, size: Size, cornerRadius: CornerRadius, alpha: Float) = Unit
+    actual fun DrawScope.applyNoise(path: Path, alpha: Float): Unit = Unit
+    actual fun DrawScope.applyNoise(center: Offset, radius: Float, alpha: Float): Unit = Unit
+    actual fun DrawScope.applyNoise(topLeft: Offset, size: Size, cornerRadius: CornerRadius, alpha: Float): Unit = Unit
 }

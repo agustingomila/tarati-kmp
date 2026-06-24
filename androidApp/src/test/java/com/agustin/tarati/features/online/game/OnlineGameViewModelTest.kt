@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -82,8 +83,7 @@ class OnlineGameViewModelTest {
         yourColor = WHITE.description,
         gameState = GameState.initialGameState(),
         status = OnlineGameStatus.InProgress,
-        timeControl = testTimeControl,
-        isRated = true
+        timeControl = testTimeControl
     )
 
     @Before
@@ -118,24 +118,24 @@ class OnlineGameViewModelTest {
     // ── Matchmaking ───────────────────────────────────────────────────────────
 
     @Test
-    fun `startMatchmaking calls client and returns success`() = runTest {
+    fun `startMatchmaking calls client and returns success`(): TestResult = runTest {
         coEvery { mockOnlineClient.joinMatchmaking(any(), any()) } answers {
             matchmakingStateFlow.value = MatchmakingState.Searching(testTicket)
         }
 
-        val result = viewModel.startMatchmaking(TimeControl.BLITZ.key, rated = true)
+        val result = viewModel.startMatchmaking(TimeControl.BLITZ.key)
         advanceUntilIdle()
 
         assertTrue(result.isSuccess)
         assertEquals("ticket_123", result.getOrNull())
-        coVerify { mockOnlineClient.joinMatchmaking(TimeControl.BLITZ.key, true) }
+        coVerify { mockOnlineClient.joinMatchmaking(TimeControl.BLITZ.key) }
     }
 
     @Test
-    fun `startMatchmaking with error returns failure`() = runTest {
+    fun `startMatchmaking with error returns failure`(): TestResult = runTest {
         coEvery { mockOnlineClient.joinMatchmaking(any(), any()) } throws Exception("Matchmaking failed")
 
-        val result = viewModel.startMatchmaking(TimeControl.BLITZ.key, rated = true)
+        val result = viewModel.startMatchmaking(TimeControl.BLITZ.key)
         advanceUntilIdle()
 
         assertTrue(result.isFailure)
@@ -143,7 +143,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `cancelMatchmaking calls client when searching`() = runTest {
+    fun `cancelMatchmaking calls client when searching`(): TestResult = runTest {
         matchmakingStateFlow.value = MatchmakingState.Searching(testTicket)
 
         viewModel.cancelMatchmaking()
@@ -153,7 +153,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `cancelMatchmaking does nothing when not searching`() = runTest {
+    fun `cancelMatchmaking does nothing when not searching`(): TestResult = runTest {
         assertEquals(MatchmakingState.Idle, matchmakingStateFlow.value)
 
         viewModel.cancelMatchmaking()
@@ -165,7 +165,7 @@ class OnlineGameViewModelTest {
     // ── makeOnlineMove ────────────────────────────────────────────────────────
 
     @Test
-    fun `makeOnlineMove calls client when game is active`() = runTest {
+    fun `makeOnlineMove calls client when game is active`(): TestResult = runTest {
         currentGameFlow.value = makeGame()
         val move = Move(from = A1, to = B2)
 
@@ -176,7 +176,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `makeOnlineMove does nothing when no active game`() = runTest {
+    fun `makeOnlineMove does nothing when no active game`(): TestResult = runTest {
         assertNull(currentGameFlow.value)
         val move = Move(from = A1, to = B2)
 
@@ -189,7 +189,7 @@ class OnlineGameViewModelTest {
     // ── resign ────────────────────────────────────────────────────────────────
 
     @Test
-    fun `resign calls client when game is active`() = runTest {
+    fun `resign calls client when game is active`(): TestResult = runTest {
         currentGameFlow.value = makeGame()
 
         viewModel.resign()
@@ -199,7 +199,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `resign does nothing when no active game`() = runTest {
+    fun `resign does nothing when no active game`(): TestResult = runTest {
         assertNull(currentGameFlow.value)
 
         viewModel.resign()
@@ -211,7 +211,7 @@ class OnlineGameViewModelTest {
     // ── offerDraw ─────────────────────────────────────────────────────────────
 
     @Test
-    fun `offerDraw calls client when game is active`() = runTest {
+    fun `offerDraw calls client when game is active`(): TestResult = runTest {
         currentGameFlow.value = makeGame()
 
         viewModel.offerDraw()
@@ -221,7 +221,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `offerDraw does nothing when no active game`() = runTest {
+    fun `offerDraw does nothing when no active game`(): TestResult = runTest {
         assertNull(currentGameFlow.value)
 
         viewModel.offerDraw()
@@ -233,7 +233,7 @@ class OnlineGameViewModelTest {
     // ── respondToDraw ─────────────────────────────────────────────────────────
 
     @Test
-    fun `respondToDraw calls client when game is active`() = runTest {
+    fun `respondToDraw calls client when game is active`(): TestResult = runTest {
         currentGameFlow.value = makeGame()
 
         viewModel.respondToDraw(accept = true)
@@ -243,7 +243,7 @@ class OnlineGameViewModelTest {
     }
 
     @Test
-    fun `respondToDraw does nothing when no active game`() = runTest {
+    fun `respondToDraw does nothing when no active game`(): TestResult = runTest {
         assertNull(currentGameFlow.value)
 
         viewModel.respondToDraw(accept = true)

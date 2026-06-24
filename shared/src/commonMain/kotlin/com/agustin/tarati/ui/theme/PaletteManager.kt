@@ -1,6 +1,7 @@
 package com.agustin.tarati.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 
@@ -64,7 +65,7 @@ object PaletteManager {
  * que dependa de `LocalBoardPalette.current` fuera de cualquier `TaratiTheme`,
  * lo cual no debería ocurrir en producción.
  */
-val LocalBoardPalette = compositionLocalOf<BoardPalette> { ClassicPalette }
+val LocalBoardPalette: ProvidableCompositionLocal<BoardPalette> = compositionLocalOf<BoardPalette> { ClassicPalette }
 
 /**
  * Construye un [BoardColors] a partir de la paleta actual en la jerarquía

@@ -32,6 +32,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -63,7 +64,7 @@ import kotlin.time.toDuration
  * ## Expected evolution
  * - Sound: add support with javax.sound.sampled
  */
-val desktopServiceModule = module {
+val desktopServiceModule: Module = module {
     // HttpClient con engine CIO (JVM/Desktop) para WebSockets y REST
     single {
         HttpClient(CIO) {
@@ -111,7 +112,7 @@ val desktopServiceModule = module {
  * - Type-safe with enums
  * - Reactive with StateFlows
  */
-val desktopDataModule = module {
+val desktopDataModule: Module = module {
     // Settings — Preferences persistence
     single<SettingsRepository> { DesktopSettingsRepository() }
     single<AuthRepository> { DesktopAuthRepository() }
@@ -126,16 +127,16 @@ val desktopDataModule = module {
     single<GameRepository> { RoomGameRepository(get()) }
 }
 
-val desktopViewModelModule = module {
+val desktopViewModelModule: Module = module {
     // Settings ViewModel
-    viewModel { DesktopSettingsViewModel(get(), get()) }
+    viewModel { DesktopSettingsViewModel(get(), get(), get()) }
 
     // GameViewModel — CRITICAL: register with IGameModel interface
     // so OnlineGameViewModel can resolve it correctly
     viewModel { DesktopGameViewModel(get(), get()) } bind IGameModel::class
 }
 
-val desktopModules = listOf(
+val desktopModules: List<Module> = listOf(
     desktopServiceModule
 ) + sharedModules + listOf(
     desktopDataModule,

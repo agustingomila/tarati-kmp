@@ -513,8 +513,8 @@ fun DrawScope.drawAllPieces(
     // elimina N llamadas a cos()/sin()/sqrt() donde N = nº de piezas en el tablero.
     val lightOfDay = getLightOfDay(hourOfDay, pieceRadius)
     val organicColors = mapOf(
-        CobColor.WHITE to createOrganicColor(getPieceColors(Cob(CobColor.WHITE, false), colors), hourOfDay, colors),
-        CobColor.BLACK to createOrganicColor(getPieceColors(Cob(CobColor.BLACK, false), colors), hourOfDay, colors),
+        CobColor.WHITE to createOrganicColor(getPieceColors(Cob(CobColor.WHITE), colors), hourOfDay, colors),
+        CobColor.BLACK to createOrganicColor(getPieceColors(Cob(CobColor.BLACK), colors), hourOfDay, colors),
     )
 
     // Dibujar piezas estáticas

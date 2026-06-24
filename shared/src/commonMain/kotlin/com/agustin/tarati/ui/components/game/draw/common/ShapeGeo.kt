@@ -20,9 +20,9 @@ import androidx.compose.ui.geometry.Offset
  */
 data class ShapeGeo(
     val n: Int,
-    val offsets: Array<Offset>,
+    private val offsets: Array<Offset>,
     val r: Float,
-    val ref: Double,
+    private val ref: Double,
     val aC: Array<Offset>,      // centros de los círculos de esquina
     val tS: Array<Offset>,      // puntos de entrada al arco
     val tE: Array<Offset>,      // puntos de salida del arco

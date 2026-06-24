@@ -10,9 +10,9 @@ data class EnginePerformance(
     val losses: Int = 0,
     val draws: Int = 0,
     val totalGames: Int = 0,
-    val totalMoves: Int = 0,
-    val timeouts: Int = 0,
-    val performanceMetrics: MutableList<PerformanceMetrics> = mutableListOf(),
+    private val totalMoves: Int = 0,
+    private val timeouts: Int = 0,
+    private val performanceMetrics: MutableList<PerformanceMetrics> = mutableListOf(),
 ) {
     val winRate: Double get() = if (totalGames > 0) wins.toDouble() / totalGames else 0.0
     val score: Double get() = wins + (draws * 0.5)

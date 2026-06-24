@@ -3,38 +3,38 @@ package com.agustin.tarati.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ── Esquema oscuro ────────────────────────────────────────────────────────────
-val DarkPrimary = Color(0xFFB69CEC)
-val DarkSecondary = Color(0xFF7C5FD9)
-val DarkTertiary = Color(0xFFEFCE57)
+val DarkPrimary: Color = Color(0xFFB69CEC)
+val DarkSecondary: Color = Color(0xFF7C5FD9)
+val DarkTertiary: Color = Color(0xFFEFCE57)
 
 // ── Esquema claro ─────────────────────────────────────────────────────────────
-val LightPrimary = Color(0xFF6650a4)
-val LightSecondary = Color(0xFF625b71)
-val LightTertiary = Color(0xFF7D5279)
+val LightPrimary: Color = Color(0xFF6650a4)
+val LightSecondary: Color = Color(0xFF625b71)
+val LightTertiary: Color = Color(0xFF7D5279)
 
 // ── Fondos y superficies ──────────────────────────────────────────────────────
-val DarkBackground = Color(0xFF1A1420)
-val DarkSurface = Color(0xFF231A2A)
-val LightBackground = Color(0xFFF8F4FF)
-val LightSurface = Color(0xFFF5F0FC)
+val DarkBackground: Color = Color(0xFF1A1420)
+val DarkSurface: Color = Color(0xFF231A2A)
+val LightBackground: Color = Color(0xFFF8F4FF)
+val LightSurface: Color = Color(0xFFF5F0FC)
 
 // ── Colores de texto (esquema oscuro) ─────────────────────────────────────────
-val OnPrimaryDark = Color(0xFF2E1F52)
-val OnSecondaryDark = Color(0xFF2E1F52)
-val OnTertiaryDark = Color(0xFF2E1F52)
-val OnBackgroundDark = Color(0xFFE5DFF5)
-val OnSurfaceDark = Color(0xFFE5DFF5)
+val OnPrimaryDark: Color = Color(0xFF2E1F52)
+val OnSecondaryDark: Color = Color(0xFF2E1F52)
+val OnTertiaryDark: Color = Color(0xFF2E1F52)
+val OnBackgroundDark: Color = Color(0xFFE5DFF5)
+val OnSurfaceDark: Color = Color(0xFFE5DFF5)
 
 // ── Colores de texto (esquema claro) ──────────────────────────────────────────
-val OnBackgroundLight = Color(0xFF3A2C5D)
-val OnSurfaceLight = Color(0xFF3A2C5D)
-val OnPrimaryLight = Color.White
-val OnSecondaryLight = Color.White
-val OnTertiaryLight = Color.White
+val OnBackgroundLight: Color = Color(0xFF3A2C5D)
+val OnSurfaceLight: Color = Color(0xFF3A2C5D)
+val OnPrimaryLight: Color = Color.White
+val OnSecondaryLight: Color = Color.White
+val OnTertiaryLight: Color = Color.White
 
 // ── Error y acento ────────────────────────────────────────────────────────────
-val ErrorVariant = Color(0xFF9D62F0)
-val Tarati = Color(0xFF57936B)
+val ErrorVariant: Color = Color(0xFF9D62F0)
+val Tarati: Color = Color(0xFF57936B)
 
 // ── Extensiones de manipulación de color ─────────────────────────────────────
 

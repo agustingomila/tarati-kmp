@@ -53,8 +53,8 @@ class GetBoardStateAtMoveTest {
 
     private val editedInitialState = GameState(
         cobs = mapOf(
-            C3 to Cob(WHITE, false),
-            C9 to Cob(BLACK, false),
+            C3 to Cob(WHITE),
+            C9 to Cob(BLACK),
         ),
         currentTurn = WHITE,
     )
@@ -75,7 +75,7 @@ class GetBoardStateAtMoveTest {
     fun `moveIndex null applies all moves in the list`() {
         val moves = listOf(Move(C1 to B1), Move(C7 to B4))
 
-        val result = getBoardStateAtMove(moves, moveIndex = null)
+        val result = getBoardStateAtMove(moves)
 
         assertEquals("B1 has white", WHITE, result.cobs[B1]?.color)
         assertEquals("B4 has black", BLACK, result.cobs[B4]?.color)

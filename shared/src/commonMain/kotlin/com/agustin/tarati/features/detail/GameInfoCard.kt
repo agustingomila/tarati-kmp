@@ -276,7 +276,6 @@ private fun ViewingGameInfoContent(
                 val value = field.getValue(header)
                 if (shouldShowField(value)) {
                     EditableGameInfoRow(
-                        isEditing = false,
                         label = stringResource(field.labelRes),
                         value = value,
                     )
@@ -286,7 +285,6 @@ private fun ViewingGameInfoContent(
             // Observaciones solo si hay contenido
             if (shouldShowField(header.observations)) {
                 EditableGameInfoRow(
-                    isEditing = false,
                     label = stringResource(Res.string.observations),
                     value = header.observations,
                     isMultiline = true,

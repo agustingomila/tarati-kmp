@@ -48,8 +48,7 @@ class GameProtocolTest {
     @Test
     fun `serialize and deserialize JoinMatchmaking`() {
         val original = ClientMessage.JoinMatchmaking(
-            timeControl = TimeControl.BLITZ.key,
-            rated = true
+            timeControl = TimeControl.BLITZ.key
         )
 
         val jsonText = json.encodeToString<ClientMessage>(original)
@@ -159,8 +158,7 @@ class GameProtocolTest {
             userId = "user_123",
             username = "TestPlayer",
             rating = 1500,
-            country = "AR",
-            title = null
+            country = "AR"
         )
 
         val timeControl = TimeControlInfo(
@@ -343,9 +341,7 @@ class GameProtocolTest {
         val original = PlayerInfo(
             userId = "user_000",
             username = "Anonymous",
-            rating = 1200,
-            country = null,
-            title = null
+            rating = 1200
         )
 
         val jsonText = json.encodeToString(original)
@@ -361,8 +357,7 @@ class GameProtocolTest {
         val original = ServerMessage.GameEnded(
             gameId = "casual_game_123",
             result = GameResult.DRAW.key,
-            reason = GameEndReason.DRAW_AGREEMENT.key,
-            newRatings = null
+            reason = GameEndReason.DRAW_AGREEMENT.key
         )
 
         val jsonText = json.encodeToString<ServerMessage>(original)

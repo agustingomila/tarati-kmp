@@ -56,6 +56,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class BillingManager(
     context: android.content.Context,
     private val activityProvider: ActivityProvider,
+    private val entitlementsRepository: EntitlementsRepository,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
 ) : IBillingManager, PurchasesUpdatedListener {
 
@@ -259,6 +260,15 @@ class BillingManager(
             }
 
             owned.addAll(purchase.products)
+
+            // Validar el recibo en el servidor para ownership cross-platform (C2).
+            // No bloquea el estado local: si no hay sesión de Tarati o falla la red,
+            // la compra sigue reconocida localmente vía [purchasedProductIds].
+            for (productId in purchase.products) {
+                scope.launch {
+                    entitlementsRepository.validateGooglePlay(productId, purchase.purchaseToken)
+                }
+            }
         }
 
         _purchasedProductIds.value = owned

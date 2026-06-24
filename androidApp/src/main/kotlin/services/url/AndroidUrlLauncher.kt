@@ -2,7 +2,6 @@ package com.agustin.tarati.services.url
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.core.net.toUri
 
 class AndroidUrlLauncher(private val context: Context) : IUrlLauncher {

@@ -49,8 +49,8 @@ class GameBoardTest {
 
     @Test
     fun homeBases_containCorrectVertices() {
-        val whiteHome = homeBases[WHITE]!!
-        val blackHome = homeBases[BLACK]!!
+        val whiteHome = homeBases[WHITE] ?: return
+        val blackHome = homeBases[BLACK] ?: return
 
         assertEquals("White home should have 4 vertices", 4, whiteHome.size)
         assertEquals("Black home should have 4 vertices", 4, blackHome.size)

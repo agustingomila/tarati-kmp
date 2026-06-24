@@ -23,10 +23,10 @@ data class TournamentResult(
     val performanceMetrics: PerformanceMetrics? = null,
     val logInfo: (String) -> Unit,
 ) {
-    val winRateA: Double get() = winsA.toDouble() / totalGames
-    val winRateB: Double get() = winsB.toDouble() / totalGames
-    val scoreA: Double get() = winsA + (draws * 0.5)
-    val scoreB: Double get() = winsB + (draws * 0.5)
+    private val winRateA: Double get() = winsA.toDouble() / totalGames
+    private val winRateB: Double get() = winsB.toDouble() / totalGames
+    private val scoreA: Double get() = winsA + (draws * 0.5)
+    private val scoreB: Double get() = winsB + (draws * 0.5)
     val eloDifference: Int get() = calculateEloDifference(winRateA)
 
     fun printSummary() {

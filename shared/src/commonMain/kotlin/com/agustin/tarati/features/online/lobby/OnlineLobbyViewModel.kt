@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 // ── State models ───────────────────────────────────────────────────────────────
@@ -123,11 +124,11 @@ class OnlineLobbyViewModel(
 
     companion object {
         /** Intervalo de refresco del lobby (partidas en vivo + búsquedas). */
-        val LIVE_POLL_INTERVAL = 5.seconds
+        val LIVE_POLL_INTERVAL: Duration = 5.seconds
 
         /** Usuarios en línea se refrescan cada 2 ciclos (~10 s) dentro del polling de En Vivo. */
         private const val ONLINE_USERS_EVERY_N_CYCLES = 2
-        const val PAGE_SIZE = 20
+        const val PAGE_SIZE: Int = 20
     }
 
     private var pollCycle = 0

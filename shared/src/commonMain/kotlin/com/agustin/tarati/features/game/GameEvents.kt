@@ -224,7 +224,7 @@ class GameEvents(
         onPut()
     }
 
-    fun clearBoard(gameState: GameState = initialGameState()) {
+    private fun clearBoard(gameState: GameState = initialGameState()) {
         gameService.stopGame()
         aiEngine.clearHistory()
         gameService.updateGameState(gameState)
@@ -327,12 +327,12 @@ class GameEvents(
         gameService.updateGameState(gameState)
     }
 
-    fun showGamesLibrary() = onGamesLibrary()
+    fun showGamesLibrary(): Unit = onGamesLibrary()
 
-    fun saveGame() = onSaveGame()
+    fun saveGame(): Unit = onSaveGame()
 
     /** Delega a [IAchievementsManager] para abrir la pantalla de logros. */
-    fun showAchievementsUI(onNavigateToScreen: () -> Unit = {}) =
+    fun showAchievementsUI(onNavigateToScreen: () -> Unit = {}): Unit =
         achievementsManager.showAchievementsUI(onNavigateToScreen)
 }
 

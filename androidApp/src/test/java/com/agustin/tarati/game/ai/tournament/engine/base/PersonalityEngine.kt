@@ -1,5 +1,6 @@
 package com.agustin.tarati.game.ai.tournament.engine.base
 
+import com.agustin.tarati.core.domain.ai.api.AIDiagnostics
 import com.agustin.tarati.core.domain.ai.api.IAIEngine
 import com.agustin.tarati.core.domain.ai.engine.TaratiAI
 import com.agustin.tarati.core.domain.ai.evaluator.EvaluationConfig
@@ -37,15 +38,15 @@ class PersonalityEngine(
 
     override val positionHistory: MutableMap<String, Int> get() = engine.positionHistory
     override suspend fun getNextMove(gameState: GameState): MoveEval = engine.getNextMove(gameState)
-    override fun clearHistory() = engine.clearHistory()
+    override fun clearHistory(): Unit = engine.clearHistory()
     override fun putState(gameState: GameState, moveBy: CobColor): CobColor? = engine.putState(gameState, moveBy)
-    override fun removeState(gameState: GameState) = engine.removeState(gameState)
+    override fun removeState(gameState: GameState): Unit = engine.removeState(gameState)
     override fun setConfig(config: EvaluationConfig) {
         currentConfig = config
         engine.setConfig(config)
     }
 
-    override fun getDiagnostics() = engine.getDiagnostics()
+    override fun getDiagnostics(): AIDiagnostics? = engine.getDiagnostics()
 }
 
 /**

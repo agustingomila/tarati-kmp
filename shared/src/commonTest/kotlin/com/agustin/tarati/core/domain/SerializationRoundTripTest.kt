@@ -77,10 +77,10 @@ class SerializationRoundTripTest {
     fun gameState_withCustomCobs_survivesJsonRoundTrip() {
         val original = GameState(
             cobs = mapOf(
-                GameBoard.A1 to Cob(CobColor.WHITE, isUpgraded = false),
+                GameBoard.A1 to Cob(CobColor.WHITE),
                 GameBoard.B1 to Cob(CobColor.BLACK, isUpgraded = true),
                 GameBoard.C1 to Cob(CobColor.WHITE, isUpgraded = true),
-                GameBoard.D1 to Cob(CobColor.BLACK, isUpgraded = false),
+                GameBoard.D1 to Cob(CobColor.BLACK),
             ),
             currentTurn = CobColor.BLACK,
             halfMoveClock = 14,
@@ -125,9 +125,9 @@ class SerializationRoundTripTest {
     @Test
     fun cob_allCombinations_surviveJsonRoundTrip() {
         listOf(
-            Cob(CobColor.WHITE, isUpgraded = false),
+            Cob(CobColor.WHITE),
             Cob(CobColor.WHITE, isUpgraded = true),
-            Cob(CobColor.BLACK, isUpgraded = false),
+            Cob(CobColor.BLACK),
             Cob(CobColor.BLACK, isUpgraded = true),
         ).forEach { original ->
             val restored = jsonRoundTrip(original, Cob.serializer())

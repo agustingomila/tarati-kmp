@@ -79,7 +79,7 @@ data class OnlineUserInfo(
     val username: String,
     val displayName: String = username,
     val rating: Int = 1500,
-    val avatarUrl: String? = null,
+    private val avatarUrl: String? = null,
 )
 
 /**

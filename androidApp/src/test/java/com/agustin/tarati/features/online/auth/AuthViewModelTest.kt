@@ -7,6 +7,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -65,7 +66,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `authenticateWithToken updates state to Authenticated`() = runTest {
+    fun `authenticateWithToken updates state to Authenticated`(): TestResult = runTest {
         val token = makeTestJwt(sub = "user-123", username = "test_player")
 
         val result = viewModel.authenticateWithToken(token)
@@ -82,7 +83,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `authenticateWithToken with guest token creates guest user`() = runTest {
+    fun `authenticateWithToken with guest token creates guest user`(): TestResult = runTest {
         val token = makeTestJwt(sub = "guest-1", username = "guest_player", isGuest = true)
 
         val result = viewModel.authenticateWithToken(token)
@@ -114,7 +115,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `logout clears state and calls repository`() = runTest {
+    fun `logout clears state and calls repository`(): TestResult = runTest {
         val token = makeTestJwt(sub = "user-123", username = "test_player")
         viewModel.authenticateWithToken(token)
         advanceUntilIdle()
@@ -130,7 +131,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `clearError transitions from Error to Unauthenticated`() = runTest {
+    fun `clearError transitions from Error to Unauthenticated`(): TestResult = runTest {
         // Forzar estado de error es complejo en este mock —
         // este test verifica que clearError no rompe el estado Unauthenticated.
         viewModel.clearError()
@@ -162,7 +163,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `currentUser returns UserInfo when authenticated`() = runTest {
+    fun `currentUser returns UserInfo when authenticated`(): TestResult = runTest {
         val token = makeTestJwt(sub = "user-123", username = "test_player")
         viewModel.authenticateWithToken(token)
         advanceUntilIdle()

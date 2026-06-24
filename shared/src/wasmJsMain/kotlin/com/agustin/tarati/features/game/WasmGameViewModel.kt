@@ -27,9 +27,9 @@ class WasmGameViewModel(
         playerSettings.loadFromDataStore()
     }
 
-    override fun saveGameState() = Unit
+    override fun saveGameState(): Unit = Unit
 
-    override fun persistEditingState(isEditing: Boolean) = Unit
+    override fun persistEditingState(isEditing: Boolean): Unit = Unit
 }
 
 internal class WasmPlayerSettingsHolder(

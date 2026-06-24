@@ -278,7 +278,7 @@ data class GameState(
         return matchState
     }
 
-    fun hasTripleRepetition(
+    private fun hasTripleRepetition(
         positionHistory: Map<String, Int> = emptyMap(),
     ): Boolean {
         val hash = this.hashBoard()

@@ -21,7 +21,7 @@ class DesktopGameViewModel(
 
     // ── Session state (no-op: Desktop has no SavedStateHandle) ────────────────
 
-    override fun saveGameState() = Unit
+    override fun saveGameState(): Unit = Unit
 
-    override fun persistEditingState(isEditing: Boolean) = Unit
+    override fun persistEditingState(isEditing: Boolean): Unit = Unit
 }

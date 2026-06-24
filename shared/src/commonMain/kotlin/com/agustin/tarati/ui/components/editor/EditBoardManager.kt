@@ -27,7 +27,7 @@ class EditBoardManager : IEditBoardManager {
     override val editBoardOrientation: StateFlow<BoardOrientation> = _editBoardOrientation.asStateFlow()
 
     // Métodos de edición
-    fun endEditing() = _isEditing.update { false }
+    fun endEditing(): Unit = _isEditing.update { false }
 
     fun toggleEditing(currentTurn: CobColor, boardOrientation: BoardOrientation) {
         val newValue = !_isEditing.value
@@ -42,9 +42,9 @@ class EditBoardManager : IEditBoardManager {
         }
     }
 
-    fun toggleEditColor() = _editColor.update { it.opponent }
+    fun toggleEditColor(): Unit = _editColor.update { it.opponent }
 
-    fun toggleEditTurn() = _editTurn.update { it.opponent }
+    fun toggleEditTurn(): Unit = _editTurn.update { it.opponent }
 
     fun rotateEditBoard() {
         _editBoardOrientation.update {
@@ -71,7 +71,7 @@ class EditBoardManager : IEditBoardManager {
             // Caso 1: No hay pieza - colocar nueva
             currentCob == null -> {
                 if (canPlacePiece(_editColor.value, pieceCounts)) {
-                    mutableCobs[vertex] = Cob(_editColor.value, false)
+                    mutableCobs[vertex] = Cob(_editColor.value)
                 }
             }
             // Caso 2: Pieza del color seleccionado - mejorar
@@ -85,7 +85,7 @@ class EditBoardManager : IEditBoardManager {
             // Caso 4: Pieza del color opuesto - reemplazar
             else -> {
                 if (canReplacePiece(currentCounts = pieceCounts)) {
-                    mutableCobs[vertex] = Cob(_editColor.value, false)
+                    mutableCobs[vertex] = Cob(_editColor.value)
                 }
             }
         }

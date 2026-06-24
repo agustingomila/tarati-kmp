@@ -43,7 +43,7 @@ sealed class AuthState {
     @Serializable
     data class Error(
         val message: String,
-        val canRetry: Boolean = true
+        private val canRetry: Boolean = true
     ) : AuthState()
 }
 
@@ -113,5 +113,5 @@ data class AuthResponse(
     val accessToken: String,
     val refreshToken: String,
     val userInfo: UserInfo,
-    val expiresIn: Int = 900 // 15 minutos por defecto
+    private val expiresIn: Int = 900 // 15 minutos por defecto
 )

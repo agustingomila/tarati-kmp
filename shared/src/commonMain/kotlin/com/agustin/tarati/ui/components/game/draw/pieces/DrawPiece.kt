@@ -37,7 +37,7 @@ import com.agustin.tarati.ui.theme.BoardColors
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Grosor del canto poligonal. Mismo valor que COIN_EDGE_THICKNESS circular (0.22f). */
-const val MORPH_EDGE_THICKNESS = 0.22f
+const val MORPH_EDGE_THICKNESS: Float = 0.22f
 
 /**
  * Anillo de selección poligonal con cabeza animada.
@@ -96,7 +96,7 @@ fun DrawScope.drawPolygonSelection(
     }
 
     // ── 3 + 4 + 5. Cabeza animada ─────────────────────────────────────────────
-    val measure = createPathMeasure(selPath, closed = false)
+    val measure = createPathMeasure(selPath)
     val totalLength = measure.length
     if (totalLength <= 0f) return
 
@@ -111,11 +111,11 @@ fun DrawScope.drawPolygonSelection(
     // Extraer el path del segmento (puede cruzar el 0)
     val segCompose = if (segStart < headDist) {
         // Segmento normal sin wrap
-        measure.getSegment(segStart, headDist, startWithMoveTo = true)
+        measure.getSegment(segStart, headDist)
     } else {
         // Segmento con wrap: de segStart hasta el final + de 0 hasta headDist
-        val part1 = measure.getSegment(segStart, totalLength, startWithMoveTo = true)
-        val part2 = measure.getSegment(0f, headDist, startWithMoveTo = true)
+        val part1 = measure.getSegment(segStart, totalLength)
+        val part2 = measure.getSegment(0f, headDist)
 
         if (part1 != null && part2 != null) {
             Path().apply {
@@ -186,7 +186,6 @@ fun DrawScope.drawPolygonSelection(
         strokeWidth = 0f,           // sin línea visible — solo la punta
         arrowSize = radius * 0.28f,
         arrowWidth = radius * 0.10f,
-        arrowAtEnd = true,
         arrowStyle = ArrowTipStyle.PENCIL,
     )
 
@@ -255,7 +254,6 @@ fun DrawScope.drawMorphConversionFlip(
         radius = radius,
         projection = projection,
         flipProgress = animatedCob.conversionProgress,
-        rimFrac = MORPH_EDGE_THICKNESS,
         cobShape = cobShapeFor(pieceType, animatedCob.cob),
         cobColor = animatedCob.cob.color,
         boardColors = boardColors,

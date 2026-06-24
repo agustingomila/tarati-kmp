@@ -93,7 +93,7 @@ private val concaveAndCapsuleSamples = listOf(
         Color(0xFF4EE68C), "Hexágono\ns=−0.5"
     ),
     ShapeSample(
-        MorphShape(sides = 2, cornerRadius = 55f, rotationDeg = 0f),
+        MorphShape(sides = 2, cornerRadius = 55f),
         Color(0xFFB84EE6), "Cápsula\nN=2 r=55"
     ),
     ShapeSample(

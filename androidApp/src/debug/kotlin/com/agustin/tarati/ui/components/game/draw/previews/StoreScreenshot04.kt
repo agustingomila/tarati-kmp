@@ -23,7 +23,7 @@ import com.agustin.tarati.ui.theme.NaturePalette
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot04b_ES() = PlayStoreScreenshotFan(
+fun StoreScreenshot04b_ES(): Unit = PlayStoreScreenshotFan(
     left = FanCard(R.drawable.ss_01_en_classic, ClassicPalette),
     center = FanCard(R.drawable.ss_01_en_dark, DarkPalette),
     right = FanCard(R.drawable.ss_01_en_nature, NaturePalette),
@@ -34,7 +34,7 @@ fun StoreScreenshot04b_ES() = PlayStoreScreenshotFan(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot04b_ES_GrayscaleCenter() = PlayStoreScreenshotFan(
+fun StoreScreenshot04b_ES_GrayscaleCenter(): Unit = PlayStoreScreenshotFan(
     left = FanCard(R.drawable.ss_01_en_classic, ClassicPalette),
     center = FanCard(R.drawable.ss_01_en_grayscale, GrayscalePalette),
     right = FanCard(R.drawable.ss_01_en_nature, NaturePalette),
@@ -45,7 +45,7 @@ fun StoreScreenshot04b_ES_GrayscaleCenter() = PlayStoreScreenshotFan(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot04b_EN() = PlayStoreScreenshotFan(
+fun StoreScreenshot04b_EN(): Unit = PlayStoreScreenshotFan(
     left = FanCard(R.drawable.ss_01_en_classic, ClassicPalette),
     center = FanCard(R.drawable.ss_01_en_dark, DarkPalette),
     right = FanCard(R.drawable.ss_01_en_nature, NaturePalette),
@@ -55,7 +55,7 @@ fun StoreScreenshot04b_EN() = PlayStoreScreenshotFan(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot04b_EN_GrayscaleCenter() = PlayStoreScreenshotFan(
+fun StoreScreenshot04b_EN_GrayscaleCenter(): Unit = PlayStoreScreenshotFan(
     left = FanCard(R.drawable.ss_01_en_classic, ClassicPalette),
     center = FanCard(R.drawable.ss_01_en_grayscale, GrayscalePalette),
     right = FanCard(R.drawable.ss_01_en_nature, NaturePalette),

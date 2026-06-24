@@ -91,9 +91,9 @@ object PreviewGamesLibrary : IGamesLibraryViewModel {
 
 // ── Datos de preview ──────────────────────────────────────────────────────────
 
-val previewGameState = parseBoardNotation(previewBoardPosition)
+val previewGameState: GameState = parseBoardNotation(previewBoardPosition)
 
-val previewSavedGames =
+val previewSavedGames: List<SavedGame> =
     listOf(
         SavedGame(
             id = "1",
@@ -137,7 +137,7 @@ val previewSavedGames =
         ),
     )
 
-val previewHeader =
+val previewHeader: PGNHeader =
     PGNHeader(
         event = "Tarati World Championship",
         site = "Buenos Aires",
@@ -226,16 +226,16 @@ val exampleMoveHistory: List<HistoryEntry> = previewMoveList.mapIndexed { index,
     HistoryEntry(move, GameState(mapOf(), color))
 }
 
-const val previewBoardPosition = "B2B/B3W/B4W/B5b/B6W/C11W/C12W/D3W w"
+const val previewBoardPosition: String = "B2B/B3W/B4W/B5b/B6W/C11W/C12W/D3W w"
 
-val previewGameDto =
+val previewGameDto: GameDto =
     GameDto(
         boardPosition = previewBoardPosition,
         matchResult = MatchResult.WHITE_WON,
         moveHistory = previewMoveList,
     )
 
-val previewMatchDto =
+val previewMatchDto: MatchDto =
     MatchDto(
         header = previewHeader,
         game = previewGameDto,

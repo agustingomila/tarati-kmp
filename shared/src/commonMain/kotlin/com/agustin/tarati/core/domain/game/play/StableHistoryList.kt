@@ -41,5 +41,5 @@ class StableHistoryList(
 
     fun getGameState(index: Int): GameState = entries[index].gameState
 
-    fun iterator() = entries.iterator()
+    fun iterator(): Iterator<HistoryEntry> = entries.iterator()
 }

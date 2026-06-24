@@ -52,12 +52,14 @@ import kotlin.time.Clock
  */
 class AuthViewModel(
     private val authRepository: AuthRepository,
-    private val httpClient: io.ktor.client.HttpClient
+    private val httpClient: io.ktor.client.HttpClient,
+    // Opcional (nullable) para no romper construcciones directas en tests; Koin inyecta el real.
+    private val entitlementsRepository: com.agustin.tarati.services.billing.EntitlementsRepository? = null,
 ) : ViewModel(), IAuthViewModel {
 
     private val logger = getLogger("AuthViewModel")
 
-    private val ACCESS_TOKEN_DURATION_MS = 15 * 60 * 1000L   // 15 minutos
+    private val _accessTokenDurationMs = 15 * 60 * 1000L   // 15 minutos
 
     // Refresh token en memoria para sesiones sin "Recordarme".
     // Si hay uno persistido en authRepository, ese tiene prioridad.
@@ -92,13 +94,17 @@ class AuthViewModel(
 
         return try {
             val userInfo = parseUserInfoFromToken(token)
-            val expiresAt = Clock.System.now().toEpochMilliseconds() + ACCESS_TOKEN_DURATION_MS
+            val expiresAt = Clock.System.now().toEpochMilliseconds() + _accessTokenDurationMs
 
             _accessToken = token
             _authState.value = AuthState.Authenticated(
                 userInfo = userInfo,
                 tokenExpiry = expiresAt
             )
+
+            // Cargar ownership cross-platform para la sesión recién establecida.
+            // Funnel común de login/guest/restore — no bloquea la autenticación.
+            viewModelScope.launch { entitlementsRepository?.refresh() }
 
             logger.debug("Authenticated as ${userInfo.username}")
             Result.success(userInfo)
@@ -108,8 +114,7 @@ class AuthViewModel(
         } catch (e: Exception) {
             logger.error("Authentication failed: ${e.message}")
             _authState.value = AuthState.Error(
-                message = e.message ?: "Authentication failed",
-                canRetry = true
+                message = e.message ?: "Authentication failed"
             )
             Result.failure(e)
         }
@@ -164,14 +169,14 @@ class AuthViewModel(
             } else {
                 val code = parseServerError(response.bodyAsText())
                 val msg = if (code != null) localizedApiError(code) else "Login failed: HTTP ${response.status.value}"
-                _authState.value = AuthState.Error(message = msg, canRetry = true)
+                _authState.value = AuthState.Error(message = msg)
                 Result.failure(Exception(msg))
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             logger.debug("loginWithServer error: ${e.message}")
-            _authState.value = AuthState.Error(message = e.message ?: "Login failed", canRetry = true)
+            _authState.value = AuthState.Error(message = e.message ?: "Login failed")
             Result.failure(e)
         }
     }
@@ -223,7 +228,7 @@ class AuthViewModel(
                     val currentState = _authState.value
                     val userInfo = (currentState as? AuthState.Authenticated)?.userInfo
                         ?: parseUserInfoFromToken(newAccessToken)
-                    val newExpiry = Clock.System.now().toEpochMilliseconds() + ACCESS_TOKEN_DURATION_MS
+                    val newExpiry = Clock.System.now().toEpochMilliseconds() + _accessTokenDurationMs
 
                     _accessToken = newAccessToken
                     _authState.value = AuthState.Authenticated(
@@ -316,14 +321,14 @@ class AuthViewModel(
                 val code = parseServerError(response.bodyAsText())
                 val msg =
                     if (code != null) localizedApiError(code) else "Registration failed: HTTP ${response.status.value}"
-                _authState.value = AuthState.Error(message = msg, canRetry = true)
+                _authState.value = AuthState.Error(message = msg)
                 Result.failure(Exception(msg))
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             logger.debug("registerWithServer error: ${e.message}")
-            _authState.value = AuthState.Error(message = e.message ?: "Registration failed", canRetry = true)
+            _authState.value = AuthState.Error(message = e.message ?: "Registration failed")
             Result.failure(e)
         }
     }
@@ -347,6 +352,7 @@ class AuthViewModel(
         authRepository.clearAll()
         _inMemoryRefreshToken = null
         _accessToken = null
+        entitlementsRepository?.clear()
         _authState.value = AuthState.Unauthenticated
     }
 
@@ -376,14 +382,14 @@ class AuthViewModel(
                 val code = parseServerError(response.bodyAsText())
                 val msg =
                     if (code != null) localizedApiError(code) else "Guest login failed: HTTP ${response.status.value}"
-                _authState.value = AuthState.Error(message = msg, canRetry = true)
+                _authState.value = AuthState.Error(message = msg)
                 Result.failure(Exception(msg))
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             logger.debug("loginAsGuest error: ${e.message}")
-            _authState.value = AuthState.Error(message = e.message ?: "Guest login failed", canRetry = true)
+            _authState.value = AuthState.Error(message = e.message ?: "Guest login failed")
             Result.failure(e)
         }
     }
@@ -530,7 +536,7 @@ class AuthViewModel(
         try {
             val userInfo = parseUserInfoFromToken(token)
             val expiresAt = parseTokenExpiry(token)
-                ?: (Clock.System.now().toEpochMilliseconds() + ACCESS_TOKEN_DURATION_MS)
+                ?: (Clock.System.now().toEpochMilliseconds() + _accessTokenDurationMs)
             val now = Clock.System.now().toEpochMilliseconds()
 
             if (expiresAt > now + 30_000L) {

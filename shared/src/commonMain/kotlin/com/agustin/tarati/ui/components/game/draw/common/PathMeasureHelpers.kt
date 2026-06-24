@@ -60,12 +60,12 @@ fun extractSegments(
         when {
             // Segmento normal (no cruza el origen)
             start < end -> {
-                measure.getSegment(start, end, startWithMoveTo = true)
+                measure.getSegment(start, end)
             }
             // Segmento que cruza el origen (wrap around)
             start > end -> {
                 // Parte 1: desde start hasta el final
-                val part1 = measure.getSegment(start, totalLength, startWithMoveTo = true)
+                val part1 = measure.getSegment(start, totalLength)
                 // Parte 2: desde el inicio hasta end
                 val part2 = measure.getSegment(0f, end, startWithMoveTo = false)
 

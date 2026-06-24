@@ -112,8 +112,8 @@ class GameManagerTest {
 
     private val editedState = GameState(
         cobs = mapOf(
-            C3 to Cob(WHITE, false),
-            C9 to Cob(BLACK, false),
+            C3 to Cob(WHITE),
+            C9 to Cob(BLACK),
         ),
         currentTurn = WHITE,
     )

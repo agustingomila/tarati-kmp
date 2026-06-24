@@ -159,7 +159,7 @@ internal fun PlayStoreScreenshot(
         val screenH = phoneH - topBezel - botBezel
 
         drawBackgroundLayer(gradTop, gradBottom, textPosition, size, boardColors)
-        drawPhoneShadow(phoneX, phoneY, phoneW, phoneH, 1f, boardColors)
+        drawPhoneShadow(phoneX, phoneY, phoneW, phoneH, colors = boardColors)
         drawPhoneBody(Offset(phoneX, phoneY), Size(phoneW, phoneH))
         drawScreen(screenX, screenY, screenW, screenH, screenshotBitmap, boardColors)
         drawCameraLens(phoneX, phoneY, phoneW)

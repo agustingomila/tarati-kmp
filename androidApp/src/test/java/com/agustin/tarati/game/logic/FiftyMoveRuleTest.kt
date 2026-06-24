@@ -37,7 +37,7 @@ class FiftyMoveRuleTest {
     @Test
     fun halfMoveClock_resetsOnCobMove() {
         val state = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false)), // cob
+            cobs = mapOf(C1 to Cob(WHITE)), // cob
             currentTurn = WHITE,
             halfMoveClock = 42,
         )
@@ -49,8 +49,8 @@ class FiftyMoveRuleTest {
     fun halfMoveClock_resetsOnForcedPromotion() {
         val state = GameState(
             cobs = mapOf(
-                C7 to Cob(WHITE, false), // sole white cob → forced promotion
-                C1 to Cob(BLACK, false),
+                C7 to Cob(WHITE), // sole white cob → forced promotion
+                C1 to Cob(BLACK),
             ),
             currentTurn = WHITE,
             halfMoveClock = 75,
@@ -64,7 +64,7 @@ class FiftyMoveRuleTest {
     fun halfMoveClock_resetsOnStandardPromotion() {
         // Cob advances to upgrade vertex → promotes, clock resets
         val state = GameState(
-            cobs = mapOf(C6 to Cob(WHITE, false)),
+            cobs = mapOf(C6 to Cob(WHITE)),
             currentTurn = WHITE,
             halfMoveClock = 60,
         )
@@ -75,7 +75,7 @@ class FiftyMoveRuleTest {
     @Test
     fun halfMoveClock_defaultIsZero() {
         val state = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false)),
+            cobs = mapOf(C1 to Cob(WHITE)),
             currentTurn = WHITE,
         )
         assertEquals("Default halfMoveClock should be 0", 0, state.halfMoveClock)
@@ -86,9 +86,8 @@ class FiftyMoveRuleTest {
         // Two states identical except halfMoveClock must produce the same hash
         // (the clock is not part of the position for triple-repetition purposes)
         val s1 = GameState(
-            cobs = mapOf(C1 to Cob(WHITE, false), C7 to Cob(BLACK, false)),
+            cobs = mapOf(C1 to Cob(WHITE), C7 to Cob(BLACK)),
             currentTurn = WHITE,
-            halfMoveClock = 0,
         )
         val s2 = s1.copy(halfMoveClock = 99)
         assertEquals("hashBoard must be equal regardless of halfMoveClock", s1.hashBoard(), s2.hashBoard())
@@ -142,7 +141,7 @@ class FiftyMoveRuleTest {
         val state = GameState(
             cobs = mapOf(
                 C6 to Cob(WHITE, true),
-                C8 to Cob(BLACK, false),
+                C8 to Cob(BLACK),
             ),
             currentTurn = WHITE,
             halfMoveClock = 100,
@@ -221,7 +220,6 @@ class FiftyMoveRuleTest {
                 C8 to Cob(BLACK, true),
             ),
             currentTurn = WHITE,
-            halfMoveClock = 0,
         )
         // 5 consecutive rok half-moves using C3↔C2 and C8↔C7
         val movePairs = listOf(
@@ -241,11 +239,10 @@ class FiftyMoveRuleTest {
         var state = GameState(
             cobs = mapOf(
                 A1 to Cob(WHITE, true),
-                C1 to Cob(WHITE, false),
+                C1 to Cob(WHITE),
                 C7 to Cob(BLACK, true),
             ),
             currentTurn = WHITE,
-            halfMoveClock = 0,
         )
         state = state.copy(halfMoveClock = 10) // shortcut: pretend 10 rok moves happened
         // Cob move by white (C1→B1) — resets

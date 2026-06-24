@@ -82,7 +82,7 @@ class TutorialManager(
         startTutorial(onStep)
     }
 
-    fun startTutorial(onStep: () -> Unit) {
+    private fun startTutorial(onStep: () -> Unit) {
         if (_steps.value.isEmpty()) return
         showStep(_steps.value[_currentStepIndex.value], onStep)
     }
@@ -156,17 +156,17 @@ class TutorialManager(
         }
     }
 
-    fun getCurrentStep(): TutorialStep? = _steps.value.getOrNull(_currentStepIndex.value)
+    private fun getCurrentStep(): TutorialStep? = _steps.value.getOrNull(_currentStepIndex.value)
 
     fun getCurrentGameState(): GameState? = getCurrentStep()?.gameState
 
-    fun shouldAutoAdvance(): Boolean {
+    private fun shouldAutoAdvance(): Boolean {
         val currentStep = getCurrentStep()
         return currentStep?.autoAdvanceDelay != null &&
                 currentStep !is InteractiveTutorialStep
     }
 
-    fun getCurrentStepDuration(): Long = getCurrentStep()?.autoAdvanceDelay ?: 0L
+    private fun getCurrentStepDuration(): Long = getCurrentStep()?.autoAdvanceDelay ?: 0L
 
     fun isWaitingForUserInteraction(): Boolean = _tutorialState.value is TutorialState.WaitingForMove
 

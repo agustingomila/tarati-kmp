@@ -183,7 +183,7 @@ private val flipSubjects = listOf(
         Color(0xFF4ECBE6), Color(0xFFE6A44E)
     ),
     FlipSubject(
-        MorphShape(sides = 4, cornerRadius = 18f, rotationDeg = 0f), "Diamante",
+        MorphShape(sides = 4, cornerRadius = 18f), "Diamante",
         Color(0xFF4EE68C), Color(0xFFB84EE6)
     ),
     FlipSubject(
@@ -276,7 +276,6 @@ fun ShapeFlipVerticalPreview() {
                     ) {
                         ShapeFlipAnimated(
                             shape = s.shape,
-                            axisAngleDeg = 90f,
                             colorFront = s.colorFront,
                             colorBack = s.colorBack
                         )
@@ -515,7 +514,7 @@ fun ShapeFlipStressTestPreview() {
                             verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             ShapeFlipAnimated(
-                                shape = subject.shape, axisAngleDeg = 90f,
+                                shape = subject.shape,
                                 colorFront = subject.colorFront, colorBack = subject.colorBack,
                                 size = 64.dp, staticProgress = prog
                             )
@@ -563,7 +562,6 @@ fun ShapeFlipRimFracComparePreview() {
                     ) {
                         ShapeFlipAnimated(
                             shape = s.shape,
-                            axisAngleDeg = 90f,
                             colorFront = s.colorFront,
                             colorBack = s.colorBack,
                             size = 64.dp,
@@ -697,12 +695,12 @@ private fun ShapeCobPaletteGrid(cobColor: CobColor) {
 /** Piezas claras (WHITE) — paletas × formas con guarda y motivo central. */
 @Preview(group = "ShapeFlipPalette", showBackground = true, widthDp = 460, heightDp = 600)
 @Composable
-fun ShapeCobPaletteGridPreview_White() = ShapeCobPaletteGrid(CobColor.WHITE)
+fun ShapeCobPaletteGridPreview_White(): Unit = ShapeCobPaletteGrid(CobColor.WHITE)
 
 /** Piezas oscuras (BLACK) — paletas × formas con guarda y motivo central. */
 @Preview(group = "ShapeFlipPalette", showBackground = true, widthDp = 460, heightDp = 600)
 @Composable
-fun ShapeCobPaletteGridPreview_Black() = ShapeCobPaletteGrid(CobColor.BLACK)
+fun ShapeCobPaletteGridPreview_Black(): Unit = ShapeCobPaletteGrid(CobColor.BLACK)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Preview 9 — Volteo con paletas (drawMorphFlip)
@@ -745,11 +743,11 @@ fun ShapeFlipCobPalettePreview() {
                     val cobShape = cobShapeForPreview(shape)
                     ShapeFlipCobAnimated(
                         cobShape = cobShape, cobColor = CobColor.WHITE, boardColors = colors,
-                        axisAngleDeg = 90f, size = 72.dp
+                        size = 72.dp
                     )
                     ShapeFlipCobAnimated(
                         cobShape = cobShape, cobColor = CobColor.BLACK, boardColors = colors,
-                        axisAngleDeg = 90f, size = 72.dp
+                        size = 72.dp
                     )
                 }
             }
@@ -876,7 +874,6 @@ fun ShapeFlipColorSchemesPreview() {
                                 cobShape = cobShape,
                                 cobColor = CobColor.WHITE,
                                 boardColors = boardColors,
-                                axisAngleDeg = 90f,
                                 size = 72.dp
                             )
                             Text(

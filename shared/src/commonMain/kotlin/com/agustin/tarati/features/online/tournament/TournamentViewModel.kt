@@ -115,7 +115,6 @@ class TournamentViewModel(
                         registering = tournaments.filter { it.status == TournamentStatus.REGISTERING },
                         active = tournaments.filter { it.status == TournamentStatus.ACTIVE },
                         finished = tournaments.filter { it.status == TournamentStatus.FINISHED },
-                        isLoading = false,
                     )
                 }
                 .onFailure { e ->

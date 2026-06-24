@@ -1,13 +1,13 @@
 package com.agustin.tarati.core.domain.ai.evaluator
 
 object EvaluationConfigBuilder {
-    fun baseline() = EvaluationConfig(name = "Default")
+    fun baseline(): EvaluationConfig = EvaluationConfig(name = "Default")
 
     /**
      * Maximizes capture value and immediate pressure.
      * Mobility is kept intact — in Tarati it correlates directly with flip opportunities.
      */
-    fun aggressive(base: EvaluationConfig = baseline()) =
+    fun aggressive(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Aggressive",
             material = base.material.scaleFlips(cob = 1.3, rok = 1.35),
@@ -23,7 +23,7 @@ object EvaluationConfigBuilder {
      * without surrendering the initiative entirely.
      * flipCobBonus is not reduced: capturing is always correct in Tarati.
      */
-    fun defensive(base: EvaluationConfig = baseline()) =
+    fun defensive(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Defensive",
             material = base.material.scalePieces(cob = 1.2, rok = 1.15),
@@ -38,7 +38,7 @@ object EvaluationConfigBuilder {
      * Pure materialism — maximizes piece count and capture value.
      * Low mobility keeps the focus on piece counts over connectivity.
      */
-    fun material(base: EvaluationConfig = baseline()) =
+    fun material(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Material",
             material = base.material
@@ -52,7 +52,7 @@ object EvaluationConfigBuilder {
      * Positional advantage is expressed by rewarding good squares more,
      * not by devaluing captures.
      */
-    fun positional(base: EvaluationConfig = baseline()) =
+    fun positional(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Positional",
             positional = base.positional
@@ -66,7 +66,7 @@ object EvaluationConfigBuilder {
      * Small uniform boosts across all factors — close to baseline but
      * slightly more dynamic.
      */
-    fun balanced(base: EvaluationConfig = baseline()) =
+    fun balanced(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Balanced",
             material = base.material
@@ -82,7 +82,7 @@ object EvaluationConfigBuilder {
      * Swarms the opponent with mobile, connected pieces.
      * Piece count is not penalized — mobility without material is unsustainable.
      */
-    fun swarming(base: EvaluationConfig = baseline()) =
+    fun swarming(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Swarming",
             material = base.material.scaleFlips(cob = 1.2),
@@ -98,7 +98,7 @@ object EvaluationConfigBuilder {
      * dominance. quickAttackWeight keeps it responsive to immediate tactics
      * so it does not fall behind in shorter games.
      */
-    fun strategist(base: EvaluationConfig = baseline()) =
+    fun strategist(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Strategist",
             positional = base.positional
@@ -114,7 +114,7 @@ object EvaluationConfigBuilder {
      * Accepts slight material risk in exchange for high tactical return.
      * Avoids draws by penalizing repetition.
      */
-    fun gambit(base: EvaluationConfig = baseline()) =
+    fun gambit(base: EvaluationConfig = baseline()): EvaluationConfig =
         base.copy(
             name = "Gambit",
             material = base.material

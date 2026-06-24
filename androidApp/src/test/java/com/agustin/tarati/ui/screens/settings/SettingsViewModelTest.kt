@@ -10,6 +10,7 @@ import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.features.settings.SettingsRepository
 import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.services.achievements.IAchievementsRepository
+import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.IBillingManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.PaletteProducts
@@ -32,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -57,6 +59,7 @@ class SettingsViewModelTest {
     private lateinit var mockSettingsRepository: SettingsRepository
     private lateinit var mockAchievementsRepository: IAchievementsRepository
     private lateinit var mockBillingManager: IBillingManager
+    private lateinit var mockEntitlementsRepository: EntitlementsRepository
 
     /**
      * Configura respuestas por defecto para TODOS los flows del SettingsRepository.
@@ -73,6 +76,8 @@ class SettingsViewModelTest {
         mockSettingsRepository = mockk()
         mockAchievementsRepository = mockk()
         mockBillingManager = mockk(relaxed = true)
+        mockEntitlementsRepository = mockk(relaxed = true)
+        every { mockEntitlementsRepository.entitlements } returns MutableStateFlow(emptySet())
 
         // ── SettingsRepository flows ───────────────────────────────────────────
         coEvery { mockSettingsRepository.isDarkTheme } returns MutableStateFlow(false)
@@ -132,7 +137,12 @@ class SettingsViewModelTest {
                 },
             )
         }
-        viewModel = AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+        viewModel = AndroidSettingsViewModel(
+            mockSettingsRepository,
+            mockAchievementsRepository,
+            mockBillingManager,
+            mockEntitlementsRepository
+        )
     }
 
     @After
@@ -150,7 +160,7 @@ class SettingsViewModelTest {
     // ── Initial state ─────────────────────────────────────────────────────────
 
     @Test
-    fun initialState_hasDefaultValues() =
+    fun initialState_hasDefaultValues(): TestResult =
         runTest {
             advanceTimeBy(100.milliseconds)
 
@@ -182,7 +192,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun initialState_includesAllBoardStateProperties() =
+    fun initialState_includesAllBoardStateProperties(): TestResult =
         runTest {
             val state = viewModel.settingsState.value
 
@@ -202,7 +212,7 @@ class SettingsViewModelTest {
     // ── Repository save calls ─────────────────────────────────────────────────
 
     @Test
-    fun toggleDarkTheme_savesSetting() =
+    fun toggleDarkTheme_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setDarkTheme(any()) } returns Unit
 
@@ -213,7 +223,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setUserName_savesSetting() =
+    fun setUserName_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setUserName(any()) } returns Unit
 
@@ -223,7 +233,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setLanguage_savesSetting() =
+    fun setLanguage_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setLanguage(any()) } returns Unit
 
@@ -233,7 +243,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setLabelsVisibility_savesSetting() =
+    fun setLabelsVisibility_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setLabelsVisibility(any()) } returns Unit
 
@@ -244,7 +254,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setVerticesVisibility_savesSetting() =
+    fun setVerticesVisibility_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setVerticesVisibility(any()) } returns Unit
 
@@ -255,7 +265,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setEdgesVisibility_savesSetting() =
+    fun setEdgesVisibility_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setEdgesVisibility(any()) } returns Unit
 
@@ -266,7 +276,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setRegionsVisibility_savesSetting() =
+    fun setRegionsVisibility_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setRegionsVisibility(any()) } returns Unit
 
@@ -277,7 +287,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setPerimeterVisibility_savesSetting() =
+    fun setPerimeterVisibility_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPerimeterVisibility(any()) } returns Unit
 
@@ -288,7 +298,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setAnimateEffects_savesSetting() =
+    fun setAnimateEffects_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setAnimateEffects(any()) } returns Unit
 
@@ -299,7 +309,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setDifficultyBlack_savesSetting() =
+    fun setDifficultyBlack_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setDifficultyBlack(any()) } returns Unit
 
@@ -312,7 +322,7 @@ class SettingsViewModelTest {
     // ── conversionAnimationStyle ──────────────────────────────────────────────
 
     @Test
-    fun setConversionAnimationStyle_flip_savesSetting() =
+    fun setConversionAnimationStyle_flip_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setConversionAnimationStyle(any()) } returns Unit
 
@@ -323,7 +333,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setConversionAnimationStyle_transformation_savesSetting() =
+    fun setConversionAnimationStyle_transformation_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setConversionAnimationStyle(any()) } returns Unit
 
@@ -336,7 +346,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setConversionAnimationStyle_surprise_savesSetting() =
+    fun setConversionAnimationStyle_surprise_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setConversionAnimationStyle(any()) } returns Unit
 
@@ -349,13 +359,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun conversionAnimationStyle_reflectsRepositoryValue() =
+    fun conversionAnimationStyle_reflectsRepositoryValue(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.conversionAnimationStyle } returns
                     MutableStateFlow(ConversionAnimationStyle.FLIP)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             assertEquals(
@@ -366,7 +381,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun conversionAnimationStyle_multipleChanges_triggerRepositoryCalls() =
+    fun conversionAnimationStyle_multipleChanges_triggerRepositoryCalls(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setConversionAnimationStyle(any()) } returns Unit
 
@@ -388,7 +403,7 @@ class SettingsViewModelTest {
     // ── pieceType ─────────────────────────────────────────────────────────────
 
     @Test
-    fun setPieceType_savesSetting() =
+    fun setPieceType_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
@@ -399,7 +414,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setPieceType_triangle_savesSetting() =
+    fun setPieceType_triangle_savesSetting(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
@@ -410,13 +425,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun pieceTypeId_reflectsRepositoryValue() =
+    fun pieceTypeId_reflectsRepositoryValue(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.pieceTypeId } returns
                     MutableStateFlow(PieceTypes.Hexagon.id)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             assertEquals(
@@ -427,7 +447,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun pieceTypeId_unknownId_defaultsToCircleInManager() =
+    fun pieceTypeId_unknownId_defaultsToCircleInManager(): TestResult =
         runTest {
             // Un id desconocido en DataStore nunca rompe el estado;
             // PieceTypes.findById devuelve el círculo por defecto.
@@ -435,7 +455,12 @@ class SettingsViewModelTest {
                     MutableStateFlow("unknown_shape_id")
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             assertEquals(
@@ -454,7 +479,7 @@ class SettingsViewModelTest {
     // ── Multiple changes ──────────────────────────────────────────────────────
 
     @Test
-    fun settingsChanges_triggerRepositoryCalls() =
+    fun settingsChanges_triggerRepositoryCalls(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setDarkTheme(any()) } returns Unit
             coEvery { mockSettingsRepository.setUserName(any()) } returns Unit
@@ -474,7 +499,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun multipleSettingsChanges_triggerMultipleRepositoryCalls() =
+    fun multipleSettingsChanges_triggerMultipleRepositoryCalls(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setDarkTheme(any()) } returns Unit
             coEvery { mockSettingsRepository.setUserName(any()) } returns Unit
@@ -499,7 +524,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun multipleVisibilityChanges_triggerRepositoryCalls() =
+    fun multipleVisibilityChanges_triggerRepositoryCalls(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setVerticesVisibility(any()) } returns Unit
             coEvery { mockSettingsRepository.setEdgesVisibility(any()) } returns Unit
@@ -543,7 +568,7 @@ class SettingsViewModelTest {
     // ── setAppTheme ───────────────────────────────────────────────────────────
 
     @Test
-    fun setAppTheme_night_callsRepositorySetAppTheme() = runTest {
+    fun setAppTheme_night_callsRepositorySetAppTheme(): TestResult = runTest {
         coEvery { mockSettingsRepository.setAppTheme(any()) } returns Unit
 
         viewModel.setAppTheme(AppTheme.MODE_NIGHT)
@@ -553,7 +578,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun setAppTheme_auto_callsRepositorySetAppTheme() = runTest {
+    fun setAppTheme_auto_callsRepositorySetAppTheme(): TestResult = runTest {
         coEvery { mockSettingsRepository.setAppTheme(any()) } returns Unit
 
         viewModel.setAppTheme(AppTheme.MODE_AUTO)
@@ -563,11 +588,16 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun settingsState_appTheme_reflectsRepositoryAppThemeFlow() = runTest {
+    fun settingsState_appTheme_reflectsRepositoryAppThemeFlow(): TestResult = runTest {
         every { mockSettingsRepository.appTheme } returns MutableStateFlow(AppTheme.MODE_NIGHT)
 
         val testViewModel =
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
         advanceUntilIdle()
 
         assertEquals(
@@ -580,7 +610,7 @@ class SettingsViewModelTest {
     // ── Repository state reflection ───────────────────────────────────────────
 
     @Test
-    fun viewModelReflectsRepositoryState() =
+    fun viewModelReflectsRepositoryState(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.isDarkTheme } returns MutableStateFlow(true)
             coEvery { mockSettingsRepository.difficulty } returns MutableStateFlow(Difficulty.HARD)
@@ -591,7 +621,12 @@ class SettingsViewModelTest {
             coEvery { mockSettingsRepository.labelsVisibility } returns MutableStateFlow(true)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             assertNotNull("ViewModel should be created", testViewModel)
             assertNotNull("Settings state should be available", testViewModel.settingsState)
@@ -600,7 +635,7 @@ class SettingsViewModelTest {
     // ── Tutorial ──────────────────────────────────────────────────────────────
 
     @Test
-    fun markTutorialSeen_callsSetTutorialSeenTrue() =
+    fun markTutorialSeen_callsSetTutorialSeenTrue(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setTutorialSeen(any()) } returns Unit
 
@@ -619,13 +654,18 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun hasTutorialBeenSeen_reflectsRepositoryTutorialSeenFlow() =
+    fun hasTutorialBeenSeen_reflectsRepositoryTutorialSeenFlow(): TestResult =
         runTest {
             val tutorialSeenFlow = MutableStateFlow(false)
             coEvery { mockSettingsRepository.tutorialSeen } returns tutorialSeenFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             assertFalse(
                 "hasTutorialBeenSeen should be false when repository emits false",
@@ -643,7 +683,7 @@ class SettingsViewModelTest {
     // ── Seasonal themes ───────────────────────────────────────────────────────
 
     @Test
-    fun setPalette_nonSeasonal_onNonSeasonalDay_onlySavesPalette() =
+    fun setPalette_nonSeasonal_onNonSeasonalDay_onlySavesPalette(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 
@@ -655,7 +695,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setPalette_seasonal_doesNotUpdatePreSeasonal() =
+    fun setPalette_seasonal_doesNotUpdatePreSeasonal(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 
@@ -667,7 +707,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_initiallyContainsNonSeasonalPalettes() =
+    fun availablePalettes_initiallyContainsNonSeasonalPalettes(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -684,7 +724,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_includesHalloweenWhenUnlocked() =
+    fun availablePalettes_includesHalloweenWhenUnlocked(): TestResult =
         runTest {
             val halloweenFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns halloweenFlow
@@ -693,7 +733,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             halloweenFlow.value = true
             advanceUntilIdle()
@@ -706,7 +751,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_includesChristmasWhenUnlocked() =
+    fun availablePalettes_includesChristmasWhenUnlocked(): TestResult =
         runTest {
             val christmasFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
@@ -715,7 +760,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             christmasFlow.value = true
             advanceUntilIdle()
@@ -728,7 +778,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_doesNotIncludeAuroraByDefault() =
+    fun availablePalettes_doesNotIncludeAuroraByDefault(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -741,7 +791,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_doesNotIncludeEmberByDefault() =
+    fun availablePalettes_doesNotIncludeEmberByDefault(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -754,7 +804,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_includesAuroraWhenUnlocked() =
+    fun availablePalettes_includesAuroraWhenUnlocked(): TestResult =
         runTest {
             val auroraFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
@@ -763,7 +813,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             auroraFlow.value = true
             advanceUntilIdle()
@@ -776,7 +831,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_includesEmberWhenUnlocked() =
+    fun availablePalettes_includesEmberWhenUnlocked(): TestResult =
         runTest {
             val emberFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
@@ -785,7 +840,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns emberFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             emberFlow.value = true
             advanceUntilIdle()
@@ -800,7 +860,7 @@ class SettingsViewModelTest {
     // ── Billing — purchasedProductIds ─────────────────────────────────────────
 
     @Test
-    fun purchasedProductIds_initiallyEmpty() =
+    fun purchasedProductIds_initiallyEmpty(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -811,13 +871,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun purchasedProductIds_reflectsBillingManagerState() =
+    fun purchasedProductIds_reflectsBillingManagerState(): TestResult =
         runTest {
             val idsFlow = MutableStateFlow<Set<String>>(emptySet())
             every { mockBillingManager.purchasedProductIds } returns idsFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             assertTrue(
@@ -846,13 +911,18 @@ class SettingsViewModelTest {
     // ── Billing — auto-activate on purchase success ───────────────────────────
 
     @Test
-    fun purchaseResult_success_activatesPieceType() =
+    fun purchaseResult_success_activatesPieceType(): TestResult =
         runTest {
             val purchaseResultFlow = kotlinx.coroutines.flow.MutableSharedFlow<PurchaseResult>()
             every { mockBillingManager.purchaseResult } returns purchaseResultFlow
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
             advanceUntilIdle()
 
             purchaseResultFlow.emit(PurchaseResult.Success("piece_hexagon"))
@@ -862,13 +932,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun purchaseResult_successUnknownProduct_doesNotActivateAnyPieceType() =
+    fun purchaseResult_successUnknownProduct_doesNotActivateAnyPieceType(): TestResult =
         runTest {
             val purchaseResultFlow = kotlinx.coroutines.flow.MutableSharedFlow<PurchaseResult>()
             every { mockBillingManager.purchaseResult } returns purchaseResultFlow
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
             advanceUntilIdle()
 
             purchaseResultFlow.emit(PurchaseResult.Success("unknown_product_id"))
@@ -878,13 +953,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun purchaseResult_cancelled_doesNotActivateAnyPieceType() =
+    fun purchaseResult_cancelled_doesNotActivateAnyPieceType(): TestResult =
         runTest {
             val purchaseResultFlow = kotlinx.coroutines.flow.MutableSharedFlow<PurchaseResult>()
             every { mockBillingManager.purchaseResult } returns purchaseResultFlow
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
             advanceUntilIdle()
 
             purchaseResultFlow.emit(PurchaseResult.Cancelled)
@@ -894,13 +974,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun purchaseResult_error_doesNotActivateAnyPieceType() =
+    fun purchaseResult_error_doesNotActivateAnyPieceType(): TestResult =
         runTest {
             val purchaseResultFlow = kotlinx.coroutines.flow.MutableSharedFlow<PurchaseResult>()
             every { mockBillingManager.purchaseResult } returns purchaseResultFlow
             coEvery { mockSettingsRepository.setPieceTypeId(any()) } returns Unit
 
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
             advanceUntilIdle()
 
             purchaseResultFlow.emit(PurchaseResult.Error(responseCode = 3, debugMessage = "Billing unavailable"))
@@ -912,7 +997,7 @@ class SettingsViewModelTest {
     // ── Billing — Gilded palette ──────────────────────────────────────────────
 
     @Test
-    fun lockedPalettes_initiallyContainsGilded() =
+    fun lockedPalettes_initiallyContainsGilded(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -923,13 +1008,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun lockedPalettes_emptyWhenGildedPurchased() =
+    fun lockedPalettes_emptyWhenGildedPurchased(): TestResult =
         runTest {
             val idsFlow = MutableStateFlow<Set<String>>(emptySet())
             every { mockBillingManager.purchasedProductIds } returns idsFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             assertTrue("Gilded locked before purchase", GildedPalette.name in testViewModel.lockedPalettes.value)
@@ -942,7 +1032,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun allPalettesForSelector_alwaysIncludesGilded() =
+    fun allPalettesForSelector_alwaysIncludesGilded(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -955,7 +1045,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_doesNotIncludeGildedBeforePurchase() =
+    fun availablePalettes_doesNotIncludeGildedBeforePurchase(): TestResult =
         runTest {
             advanceUntilIdle()
 
@@ -968,13 +1058,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun availablePalettes_includesGildedAfterPurchase() =
+    fun availablePalettes_includesGildedAfterPurchase(): TestResult =
         runTest {
             val idsFlow = MutableStateFlow<Set<String>>(emptySet())
             every { mockBillingManager.purchasedProductIds } returns idsFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
             advanceUntilIdle()
 
             idsFlow.value = setOf(PaletteProducts.GILDED)
@@ -988,13 +1083,18 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun purchaseResult_gildedSuccess_activatesGildedPalette() =
+    fun purchaseResult_gildedSuccess_activatesGildedPalette(): TestResult =
         runTest {
             val purchaseResultFlow = kotlinx.coroutines.flow.MutableSharedFlow<PurchaseResult>()
             every { mockBillingManager.purchaseResult } returns purchaseResultFlow
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 
-            AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+            AndroidSettingsViewModel(
+                mockSettingsRepository,
+                mockAchievementsRepository,
+                mockBillingManager,
+                mockEntitlementsRepository
+            )
             advanceUntilIdle()
 
             purchaseResultFlow.emit(PurchaseResult.Success(PaletteProducts.GILDED))
@@ -1004,7 +1104,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun setTimeControl_savesSetting() = runTest {
+    fun setTimeControl_savesSetting(): TestResult = runTest {
         coEvery { mockSettingsRepository.setTimeControl(any()) } returns Unit
         viewModel.setTimeControl(TimeControlMode.Fischer(180_000L, 2_000L))
         advanceUntilIdle()
@@ -1012,7 +1112,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun setPreMovesEnabled_savesSetting() = runTest {
+    fun setPreMovesEnabled_savesSetting(): TestResult = runTest {
         coEvery { mockSettingsRepository.setPreMovesEnabled(any()) } returns Unit
         viewModel.setPreMovesEnabled(false)
         advanceUntilIdle()
@@ -1022,7 +1122,7 @@ class SettingsViewModelTest {
     // ── allPalettesForSelector — achievement unlocks ───────────────────────────
 
     @Test
-    fun allPalettesForSelector_includesHalloweenWhenUnlocked() =
+    fun allPalettesForSelector_includesHalloweenWhenUnlocked(): TestResult =
         runTest {
             val halloweenFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns halloweenFlow
@@ -1031,7 +1131,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             halloweenFlow.value = true
             advanceUntilIdle()
@@ -1044,7 +1149,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun allPalettesForSelector_includesAuroraWhenUnlocked() =
+    fun allPalettesForSelector_includesAuroraWhenUnlocked(): TestResult =
         runTest {
             val auroraFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
@@ -1053,7 +1158,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns MutableStateFlow(false)
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             auroraFlow.value = true
             advanceUntilIdle()
@@ -1066,7 +1176,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun allPalettesForSelector_includesEmberWhenUnlocked() =
+    fun allPalettesForSelector_includesEmberWhenUnlocked(): TestResult =
         runTest {
             val emberFlow = MutableStateFlow(false)
             coEvery { mockAchievementsRepository.halloweenUnlocked } returns MutableStateFlow(false)
@@ -1075,7 +1185,12 @@ class SettingsViewModelTest {
             coEvery { mockAchievementsRepository.emberUnlocked } returns emberFlow
 
             val testViewModel =
-                AndroidSettingsViewModel(mockSettingsRepository, mockAchievementsRepository, mockBillingManager)
+                AndroidSettingsViewModel(
+                    mockSettingsRepository,
+                    mockAchievementsRepository,
+                    mockBillingManager,
+                    mockEntitlementsRepository
+                )
 
             emberFlow.value = true
             advanceUntilIdle()
@@ -1090,7 +1205,7 @@ class SettingsViewModelTest {
     // ── applySeasonalThemeIfNeeded ────────────────────────────────────────────
 
     @Test
-    fun applySeasonalThemeIfNeeded_appliesThemeWhenSeasonalAndNeverApplied() =
+    fun applySeasonalThemeIfNeeded_appliesThemeWhenSeasonalAndNeverApplied(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
             coEvery { mockSettingsRepository.setSeasonalAutoAppliedDate(any()) } returns Unit
@@ -1111,7 +1226,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun applySeasonalThemeIfNeeded_skipsIfAlreadyAppliedToday() =
+    fun applySeasonalThemeIfNeeded_skipsIfAlreadyAppliedToday(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 
@@ -1129,7 +1244,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun restorePreSeasonalPalette_doesNothingWhenNoPreSeasonal() =
+    fun restorePreSeasonalPalette_doesNothingWhenNoPreSeasonal(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 
@@ -1144,7 +1259,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun restorePreSeasonalPalette_doesNothingWhenCurrentIsNotSeasonal() =
+    fun restorePreSeasonalPalette_doesNothingWhenCurrentIsNotSeasonal(): TestResult =
         runTest {
             coEvery { mockSettingsRepository.setPalette(any()) } returns Unit
 

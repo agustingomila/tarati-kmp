@@ -91,7 +91,7 @@ class AchievementsRepository(private val context: Context) {
      * been permanently unlocked by winning on Champion difficulty on Halloween day.
      * Always emits true in debug builds.
      */
-    val halloweenUnlocked: Flow<Boolean> =
+    private val halloweenUnlocked: Flow<Boolean> =
         context.achievementsDataStore.data.map {
             BuildConfig.DEBUG || (it[halloweenUnlockedKey] ?: false)
         }
@@ -102,7 +102,7 @@ class AchievementsRepository(private val context: Context) {
      * been permanently unlocked by winning on Champion difficulty on Christmas day.
      * Always emits true in debug builds.
      */
-    val christmasUnlocked: Flow<Boolean> =
+    private val christmasUnlocked: Flow<Boolean> =
         context.achievementsDataStore.data.map {
             BuildConfig.DEBUG || (it[christmasUnlockedKey] ?: false)
         }
@@ -188,17 +188,17 @@ class AchievementsRepository(private val context: Context) {
      * Restores the local floor so subsequent [setSteps] calls always pass a value
      * Play Games will accept.
      */
-    suspend fun ensureAtLeast(key: Preferences.Key<Int>, serverValue: Int) {
+    private suspend fun ensureAtLeast(key: Preferences.Key<Int>, serverValue: Int) {
         context.achievementsDataStore.edit { prefs ->
             val current = prefs[key] ?: 0
             if (serverValue > current) prefs[key] = serverValue
         }
     }
 
-    suspend fun ensureTotalCapturesAtLeast(value: Int) = ensureAtLeast(totalCapturesKey, value)
-    suspend fun ensureTotalPromotionsAtLeast(value: Int) = ensureAtLeast(totalPromotionsKey, value)
-    suspend fun ensureTotalWinsAtLeast(value: Int) = ensureAtLeast(totalWinsKey, value)
-    suspend fun ensureTotalGamesAtLeast(value: Int) = ensureAtLeast(totalGamesKey, value)
+    suspend fun ensureTotalCapturesAtLeast(value: Int): Unit = ensureAtLeast(totalCapturesKey, value)
+    suspend fun ensureTotalPromotionsAtLeast(value: Int): Unit = ensureAtLeast(totalPromotionsKey, value)
+    suspend fun ensureTotalWinsAtLeast(value: Int): Unit = ensureAtLeast(totalWinsKey, value)
+    suspend fun ensureTotalGamesAtLeast(value: Int): Unit = ensureAtLeast(totalGamesKey, value)
 
     // ── Cached-steps API ─────────────────────────────────────────────────────
 

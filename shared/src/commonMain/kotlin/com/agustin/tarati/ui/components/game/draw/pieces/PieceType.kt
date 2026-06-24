@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.components.game.draw.pieces
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import com.agustin.tarati.services.billing.PieceProducts
@@ -47,13 +48,13 @@ data class PieceType(
 
 object PieceTypes {
 
-    val Circle = PieceType(
+    val Circle: PieceType = PieceType(
         id = "circle",
         nameRes = Res.string.piece_type_circle,
         shape = MorphShape(sides = 1, sizeFrac = 0.82f),
     )
 
-    val Hexagon = PieceType(
+    val Hexagon: PieceType = PieceType(
         id = "hexagon",
         nameRes = Res.string.piece_type_hexagon,
         shape = MorphShape(sides = 6, cornerRadius = 12f, sizeFrac = 1.05f),
@@ -62,7 +63,7 @@ object PieceTypes {
         centerMotif = CenterMotif.Compass,
     )
 
-    val Square = PieceType(
+    val Square: PieceType = PieceType(
         id = "square",
         nameRes = Res.string.piece_type_square,
         shape = MorphShape(sides = 4, cornerRadius = 18f, rotationDeg = 45f, sizeFrac = 1.16f),
@@ -71,7 +72,7 @@ object PieceTypes {
         centerMotif = CenterMotif.Cross,
     )
 
-    val Triangle = PieceType(
+    val Triangle: PieceType = PieceType(
         id = "triangle",
         nameRes = Res.string.piece_type_triangle,
         shape = MorphShape(sides = 3, cornerRadius = 14f, rotationDeg = -90f, sizeFrac = 1.24f),
@@ -80,16 +81,16 @@ object PieceTypes {
         centerMotif = CenterMotif.Trefoil,
     )
 
-    val Diamond = PieceType(
+    val Diamond: PieceType = PieceType(
         id = "diamond",
         nameRes = Res.string.piece_type_diamond,
-        shape = MorphShape(sides = 4, cornerRadius = 18f, rotationDeg = 0f, sizeFrac = 1.14f),
+        shape = MorphShape(sides = 4, cornerRadius = 18f, sizeFrac = 1.14f),
         productId = PieceProducts.DIAMOND,
         borderPattern = BorderPattern.Diamonds,
         centerMotif = CenterMotif.DiamondCross,
     )
 
-    val Pentagon = PieceType(
+    val Pentagon: PieceType = PieceType(
         id = "pentagon",
         nameRes = Res.string.piece_type_pentagon,
         shape = MorphShape(sides = 5, cornerRadius = 12f, rotationDeg = -90f, sizeFrac = 1.1f),
@@ -98,10 +99,10 @@ object PieceTypes {
         centerMotif = CenterMotif.Star5,
     )
 
-    val Capsule = PieceType(
+    val Capsule: PieceType = PieceType(
         id = "capsule",
         nameRes = Res.string.piece_type_capsule,
-        shape = MorphShape(sides = 2, cornerRadius = 70f, rotationDeg = -90f, sizeFrac = 1f, edgeCurveStrength = 0.4f),
+        shape = MorphShape(sides = 2, cornerRadius = 70f, rotationDeg = -90f, edgeCurveStrength = 0.4f),
         productId = PieceProducts.CAPSULE,
         borderPattern = BorderPattern.DoubleRing,
         centerMotif = CenterMotif.Ring,
@@ -122,7 +123,7 @@ object PieceTypes {
 
 data class PieceTypeList(val items: List<PieceType>) {
     companion object {
-        val All = PieceTypeList(PieceTypes.all)
+        val All: PieceTypeList = PieceTypeList(PieceTypes.all)
     }
 }
 
@@ -145,4 +146,4 @@ object PieceTypeManager {
 // LocalPieceType
 // ─────────────────────────────────────────────────────────────────────────────
 
-val LocalPieceType = compositionLocalOf { PieceTypes.default }
+val LocalPieceType: ProvidableCompositionLocal<PieceType> = compositionLocalOf { PieceTypes.default }

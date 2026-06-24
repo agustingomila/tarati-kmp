@@ -44,12 +44,12 @@ class GameStateBuilderTest {
         val builder = GameStateBuilder()
         val state =
             builder
-                .setCob(C3, CobColor.WHITE, false)
+                .setCob(C3, CobColor.WHITE)
                 .build()
 
         val cob = state.cobs[C3]
         assertNotNull("Cob should be added at C3", cob)
-        assertEquals("Cob color should be WHITE", CobColor.WHITE, cob!!.color)
+        assertEquals("Cob color should be WHITE", CobColor.WHITE, (cob ?: return).color)
         assertFalse("Cob should not be upgraded", cob.isUpgraded)
     }
 
@@ -58,7 +58,7 @@ class GameStateBuilderTest {
         val initialBuilder = GameStateBuilder()
         val initialState =
             initialBuilder
-                .setCob(C3, CobColor.WHITE, false)
+                .setCob(C3, CobColor.WHITE)
                 .build()
 
         val builder = GameStateBuilder(initialState)
@@ -69,7 +69,7 @@ class GameStateBuilderTest {
 
         val cob = state.cobs[C3]
         assertNotNull("Cob should exist at C3", cob)
-        assertTrue("Cob should be upgraded", cob!!.isUpgraded)
+        assertTrue("Cob should be upgraded", (cob ?: return).isUpgraded)
     }
 
     @Test
@@ -77,17 +77,17 @@ class GameStateBuilderTest {
         val initialBuilder = GameStateBuilder()
         val initialState =
             initialBuilder
-                .setCob(C3, CobColor.WHITE, false)
+                .setCob(C3, CobColor.WHITE)
                 .build()
 
         val builder = GameStateBuilder(initialState)
         val state =
             builder
-                .setCob(C3, CobColor.BLACK, false)
+                .setCob(C3, CobColor.BLACK)
                 .build()
 
         val cob = state.cobs[C3]
-        assertEquals("Cob color should be BLACK", CobColor.BLACK, cob!!.color)
+        assertEquals("Cob color should be BLACK", CobColor.BLACK, (cob ?: return).color)
     }
 
     @Test
@@ -95,7 +95,7 @@ class GameStateBuilderTest {
         val initialBuilder = GameStateBuilder()
         val initialState =
             initialBuilder
-                .setCob(C3, CobColor.WHITE, false)
+                .setCob(C3, CobColor.WHITE)
                 .build()
 
         assertTrue("Initial state should have cob at C3", initialState.cobs.containsKey(C3))
@@ -114,7 +114,7 @@ class GameStateBuilderTest {
         val initialBuilder = GameStateBuilder()
         val initialState =
             initialBuilder
-                .setCob(C1, CobColor.WHITE, false)
+                .setCob(C1, CobColor.WHITE)
                 .build()
 
         val builder = GameStateBuilder(initialState)
@@ -127,7 +127,7 @@ class GameStateBuilderTest {
         assertTrue("New position should contain cob", state.cobs.containsKey(B1))
 
         val movedCob = state.cobs[B1]
-        assertEquals("Moved cob should retain color", CobColor.WHITE, movedCob!!.color)
+        assertEquals("Moved cob should retain color", CobColor.WHITE, (movedCob ?: return).color)
         assertFalse("Moved cob should retain upgrade status", movedCob.isUpgraded)
     }
 
@@ -136,11 +136,11 @@ class GameStateBuilderTest {
         val state =
             GameStateBuilder()
                 .setTurn(CobColor.BLACK)
-                .setCob(C1, CobColor.WHITE, false)
+                .setCob(C1, CobColor.WHITE)
                 .setCob(C7, CobColor.BLACK, true)
                 .moveCob(Move(C1 to B1))
                 .removeCob(C7)
-                .setCob(C8, CobColor.BLACK, false)
+                .setCob(C8, CobColor.BLACK)
                 .build()
 
         assertEquals("Turn should be BLACK", CobColor.BLACK, state.currentTurn)
@@ -150,10 +150,10 @@ class GameStateBuilderTest {
         assertTrue("C8 should have cob", state.cobs.containsKey(C8))
 
         val b1Cob = state.cobs[B1]
-        assertEquals("B1 cob should be WHITE", CobColor.WHITE, b1Cob!!.color)
+        assertEquals("B1 cob should be WHITE", CobColor.WHITE, (b1Cob ?: return).color)
 
         val c8Cob = state.cobs[C8]
-        assertEquals("C8 cob should be BLACK", CobColor.BLACK, c8Cob!!.color)
+        assertEquals("C8 cob should be BLACK", CobColor.BLACK, (c8Cob ?: return).color)
     }
 
     @Test
@@ -167,7 +167,7 @@ class GameStateBuilderTest {
         val builder = GameStateBuilder(customInitial)
         val state =
             builder
-                .setCob(B1, CobColor.BLACK, false)
+                .setCob(B1, CobColor.BLACK)
                 .build()
 
         assertTrue("Should retain custom initial cob", state.cobs.containsKey(A1))

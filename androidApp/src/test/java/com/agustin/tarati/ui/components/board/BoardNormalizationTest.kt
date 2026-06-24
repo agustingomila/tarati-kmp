@@ -47,12 +47,12 @@ class BoardNormalizationTest {
         assertNotNull("D4 should exist", d4)
 
         // D1 y D2 deberían estar en la parte superior (Y > 1)
-        assertTrue("D1 should be above main board", d1!!.y > 1f)
-        assertTrue("D2 should be above main board", d2!!.y > 1f)
+        assertTrue("D1 should be above main board", (d1 ?: return).y > 1f)
+        assertTrue("D2 should be above main board", (d2 ?: return).y > 1f)
 
         // D3 y D4 deberían estar en la parte inferior (Y < 0)
-        assertTrue("D3 should be below main board", d3!!.y < 0f)
-        assertTrue("D4 should be below main board", d4!!.y < 0f)
+        assertTrue("D3 should be below main board", (d3 ?: return).y < 0f)
+        assertTrue("D4 should be below main board", (d4 ?: return).y < 0f)
 
         // Todas las bases deberían tener X entre 0 y 1
         assertTrue("D1 X should be reasonable", d1.x in 0f..1f)
@@ -76,19 +76,19 @@ class BoardNormalizationTest {
         val a1 = normalizedPositions[A1]
         assertNotNull("A1 should exist", a1)
         // A1 debería estar cerca del centro del tablero principal
-        assertEquals("A1 X should be approximately 0.5", 0.5f, a1!!.x, 0.01f)
+        assertEquals("A1 X should be approximately 0.5", 0.5f, (a1 ?: return).x, 0.01f)
         assertEquals("A1 Y should be approximately 0.5", 0.5f, a1.y, 0.01f)
     }
 
     @Test
     fun normalizedPositions_consistentWithBoardGeometry() {
         // Verificar que las posiciones normalizadas mantengan la geometría del tablero
-        val a1 = normalizedPositions[A1]!!
-        val b1 = normalizedPositions[B1]!!
-        val c1 = normalizedPositions[C1]!!
-        val d1 = normalizedPositions[D1]!!
-        val d4 = normalizedPositions[D4]!!
-        val d3 = normalizedPositions[D3]!!
+        val a1 = normalizedPositions[A1] ?: return
+        val b1 = normalizedPositions[B1] ?: return
+        val c1 = normalizedPositions[C1] ?: return
+        val d1 = normalizedPositions[D1] ?: return
+        val d4 = normalizedPositions[D4] ?: return
+        val d3 = normalizedPositions[D3] ?: return
 
         // A1 debería estar en el centro del tablero principal
         assertEquals(0.5f, a1.x, 0.1f)

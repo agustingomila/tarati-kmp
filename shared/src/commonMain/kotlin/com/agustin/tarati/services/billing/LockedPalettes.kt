@@ -25,6 +25,6 @@ data class LockedPalettes(val names: Set<String>) {
 
     companion object {
         /** Sin paletas bloqueadas — estado por defecto mientras no haya IAP de temas. */
-        val None = LockedPalettes(emptySet())
+        val None: LockedPalettes = LockedPalettes(emptySet())
     }
 }

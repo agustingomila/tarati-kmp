@@ -61,7 +61,7 @@ class AITest {
 
         assertTrue("Destination should contain moved cob", newState.cobs.containsKey(B1))
 
-        val moved = newState.cobs[B1]!!
+        val moved = newState.cobs[B1] ?: return
         assertEquals("Moved piece should retain its color", WHITE, moved.color)
 
         // applyMove does toggle the turn; expect opponent currentTurn
@@ -75,18 +75,18 @@ class AITest {
     @Test
     fun applyMoveToBoard_upgradesWhenEnteringOpponentHomeBase() {
         // Prepare a minimal state: black piece at B1 (empty normally)
-        val state = GameState(mapOf(B1 to Cob(BLACK, false)), currentTurn = BLACK)
+        val state = GameState(mapOf(B1 to Cob(BLACK)), currentTurn = BLACK)
         val result = state.applyMove(Move(B1 to C1)) // C1 is white home-base
         val placed = result.cobs[C1]
         assertNotNull("Piece must be placed at destination", placed)
-        assertEquals("Color preserved", BLACK, placed!!.color)
+        assertEquals("Color preserved", BLACK, (placed ?: return).color)
         assertTrue("Piece that entered opponent home base must be upgraded", placed.isUpgraded)
     }
 
     @Test
     fun getAllPossibleMoves_excludesBackwardMove_forNonUpgradedWhite() {
         // Single white cob at C1, turn WHITE
-        val state = GameState(mapOf(C1 to Cob(WHITE, false)), currentTurn = WHITE)
+        val state = GameState(mapOf(C1 to Cob(WHITE)), currentTurn = WHITE)
         val moves = state.allMovesForTurn()
         // Expect C1 -> C2 NOT to be present (this is 'backward' for WHITE)
         assertFalse(
@@ -98,7 +98,7 @@ class AITest {
     @Test
     fun getAllPossibleMoves_includesForwardMove_forNonUpgradedWhite() {
         // Single white cob at C2, turn WHITE
-        val state = GameState(mapOf(C2 to Cob(WHITE, false)), currentTurn = WHITE)
+        val state = GameState(mapOf(C2 to Cob(WHITE)), currentTurn = WHITE)
         val moves = state.allMovesForTurn()
 
         // Debug: imprimir todos los movimientos posibles
@@ -170,9 +170,9 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C2 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C2 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -185,9 +185,9 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
-                    C8 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
+                    C8 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -199,7 +199,7 @@ class AITest {
     fun isGameOver_whiteNoPieces_returnsTrue() {
         val state =
             GameState(
-                mapOf(C7 to Cob(BLACK, false)),
+                mapOf(C7 to Cob(BLACK)),
                 currentTurn = WHITE,
             )
         assertTrue(state.isGameOver(emptyMap()))
@@ -209,7 +209,7 @@ class AITest {
     fun isGameOver_blackNoPieces_returnsTrue() {
         val state =
             GameState(
-                mapOf(C1 to Cob(WHITE, false)),
+                mapOf(C1 to Cob(WHITE)),
                 currentTurn = WHITE,
             )
         assertTrue(state.isGameOver(emptyMap()))
@@ -220,8 +220,8 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -246,8 +246,8 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    B1 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    B1 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -262,8 +262,8 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -292,7 +292,7 @@ class AITest {
     fun isValidMove_nonAdjacent_returnsFalse() {
         val state =
             GameState(
-                mapOf(C1 to Cob(WHITE, false)),
+                mapOf(C1 to Cob(WHITE)),
                 currentTurn = WHITE,
             )
         // C1 and C3 are not adjacent
@@ -304,7 +304,7 @@ class AITest {
     fun isValidMove_sameFromTo_returnsFalse() {
         val state =
             GameState(
-                mapOf(C1 to Cob(WHITE, false)),
+                mapOf(C1 to Cob(WHITE)),
                 currentTurn = WHITE,
             )
         val isValid = isValidMove(state, Move(C1 to C1))
@@ -331,10 +331,10 @@ class AITest {
         val stateNoMoves =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false), // White abajo, no puede ir más abajo
-                    B1 to Cob(BLACK, false),
-                    B6 to Cob(BLACK, false),
-                    C12 to Cob(BLACK, false),
+                    C1 to Cob(WHITE), // White abajo, no puede ir más abajo
+                    B1 to Cob(BLACK),
+                    B6 to Cob(BLACK),
+                    C12 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -352,10 +352,10 @@ class AITest {
             GameState(
                 mapOf(
                     C3 to Cob(WHITE, true),  // Rok - sole-cob promotion won't trigger
-                    C2 to Cob(BLACK, false), // Fill last empty C3 neighbor
-                    C4 to Cob(BLACK, false),
-                    B2 to Cob(BLACK, false),
-                    A1 to Cob(BLACK, false),
+                    C2 to Cob(BLACK), // Fill last empty C3 neighbor
+                    C4 to Cob(BLACK),
+                    B2 to Cob(BLACK),
+                    A1 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -371,8 +371,8 @@ class AITest {
         val stateEqual =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -380,9 +380,9 @@ class AITest {
         val stateWhiteAdvantage =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C2 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C2 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -400,8 +400,8 @@ class AITest {
         val stateIsolated =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -409,9 +409,9 @@ class AITest {
         val stateProtected =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C2 to Cob(WHITE, false), // Aliado adyacente
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C2 to Cob(WHITE), // Aliado adyacente
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -428,9 +428,9 @@ class AITest {
         val stateWhiteAdvantage =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C2 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C2 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -438,9 +438,9 @@ class AITest {
         val stateBlackAdvantage =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
-                    C8 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
+                    C8 to Cob(BLACK),
                 ),
                 currentTurn = BLACK,
             )
@@ -458,7 +458,7 @@ class AITest {
     fun isGameOver_noPiecesForOneColor() {
         val stateWhiteWins =
             GameState(
-                mapOf(C1 to Cob(WHITE, false)),
+                mapOf(C1 to Cob(WHITE)),
                 currentTurn = BLACK,
             )
 
@@ -475,8 +475,8 @@ class AITest {
             GameState(
                 mapOf(
                     B1 to Cob(WHITE, true),
-                    A1 to Cob(BLACK, false), // Puede ir hacia A1
-                    B2 to Cob(BLACK, false), // O hacia B2
+                    A1 to Cob(BLACK), // Puede ir hacia A1
+                    B2 to Cob(BLACK), // O hacia B2
                 ),
                 currentTurn = WHITE,
             )
@@ -493,8 +493,8 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    B1 to Cob(WHITE, false), // Pieza blanca normal
-                    C1 to Cob(BLACK, false),
+                    B1 to Cob(WHITE), // Pieza blanca normal
+                    C1 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -530,10 +530,10 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C1 to Cob(WHITE, false),
-                    C2 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
-                    C8 to Cob(BLACK, false),
+                    C1 to Cob(WHITE),
+                    C2 to Cob(WHITE),
+                    C7 to Cob(BLACK),
+                    C8 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -561,8 +561,8 @@ class AITest {
             GameState(
                 mapOf(
                     A1 to Cob(WHITE, true),
-                    B1 to Cob(WHITE, false),
-                    C7 to Cob(BLACK, false),
+                    B1 to Cob(WHITE),
+                    C7 to Cob(BLACK),
                 ),
                 currentTurn = WHITE,
             )
@@ -587,28 +587,28 @@ class AITest {
             createGameState {
                 setTurn(WHITE)
                 // Distribución 4-4 simétrica
-                setCob(C1, WHITE, false)
-                setCob(C2, WHITE, false)
-                setCob(D1, WHITE, false)
-                setCob(D2, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(C8, BLACK, false)
-                setCob(D3, BLACK, false)
-                setCob(D4, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C2, WHITE)
+                setCob(D1, WHITE)
+                setCob(D2, WHITE)
+                setCob(C7, BLACK)
+                setCob(C8, BLACK)
+                setCob(D3, BLACK)
+                setCob(D4, BLACK)
             }
 
         val positionBlack =
             createGameState {
                 setTurn(BLACK)
                 // Misma posición pero colores invertidos
-                setCob(C1, BLACK, false)
-                setCob(C2, BLACK, false)
-                setCob(D1, BLACK, false)
-                setCob(D2, BLACK, false)
-                setCob(C7, WHITE, false)
-                setCob(C8, WHITE, false)
-                setCob(D3, WHITE, false)
-                setCob(D4, WHITE, false)
+                setCob(C1, BLACK)
+                setCob(C2, BLACK)
+                setCob(D1, BLACK)
+                setCob(D2, BLACK)
+                setCob(C7, WHITE)
+                setCob(C8, WHITE)
+                setCob(D3, WHITE)
+                setCob(D4, WHITE)
             }
 
         val scoreWhite = boardEvaluator.evaluate(positionWhite, evalConfig)
@@ -631,12 +631,12 @@ class AITest {
                 setTurn(WHITE)
                 // Distribución con mejoras simétricas
                 setCob(C1, WHITE, true)
-                setCob(C2, WHITE, false)
-                setCob(D1, WHITE, false)
+                setCob(C2, WHITE)
+                setCob(D1, WHITE)
                 setCob(D2, WHITE, true)
                 setCob(C7, BLACK, true)
-                setCob(C8, BLACK, false)
-                setCob(D3, BLACK, false)
+                setCob(C8, BLACK)
+                setCob(D3, BLACK)
                 setCob(D4, BLACK, true)
             }
 
@@ -645,12 +645,12 @@ class AITest {
                 setTurn(BLACK)
                 // Posición invertida
                 setCob(C1, BLACK, true)
-                setCob(C2, BLACK, false)
-                setCob(D1, BLACK, false)
+                setCob(C2, BLACK)
+                setCob(D1, BLACK)
                 setCob(D2, BLACK, true)
                 setCob(C7, WHITE, true)
-                setCob(C8, WHITE, false)
-                setCob(D3, WHITE, false)
+                setCob(C8, WHITE)
+                setCob(D3, WHITE)
                 setCob(D4, WHITE, true)
             }
 
@@ -673,26 +673,26 @@ class AITest {
                 // Posición 1: Distribución 4-4 equilibrada
                 createGameState {
                     setTurn(WHITE)
-                    setCob(C1, WHITE, false)
-                    setCob(C2, WHITE, false)
-                    setCob(D1, WHITE, false)
-                    setCob(D2, WHITE, false)
-                    setCob(C7, BLACK, false)
-                    setCob(C8, BLACK, false)
-                    setCob(D3, BLACK, false)
-                    setCob(D4, BLACK, false)
+                    setCob(C1, WHITE)
+                    setCob(C2, WHITE)
+                    setCob(D1, WHITE)
+                    setCob(D2, WHITE)
+                    setCob(C7, BLACK)
+                    setCob(C8, BLACK)
+                    setCob(D3, BLACK)
+                    setCob(D4, BLACK)
                 },
                 // Posición 2: Distribución 3-5 con mejoras
                 createGameState {
                     setTurn(WHITE)
                     setCob(C1, WHITE, true)
-                    setCob(C2, WHITE, false)
+                    setCob(C2, WHITE)
                     setCob(D1, WHITE, true)
                     setCob(C7, BLACK, true)
-                    setCob(C8, BLACK, false)
-                    setCob(B5, BLACK, false) // Replaced D3: mirrors to B5(WHITE), not a dead vertex
+                    setCob(C8, BLACK)
+                    setCob(B5, BLACK) // Replaced D3: mirrors to B5(WHITE), not a dead vertex
                     setCob(D4, BLACK, true)
-                    setCob(B1, BLACK, false)
+                    setCob(B1, BLACK)
                 },
             )
 
@@ -718,28 +718,28 @@ class AITest {
             createGameState {
                 setTurn(WHITE)
                 // Ventaja para blanco (6-2)
-                setCob(A1, WHITE, false)
-                setCob(B1, WHITE, false)
-                setCob(B2, WHITE, false)
-                setCob(B3, WHITE, false)
-                setCob(B4, WHITE, false)
-                setCob(B5, WHITE, false)
-                setCob(C1, BLACK, false)
-                setCob(C8, BLACK, false)
+                setCob(A1, WHITE)
+                setCob(B1, WHITE)
+                setCob(B2, WHITE)
+                setCob(B3, WHITE)
+                setCob(B4, WHITE)
+                setCob(B5, WHITE)
+                setCob(C1, BLACK)
+                setCob(C8, BLACK)
             }
 
         val blackAdvantage =
             createGameState {
                 setTurn(BLACK)
                 // Ventaja equivalente para negro (2-6)
-                setCob(C1, WHITE, false)
-                setCob(C8, WHITE, false)
-                setCob(A1, BLACK, false)
-                setCob(B1, BLACK, false)
-                setCob(B2, BLACK, false)
-                setCob(B3, BLACK, false)
-                setCob(B4, BLACK, false)
-                setCob(B5, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C8, WHITE)
+                setCob(A1, BLACK)
+                setCob(B1, BLACK)
+                setCob(B2, BLACK)
+                setCob(B3, BLACK)
+                setCob(B4, BLACK)
+                setCob(B5, BLACK)
             }
 
         val scoreWhiteAdvantage = boardEvaluator.evaluate(whiteAdvantage, evalConfig)
@@ -761,14 +761,14 @@ class AITest {
             createGameState {
                 setTurn(WHITE)
                 // Distribución 4-4 idéntica
-                setCob(C1, WHITE, false)
-                setCob(C2, WHITE, false)
-                setCob(C3, WHITE, false)
-                setCob(C4, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(C8, BLACK, false)
-                setCob(C9, BLACK, false)
-                setCob(C10, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C2, WHITE)
+                setCob(C3, WHITE)
+                setCob(C4, WHITE)
+                setCob(C7, BLACK)
+                setCob(C8, BLACK)
+                setCob(C9, BLACK)
+                setCob(C10, BLACK)
             }
 
         val score = boardEvaluator.evaluate(balancedPosition, evalConfig)
@@ -783,28 +783,28 @@ class AITest {
         val positionWhiteTurn =
             createGameState {
                 setTurn(WHITE)
-                setCob(C1, WHITE, false)
-                setCob(C2, WHITE, false)
-                setCob(D1, WHITE, false)
-                setCob(D2, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(C8, BLACK, false)
-                setCob(D3, BLACK, false)
-                setCob(D4, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C2, WHITE)
+                setCob(D1, WHITE)
+                setCob(D2, WHITE)
+                setCob(C7, BLACK)
+                setCob(C8, BLACK)
+                setCob(D3, BLACK)
+                setCob(D4, BLACK)
             }
 
         val positionBlackTurn =
             createGameState {
                 setTurn(BLACK)
                 // Mismas piezas, solo cambia el turno
-                setCob(C1, WHITE, false)
-                setCob(C2, WHITE, false)
-                setCob(D1, WHITE, false)
-                setCob(D2, WHITE, false)
-                setCob(C7, BLACK, false)
-                setCob(C8, BLACK, false)
-                setCob(D3, BLACK, false)
-                setCob(D4, BLACK, false)
+                setCob(C1, WHITE)
+                setCob(C2, WHITE)
+                setCob(D1, WHITE)
+                setCob(D2, WHITE)
+                setCob(C7, BLACK)
+                setCob(C8, BLACK)
+                setCob(D3, BLACK)
+                setCob(D4, BLACK)
             }
 
         val scoreWhiteTurn = boardEvaluator.evaluate(positionWhiteTurn, evalConfig)
@@ -839,14 +839,14 @@ class AITest {
         val originalPosition =
             createGameState {
                 setTurn(WHITE)
-                setCob(B1, WHITE, false)
-                setCob(C2, WHITE, false)
-                setCob(D1, WHITE, false)
-                setCob(C1, WHITE, false)
-                setCob(B4, BLACK, false)
-                setCob(C7, BLACK, false)
-                setCob(D3, BLACK, false)
-                setCob(C8, BLACK, false)
+                setCob(B1, WHITE)
+                setCob(C2, WHITE)
+                setCob(D1, WHITE)
+                setCob(C1, WHITE)
+                setCob(B4, BLACK)
+                setCob(C7, BLACK)
+                setCob(D3, BLACK)
+                setCob(C8, BLACK)
             }
 
         val mirrorPosition = createMirrorPosition(originalPosition)
@@ -867,14 +867,14 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C12 to Cob(WHITE, false), // WHITE casi perdido
-                    C11 to Cob(BLACK, false),
-                    B6 to Cob(BLACK, false),
+                    C12 to Cob(WHITE), // WHITE casi perdido
+                    C11 to Cob(BLACK),
+                    B6 to Cob(BLACK),
                     C2 to Cob(BLACK, true),
-                    B1 to Cob(BLACK, false),
-                    C6 to Cob(BLACK, false),
-                    C7 to Cob(BLACK, false),
-                    C8 to Cob(BLACK, false),
+                    B1 to Cob(BLACK),
+                    C6 to Cob(BLACK),
+                    C7 to Cob(BLACK),
+                    C8 to Cob(BLACK),
                 ),
                 currentTurn = BLACK,
             )
@@ -894,14 +894,14 @@ class AITest {
         val state =
             GameState(
                 mapOf(
-                    C12 to Cob(WHITE, false), // WHITE casi perdido
-                    C11 to Cob(BLACK, false),
-                    B6 to Cob(BLACK, false),
+                    C12 to Cob(WHITE), // WHITE casi perdido
+                    C11 to Cob(BLACK),
+                    B6 to Cob(BLACK),
                     C2 to Cob(BLACK, true),
-                    C5 to Cob(BLACK, false),
-                    C6 to Cob(BLACK, false),
-                    C7 to Cob(BLACK, false),
-                    C8 to Cob(BLACK, false),
+                    C5 to Cob(BLACK),
+                    C6 to Cob(BLACK),
+                    C7 to Cob(BLACK),
+                    C8 to Cob(BLACK),
                 ),
                 currentTurn = BLACK,
             )

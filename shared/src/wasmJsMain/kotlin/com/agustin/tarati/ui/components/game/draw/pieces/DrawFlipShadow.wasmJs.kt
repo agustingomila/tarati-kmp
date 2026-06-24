@@ -13,4 +13,4 @@ actual fun DrawScope.drawFlipShadow(
     cosFlip: Float,
     sinFlip: Float,
     shadowColor: Color,
-) = Unit
+): Unit = Unit

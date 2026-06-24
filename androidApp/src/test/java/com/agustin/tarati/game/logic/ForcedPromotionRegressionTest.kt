@@ -57,12 +57,12 @@ class ForcedPromotionRegressionTest {
     fun getForcedPromotions_returnsEmpty_whenPlayerHasNormalMoves_evenWithDeadCobOnOpponentDRing() {
         val state = GameState(
             cobs = mapOf(
-                B6 to Cob(WHITE, false),  // has forward moves
-                C12 to Cob(WHITE, false),  // has forward moves
-                C2 to Cob(WHITE, false),  // has forward moves
-                D4 to Cob(WHITE, false),  // primary dead — D4 ∈ deadVertices[WHITE]
-                C5 to Cob(BLACK, false),
-                D1 to Cob(BLACK, false),
+                B6 to Cob(WHITE),  // has forward moves
+                C12 to Cob(WHITE),  // has forward moves
+                C2 to Cob(WHITE),  // has forward moves
+                D4 to Cob(WHITE),  // primary dead — D4 ∈ deadVertices[WHITE]
+                C5 to Cob(BLACK),
+                D1 to Cob(BLACK),
                 C7 to Cob(BLACK, true),   // black rok
                 D3 to Cob(BLACK, true),   // black rok
             ),
@@ -88,8 +88,8 @@ class ForcedPromotionRegressionTest {
         // After promotion D4 becomes a rok that can move anywhere.
         val state = GameState(
             cobs = mapOf(
-                D4 to Cob(WHITE, false),  // sole white piece, primary dead
-                C5 to Cob(BLACK, false),
+                D4 to Cob(WHITE),  // sole white piece, primary dead
+                C5 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
@@ -117,10 +117,10 @@ class ForcedPromotionRegressionTest {
         // (D3 is also primary dead), put both dead cobs:
         val state = GameState(
             cobs = mapOf(
-                D3 to Cob(WHITE, false),   // primary dead
-                D4 to Cob(WHITE, false),   // primary dead
-                C5 to Cob(BLACK, false),
-                D1 to Cob(BLACK, false),
+                D3 to Cob(WHITE),   // primary dead
+                D4 to Cob(WHITE),   // primary dead
+                C5 to Cob(BLACK),
+                D1 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
@@ -193,8 +193,8 @@ class ForcedPromotionRegressionTest {
         val before = GameState(
             cobs = mapOf(
                 C8 to Cob(BLACK, true),  // black rok at C8
-                C5 to Cob(BLACK, false),
-                C2 to Cob(WHITE, false),
+                C5 to Cob(BLACK),
+                C2 to Cob(WHITE),
             ),
             currentTurn = BLACK,
         )
@@ -218,8 +218,8 @@ class ForcedPromotionRegressionTest {
     fun detectUpgrades_fires_whenCobReachesUpgradeVertex() {
         val before = GameState(
             cobs = mapOf(
-                B4 to Cob(WHITE, false),  // white cob about to move to C7 (upgrade vertex)
-                D1 to Cob(BLACK, false),
+                B4 to Cob(WHITE),  // white cob about to move to C7 (upgrade vertex)
+                D1 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
@@ -256,14 +256,14 @@ class ForcedPromotionRegressionTest {
         // D2 is in white's own home base. Its only forward neighbor is C2, which is free.
         val state = GameState(
             cobs = mapOf(
-                A1 to Cob(BLACK, false),
-                B1 to Cob(BLACK, false),
-                B5 to Cob(BLACK, false),
-                B6 to Cob(BLACK, false),
-                C12 to Cob(BLACK, false),
-                D2 to Cob(WHITE, false),   // sole white piece — has a forward move to C2
-                D3 to Cob(BLACK, false),
-                D4 to Cob(BLACK, false),
+                A1 to Cob(BLACK),
+                B1 to Cob(BLACK),
+                B5 to Cob(BLACK),
+                B6 to Cob(BLACK),
+                C12 to Cob(BLACK),
+                D2 to Cob(WHITE),   // sole white piece — has a forward move to C2
+                D3 to Cob(BLACK),
+                D4 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )
@@ -292,8 +292,8 @@ class ForcedPromotionRegressionTest {
     fun detectUpgrades_fires_forInPlaceForcedPromotion() {
         val before = GameState(
             cobs = mapOf(
-                D4 to Cob(WHITE, false),  // sole white cob — forced promotion
-                C5 to Cob(BLACK, false),
+                D4 to Cob(WHITE),  // sole white cob — forced promotion
+                C5 to Cob(BLACK),
             ),
             currentTurn = WHITE,
         )

@@ -16,7 +16,7 @@ import com.agustin.tarati.ui.theme.NaturePalette
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_ES_Classic() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_ES_Classic(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_es_classic,
     title = "Editá el tablero",
     subtitle = "Configurá la posición inicial\nde cada nueva partida",
@@ -25,7 +25,7 @@ fun StoreScreenshot05b_ES_Classic() = PlayStoreScreenshotCentered(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_ES_Dark() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_ES_Dark(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_es_dark,
     title = "Editá el tablero",
     subtitle = "Configurá la posición inicial\nde cada nueva partida",
@@ -34,7 +34,7 @@ fun StoreScreenshot05b_ES_Dark() = PlayStoreScreenshotCentered(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_ES_Nature() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_ES_Nature(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_es_nature,
     title = "Editá el tablero",
     subtitle = "Configurá la posición inicial\nde cada nueva partida",
@@ -43,7 +43,7 @@ fun StoreScreenshot05b_ES_Nature() = PlayStoreScreenshotCentered(
 
 @Preview(group = "PlayStore_ES", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_ES_Grayscale() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_ES_Grayscale(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_es_grayscale,
     title = "Editá el tablero",
     subtitle = "Configurá la posición inicial\nde cada nueva partida",
@@ -52,28 +52,28 @@ fun StoreScreenshot05b_ES_Grayscale() = PlayStoreScreenshotCentered(
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_EN_Classic() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_EN_Classic(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_en_classic,
     title = "Edit the board", subtitle = "Set up the starting position\nfor every new game", palette = ClassicPalette,
 )
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_EN_Dark() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_EN_Dark(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_en_dark,
     title = "Edit the board", subtitle = "Set up the starting position\nfor every new game", palette = DarkPalette,
 )
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_EN_Nature() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_EN_Nature(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_en_nature,
     title = "Edit the board", subtitle = "Set up the starting position\nfor every new game", palette = NaturePalette,
 )
 
 @Preview(group = "PlayStore_EN", showBackground = false, widthDp = STORE_W_DP, heightDp = STORE_H_DP)
 @Composable
-fun StoreScreenshot05b_EN_Grayscale() = PlayStoreScreenshotCentered(
+fun StoreScreenshot05b_EN_Grayscale(): Unit = PlayStoreScreenshotCentered(
     screenshotRes = R.drawable.ss_05_en_grayscale,
     title = "Edit the board", subtitle = "Set up the starting position\nfor every new game", palette = GrayscalePalette,
 )

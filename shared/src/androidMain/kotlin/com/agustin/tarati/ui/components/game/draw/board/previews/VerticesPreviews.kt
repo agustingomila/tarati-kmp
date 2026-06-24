@@ -569,7 +569,6 @@ fun PreviewVertexHighlights(
                                 highlight = VertexHighlight(
                                     vertex = C3,
                                     action = HighlightAction.MOVE,
-                                    pulse = false,
                                 ),
                                 canvasSize = size,
                                 orientation = boardOrientation,

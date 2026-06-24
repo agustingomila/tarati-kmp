@@ -18,8 +18,8 @@ class NoOpAchievementsManager : IAchievementsManager {
     override val unlockedPaletteAchievements: StateFlow<Set<AchievementId>> =
         MutableStateFlow(emptySet())
 
-    override suspend fun onMoveApplied(move: Move, previousState: GameState, newState: GameState) = Unit
-    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty?) = Unit
-    override suspend fun onTutorialCompleted() = Unit
-    override fun showAchievementsUI(onNavigateToScreen: () -> Unit) = Unit
+    override suspend fun onMoveApplied(move: Move, previousState: GameState, newState: GameState): Unit = Unit
+    override suspend fun onGameOver(matchState: MatchState, playerSide: CobColor, difficulty: Difficulty?): Unit = Unit
+    override suspend fun onTutorialCompleted(): Unit = Unit
+    override fun showAchievementsUI(onNavigateToScreen: () -> Unit): Unit = Unit
 }
