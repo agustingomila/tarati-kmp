@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.prefs.Preferences
 
 /**
- * Implementación de [SettingsRepository] para Desktop usando [java.util.prefs.Preferences].
+ * Implementación de [SettingsRepository] para Desktop usando [Preferences].
  *
  * **Ubicación de persistencia**:
  * - Windows: `HKEY_CURRENT_USER\Software\JavaSoft\Prefs\com\agustin\tarati\settings`
@@ -80,7 +80,7 @@ class DesktopSettingsRepository : SettingsRepository {
     // ── User & Localization ────────────────────────────────────────────────────
 
     private val _userName = MutableStateFlow(prefs.get(KEY_USER_NAME, ""))
-    override val userName: StateFlow<String?> = _userName.asStateFlow()
+    override val userName: StateFlow<String> = _userName.asStateFlow()
 
     private val _language = MutableStateFlow(
         AppLanguage.entries.find { it.name == prefs.get(KEY_LANGUAGE, null) } ?: AppLanguage.SPANISH
@@ -90,7 +90,7 @@ class DesktopSettingsRepository : SettingsRepository {
     // ── Visual Style ───────────────────────────────────────────────────────────
 
     private val _palette = MutableStateFlow(prefs.get(KEY_PALETTE, "Classic"))
-    override val palette: StateFlow<String?> = _palette.asStateFlow()
+    override val palette: StateFlow<String> = _palette.asStateFlow()
 
     private val _conversionAnimationStyle = MutableStateFlow(
         ConversionAnimationStyle.entries.find { it.name == prefs.get(KEY_CONVERSION_STYLE, null) }
@@ -99,7 +99,7 @@ class DesktopSettingsRepository : SettingsRepository {
     override val conversionAnimationStyle: StateFlow<ConversionAnimationStyle> = _conversionAnimationStyle.asStateFlow()
 
     private val _pieceTypeId = MutableStateFlow(prefs.get(KEY_PIECE_TYPE_ID, PieceTypes.default.id))
-    override val pieceTypeId: StateFlow<String?> = _pieceTypeId.asStateFlow()
+    override val pieceTypeId: StateFlow<String> = _pieceTypeId.asStateFlow()
 
     // ── Sound ──────────────────────────────────────────────────────────────────
 
@@ -115,10 +115,10 @@ class DesktopSettingsRepository : SettingsRepository {
     override val tutorialSeen: StateFlow<Boolean> = _tutorialSeen.asStateFlow()
 
     private val _seasonalAutoAppliedDate = MutableStateFlow(prefs.get(KEY_SEASONAL_DATE, ""))
-    override val seasonalAutoAppliedDate: StateFlow<String?> = _seasonalAutoAppliedDate.asStateFlow()
+    override val seasonalAutoAppliedDate: StateFlow<String> = _seasonalAutoAppliedDate.asStateFlow()
 
     private val _preSeasonalPalette = MutableStateFlow(prefs.get(KEY_PRE_SEASONAL_PALETTE, ""))
-    override val preSeasonalPalette: StateFlow<String?> = _preSeasonalPalette.asStateFlow()
+    override val preSeasonalPalette: StateFlow<String> = _preSeasonalPalette.asStateFlow()
 
     // ── Game Session ───────────────────────────────────────────────────────────
 
@@ -131,7 +131,7 @@ class DesktopSettingsRepository : SettingsRepository {
     private val _boardOrientation = MutableStateFlow(
         prefs.get(KEY_BOARD_ORIENTATION, BoardOrientation.PORTRAIT_WHITE.name)
     )
-    override val boardOrientation: StateFlow<String?> = _boardOrientation.asStateFlow()
+    override val boardOrientation: StateFlow<String> = _boardOrientation.asStateFlow()
 
     private val _isManuallyRotated = MutableStateFlow(prefs.getBoolean(KEY_MANUALLY_ROTATED, false))
     override val isManuallyRotated: StateFlow<Boolean> = _isManuallyRotated.asStateFlow()
@@ -148,7 +148,7 @@ class DesktopSettingsRepository : SettingsRepository {
     override val preMovesEnabled: StateFlow<Boolean> = _preMovesEnabled.asStateFlow()
 
     private val _onlineTimeControl = MutableStateFlow(prefs.get(KEY_ONLINE_TIME_CONTROL, TimeControl.BLITZ.key))
-    override val onlineTimeControl: StateFlow<String?> = _onlineTimeControl.asStateFlow()
+    override val onlineTimeControl: StateFlow<String> = _onlineTimeControl.asStateFlow()
 
     private val _onlineRated = MutableStateFlow(prefs.getBoolean(KEY_ONLINE_RATED, true))
     override val onlineRated: StateFlow<Boolean> = _onlineRated.asStateFlow()
