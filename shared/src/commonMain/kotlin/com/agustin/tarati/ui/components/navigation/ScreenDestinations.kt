@@ -13,6 +13,8 @@ sealed class ScreenDestinations(
 
     object SupporterDest : ScreenDestinations(route = "supporter")
 
+    object StoreDest : ScreenDestinations(route = "store")
+
     object GamesLibraryDest : ScreenDestinations(route = "games_library")
 
     object GameDetailsDest : ScreenDestinations(route = "game_details/{gameId}")

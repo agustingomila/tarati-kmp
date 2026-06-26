@@ -46,6 +46,7 @@ import com.agustin.tarati.shared.generated.resources.supporter_custom_amount
 import com.agustin.tarati.shared.generated.resources.supporter_min_amount
 import com.agustin.tarati.shared.generated.resources.supporter_monthly
 import com.agustin.tarati.shared.generated.resources.supporter_once
+import com.agustin.tarati.shared.generated.resources.supporter_play_cta
 import com.agustin.tarati.shared.generated.resources.supporter_thanks
 import com.agustin.tarati.shared.generated.resources.supporter_title
 import com.agustin.tarati.shared.generated.resources.supporter_unavailable_platform
@@ -81,6 +82,8 @@ private fun SupporterContent(
 ) {
     val state by viewModel.uiState.collectAsState()
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    // Acción de compra nativa (Google Play en Android); null en Desktop/Web/iOS.
+    val nativePurchase = rememberSupporterPurchaseAction()
 
     // Refrescar al entrar (trae el estado tras volver del pago) y abrir el checkout.
     LaunchedEffect(Unit) { viewModel.refresh() }
@@ -135,11 +138,23 @@ private fun SupporterContent(
                 Spacer(Modifier.height(24.dp))
 
                 if (!viewModel.stripeAvailable) {
-                    Text(
-                        text = localizedString(Res.string.supporter_unavailable_platform),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // Android: compra del tier supporter por Google Play (precio fijo de consola).
+                    if (nativePurchase != null) {
+                        Button(
+                            onClick = nativePurchase,
+                            enabled = !state.isSupporter,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(localizedString(Res.string.supporter_play_cta))
+                        }
+                    } else {
+                        // iOS u otras plataformas sin compra nativa.
+                        Text(
+                            text = localizedString(Res.string.supporter_unavailable_platform),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     return@Column
                 }
 

@@ -84,6 +84,7 @@ import com.agustin.tarati.shared.generated.resources.settings
 import com.agustin.tarati.shared.generated.resources.settings_achievements
 import com.agustin.tarati.shared.generated.resources.settings_install_app
 import com.agustin.tarati.shared.generated.resources.settings_online
+import com.agustin.tarati.shared.generated.resources.store_title
 import com.agustin.tarati.shared.generated.resources.supporter_title
 import com.agustin.tarati.shared.generated.resources.sound
 import com.agustin.tarati.shared.generated.resources.sound_disabled
@@ -128,6 +129,7 @@ fun SettingsScreen(
     onNavigateToOnlineSettings: (() -> Unit)? = null,
     onNavigateToAchievements: (() -> Unit)? = null,
     onNavigateToSupporter: (() -> Unit)? = null,
+    onNavigateToStore: (() -> Unit)? = null,
 ) {
     val settingsState by viewModel.settingsState.collectAsState()
 
@@ -199,6 +201,34 @@ fun SettingsScreen(
                 )
 
                 SettingsCategory(title = Res.string.appearance)
+                if (onNavigateToStore != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onNavigateToStore() }
+                            .padding(horizontal = 20.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = TaratiIcons.CardGiftcard,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = localizedString(Res.string.store_title),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Icon(
+                            imageVector = TaratiIcons.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
                 ThemeSetting(
                     theme = settingsState.appTheme,
                     onThemeChange = events::onThemeChange,

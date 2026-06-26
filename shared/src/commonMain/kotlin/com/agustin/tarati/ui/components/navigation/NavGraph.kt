@@ -31,6 +31,7 @@ import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
 import com.agustin.tarati.features.online.supporter.SupporterScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
+import com.agustin.tarati.features.store.StoreScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
 import com.agustin.tarati.features.settings.OnlineSettingsScreen
@@ -49,6 +50,7 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.OnlineSett
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.StoreDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SupporterDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.TournamentDetailDest
 import com.agustin.tarati.ui.layout.CompanionPanelDestination
@@ -162,11 +164,22 @@ fun NavGraph(
                 onNavigateToSupporter = {
                     navController.navigate(SupporterDest.route)
                 },
+                onNavigateToStore = {
+                    navController.navigate(StoreDest.route)
+                },
             )
         }
 
         composable(route = OnlineSettingsDest.route) {
             OnlineSettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(route = StoreDest.route) {
+            StoreScreen(
+                settingsViewModel = settingsViewModel,
+                onNavigateToSupporter = { navController.navigate(SupporterDest.route) },
                 onNavigateBack = { navController.popBackStack() },
             )
         }

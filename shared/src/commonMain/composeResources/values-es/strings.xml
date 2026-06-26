@@ -622,6 +622,9 @@
     <string name="supporter_checkout_failed">No se pudo iniciar el pago. Probá de nuevo más tarde.</string>
     <string name="supporter_completed_payment">Ya completé el pago</string>
     <string name="supporter_unavailable_platform">El aporte con tarjeta está disponible en Web y Desktop.</string>
+    <string name="supporter_play_cta">Apoyar Tarati</string>
     <string name="supporter_badge">Supporter</string>
     <string name="supporter_unlock_cta">Beneficio de supporter — desbloquéalo apoyando Tarati</string>
+    <string name="store_title">Tienda</string>
+    <string name="store_unlock_all_cta">Desbloqueá todas las paletas y piezas — hacete supporter ♥</string>
 </resources>

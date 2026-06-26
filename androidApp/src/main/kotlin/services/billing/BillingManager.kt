@@ -290,7 +290,9 @@ class BillingManager(
      * Se llama una vez al conectar y bajo demanda si el caché está vacío.
      */
     private suspend fun warmProductDetailsCache() {
-        val productList = (PieceProducts.ALL_PRODUCT_IDS + PaletteProducts.ALL_PRODUCT_IDS).map { id ->
+        // Incluye el tier `supporter` (managed, precio fijo de consola) además de los à la carte.
+        val ids = PieceProducts.ALL_PRODUCT_IDS + PaletteProducts.ALL_PRODUCT_IDS + SUPPORTER_PRODUCT_ID
+        val productList = ids.map { id ->
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(id)
                 .setProductType(ProductType.INAPP)

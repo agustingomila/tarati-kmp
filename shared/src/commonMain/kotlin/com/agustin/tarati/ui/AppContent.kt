@@ -66,6 +66,7 @@ import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
 import com.agustin.tarati.features.online.supporter.SupporterScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
+import com.agustin.tarati.features.store.StoreScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
 import com.agustin.tarati.features.settings.SettingsRepository
@@ -99,6 +100,7 @@ import com.agustin.tarati.ui.layout.CompanionPanelDestination.None
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.OnlineSettings
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Profile
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Settings
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Store
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Supporter
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.TournamentDetail
 import com.agustin.tarati.ui.layout.DisplayMode
@@ -434,6 +436,9 @@ private fun CompanionPane(
             onNavigateToSupporter = {
                 controller.navigate(Supporter)
             },
+            onNavigateToStore = {
+                controller.navigate(Store)
+            },
         )
 
         Achievements -> AchievementsScreen(onBack = controller::back)
@@ -443,6 +448,12 @@ private fun CompanionPane(
         )
 
         Supporter -> SupporterScreen(
+            onNavigateBack = controller::back,
+        )
+
+        Store -> StoreScreen(
+            settingsViewModel = settingsViewModel,
+            onNavigateToSupporter = { controller.navigate(Supporter) },
             onNavigateBack = controller::back,
         )
 

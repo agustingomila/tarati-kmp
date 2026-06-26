@@ -611,6 +611,9 @@
     <string name="supporter_checkout_failed">Couldn\'t start the payment. Please try again later.</string>
     <string name="supporter_completed_payment">I\'ve completed the payment</string>
     <string name="supporter_unavailable_platform">Supporting with a card is available on Web and Desktop.</string>
+    <string name="supporter_play_cta">Support Tarati</string>
     <string name="supporter_badge">Supporter</string>
     <string name="supporter_unlock_cta">Supporter perk — unlock it by supporting Tarati</string>
+    <string name="store_title">Store</string>
+    <string name="store_unlock_all_cta">Unlock every palette and piece set — become a supporter ♥</string>
 </resources>
