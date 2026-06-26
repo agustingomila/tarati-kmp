@@ -3,6 +3,13 @@ package com.agustin.tarati.network.models
 import kotlinx.serialization.Serializable
 
 /**
+ * `productId` del entitlement global que desbloquea todo el contenido supporter-only
+ * (modelo Supporter unlock, fases C3/C4). Fuente única de verdad compartida por server
+ * (validación/webhook/flair) y cliente (regla `isUnlocked`, gate, flair).
+ */
+const val SUPPORTER_PRODUCT_ID: String = "supporter"
+
+/**
  * Origen de un entitlement — de dónde proviene la titularidad de un producto.
  *
  * [key] es el valor almacenado en la columna `entitlements.source`. Sigue la
@@ -45,4 +52,29 @@ data class GooglePlayPurchaseRequest(
 @Serializable
 data class EntitlementsResponse(
     val productIds: List<String>,
+)
+
+/**
+ * Cuerpo de POST /api/checkout/stripe (fase C3).
+ *
+ * El cliente (Desktop/Web) envía el monto elegido y el intervalo; el servidor crea
+ * un Stripe Checkout Session y devuelve la URL de redirección. El monto se valida
+ * (clamp) server-side — no se confía en el valor crudo del cliente.
+ *
+ * @param amountCents Monto en centavos de USD.
+ * @param interval    "once" (pago único) | "month" (suscripción mensual).
+ */
+@Serializable
+data class StripeCheckoutRequest(
+    val amountCents: Int,
+    val interval: String,
+)
+
+/**
+ * Respuesta de POST /api/checkout/stripe — URL del Checkout Session de Stripe.
+ * El cliente abre esta URL en el browser para completar el pago.
+ */
+@Serializable
+data class StripeCheckoutResponse(
+    val checkoutUrl: String,
 )

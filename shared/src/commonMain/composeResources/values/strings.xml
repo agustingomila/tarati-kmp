@@ -598,4 +598,19 @@
     <string name="settings_delete_account_body">This action is permanent and cannot be undone. Your games, rating and
         achievements will be deleted.
     </string>
+
+    <!-- Supporter (Stripe donation, C3) -->
+    <string name="supporter_title">Support Tarati</string>
+    <string name="supporter_body">Tarati is free — no ads, no subscriptions. Supporting helps cover server costs and keeps the game open for everyone. Thank you ♥</string>
+    <string name="supporter_once">One-time</string>
+    <string name="supporter_monthly">Monthly</string>
+    <string name="supporter_custom_amount">Other amount (USD)</string>
+    <string name="supporter_continue">Continue to payment</string>
+    <string name="supporter_thanks">You\'re a supporter — thank you! ♥</string>
+    <string name="supporter_min_amount">The minimum amount is $2.</string>
+    <string name="supporter_checkout_failed">Couldn\'t start the payment. Please try again later.</string>
+    <string name="supporter_completed_payment">I\'ve completed the payment</string>
+    <string name="supporter_unavailable_platform">Supporting with a card is available on Web and Desktop.</string>
+    <string name="supporter_badge">Supporter</string>
+    <string name="supporter_unlock_cta">Supporter perk — unlock it by supporting Tarati</string>
 </resources>

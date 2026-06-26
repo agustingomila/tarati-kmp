@@ -609,4 +609,19 @@
     <string name="settings_delete_account_body">Esta acción es permanente e irreversible. Tus partidas, rating y logros
         serán eliminados.
     </string>
+
+    <!-- Supporter (donación Stripe, C3) -->
+    <string name="supporter_title">Apoyar Tarati</string>
+    <string name="supporter_body">Tarati es gratis — sin anuncios, sin suscripciones. Tu aporte ayuda a cubrir los costos del servidor y mantiene el juego abierto para todos. ¡Gracias ♥</string>
+    <string name="supporter_once">Único</string>
+    <string name="supporter_monthly">Mensual</string>
+    <string name="supporter_custom_amount">Otro monto (USD)</string>
+    <string name="supporter_continue">Continuar al pago</string>
+    <string name="supporter_thanks">Ya sos supporter, ¡gracias! ♥</string>
+    <string name="supporter_min_amount">El monto mínimo es $2.</string>
+    <string name="supporter_checkout_failed">No se pudo iniciar el pago. Probá de nuevo más tarde.</string>
+    <string name="supporter_completed_payment">Ya completé el pago</string>
+    <string name="supporter_unavailable_platform">El aporte con tarjeta está disponible en Web y Desktop.</string>
+    <string name="supporter_badge">Supporter</string>
+    <string name="supporter_unlock_cta">Beneficio de supporter — desbloquéalo apoyando Tarati</string>
 </resources>

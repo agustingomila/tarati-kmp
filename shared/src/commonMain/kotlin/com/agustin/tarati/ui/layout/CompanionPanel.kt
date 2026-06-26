@@ -20,6 +20,7 @@ sealed interface CompanionPanelDestination {
     data object Lobby : CompanionPanelDestination
     data object Settings : CompanionPanelDestination
     data object OnlineSettings : CompanionPanelDestination
+    data object Supporter : CompanionPanelDestination
     data object Library : CompanionPanelDestination
     data object Leaderboard : CompanionPanelDestination
     data class Profile(val userId: String) : CompanionPanelDestination

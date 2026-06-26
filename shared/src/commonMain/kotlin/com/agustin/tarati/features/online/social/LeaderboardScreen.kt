@@ -40,7 +40,9 @@ import com.agustin.tarati.shared.generated.resources.error
 import com.agustin.tarati.shared.generated.resources.profile_leaderboard
 import com.agustin.tarati.shared.generated.resources.profile_no_leaderboard_data
 import com.agustin.tarati.shared.generated.resources.refresh
+import com.agustin.tarati.ui.components.SupporterBadge
 import com.agustin.tarati.ui.components.TooltipIconButton
+import com.agustin.tarati.ui.components.supporterNameColor
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
@@ -189,11 +191,18 @@ private fun LeaderboardEntryRow(entry: LeaderboardEntryDto, onClick: () -> Unit)
 
             // Name + country
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = entry.displayName?.takeIf { it.isNotBlank() } ?: entry.username,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Text(
+                        text = entry.displayName?.takeIf { it.isNotBlank() } ?: entry.username,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (entry.isSupporter) supporterNameColor() else Color.Unspecified,
+                    )
+                    if (entry.isSupporter) SupporterBadge(size = 14.dp)
+                }
                 if (!entry.country.isNullOrBlank()) {
                     Text(
                         text = entry.country,

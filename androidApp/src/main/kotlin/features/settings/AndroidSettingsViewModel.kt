@@ -8,6 +8,7 @@ import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.IBillingManager
 import com.agustin.tarati.services.billing.LockedPalettes
 import com.agustin.tarati.services.billing.PaletteProducts
+import com.agustin.tarati.services.billing.effectiveOwnedProducts
 import com.agustin.tarati.services.billing.PurchaseResult
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.theme.GildedPalette
@@ -39,19 +40,22 @@ class AndroidSettingsViewModel(
 
     // ── Billing ───────────────────────────────────────────────────────────────
 
-    // Compras locales de Google Play (billing) ∪ entitlements del servidor (cross-platform).
+    // Compras locales de Google Play (billing) ∪ entitlements del servidor (cross-platform),
+    // expandido con la regla supporter (supporter desbloquea todo lo premium).
     override val purchasedProductIds: StateFlow<Set<String>> = combine(
         billingManager.purchasedProductIds,
         entitlementsRepository.entitlements,
-    ) { local, server -> local + server }.stateIn(
+    ) { local, server -> effectiveOwnedProducts(local + server) }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = emptySet(),
     )
 
-    // Derivado del billing: true si Gilded está entre los productos comprados.
-    private val gildedPurchasedFlow = billingManager.purchasedProductIds
-        .map { PaletteProducts.GILDED in it }
+    // True si Gilded está desbloqueada: comprada (billing), poseída (server) o supporter.
+    private val gildedUnlockedFlow = combine(
+        billingManager.purchasedProductIds,
+        entitlementsRepository.entitlements,
+    ) { local, server -> PaletteProducts.GILDED in effectiveOwnedProducts(local + server) }
 
     // ── Paletas disponibles (filtradas por achievements y fecha) ──────────────
 
@@ -76,9 +80,9 @@ class AndroidSettingsViewModel(
 
     override val availablePalettes: StateFlow<PaletteList> = combine(
         achievementsPaletteListFlow,
-        gildedPurchasedFlow,
-    ) { basePalettes, gildedPurchased ->
-        PaletteList(items = if (gildedPurchased) basePalettes + GildedPalette else basePalettes)
+        gildedUnlockedFlow,
+    ) { basePalettes, gildedUnlocked ->
+        PaletteList(items = if (gildedUnlocked) basePalettes + GildedPalette else basePalettes)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -118,9 +122,9 @@ class AndroidSettingsViewModel(
             ),
         )
 
-    override val lockedPalettes: StateFlow<LockedPalettes> = gildedPurchasedFlow
-        .map { gildedPurchased ->
-            if (gildedPurchased) LockedPalettes.None
+    override val lockedPalettes: StateFlow<LockedPalettes> = gildedUnlockedFlow
+        .map { gildedUnlocked ->
+            if (gildedUnlocked) LockedPalettes.None
             else LockedPalettes(setOf(GildedPalette.name))
         }.stateIn(
             scope = viewModelScope,

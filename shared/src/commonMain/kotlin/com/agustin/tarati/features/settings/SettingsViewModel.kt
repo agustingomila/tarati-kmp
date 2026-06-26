@@ -6,6 +6,8 @@ import com.agustin.tarati.core.domain.ai.services.Difficulty
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
 import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.LockedPalettes
+import com.agustin.tarati.services.billing.effectiveOwnedProducts
+import com.agustin.tarati.services.billing.lockedPaletteNames
 import com.agustin.tarati.services.localization.AppLanguage
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypeManager
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.agustin.tarati.ui.theme.availablePalettes as allAvailablePalettes
@@ -40,9 +43,12 @@ open class SettingsViewModel(
     private val _hasTutorialBeenSeen = MutableStateFlow(false)
     override val hasTutorialBeenSeen: StateFlow<Boolean> = _hasTutorialBeenSeen
 
-    // Ownership cross-platform leído del servidor (override en AndroidSettingsViewModel
-    // para mergear con las compras locales de Google Play Billing).
+    // Ownership cross-platform leído del servidor, expandido con la regla supporter
+    // (supporter desbloquea todo lo premium). Override en AndroidSettingsViewModel para
+    // mergear además con las compras locales de Google Play Billing.
     override val purchasedProductIds: StateFlow<Set<String>> = entitlementsRepository.entitlements
+        .map { effectiveOwnedProducts(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
     // ── settingsState: combina todos los flows del repositorio ─────────────────
     //
@@ -146,16 +152,17 @@ open class SettingsViewModel(
     override val allPalettesForSelector: StateFlow<PaletteList> = availablePalettes
 
     /**
-     * Paletas bloqueadas (base - ninguna bloqueada).
-     * Override en AndroidSettingsViewModel para reflejar estado de billing.
+     * Paletas bloqueadas según el entitlement supporter (C4): Gilded queda bloqueada
+     * salvo que el usuario sea supporter o la posea. Override en AndroidSettingsViewModel
+     * para mergear con el billing local.
      */
-    override val lockedPalettes: StateFlow<LockedPalettes> = MutableStateFlow(
-        LockedPalettes.None
-    ).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = LockedPalettes.None,
-    )
+    override val lockedPalettes: StateFlow<LockedPalettes> = entitlementsRepository.entitlements
+        .map { LockedPalettes(lockedPaletteNames(it)) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = LockedPalettes.None,
+        )
 
     // ── Inicialización: restaurar singletons desde Repository ──────────────────
 

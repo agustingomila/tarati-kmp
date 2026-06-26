@@ -296,4 +296,6 @@ data class OnlineUserDto(
     val ratingBlitz: Int? = null,
     /** Si el usuario acepta recibir desafíos de partida. */
     val acceptsChallenges: Boolean = true,
+    /** True si el usuario es supporter — habilita badge + color de nombre (C4). */
+    val isSupporter: Boolean = false,
 )

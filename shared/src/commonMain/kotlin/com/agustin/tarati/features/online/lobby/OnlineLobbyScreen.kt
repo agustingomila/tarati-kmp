@@ -60,6 +60,7 @@ import com.agustin.tarati.shared.generated.resources.lobby_new_search
 import com.agustin.tarati.shared.generated.resources.lobby_not_connected_to_server
 import com.agustin.tarati.shared.generated.resources.online_lobby
 import com.agustin.tarati.shared.generated.resources.profile_leaderboard
+import com.agustin.tarati.shared.generated.resources.supporter_title
 import com.agustin.tarati.shared.generated.resources.search_no_longer_available
 import com.agustin.tarati.shared.generated.resources.social_feed
 import com.agustin.tarati.shared.generated.resources.spectator_unavailable
@@ -119,6 +120,8 @@ fun OnlineLobbyScreen(
     onNavigateToGameDetails: ((gameId: String) -> Unit)? = null,
     /** Callback al tocar un torneo en el tab Torneos. Null = sin navegación al detalle. */
     onNavigateToTournament: ((tournamentId: String) -> Unit)? = null,
+    /** Abre la pantalla Supporter (pago C3). Null = sin botón ♥ en la TopBar. */
+    onNavigateToSupporter: (() -> Unit)? = null,
     /** Tab inicial a mostrar al entrar. Útil en CompanionPanel para restaurar el tab activo. */
     initialTab: Int = 0,
     viewModel: IOnlineLobbyViewModel = koinViewModel<OnlineLobbyViewModel>(),
@@ -306,6 +309,19 @@ fun OnlineLobbyScreen(
                         imageVector = TaratiIcons.Leaderboard,
                         contentDescription = localizedString(Res.string.profile_leaderboard),
                         tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            // Botón Supporter ♥ — solo para usuarios registrados (el checkout requiere sesión).
+            if (onNavigateToSupporter != null && isAuthenticated && !isGuest) {
+                TooltipIconButton(
+                    tooltip = localizedString(Res.string.supporter_title),
+                    onClick = onNavigateToSupporter,
+                ) {
+                    Icon(
+                        imageVector = TaratiIcons.Supporter,
+                        contentDescription = localizedString(Res.string.supporter_title),
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             }

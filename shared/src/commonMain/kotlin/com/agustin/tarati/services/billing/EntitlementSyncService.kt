@@ -3,6 +3,8 @@ package com.agustin.tarati.services.billing
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.EntitlementsResponse
 import com.agustin.tarati.network.models.GooglePlayPurchaseRequest
+import com.agustin.tarati.network.models.StripeCheckoutRequest
+import com.agustin.tarati.network.models.StripeCheckoutResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -47,4 +49,18 @@ class EntitlementSyncService(private val httpClient: HttpClient) {
         }
         response.status.isSuccess()
     }.getOrDefault(false)
+
+    /**
+     * Crea un Stripe Checkout Session para el pago Supporter (fase C3, Desktop/Web).
+     * @return La URL de Checkout a abrir en el browser, o [Result.failure] si el server
+     *         no pudo crearlo (503 sin credenciales, 502 error de Stripe, red).
+     */
+    suspend fun createStripeCheckout(token: String, amountCents: Int, interval: String): Result<String> =
+        runCatching {
+            httpClient.post("$baseUrl/api/checkout/stripe") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(StripeCheckoutRequest(amountCents, interval))
+            }.body<StripeCheckoutResponse>().checkoutUrl
+        }
 }

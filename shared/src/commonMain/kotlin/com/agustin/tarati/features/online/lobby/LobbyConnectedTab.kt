@@ -60,7 +60,9 @@ import com.agustin.tarati.shared.generated.resources.rated
 import com.agustin.tarati.shared.generated.resources.social_challenge
 import com.agustin.tarati.shared.generated.resources.social_challenge_dialog_title
 import com.agustin.tarati.shared.generated.resources.you
+import com.agustin.tarati.ui.components.SupporterBadge
 import com.agustin.tarati.ui.components.TooltipIconButton
+import com.agustin.tarati.ui.components.supporterNameColor
 import com.agustin.tarati.ui.theme.TaratiIcons
 import com.agustin.tarati.ui.theme.timeControlIcon
 import kotlinx.coroutines.launch
@@ -234,12 +236,19 @@ private fun ConnectedUserRow(
         )
         Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                if (isSelf) "${user.displayName} (${localizedString(Res.string.you)})"
-                else user.displayName,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (isSelf) FontWeight.SemiBold else FontWeight.Normal,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    if (isSelf) "${user.displayName} (${localizedString(Res.string.you)})"
+                    else user.displayName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = if (isSelf) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (user.isSupporter) supporterNameColor() else Color.Unspecified,
+                )
+                if (user.isSupporter) SupporterBadge(size = 14.dp)
+            }
             Text(
                 localizedString(
                     if (user.status == OnlineUserStatus.PLAYING) Res.string.lobby_status_playing

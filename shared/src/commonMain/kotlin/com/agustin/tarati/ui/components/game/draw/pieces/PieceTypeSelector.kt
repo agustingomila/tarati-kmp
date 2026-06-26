@@ -98,9 +98,9 @@ fun PieceTypeSelector(
     ) {
         itemsIndexed(pieceTypes.items) { index, pieceType ->
             val isSelected = pieceType.id == selectedId
-            // Sin in-app-purchases
-            // val isLocked = pieceType.isPremium && pieceType.productId.orEmpty() !in purchasedIds
-            val isLocked = false
+            // Gate supporter (C4): las piezas premium quedan bloqueadas salvo supporter / compra.
+            // purchasedIds ya es el ownership efectivo (supporter incluye todos los piece_*).
+            val isLocked = pieceType.isPremium && pieceType.productId.orEmpty() !in purchasedIds
 
             // Desfase uniforme entre tiles: con N=7, cada pieza arranca a 1/7 de
             // ciclo del anterior. Ningún par de piezas coincide en el mismo ángulo.

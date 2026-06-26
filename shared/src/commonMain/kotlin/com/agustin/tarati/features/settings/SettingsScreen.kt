@@ -84,6 +84,7 @@ import com.agustin.tarati.shared.generated.resources.settings
 import com.agustin.tarati.shared.generated.resources.settings_achievements
 import com.agustin.tarati.shared.generated.resources.settings_install_app
 import com.agustin.tarati.shared.generated.resources.settings_online
+import com.agustin.tarati.shared.generated.resources.supporter_title
 import com.agustin.tarati.shared.generated.resources.sound
 import com.agustin.tarati.shared.generated.resources.sound_disabled
 import com.agustin.tarati.shared.generated.resources.sound_effects
@@ -97,6 +98,7 @@ import com.agustin.tarati.shared.generated.resources.volume_low
 import com.agustin.tarati.shared.generated.resources.volume_medium
 import com.agustin.tarati.shared.generated.resources.volume_muted
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
+import com.agustin.tarati.services.billing.supporterStripeAvailable
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypeSelector
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -125,6 +127,7 @@ fun SettingsScreen(
     loggedInUsername: String? = null,
     onNavigateToOnlineSettings: (() -> Unit)? = null,
     onNavigateToAchievements: (() -> Unit)? = null,
+    onNavigateToSupporter: (() -> Unit)? = null,
 ) {
     val settingsState by viewModel.settingsState.collectAsState()
 
@@ -209,7 +212,13 @@ fun SettingsScreen(
                         events.onPaletteChange(palette)
                     },
                     onPurchasePalette = { productId ->
-                        viewModel.launchPurchaseFlow(productId)
+                        // Gate supporter (C4): Desktop/Web desbloquean haciéndose supporter
+                        // (Stripe); Android conserva la compra à la carte de Google Play.
+                        if (supporterStripeAvailable() && onNavigateToSupporter != null) {
+                            onNavigateToSupporter()
+                        } else {
+                            viewModel.launchPurchaseFlow(productId)
+                        }
                     },
                 )
                 PieceTypeSetting(
@@ -220,7 +229,11 @@ fun SettingsScreen(
                         viewModel.setPieceType(pieceTypeId)
                     },
                     onPurchasePieceType = { productId ->
-                        viewModel.launchPurchaseFlow(productId)
+                        if (supporterStripeAvailable() && onNavigateToSupporter != null) {
+                            onNavigateToSupporter()
+                        } else {
+                            viewModel.launchPurchaseFlow(productId)
+                        }
                     },
                 )
 
@@ -330,6 +343,38 @@ fun SettingsScreen(
                                 text = loggedInUsername,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Icon(
+                                imageVector = TaratiIcons.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 56.dp, end = 16.dp),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                        )
+                    }
+                    if (onNavigateToSupporter != null && !loggedInUsername.isNullOrBlank() && !isGuest) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToSupporter() }
+                                .padding(horizontal = 20.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = TaratiIcons.Supporter,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            Text(
+                                text = localizedString(Res.string.supporter_title),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
                             )
                             Icon(

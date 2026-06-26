@@ -6,7 +6,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /** `productId` del entitlement global que desbloquea todo (modelo Supporter, fase C4). */
-const val SUPPORTER_PRODUCT_ID: String = "supporter"
+const val SUPPORTER_PRODUCT_ID: String = com.agustin.tarati.network.models.SUPPORTER_PRODUCT_ID
+
+/** Montos sugeridos (en centavos de USD) para el pago Supporter vía Stripe (fase C3). */
+val SUPPORTER_PRESET_CENTS: List<Int> = listOf(300, 500, 1000)
+
+/** Monto mínimo aceptado para el pago Supporter (USD 2.00, en centavos). El server re-valida. */
+const val SUPPORTER_MIN_CENTS: Int = 200
+
+/** Intervalo de cobro del pago Supporter — el `key` viaja en el DTO al servidor. */
+enum class SupporterInterval(val key: String) {
+    ONCE("once"),
+    MONTHLY("month"),
+}
 
 /**
  * Regla de desbloqueo cross-platform: un producto está desbloqueado si el usuario
@@ -41,6 +53,13 @@ interface EntitlementsRepository {
      */
     suspend fun validateGooglePlay(productId: String, purchaseToken: String): Boolean
 
+    /**
+     * Crea un Stripe Checkout Session para el pago Supporter (Desktop/Web, fase C3).
+     * @return La URL de Checkout a abrir en el browser, o null si no hay sesión o el
+     *         servidor no pudo crearla. El grant llega luego vía webhook → [refresh].
+     */
+    suspend fun startStripeCheckout(amountCents: Int, interval: SupporterInterval): String?
+
     /** Vacía el estado local (logout). No persiste nada. */
     fun clear()
 }
@@ -67,6 +86,11 @@ class EntitlementsRepositoryImpl(
         val granted = syncService.validateGooglePlay(token, productId, purchaseToken)
         if (granted) refresh()
         return granted
+    }
+
+    override suspend fun startStripeCheckout(amountCents: Int, interval: SupporterInterval): String? {
+        val token = authRepository.getToken() ?: return null
+        return syncService.createStripeCheckout(token, amountCents, interval.key).getOrNull()
     }
 
     override fun clear() {

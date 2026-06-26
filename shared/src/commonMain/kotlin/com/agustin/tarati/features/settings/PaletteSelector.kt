@@ -98,9 +98,8 @@ fun PaletteSelector(
     ) {
         items(palettes.items, key = { it.name }) { palette ->
             val isSelected = palette.name == selectedPaletteName
-            // Sin in-app-purchases
-            // val isLocked = palette.name in lockedPalettes
-            val isLocked = false
+            // Gate supporter (C4): las paletas premium quedan bloqueadas salvo supporter / compra.
+            val isLocked = palette.name in lockedPalettes
 
             PaletteBoardTile(
                 palette = palette,

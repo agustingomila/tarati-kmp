@@ -64,6 +64,7 @@ import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
 import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
+import com.agustin.tarati.features.online.supporter.SupporterScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
@@ -98,6 +99,7 @@ import com.agustin.tarati.ui.layout.CompanionPanelDestination.None
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.OnlineSettings
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Profile
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.Settings
+import com.agustin.tarati.ui.layout.CompanionPanelDestination.Supporter
 import com.agustin.tarati.ui.layout.CompanionPanelDestination.TournamentDetail
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.layout.LocalCompanionPanelController
@@ -380,6 +382,9 @@ private fun CompanionPane(
                 lastLobbyTab = 2 // Tab "Torneos"
                 controller.navigate(TournamentDetail(tournamentId))
             },
+            onNavigateToSupporter = {
+                controller.navigate(Supporter)
+            },
             initialTab = lastLobbyTab,
         )
 
@@ -426,11 +431,18 @@ private fun CompanionPane(
             onNavigateToAchievements = {
                 controller.navigate(Achievements)
             },
+            onNavigateToSupporter = {
+                controller.navigate(Supporter)
+            },
         )
 
         Achievements -> AchievementsScreen(onBack = controller::back)
 
         OnlineSettings -> OnlineSettingsScreen(
+            onNavigateBack = controller::back,
+        )
+
+        Supporter -> SupporterScreen(
             onNavigateBack = controller::back,
         )
 

@@ -98,6 +98,25 @@ class EntitlementsRepositoryTest {
     }
 
     @Test
+    fun `startStripeCheckout returns the url from the server`(): TestResult = runTest {
+        every { authRepository.getToken() } returns "tok"
+        coEvery { syncService.createStripeCheckout("tok", 500, "once") } returns Result.success("https://checkout/x")
+
+        val url = repo().startStripeCheckout(500, SupporterInterval.ONCE)
+
+        assertEquals("https://checkout/x", url)
+    }
+
+    @Test
+    fun `startStripeCheckout returns null without a token`(): TestResult = runTest {
+        every { authRepository.getToken() } returns null
+
+        val url = repo().startStripeCheckout(500, SupporterInterval.ONCE)
+
+        assertEquals(null, url)
+    }
+
+    @Test
     fun `isUnlocked respects supporter and specific ownership`() {
         assertTrue(isUnlocked("palette_gilded", setOf("supporter")))
         assertTrue(isUnlocked("palette_gilded", setOf("palette_gilded")))

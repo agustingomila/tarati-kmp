@@ -18,6 +18,8 @@ import com.agustin.tarati.features.online.social.IPublicProfileViewModel
 import com.agustin.tarati.features.online.social.LeaderboardViewModel
 import com.agustin.tarati.features.online.social.PublicProfileViewModel
 import com.agustin.tarati.features.online.social.SocialRepository
+import com.agustin.tarati.features.online.supporter.ISupporterViewModel
+import com.agustin.tarati.features.online.supporter.SupporterViewModel
 import com.agustin.tarati.features.online.tournament.ITournamentViewModel
 import com.agustin.tarati.features.online.tournament.TournamentRepository
 import com.agustin.tarati.features.online.tournament.TournamentViewModel
@@ -177,6 +179,11 @@ val onlineModule: Module = module {
     single<EntitlementsRepository> {
         EntitlementsRepositoryImpl(syncService = get(), authRepository = get())
     }
+
+    // Pantalla Supporter (pago Stripe C3) — scope de pantalla.
+    viewModel {
+        SupporterViewModel(entitlementsRepository = get())
+    } bind ISupporterViewModel::class
 
     /**
      * ConnectionViewModel — singleton de sesión.

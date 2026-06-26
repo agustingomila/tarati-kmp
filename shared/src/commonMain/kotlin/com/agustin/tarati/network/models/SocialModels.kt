@@ -50,6 +50,8 @@ data class LeaderboardEntryDto(
     val wins: Int,
     val losses: Int,
     val draws: Int,
+    /** True si el jugador es supporter — habilita badge + color de nombre (C4). */
+    val isSupporter: Boolean = false,
 )
 
 /**
@@ -76,6 +78,8 @@ data class PublicProfileDto(
     val isGuest: Boolean = false,
     /** Si el usuario acepta recibir desafíos de partida. */
     val acceptsChallenges: Boolean = true,
+    /** True si el usuario es supporter — habilita badge + color de nombre (C4). */
+    val isSupporter: Boolean = false,
 )
 
 /**

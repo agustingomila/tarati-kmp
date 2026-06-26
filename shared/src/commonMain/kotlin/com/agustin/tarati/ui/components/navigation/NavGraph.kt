@@ -29,6 +29,7 @@ import com.agustin.tarati.features.online.lobby.OnlineLobbyScreen
 import com.agustin.tarati.features.online.lobby.OnlineLobbyViewModel
 import com.agustin.tarati.features.online.social.LeaderboardScreen
 import com.agustin.tarati.features.online.social.PublicProfileScreen
+import com.agustin.tarati.features.online.supporter.SupporterScreen
 import com.agustin.tarati.features.online.tournament.TournamentDetailScreen
 import com.agustin.tarati.features.settings.ISettingsViewModel
 import com.agustin.tarati.features.settings.LanguageAwareSettingsScreen
@@ -48,6 +49,7 @@ import com.agustin.tarati.ui.components.navigation.ScreenDestinations.OnlineSett
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.PublicProfileDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SettingsScreenDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SplashScreenDest
+import com.agustin.tarati.ui.components.navigation.ScreenDestinations.SupporterDest
 import com.agustin.tarati.ui.components.navigation.ScreenDestinations.TournamentDetailDest
 import com.agustin.tarati.ui.layout.CompanionPanelDestination
 import com.agustin.tarati.ui.layout.LocalCompanionPanelController
@@ -157,11 +159,20 @@ fun NavGraph(
                 onNavigateToAchievements = {
                     navController.navigate(AchievementsDest.route)
                 },
+                onNavigateToSupporter = {
+                    navController.navigate(SupporterDest.route)
+                },
             )
         }
 
         composable(route = OnlineSettingsDest.route) {
             OnlineSettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(route = SupporterDest.route) {
+            SupporterScreen(
                 onNavigateBack = { navController.popBackStack() },
             )
         }
@@ -230,6 +241,7 @@ fun NavGraph(
                 onNavigateToTournament = { tournamentId ->
                     navController.navigate(TournamentDetailDest.createRoute(tournamentId))
                 },
+                onNavigateToSupporter = { navController.navigate(SupporterDest.route) },
                 viewModel = onlineLobbyViewModel,
             )
         }

@@ -83,8 +83,10 @@ import com.agustin.tarati.shared.generated.resources.social_followers
 import com.agustin.tarati.shared.generated.resources.social_following
 import com.agustin.tarati.shared.generated.resources.social_unfollow
 import com.agustin.tarati.shared.generated.resources.win
+import com.agustin.tarati.ui.components.SupporterBadge
 import com.agustin.tarati.ui.components.carditem.GameCardItem
 import com.agustin.tarati.ui.components.game.CobColorIndicator
+import com.agustin.tarati.ui.components.supporterNameColor
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
 import com.agustin.tarati.ui.components.topbar.TopBarNavigationType
 import com.agustin.tarati.ui.theme.TaratiBackground
@@ -330,11 +332,18 @@ private fun ProfileHeader(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = profile.displayName?.takeIf { it.isNotBlank() } ?: profile.username,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = profile.displayName?.takeIf { it.isNotBlank() } ?: profile.username,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = if (profile.isSupporter) supporterNameColor() else Color.Unspecified,
+                    )
+                    if (profile.isSupporter) SupporterBadge(size = 20.dp)
+                }
                 // Mostrar @handle solo para usuarios reales con displayName distinto al username.
                 // Los bots tienen username interno (bot_lena) que nunca debe mostrarse.
                 if (!profile.displayName.isNullOrBlank() && !profile.isBot) {
