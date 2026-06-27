@@ -173,6 +173,9 @@ fun DrawScope.drawMorphFlip(
                     absScale = abs(scale),
                     rotationDeg = cobShape.shape.rotationDeg,
                 )
+
+                // Noise dentro de la proyección: cubre la cara achatada, no la silueta plana.
+                with(NoiseTexture) { applyNoise(paths.face) }
             }
         } else {
             // Sin proyección (scale == 1.0), dibujar directamente
@@ -203,9 +206,10 @@ fun DrawScope.drawMorphFlip(
                 projectionScale = scale,  // signo preservado para espejo de cara trasera
                 projectionAxisAngleDeg = projection.axisAngleDeg,
             )
-        }
 
-        with(NoiseTexture) { applyNoise(paths.face) }
+            // scale ≈ 1: la cara es plana, paths.face ya coincide con el área visible.
+            with(NoiseTexture) { applyNoise(paths.face) }
+        }
     }
 }
 

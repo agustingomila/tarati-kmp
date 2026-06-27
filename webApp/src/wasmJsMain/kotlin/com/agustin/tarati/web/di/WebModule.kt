@@ -14,9 +14,9 @@ import com.agustin.tarati.services.achievements.ServerAchievementsManager
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.clipboard.IClipboardService
 import com.agustin.tarati.services.sound.ISoundService
-import com.agustin.tarati.services.sound.NoOpSoundService
 import com.agustin.tarati.services.url.IUrlLauncher
 import com.agustin.tarati.web.NoOpGameRepository
+import com.agustin.tarati.web.WebSoundService
 import com.agustin.tarati.web.WasmAuthRepository
 import com.agustin.tarati.web.WasmClipboardService
 import com.agustin.tarati.web.WasmSettingsRepository
@@ -50,7 +50,7 @@ val webServiceModule: Module = module {
 
     single<IClipboardService> { WasmClipboardService() }
     single { GameClipboardHelper(get()) }
-    single<ISoundService> { NoOpSoundService() }
+    single<ISoundService> { WebSoundService() }
     single<IUrlLauncher> { WasmUrlLauncher() }
     single<ISpecialEventManager> { NoOpSpecialEventManager() }
 

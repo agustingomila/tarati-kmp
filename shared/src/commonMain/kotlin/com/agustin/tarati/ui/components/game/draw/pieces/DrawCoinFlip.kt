@@ -1,5 +1,6 @@
 package com.agustin.tarati.ui.components.game.draw.pieces
 
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -170,5 +171,15 @@ fun DrawScope.drawFlipFace(
         )
     }
 
-    with(NoiseTexture) { applyNoise(position, radius) }
+    // El noise debe ocupar el área visible de la cara, que se achata en X por
+    // faceScaleX durante el volteo. Un round-rect con corner = semiejes es una
+    // elipse exacta; con faceScaleX = 1 (pieza plana) coincide con el círculo previo.
+    val noiseRx = radius * faceScaleX
+    with(NoiseTexture) {
+        applyNoise(
+            topLeft = Offset(position.x - noiseRx, position.y - radius),
+            size = Size(noiseRx * 2f, radius * 2f),
+            cornerRadius = CornerRadius(noiseRx, radius),
+        )
+    }
 }

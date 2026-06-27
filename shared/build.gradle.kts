@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -11,6 +12,33 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.compose)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// appVersion generado desde version.properties — fuente única, incluye build number.
+// Reemplaza los antiguos AppInfo.kt hardcodeados ("1.0.0") por plataforma.
+// ─────────────────────────────────────────────────────────────────────────────
+val generateAppVersion by tasks.registering {
+    val versionFile = rootProject.file("version.properties")
+    val outputDir = layout.buildDirectory.dir("generated/appVersion/kotlin")
+    inputs.file(versionFile)
+    outputs.dir(outputDir)
+    doLast {
+        val props = Properties().apply { versionFile.inputStream().use { load(it) } }
+        val name = props.getProperty("versionName")
+        val code = props.getProperty("versionCode")
+        val pkgDir = outputDir.get().dir("com/agustin/tarati").asFile
+        pkgDir.mkdirs()
+        pkgDir.resolve("AppVersion.kt").writeText(
+            buildString {
+                appendLine("package com.agustin.tarati")
+                appendLine()
+                appendLine("// GENERADO por la tarea Gradle :shared:generateAppVersion desde version.properties.")
+                appendLine("// No editar a mano — se regenera en cada build.")
+                appendLine("val appVersion: String = \"$name (build $code)\"")
+            }
+        )
+    }
 }
 
 kotlin {
@@ -44,6 +72,11 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
+        // Fuente generada con appVersion (build number incluido).
+        commonMain {
+            kotlin.srcDir(generateAppVersion)
+        }
+
         commonMain.dependencies {
             // Kotlin
             implementation(libs.kotlinx.coroutines.core)
@@ -88,6 +121,16 @@ kotlin {
         androidMain.get().dependsOn(roomMain)
         iosMain.get().dependsOn(roomMain)
         jvmMain.get().dependsOn(roomMain)
+
+        // skikoMain: implementación gráfica única basada en Skiko (org.jetbrains.skia),
+        // compartida por Desktop (jvm), Web (wasmJs) e iOS (native). Android NO la usa
+        // (su backend es android.graphics). Mismo patrón intermedio que roomMain.
+        val skikoMain by creating {
+            dependsOn(commonMain.get())
+        }
+        jvmMain.get().dependsOn(skikoMain)
+        wasmJsMain.get().dependsOn(skikoMain)
+        iosMain.get().dependsOn(skikoMain)
 
         androidMain.dependencies {
             // Room KTX (solo en Android)

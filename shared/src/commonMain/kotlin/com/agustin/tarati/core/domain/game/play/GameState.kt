@@ -422,7 +422,7 @@ data class GameState(
         val cob = mutableCobs[move.from] ?: return this
         mutableCobs[move.from] = cob.copy(isUpgraded = true)
         // Promotion resets the 50-move clock (§7.2) but keeps the current turn.
-        return GameState(mutableCobs, currentTurn, halfMoveClock = 0)
+        return GameState(mutableCobs, currentTurn)
     }
 
     fun getPieceCounts(): PieceCounts {
@@ -681,14 +681,14 @@ data class GameState(
         fun initialGameState(currentTurn: CobColor = WHITE): GameState {
             val map =
                 mapOf(
-                    GameBoard.C1 to Cob(WHITE, false),
-                    GameBoard.C2 to Cob(WHITE, false),
-                    GameBoard.D1 to Cob(WHITE, false),
-                    GameBoard.D2 to Cob(WHITE, false),
-                    GameBoard.C7 to Cob(BLACK, false),
-                    GameBoard.C8 to Cob(BLACK, false),
-                    GameBoard.D3 to Cob(BLACK, false),
-                    GameBoard.D4 to Cob(BLACK, false),
+                    GameBoard.C1 to Cob(WHITE),
+                    GameBoard.C2 to Cob(WHITE),
+                    GameBoard.D1 to Cob(WHITE),
+                    GameBoard.D2 to Cob(WHITE),
+                    GameBoard.C7 to Cob(BLACK),
+                    GameBoard.C8 to Cob(BLACK),
+                    GameBoard.D3 to Cob(BLACK),
+                    GameBoard.D4 to Cob(BLACK),
                 )
             return GameState(cobs = map, currentTurn = currentTurn)
         }

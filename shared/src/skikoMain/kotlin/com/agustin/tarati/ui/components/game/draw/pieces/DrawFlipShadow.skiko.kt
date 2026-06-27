@@ -17,17 +17,17 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 
 /**
- * Implementación Desktop de [drawFlipShadow] usando Skiko (org.jetbrains.skia).
+ * Implementación Skiko de [drawFlipShadow] (org.jetbrains.skia) — compartida por
+ * Desktop (jvm), Web (wasmJs) e iOS (native).
  *
  * ## Diferencias respecto a androidMain
  *
- * | Android                                      | Desktop (Skiko)                                        |
+ * | Android                                      | Skiko                                                  |
  * |----------------------------------------------|--------------------------------------------------------|
  * | `android.graphics.Paint`                     | `org.jetbrains.skia.Paint`                             |
  * | `android.graphics.BlurMaskFilter`            | `org.jetbrains.skia.MaskFilter.makeBlur(...)`          |
  * | `paint.alpha = 0..255`                       | alpha incluido en `paint.color` (ARGB Int)             |
  * | `canvas.drawOval(l,t,r,b, paint)`            | `canvas.drawOval(Rect.makeLTRB(l,t,r,b), paint)`       |
- * | `drawContext.canvas.nativeCanvas` → `android.graphics.Canvas` | → `org.jetbrains.skia.Canvas` |
  *
  * ## Conversión BlurRadius → Sigma
  * En Android, `BlurMaskFilter(radius, NORMAL)` usa el radio directamente.

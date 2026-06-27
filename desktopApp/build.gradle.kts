@@ -39,6 +39,9 @@ dependencies {
 
     // SLF4J provider para Desktop (elimina warning "No SLF4J providers were found")
     implementation(libs.logback)
+
+    // Decoder MP3 para javax.sound.sampled (SPI: JLayer + Tritonus) — usado por DesktopSoundService
+    implementation(libs.mp3spi)
 }
 
 compose.desktop {

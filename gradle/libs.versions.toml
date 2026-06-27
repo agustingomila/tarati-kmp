@@ -71,6 +71,7 @@ javaJwt = "4.5.2"
 jbcrypt = "0.4"
 kreds = "0.9.1"
 logback = "1.5.34"
+mp3spi = "1.9.5.4"
 postgresql = "42.7.11"
 resend = "3.1.0"
 slf4j = "1.7.36"
@@ -188,6 +189,7 @@ java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
 jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
 kreds = { module = "io.github.crackthecodeabhi:kreds", version.ref = "kreds" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+mp3spi = { module = "com.googlecode.soundlibs:mp3spi", version.ref = "mp3spi" }
 slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 resend-java = { module = "com.resend:resend-java", version.ref = "resend" }

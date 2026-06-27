@@ -21,8 +21,8 @@ import com.agustin.tarati.services.achievements.ServerAchievementsManager
 import com.agustin.tarati.services.clipboard.DesktopClipboardService
 import com.agustin.tarati.services.clipboard.GameClipboardHelper
 import com.agustin.tarati.services.clipboard.IClipboardService
+import com.agustin.tarati.services.sound.DesktopSoundService
 import com.agustin.tarati.services.sound.ISoundService
-import com.agustin.tarati.services.sound.NoOpSoundService
 import com.agustin.tarati.services.url.DesktopUrlLauncher
 import com.agustin.tarati.services.url.IUrlLauncher
 import io.ktor.client.HttpClient
@@ -44,7 +44,7 @@ import kotlin.time.toDuration
  *
  * Provides Desktop-specific implementations:
  * - [DesktopClipboardService] → uses java.awt.Toolkit
- * - [NoOpSoundService] → no audio in Desktop (for now)
+ * - [DesktopSoundService] → javax.sound.sampled + mp3spi (decodes composeResources MP3)
  * - [ServerAchievementsManager] → syncs achievements to Tarati server when logged in
  * - [DesktopSettingsRepository] → **java.util.prefs.Preferences persistence** ✅
  * - [RoomGameRepository] → **Room with SQLite persistence** ✅
@@ -60,9 +60,6 @@ import kotlin.time.toDuration
  * - Windows: `HKEY_CURRENT_USER\Software\JavaSoft\Prefs\com\agustin\tarati\settings`
  * - macOS: `~/Library/Preferences/com.agustin.tarati.settings.plist`
  * - Linux: `~/.java/.userPrefs/com/agustin/tarati/settings/prefs.xml`
- *
- * ## Expected evolution
- * - Sound: add support with javax.sound.sampled
  */
 val desktopServiceModule: Module = module {
     // HttpClient con engine CIO (JVM/Desktop) para WebSockets y REST
@@ -85,8 +82,8 @@ val desktopServiceModule: Module = module {
     single { GameClipboardHelper(get()) }
     single<IUrlLauncher> { DesktopUrlLauncher() }
 
-    // Sound — no-op in Desktop for now
-    single<ISoundService> { NoOpSoundService() }
+    // Sound — javax.sound.sampled + mp3spi (decodifica los MP3 de composeResources)
+    single<ISoundService> { DesktopSoundService() }
 
     // Special Events — no-op in Desktop
     single<ISpecialEventManager> { NoOpSpecialEventManager() }
