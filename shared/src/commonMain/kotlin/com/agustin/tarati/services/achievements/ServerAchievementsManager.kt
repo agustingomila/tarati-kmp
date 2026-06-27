@@ -78,13 +78,13 @@ class ServerAchievementsManager(
     }
 
     override suspend fun onProgress(achievementId: AchievementId, steps: Int, maxSteps: Int) {
-        if (steps >= maxSteps) return
+        val clamped = steps.coerceAtMost(maxSteps)
         flushPending()
         val token = authRepository.getToken()
         if (token != null) {
-            if (!syncService.progress(token, achievementId, steps)) pendingProgress[achievementId] = steps
+            if (!syncService.progress(token, achievementId, clamped)) pendingProgress[achievementId] = clamped
         } else {
-            pendingProgress[achievementId] = steps
+            pendingProgress[achievementId] = clamped
         }
     }
 
