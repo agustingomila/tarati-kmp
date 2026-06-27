@@ -1,0 +1,19 @@
+# Hooks de pre-commit de Tarati — escaneo de secrets antes de commitear.
+#
+# Usa ggshield (GitGuardian), el MISMO motor que el check de GitGuardian en el CI,
+# así lo que pasa local pasa en el PR. Evita pushear secrets por accidente.
+#
+# Activación (una vez por clon del repo):
+#   pip install --user pre-commit ggshield
+#   pre-commit install
+#
+# Autenticación de ggshield (una vez; el hook no escanea sin esto):
+#   ggshield auth login            # interactivo, con tu cuenta de GitGuardian
+#   # o bien exportar GITGUARDIAN_API_KEY en el entorno (nunca commitearlo)
+repos:
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.52.2
+    hooks:
+      - id: ggshield
+        name: GitGuardian secret scan
+        stages: [pre-commit]
