@@ -17,11 +17,12 @@ const val SUPPORTER_PRODUCT_ID: String = "supporter"
  * valor persistido se deriva de `name.lowercase()`, sin literales sueltos.
  *
  * - GOOGLE_PLAY — compra validada contra la Google Play Developer API.
- * - STRIPE      — pago validado vía webhook de Stripe (fase C3).
+ * - STRIPE      — pago validado vía webhook de Stripe (fase C3, ahora dormido).
+ * - POLAR       — pago validado vía webhook de Polar (Merchant of Record, activo Web/Desktop).
  * - GRANT       — concesión manual de admin (cuentas de prueba, soporte).
  */
 enum class EntitlementSource {
-    GOOGLE_PLAY, STRIPE, GRANT;
+    GOOGLE_PLAY, STRIPE, POLAR, GRANT;
 
     val key: String get() = name.lowercase()
 
@@ -76,5 +77,26 @@ data class StripeCheckoutRequest(
  */
 @Serializable
 data class StripeCheckoutResponse(
+    val checkoutUrl: String,
+)
+
+/**
+ * Cuerpo de POST /api/checkout/polar (proveedor activo Web/Desktop).
+ *
+ * Sin monto: Polar cobra el importe en su propia página de checkout (producto
+ * pay-what-you-want o precio fijo). Solo se elige el intervalo.
+ *
+ * @param interval "once" (pago único) | "month" (suscripción mensual).
+ */
+@Serializable
+data class PolarCheckoutRequest(
+    val interval: String,
+)
+
+/**
+ * Respuesta de POST /api/checkout/polar — URL del Checkout de Polar a abrir en el browser.
+ */
+@Serializable
+data class PolarCheckoutResponse(
     val checkoutUrl: String,
 )

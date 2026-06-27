@@ -3,6 +3,8 @@ package com.agustin.tarati.services.billing
 import com.agustin.tarati.features.online.devServerUrl
 import com.agustin.tarati.network.models.EntitlementsResponse
 import com.agustin.tarati.network.models.GooglePlayPurchaseRequest
+import com.agustin.tarati.network.models.PolarCheckoutRequest
+import com.agustin.tarati.network.models.PolarCheckoutResponse
 import com.agustin.tarati.network.models.StripeCheckoutRequest
 import com.agustin.tarati.network.models.StripeCheckoutResponse
 import io.ktor.client.HttpClient
@@ -62,5 +64,18 @@ class EntitlementSyncService(private val httpClient: HttpClient) {
                 contentType(ContentType.Application.Json)
                 setBody(StripeCheckoutRequest(amountCents, interval))
             }.body<StripeCheckoutResponse>().checkoutUrl
+        }
+
+    /**
+     * Crea un Checkout de Polar (proveedor activo Web/Desktop). Sin monto: Polar lo cobra en
+     * su página. @return la URL a abrir en el browser, o [Result.failure].
+     */
+    suspend fun createPolarCheckout(token: String, interval: String): Result<String> =
+        runCatching {
+            httpClient.post("$baseUrl/api/checkout/polar") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(PolarCheckoutRequest(interval))
+            }.body<PolarCheckoutResponse>().checkoutUrl
         }
 }

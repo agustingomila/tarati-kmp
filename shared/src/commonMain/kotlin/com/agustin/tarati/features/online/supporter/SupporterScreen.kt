@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,9 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.agustin.tarati.services.billing.SUPPORTER_PRESET_CENTS
 import com.agustin.tarati.services.billing.SupporterInterval
 import com.agustin.tarati.services.localization.LocalAppLanguage
 import com.agustin.tarati.services.localization.localizedString
@@ -42,8 +37,6 @@ import com.agustin.tarati.shared.generated.resources.supporter_body
 import com.agustin.tarati.shared.generated.resources.supporter_checkout_failed
 import com.agustin.tarati.shared.generated.resources.supporter_completed_payment
 import com.agustin.tarati.shared.generated.resources.supporter_continue
-import com.agustin.tarati.shared.generated.resources.supporter_custom_amount
-import com.agustin.tarati.shared.generated.resources.supporter_min_amount
 import com.agustin.tarati.shared.generated.resources.supporter_monthly
 import com.agustin.tarati.shared.generated.resources.supporter_once
 import com.agustin.tarati.shared.generated.resources.supporter_play_cta
@@ -172,42 +165,10 @@ private fun SupporterContent(
                     )
                 }
 
-                Spacer(Modifier.height(16.dp))
-
-                // ── Montos preset ─────────────────────────────────────────────
-                val usingCustom = state.customAmountText.isNotBlank()
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SUPPORTER_PRESET_CENTS.forEach { cents ->
-                        FilterChip(
-                            selected = !usingCustom && state.amountCents == cents,
-                            onClick = { viewModel.selectPreset(cents) },
-                            label = { Text("$${cents / 100}") },
-                            leadingIcon = if (!usingCustom && state.amountCents == cents) {
-                                { Icon(TaratiIcons.Check, null, Modifier.size(FilterChipDefaults.IconSize)) }
-                            } else null,
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // ── Monto libre ───────────────────────────────────────────────
-                OutlinedTextField(
-                    value = state.customAmountText,
-                    onValueChange = viewModel::setCustomAmount,
-                    label = { Text(localizedString(Res.string.supporter_custom_amount)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                state.error?.let { error ->
+                state.error?.let {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = when (error) {
-                            SupporterViewModel.ERROR_MIN_AMOUNT -> localizedString(Res.string.supporter_min_amount)
-                            else -> localizedString(Res.string.supporter_checkout_failed)
-                        },
+                        text = localizedString(Res.string.supporter_checkout_failed),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                     )

@@ -54,11 +54,17 @@ interface EntitlementsRepository {
     suspend fun validateGooglePlay(productId: String, purchaseToken: String): Boolean
 
     /**
-     * Crea un Stripe Checkout Session para el pago Supporter (Desktop/Web, fase C3).
+     * Crea un Stripe Checkout Session para el pago Supporter (Desktop/Web, fase C3, dormido).
      * @return La URL de Checkout a abrir en el browser, o null si no hay sesión o el
      *         servidor no pudo crearla. El grant llega luego vía webhook → [refresh].
      */
     suspend fun startStripeCheckout(amountCents: Int, interval: SupporterInterval): String?
+
+    /**
+     * Crea un Checkout de Polar (proveedor activo Web/Desktop). Sin monto: Polar lo cobra en
+     * su página. @return La URL a abrir en el browser, o null. El grant llega vía webhook → [refresh].
+     */
+    suspend fun startPolarCheckout(interval: SupporterInterval): String?
 
     /** Vacía el estado local (logout). No persiste nada. */
     fun clear()
@@ -91,6 +97,11 @@ class EntitlementsRepositoryImpl(
     override suspend fun startStripeCheckout(amountCents: Int, interval: SupporterInterval): String? {
         val token = authRepository.getToken() ?: return null
         return syncService.createStripeCheckout(token, amountCents, interval.key).getOrNull()
+    }
+
+    override suspend fun startPolarCheckout(interval: SupporterInterval): String? {
+        val token = authRepository.getToken() ?: return null
+        return syncService.createPolarCheckout(token, interval.key).getOrNull()
     }
 
     override fun clear() {

@@ -3,7 +3,6 @@ package com.agustin.tarati.features.online.supporter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.services.billing.EntitlementsRepository
-import com.agustin.tarati.services.billing.SUPPORTER_MIN_CENTS
 import com.agustin.tarati.services.billing.SUPPORTER_PRODUCT_ID
 import com.agustin.tarati.services.billing.SupporterInterval
 import com.agustin.tarati.services.billing.supporterStripeAvailable
@@ -19,10 +18,10 @@ import kotlinx.coroutines.launch
 /**
  * Implementación de [ISupporterViewModel].
  *
- * No requiere token explícito: [EntitlementsRepository] resuelve la sesión internamente
- * (mismo patrón que C2). El grant del entitlement llega por el webhook server-side; tras
- * volver del browser, [refresh] trae el estado actualizado y `isSupporter` se actualiza
- * por el collector del flow de entitlements.
+ * Proveedor activo en Desktop/Web: **Polar** (Merchant of Record). El monto lo cobra Polar en
+ * su propia página (pay-what-you-want o precio fijo), así que el cliente solo elige el intervalo
+ * (único / mensual) y no maneja montos. El grant del entitlement llega por el webhook server-side;
+ * al volver del browser, [refresh] trae el estado y `isSupporter` se actualiza por el collector.
  */
 class SupporterViewModel(
     private val entitlementsRepository: EntitlementsRepository,
@@ -48,32 +47,12 @@ class SupporterViewModel(
         _uiState.update { it.copy(interval = interval) }
     }
 
-    override fun selectPreset(amountCents: Int) {
-        _uiState.update { it.copy(amountCents = amountCents, customAmountText = "", error = null) }
-    }
-
-    override fun setCustomAmount(text: String) {
-        val cents = parseDollarsToCents(text)
-        _uiState.update {
-            it.copy(
-                customAmountText = text,
-                amountCents = cents ?: it.amountCents,
-                error = null,
-            )
-        }
-    }
-
     override fun checkout() {
         if (!stripeAvailable) return
-        val state = _uiState.value
-        if (state.amountCents < SUPPORTER_MIN_CENTS) {
-            _uiState.update { it.copy(error = ERROR_MIN_AMOUNT) }
-            return
-        }
-
+        val interval = _uiState.value.interval
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val url = entitlementsRepository.startStripeCheckout(state.amountCents, state.interval)
+            val url = entitlementsRepository.startPolarCheckout(interval)
             if (url != null) {
                 _checkoutUrlEvent.emit(url)
             } else {
@@ -88,22 +67,7 @@ class SupporterViewModel(
     }
 
     companion object {
-        /** Clave de error: monto por debajo del mínimo. */
-        const val ERROR_MIN_AMOUNT = "min_amount"
-
         /** Clave de error: el servidor no pudo crear el checkout (503/502/red). */
-        const val ERROR_CHECKOUT_FAILED = "checkout_failed"
-
-        /**
-         * Parsea un monto en dólares (texto del usuario) a centavos. Acepta coma o punto
-         * decimal. Devuelve null si no es un número válido o es <= 0.
-         */
-        fun parseDollarsToCents(text: String): Int? {
-            val normalized = text.trim().replace(',', '.')
-            if (normalized.isEmpty()) return null
-            val dollars = normalized.toDoubleOrNull() ?: return null
-            if (dollars <= 0.0) return null
-            return (dollars * 100).toInt()
-        }
+        const val ERROR_CHECKOUT_FAILED: String = "checkout_failed"
     }
 }

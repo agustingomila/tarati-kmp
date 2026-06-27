@@ -23,10 +23,10 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Tests de [SupporterViewModel] — flujo de pago Supporter (C3).
+ * Tests de [SupporterViewModel] — flujo de pago Supporter vía Polar (proveedor activo Web/Desktop).
  *
- * Mockea [EntitlementsRepository] con MockK. `stripeAvailable` se inyecta en true para
- * poder testear el checkout aunque el actual de Android sea false.
+ * El monto lo cobra Polar en su página, así que el ViewModel solo maneja intervalo + checkout.
+ * `stripeAvailable` se inyecta en true para testear el checkout aunque el actual de Android sea false.
  */
 class SupporterViewModelTest {
 
@@ -49,64 +49,57 @@ class SupporterViewModelTest {
         SupporterViewModel(entitlementsRepository = repository, stripeAvailable = available)
 
     @Test
-    fun `parseDollarsToCents parses dollars and rejects garbage`() {
-        assertEquals(500, SupporterViewModel.parseDollarsToCents("5"))
-        assertEquals(550, SupporterViewModel.parseDollarsToCents("5.50"))
-        assertEquals(550, SupporterViewModel.parseDollarsToCents("5,50"))
-        assertNull(SupporterViewModel.parseDollarsToCents(""))
-        assertNull(SupporterViewModel.parseDollarsToCents("abc"))
-        assertNull(SupporterViewModel.parseDollarsToCents("0"))
-    }
-
-    @Test
-    fun `selectPreset updates amount`() {
+    fun `selectInterval updates state`() {
         val model = vm()
-        model.selectPreset(1000)
-        assertEquals(1000, model.uiState.value.amountCents)
-    }
-
-    @Test
-    fun `setCustomAmount parses to cents`() {
-        val model = vm()
-        model.setCustomAmount("7.50")
-        assertEquals(750, model.uiState.value.amountCents)
-        assertEquals("7.50", model.uiState.value.customAmountText)
-    }
-
-    @Test
-    fun `checkout below minimum sets error and does not call the server`(): TestResult = runTest {
-        val model = vm()
-        model.setCustomAmount("1") // $1 < $2 min
-
-        model.checkout()
-
-        assertEquals(SupporterViewModel.ERROR_MIN_AMOUNT, model.uiState.value.error)
-        io.mockk.coVerify(exactly = 0) { repository.startStripeCheckout(any(), any()) }
+        model.selectInterval(SupporterInterval.MONTHLY)
+        assertEquals(SupporterInterval.MONTHLY, model.uiState.value.interval)
     }
 
     @Test
     fun `checkout success emits the checkout url`(): TestResult = runTest {
-        coEvery { repository.startStripeCheckout(500, SupporterInterval.ONCE) } returns "https://checkout.stripe.com/x"
+        coEvery { repository.startPolarCheckout(SupporterInterval.ONCE) } returns "https://polar.sh/checkout/x"
         val model = vm()
 
         var emitted: String? = null
-        // Colectar en el mismo dispatcher Main del viewModelScope para que el emit no se pierda.
         backgroundScope.launch(Dispatchers.Main) { model.checkoutUrlEvent.collect { emitted = it } }
 
         model.checkout()
 
-        assertEquals("https://checkout.stripe.com/x", emitted)
+        assertEquals("https://polar.sh/checkout/x", emitted)
         assertNull(model.uiState.value.error)
     }
 
     @Test
+    fun `checkout uses the selected interval`(): TestResult = runTest {
+        coEvery { repository.startPolarCheckout(SupporterInterval.MONTHLY) } returns "https://polar.sh/checkout/m"
+        val model = vm()
+        model.selectInterval(SupporterInterval.MONTHLY)
+
+        var emitted: String? = null
+        backgroundScope.launch(Dispatchers.Main) { model.checkoutUrlEvent.collect { emitted = it } }
+
+        model.checkout()
+
+        assertEquals("https://polar.sh/checkout/m", emitted)
+    }
+
+    @Test
     fun `checkout failure sets error`(): TestResult = runTest {
-        coEvery { repository.startStripeCheckout(any(), any()) } returns null
+        coEvery { repository.startPolarCheckout(any()) } returns null
         val model = vm()
 
         model.checkout()
 
         assertEquals(SupporterViewModel.ERROR_CHECKOUT_FAILED, model.uiState.value.error)
+    }
+
+    @Test
+    fun `checkout is a no-op when web checkout is unavailable`(): TestResult = runTest {
+        val model = vm(available = false)
+
+        model.checkout()
+
+        io.mockk.coVerify(exactly = 0) { repository.startPolarCheckout(any()) }
     }
 
     @Test
