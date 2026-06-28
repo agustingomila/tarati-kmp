@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalWindowInfo
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.ui.components.game.draw.board.drawBoardBackground
+import com.agustin.tarati.ui.components.game.draw.common.NoiseTexture
 import kotlin.random.Random
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -114,6 +116,7 @@ private fun DrawScope.drawBoardOverlay(boardColors: BoardColors, spec: BoardOver
                     perimeterVisible = false,
                     bordersVisible = false,
                     baseBoardVisible = false,
+                    noiseVisible = false,
                     colors = subtleColors,
                 )
             }
@@ -159,6 +162,18 @@ fun DrawScope.drawAppBackground(boardColors: BoardColors, variant: Int = 0, isLa
     drawRect(color = Color.Black.copy(alpha = BACKGROUND_DARKEN_ALPHA))
 
     v.specs.forEach { drawBoardOverlay(boardColors, it) }
+
+    // Pase único de textura de grano sobre todo el espacio de fondo. Los tableros
+    // traslúcidos no aplican su grano individual (noiseVisible = false): si lo
+    // hicieran, las zonas no cubiertas por ningún tablero quedarían sin textura.
+    with(NoiseTexture) {
+        applyNoise(
+            topLeft = Offset.Zero,
+            size = size,
+            cornerRadius = CornerRadius(0f),
+            alpha = 0.07f,
+        )
+    }
 
     val glowR = minOf(size.width, size.height) * 0.75f
     // En landscape el glow rota: X pasa a ser la fracción glowYFraction del ancho

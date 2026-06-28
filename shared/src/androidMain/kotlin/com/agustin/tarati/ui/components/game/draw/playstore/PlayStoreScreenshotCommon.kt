@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.services.localization.LocalAppLanguage
 import com.agustin.tarati.ui.components.game.draw.board.drawBoardBackground
+import com.agustin.tarati.ui.components.game.draw.common.NoiseTexture
 import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.BOTTOM
 import com.agustin.tarati.ui.components.game.draw.playstore.TextPosition.TOP
 import com.agustin.tarati.ui.theme.BoardColors
@@ -252,6 +253,7 @@ internal fun DrawScope.drawBoardOverlay(
                     perimeterVisible = false,
                     bordersVisible = false,
                     baseBoardVisible = false,
+                    noiseVisible = false,
                     colors = subtleColors,
                 )
             }
@@ -303,6 +305,18 @@ fun DrawScope.drawBackgroundLayer(
             centerYFraction = spec.centerYFraction,
             boardSizeFraction = spec.boardSizeFraction,
             alpha = spec.alpha
+        )
+    }
+
+    // Pase único de textura de grano sobre todo el espacio de fondo. Los tableros
+    // traslúcidos no aplican su grano individual (noiseVisible = false): si lo
+    // hicieran, las zonas no cubiertas por ningún tablero quedarían sin textura.
+    with(NoiseTexture) {
+        applyNoise(
+            topLeft = Offset.Zero,
+            size = canvasSize,
+            cornerRadius = CornerRadius(0f),
+            alpha = 0.07f,
         )
     }
 

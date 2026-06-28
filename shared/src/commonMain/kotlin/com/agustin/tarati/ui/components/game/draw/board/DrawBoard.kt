@@ -37,6 +37,7 @@ fun DrawScope.drawBoardBackground(
     edgesVisible: Boolean = true,
     bordersVisible: Boolean = true,
     baseBoardVisible: Boolean = true,
+    noiseVisible: Boolean = true,
     colors: BoardColors,
 ) {
     if (baseBoardVisible) {
@@ -91,16 +92,23 @@ fun DrawScope.drawBoardBackground(
     // ShaderBrush con BitmapShader REPEAT: el tiling lo realiza el driver gráfico
     // sin loops manuales. BlendMode.Overlay oscurece píxeles oscuros del ruido y
     // aclara los claros, produciendo textura granulada que preserva la paleta.
-    val grainRect = calculateBoardBoundingBox(
-        getBoardRect(vertices, canvasSize, orientation), canvasSize, 0.1f,
-    )
-    with(NoiseTexture) {
-        applyNoise(
-            topLeft = grainRect.topLeft,
-            size = grainRect.size,
-            cornerRadius = CornerRadius(16f),
-            alpha = 0.07f,
+    //
+    // Acotado al bounding box del tablero: correcto cuando el canvas ES el tablero
+    // (juego real, previews). En capas de fondo donde el tablero ocupa solo una
+    // sub-región del canvas, el grano debe aplicarse una sola vez sobre todo el
+    // espacio (noiseVisible = false aquí) para no dejar zonas sin textura.
+    if (noiseVisible) {
+        val grainRect = calculateBoardBoundingBox(
+            getBoardRect(vertices, canvasSize, orientation), canvasSize, 0.1f,
         )
+        with(NoiseTexture) {
+            applyNoise(
+                topLeft = grainRect.topLeft,
+                size = grainRect.size,
+                cornerRadius = CornerRadius(16f),
+                alpha = 0.07f,
+            )
+        }
     }
 }
 
