@@ -10,6 +10,7 @@
 [![Android](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://www.android.com)
 [![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-orange.svg)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![Web](https://img.shields.io/badge/Web-tarati.tech-blue.svg)](https://tarati.tech)
+[![itch.io](https://img.shields.io/badge/itch.io-Tarati-FA5C5C.svg?logo=itchdotio&logoColor=white)](https://6e61646965.itch.io/tarati)
 [![en](https://flagcdn.com/w20/gb.png)](README.md)
 
 **Implementación multiplataforma (Android · Desktop · Web) del juego de estrategia Tarati**
@@ -212,6 +213,12 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 - Autocontenido — no requiere runtime de Java
 - 50–100 MB de espacio libre
 
+### itch.io
+
+Todos los instaladores de escritorio y el APK de Android también están publicados en itch.io:
+
+[![Descargar en itch.io](https://img.shields.io/badge/itch.io-Descargar-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://6e61646965.itch.io/tarati)
+
 ---
 
 ## Características
@@ -287,6 +294,7 @@ shared/commonMain/
 ├── di/
 │   └── SharedModule.kt        # Koin modules compartidos
 ├── features/
+│   ├── achievements/          # Pantalla de logros, insignias, ViewModel
 │   ├── game/                  # Pantalla de juego principal y ViewModels
 │   ├── detail/                # Pantalla de detalle de partida
 │   ├── library/               # Biblioteca de partidas guardadas
@@ -296,11 +304,12 @@ shared/commonMain/
 │   │   ├── game/              # OnlineGameViewModel, OnlineGameClient
 │   │   ├── lobby/             # OnlineLobbyScreen, UI de matchmaking
 │   │   ├── social/            # Clasificación, perfiles, seguidos, feed
+│   │   ├── supporter/         # Pantalla Supporter (checkout Polar / Play)
 │   │   ├── tournament/        # TournamentViewModel, TournamentDetailScreen
 │   │   └── ui/                # OnlineGameBar, UIMessageBus
 │   ├── seasonal/              # Eventos de temporada
 │   ├── settings/              # Pantalla de configuración
-│   └── splash/                # Pantalla de inicio
+│   └── store/                 # Vitrina de tienda (preview en vivo)
 ├── network/
 │   ├── client/                # TaratiWebSocketClient, cliente HTTP
 │   ├── models/                # DTOs compartidos con el servidor
@@ -314,17 +323,24 @@ shared/commonMain/
 │   ├── dialogs/               # Sistema de diálogos
 │   ├── localization/          # Gestión de idiomas
 │   ├── notifications/         # UIMessageBus (Toast + Alert)
+│   ├── pwa/                   # Instalación PWA (expect/actual)
 │   ├── sound/                 # Interfaz de sonido (expect/actual)
 │   └── url/                   # Resolvedor de URLs (dev/prod)
 └── ui/
     ├── components/
     │   ├── game/              # Tablero, highlights, animaciones, pre-movimientos
+    │   ├── bottombar/         # Barra inferior de juego
+    │   ├── carditem/          # Ítem de tarjeta de partida
     │   ├── editor/            # Editor de tablero
+    │   ├── library/           # Renderizador estático de tablero
+    │   ├── movelist/          # Lista de movimientos
     │   ├── navigation/        # Grafo de navegación
     │   ├── sidebar/           # Panel lateral
     │   ├── topbar/            # Barra superior
     │   ├── turnIndicator/     # Indicador de turno
     │   └── tutorial/          # Componentes de UI del tutorial
+    ├── layout/                # Layout adaptativo (panel lateral)
+    ├── splash/                # Pantalla de inicio
     └── theme/                 # Sistema de diseño, temas y paletas
 
 androidApp/
@@ -352,6 +368,7 @@ desktopApp/
 │   └── settings/              # Desktop SettingsViewModel
 ├── services/
 │   ├── clipboard/             # ClipboardManager Desktop
+│   ├── sound/                 # Servicio de sonido Desktop
 │   └── url/                   # Apertura de URLs Desktop
 └── Main.kt                    # Entry point Desktop
 
@@ -363,11 +380,13 @@ server/
 ├── Application.kt             # Entry point, plugins Ktor, setup de módulos
 ├── ConnectionManager.kt       # Sesiones WebSocket, presencia, desafíos
 ├── auth/                      # Configuración JWT, auth WebSocket
+├── billing/                   # Clientes de checkout Stripe y Polar, webhooks
 ├── bots/                      # BotService, BotManager, BotAgent, BotPlayer
 ├── config/                    # ServerConfig, AuthRateLimiter
 ├── database/
-│   ├── dao/                   # UserDao, GameDao, SessionDao, FollowDao, TournamentDao, AchievementDao
+│   ├── dao/                   # UserDao, GameDao, SessionDao, FollowDao, TournamentDao, AchievementDao, EntitlementDao
 │   └── tables/                # Definiciones de tablas Exposed (PostgreSQL)
+├── entitlements/              # EntitlementService, GooglePlayValidator
 ├── game/                      # GameSessionManager, ClockManager
 ├── matchmaking/               # MatchmakingEngine (cola Glicko-2)
 ├── metrics/                   # TaratiMetrics (Prometheus)
@@ -410,5 +429,5 @@ conoce."_
 
 ---
 
-*Este proyecto es una implementación educativa y no tiene fines comerciales. Todos los derechos del concepto original
-pertenecen a George Spencer-Brown.*
+*El código fuente se publica bajo la [Licencia MIT](LICENSE). Tarati es una implementación educativa; el concepto
+original del juego y "Laws of Form" pertenecen a George Spencer-Brown.*
