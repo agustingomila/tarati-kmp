@@ -657,19 +657,23 @@ jobs:
 
       - name: Check if Play Console secret exists
         id: check_secret
+        env:
+          PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
-          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
-            echo "has_secret=true" >> $GITHUB_OUTPUT
+          if [ -n "$PLAY_JSON" ]; then
+            echo "has_secret=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_secret=false" >> $GITHUB_OUTPUT
+            echo "has_secret=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Google Service Account JSON
         if: steps.check_secret.outputs.has_secret == 'true'
         id: google_json
+        env:
+          PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
-          echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > google-service-account.json
-          echo "json_path=$(pwd)/google-service-account.json" >> $GITHUB_OUTPUT
+          printf '%s' "$PLAY_JSON" > google-service-account.json
+          echo "json_path=$(pwd)/google-service-account.json" >> "$GITHUB_OUTPUT"
 
       - name: Upload AAB to Play Console
         if: steps.check_secret.outputs.has_secret == 'true'
