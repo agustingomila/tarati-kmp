@@ -186,6 +186,7 @@ jobs:
             androidApp/build/outputs/apk/release/*.apk
             androidApp/build/outputs/bundle/release/*.aab
             androidApp/build/outputs/native-debug-symbols/**/*.zip
+            androidApp/build/outputs/mapping/release/mapping.txt
           retention-days: 7
 
       # ═══════════════════════════════════════════════════════════
@@ -675,6 +676,32 @@ jobs:
           printf '%s' "$PLAY_JSON" > google-service-account.json
           echo "json_path=$(pwd)/google-service-account.json" >> "$GITHUB_OUTPUT"
 
+      - name: Locate native debug symbols
+        if: steps.check_secret.outputs.has_secret == 'true'
+        id: symbols
+        run: |
+          SYMBOLS=$(find ./android-artifacts -name 'native-debug-symbols.zip' | head -1)
+          if [ -n "$SYMBOLS" ]; then
+            echo "path=$SYMBOLS" >> "$GITHUB_OUTPUT"
+            echo "✅ Debug symbols: $SYMBOLS"
+          else
+            echo "path=" >> "$GITHUB_OUTPUT"
+            echo "ℹ️  No native debug symbols found — skipping"
+          fi
+
+      - name: Locate R8 mapping file
+        if: steps.check_secret.outputs.has_secret == 'true'
+        id: mapping
+        run: |
+          MAPPING=$(find ./android-artifacts -name 'mapping.txt' | head -1)
+          if [ -n "$MAPPING" ]; then
+            echo "path=$MAPPING" >> "$GITHUB_OUTPUT"
+            echo "✅ Mapping: $MAPPING"
+          else
+            echo "path=" >> "$GITHUB_OUTPUT"
+            echo "ℹ️  No mapping.txt found — skipping"
+          fi
+
       - name: Upload AAB to Play Console
         if: steps.check_secret.outputs.has_secret == 'true'
         id: upload_play
@@ -682,7 +709,9 @@ jobs:
         with:
           serviceAccountJson: ${{ steps.google_json.outputs.json_path }}
           packageName: com.agustin.tarati
-          releaseFiles: ./android-artifacts/*.aab
+          releaseFiles: ./android-artifacts/**/*.aab
+          debugSymbols: ${{ steps.symbols.outputs.path }}
+          mappingFile: ${{ steps.mapping.outputs.path }}
           track: internal
           status: completed
         continue-on-error: true
