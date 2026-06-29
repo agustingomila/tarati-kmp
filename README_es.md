@@ -35,7 +35,7 @@ Requisitos: Android 8.0+ (API 26)
 ### Desktop
 
 **Versión 1.0.0** — Windows · macOS · Linux  
-Requisitos: JVM 21+
+Requisitos: Windows 10+ · macOS 11+ · Linux (Ubuntu 20.04+)
 
 ### iOS
 
@@ -209,7 +209,7 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 **Requisitos:**
 
 - Windows 10+, macOS 11+, o Linux (Ubuntu 20.04+)
-- JVM 21 o superior
+- Autocontenido — no requiere runtime de Java
 - 50–100 MB de espacio libre
 
 ---
@@ -247,6 +247,8 @@ Interfaz intuitiva construida con Jetpack Compose / Compose Multiplatform.
 | Concurrencia              | Kotlin Coroutines 1.11.0                                                      |
 | Networking                | Ktor 3.5.0 (cliente + servidor, online en tarati.tech)                        |
 | Cliente Redis             | Kreds 0.9.1 (Kotlin-nativo, coroutines-first)                                 |
+| Base de datos (servidor)  | PostgreSQL 16, Exposed ORM 1.3.0                                              |
+| Auth (servidor)           | Auth0 java-jwt 4.5.2, jBCrypt 0.4                                             |
 | Serialización             | kotlinx-serialization 1.11.0                                                  |
 | Tiempo                    | kotlinx-datetime 0.8.0                                                        |
 | IA                        | Minimax con poda Alpha-Beta, profundización iterativa, tabla de transposición |
@@ -356,6 +358,25 @@ desktopApp/
 webApp/
 └── web/
     └── di/                    # Módulos Koin web, implementaciones de plataforma
+
+server/
+├── Application.kt             # Entry point, plugins Ktor, setup de módulos
+├── ConnectionManager.kt       # Sesiones WebSocket, presencia, desafíos
+├── auth/                      # Configuración JWT, auth WebSocket
+├── bots/                      # BotService, BotManager, BotAgent, BotPlayer
+├── config/                    # ServerConfig, AuthRateLimiter
+├── database/
+│   ├── dao/                   # UserDao, GameDao, SessionDao, FollowDao, TournamentDao, AchievementDao
+│   └── tables/                # Definiciones de tablas Exposed (PostgreSQL)
+├── game/                      # GameSessionManager, ClockManager
+├── matchmaking/               # MatchmakingEngine (cola Glicko-2)
+├── metrics/                   # TaratiMetrics (Prometheus)
+├── models/                    # Role, User, AuthResponse
+├── rating/                    # Glicko-2 RatingCalculator, RatingService
+├── redis/                     # TaratiRedisClient (Kreds)
+├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
+├── services/                  # AuthService, EmailService, GuestCleanupJob
+└── tournament/                # TournamentEngine (Round Robin y Swiss), TournamentManager
 ```
 
 Más de 500 tests (400+ cliente · 114 servidor) y previews de Compose.

@@ -35,7 +35,7 @@ Requirements: Android 8.0+ (API 26)
 ### Desktop
 
 **Version 1.0.0** — Windows · macOS · Linux  
-Requirements: JVM 21+
+Requirements: Windows 10+ · macOS 11+ · Linux (Ubuntu 20.04+)
 
 ### iOS
 
@@ -204,7 +204,7 @@ Intuitive interface built with Jetpack Compose / Compose Multiplatform.
 **Requirements:**
 
 - Windows 10+, macOS 11+, or Linux (Ubuntu 20.04+)
-- JVM 21 or higher
+- Self-contained — no Java runtime required
 - 50–100 MB free space
 
 ---
@@ -242,6 +242,8 @@ Intuitive interface built with Jetpack Compose / Compose Multiplatform.
 | Concurrency          | Kotlin Coroutines 1.11.0                                                  |
 | Networking           | Ktor 3.5.0 (client + server, online play at tarati.tech)                  |
 | Redis client         | Kreds 0.9.1 (Kotlin-native, coroutines-first)                             |
+| Database (server)    | PostgreSQL 16, Exposed ORM 1.3.0                                          |
+| Auth (server)        | Auth0 java-jwt 4.5.2, jBCrypt 0.4                                         |
 | Serialization        | kotlinx-serialization 1.11.0                                              |
 | Time                 | kotlinx-datetime 0.8.0                                                    |
 | AI                   | Minimax with Alpha-Beta pruning, iterative deepening, transposition table |
@@ -351,6 +353,25 @@ desktopApp/
 webApp/
 └── web/
     └── di/                    # Web Koin modules, platform implementations
+
+server/
+├── Application.kt             # Entry point, Ktor plugins, module setup
+├── ConnectionManager.kt       # WebSocket sessions, presence, challenges
+├── auth/                      # JWT config, WebSocket auth
+├── bots/                      # BotService, BotManager, BotAgent, BotPlayer
+├── config/                    # ServerConfig, AuthRateLimiter
+├── database/
+│   ├── dao/                   # UserDao, GameDao, SessionDao, FollowDao, TournamentDao, AchievementDao
+│   └── tables/                # Exposed table definitions (PostgreSQL)
+├── game/                      # GameSessionManager, ClockManager
+├── matchmaking/               # MatchmakingEngine (Glicko-2 queue)
+├── metrics/                   # TaratiMetrics (Prometheus)
+├── models/                    # Role, User, AuthResponse
+├── rating/                    # Glicko-2 RatingCalculator, RatingService
+├── redis/                     # TaratiRedisClient (Kreds)
+├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
+├── services/                  # AuthService, EmailService, GuestCleanupJob
+└── tournament/                # TournamentEngine (Round Robin & Swiss), TournamentManager
 ```
 
 500+ tests (400+ client · 114 server) and Compose previews.

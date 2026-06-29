@@ -1,0 +1,149 @@
+name: Server Deploy
+
+# Dispara cuando cambia código del servidor o su configuración Docker.
+# También permite disparo manual con opción de saltear tests (emergencias).
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+      - 'deployment/docker/**'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Saltar tests del servidor (solo emergencias)'
+        type: boolean
+        default: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Detectar si el código del server está presente
+  # El repo público no incluye la carpeta `server/` (backend cerrado por ahora).
+  # Sin esta guarda, test-server/deploy-server fallarían en ese repo.
+  # ═══════════════════════════════════════════════════════════════════════════
+  check-server:
+    runs-on: ubuntu-latest
+    outputs:
+      present: ${{ steps.detect.outputs.present }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect server module
+        id: detect
+        run: |
+          if [ -d "server/src" ]; then
+            echo "present=true" >> $GITHUB_OUTPUT
+            echo "✅ Código del server presente — se ejecutan tests y deploy"
+          else
+            echo "present=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ Carpeta server/ ausente (repo público) — se omiten tests y deploy"
+          fi
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Tests del servidor (PostgreSQL + Redis reales)
+  # ═══════════════════════════════════════════════════════════════════════════
+  test-server:
+    runs-on: ubuntu-latest
+    needs: check-server
+    if: ${{ needs.check-server.outputs.present == 'true' && !inputs.skip_tests }}
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: tarati_test
+          POSTGRES_USER: tarati
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run server tests
+        run: ./gradlew :server:test --info
+        env:
+          ENVIRONMENT: test
+          DATABASE_URL: jdbc:postgresql://localhost:5432/tarati_test
+          DATABASE_USER: tarati
+          DATABASE_PASSWORD: test_password
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          REDIS_PASSWORD: ""
+          JWT_SECRET: tarati_ci_test_secret_not_for_production_use_must_be_64_chars!!
+          JWT_ISSUER: tarati-server
+          JWT_AUDIENCE: tarati-client
+          BOTS_ENABLED: "false"
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-test-report
+          path: server/build/reports/tests/
+          retention-days: 7
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Deploy al VPS
+  # Espera que los tests pasen; si se saltaron (skip_tests), despliega igual.
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-server:
+    runs-on: ubuntu-latest
+    needs: [ check-server, test-server ]
+    if: >-
+      always() &&
+      needs.check-server.outputs.present == 'true' && (
+        needs.test-server.result == 'success' ||
+        needs.test-server.result == 'skipped'
+      )
+
+    steps:
+      - name: Deploy al VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 10m
+          script: |
+            set -e
+            cd /opt/tarati/deployment
+            ./scripts/deploy.sh

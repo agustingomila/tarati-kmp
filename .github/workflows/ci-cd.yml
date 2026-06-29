@@ -542,6 +542,98 @@ jobs:
           fi
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # Publicar instaladores en itch.io (butler)
+  # Reusa los artifacts de build-android/build-desktop — no rebuildea nada.
+  # Corre en paralelo con create-release.
+  # ═══════════════════════════════════════════════════════════════════════════
+  publish-itch:
+    runs-on: ubuntu-latest
+    needs: [ build-android, build-desktop ]
+    if: >-
+      (
+        github.event_name == 'workflow_dispatch'
+      ) || (
+        github.ref == 'refs/heads/main' &&
+        !contains(github.event.head_commit.message, '[skip release]') &&
+        !contains(github.event.head_commit.message, '[no release]') &&
+        !startsWith(github.event.head_commit.message, 'ci: Bump versionCode')
+      )
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ═══════════════════════════════════════════════════════════
+      # Leer versión (para --userversion de butler)
+      # ═══════════════════════════════════════════════════════════
+      - name: Read version
+        id: version
+        run: |
+          if [ ! -f version.properties ]; then
+            echo "versionCode=1" > version.properties
+            echo "versionName=1.0.0" >> version.properties
+          fi
+
+          VERSION_CODE=$(grep 'versionCode' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          VERSION_NAME=$(grep 'versionName' version.properties | cut -d'=' -f2 | tr -d '[:space:]"')
+
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+
+          echo "🎮 Publicando en itch.io v$VERSION_NAME (build $VERSION_CODE)"
+
+      # ═══════════════════════════════════════════════════════════
+      # Descargar todos los artifacts (APK, .msi, .dmg, .deb)
+      # ═══════════════════════════════════════════════════════════
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      # ═══════════════════════════════════════════════════════════
+      # Instalar butler (CLI oficial de itch.io)
+      # ═══════════════════════════════════════════════════════════
+      - name: Setup butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      # ═══════════════════════════════════════════════════════════
+      # Push por canal — itch detecta la plataforma por el nombre
+      # del canal (windows / mac / linux / android).
+      # ═══════════════════════════════════════════════════════════
+      - name: Push builds to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_TARGET: 6e61646965/tarati
+          VERSION: ${{ steps.version.outputs.version_name }}
+        run: |
+          set -e
+
+          push_channel() {
+            local pattern="$1"
+            local channel="$2"
+            local file
+            file=$(find ./artifacts -name "$pattern" | head -1)
+            if [ -z "$file" ]; then
+              echo "❌ No se encontró $pattern para el canal $channel"
+              exit 1
+            fi
+            echo "📤 $channel ← $file"
+            ./butler push "$file" "$ITCH_TARGET:$channel" --userversion "$VERSION"
+          }
+
+          push_channel "*.msi" windows
+          push_channel "*.dmg" mac
+          push_channel "*.deb" linux
+          push_channel "*.apk" android
+
+          echo "✅ Todos los builds publicados en itch.io"
+          ./butler status "$ITCH_TARGET"
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # Upload a Google Play Console (opcional)
   # ═══════════════════════════════════════════════════════════════════════════
   upload-play-console:
