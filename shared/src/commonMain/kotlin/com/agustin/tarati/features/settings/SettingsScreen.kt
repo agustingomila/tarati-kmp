@@ -99,7 +99,6 @@ import com.agustin.tarati.shared.generated.resources.volume_low
 import com.agustin.tarati.shared.generated.resources.volume_medium
 import com.agustin.tarati.shared.generated.resources.volume_muted
 import com.agustin.tarati.ui.components.game.draw.pieces.ConversionAnimationStyle
-import com.agustin.tarati.services.billing.supporterStripeAvailable
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypeSelector
 import com.agustin.tarati.ui.components.game.draw.pieces.PieceTypes
 import com.agustin.tarati.ui.components.topbar.TaratiTopBar
@@ -242,9 +241,11 @@ fun SettingsScreen(
                         events.onPaletteChange(palette)
                     },
                     onPurchasePalette = { productId ->
-                        // Gate supporter (C4): Desktop/Web desbloquean haciéndose supporter
-                        // (Stripe); Android conserva la compra à la carte de Google Play.
-                        if (supporterStripeAvailable() && onNavigateToSupporter != null) {
+                        // Gate supporter (C4): tocar un cosmético premium bloqueado lleva a la
+                        // pantalla Supporter en todas las plataformas. Android compra el tier
+                        // `supporter` por Google Play; Desktop/Web por Polar. El supporter
+                        // desbloquea todo, así que el productId puntual solo se usa de fallback.
+                        if (onNavigateToSupporter != null) {
                             onNavigateToSupporter()
                         } else {
                             viewModel.launchPurchaseFlow(productId)
@@ -259,7 +260,7 @@ fun SettingsScreen(
                         viewModel.setPieceType(pieceTypeId)
                     },
                     onPurchasePieceType = { productId ->
-                        if (supporterStripeAvailable() && onNavigateToSupporter != null) {
+                        if (onNavigateToSupporter != null) {
                             onNavigateToSupporter()
                         } else {
                             viewModel.launchPurchaseFlow(productId)

@@ -36,7 +36,6 @@ import com.agustin.tarati.features.settings.SettingsViewModel
 import com.agustin.tarati.network.models.SUPPORTER_PRODUCT_ID
 import com.agustin.tarati.services.billing.EntitlementsRepository
 import com.agustin.tarati.services.billing.OwnedProducts
-import com.agustin.tarati.services.billing.supporterStripeAvailable
 import com.agustin.tarati.services.localization.LocalAppLanguage
 import com.agustin.tarati.services.localization.localizedString
 import com.agustin.tarati.shared.generated.resources.Res
@@ -93,11 +92,9 @@ private fun StoreContent(
     val boardColors = getBoardColors()
     val previewState = remember { GameState.initialGameState() }
 
-    // Tile bloqueado: Desktop/Web → hacerse supporter (Stripe); Android → compra à la carte de Play.
-    val onPurchase: (String) -> Unit = { productId ->
-        if (supporterStripeAvailable()) onNavigateToSupporter()
-        else viewModel.launchPurchaseFlow(productId)
-    }
+    // Tile bloqueado: en todas las plataformas lleva a la pantalla Supporter. Android compra
+    // el tier `supporter` por Google Play; Desktop/Web por Polar. El supporter desbloquea todo.
+    val onPurchase: (String) -> Unit = { onNavigateToSupporter() }
 
     Scaffold(
         topBar = {
