@@ -469,6 +469,15 @@
     <string name="tournament_type_round_robin">Round Robin</string>
     <string name="tournament_type_swiss">Swiss</string>
     <string name="tournament_type_arena">Arena</string>
+    <string name="tournament_type_elimination">Elimination</string>
+    <string name="tournament_bye">BYE</string>
+    <string name="tournament_final">Final</string>
+    <string name="tournament_semifinals">Semifinals</string>
+    <string name="tournament_quarterfinals">Quarterfinals</string>
+    <string name="tournament_round_of">Round of %1$d</string>
+    <string name="tournament_replay">Replay</string>
+    <string name="tournament_champion">Champion</string>
+    <string name="tournament_duration_minutes">Duration (minutes)</string>
     <string name="tournament_arena_ends_in">Ends in %1$s</string>
     <string name="tournament_arena_ended">Time\'s up</string>
     <string name="tournament_round_n">Round %1$d</string>
@@ -480,6 +489,7 @@
     <string name="validation_min_players_count">Minimum is 2 players</string>
     <string name="validation_max_players_count">Maximum is 128 players</string>
     <string name="validation_max_gte_min">Max players must be ≥ min</string>
+    <string name="validation_arena_duration">Duration must be 1–360 minutes</string>
     <string name="tournament_filter_all">All</string>
     <string name="tournament_recent_only">Recent</string>
     <string name="tournament_sort_most_players">Most players</string>

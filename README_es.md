@@ -234,7 +234,8 @@ Todos los instaladores de escritorio y el APK de Android también están publica
 - **Logros** — cross-platform, sincronizados al servidor; integración Google Play Games en Android
 - **Soporte bilingüe** — español e inglés con selector in-app
 - **Multijugador online** — matchmaking, rating Glicko-2, clasificación, perfiles públicos, seguidos, desafíos,
-  modo espectador, revanchas, reconexión y torneos (Round Robin y Swiss) en [tarati.tech](https://tarati.tech)
+  modo espectador, revanchas, reconexión y torneos (Round Robin, Swiss, Arena y eliminación directa)
+  en [tarati.tech](https://tarati.tech)
 - **Acceso como invitado** — jugá online sin registrarte
 - **Panel lateral adaptativo** — en pantallas anchas, lobby, configuración y biblioteca coexisten junto al tablero
 - **Multiplataforma** — mismo código compartido entre Android, Desktop y Web
@@ -395,7 +396,7 @@ server/
 ├── redis/                     # TaratiRedisClient (Kreds)
 ├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
 ├── services/                  # AuthService, EmailService, GuestCleanupJob
-└── tournament/                # TournamentEngine (Round Robin y Swiss), TournamentManager
+└── tournament/                # TournamentEngine (Round Robin, Swiss, Arena y Eliminación), TournamentManager
 ```
 
 Más de 500 tests (400+ cliente · 114 servidor) y previews de Compose.

@@ -75,6 +75,7 @@ import com.agustin.tarati.shared.generated.resources.retry
 import com.agustin.tarati.shared.generated.resources.sort
 import com.agustin.tarati.shared.generated.resources.sort_newest
 import com.agustin.tarati.shared.generated.resources.time_control
+import com.agustin.tarati.shared.generated.resources.tournament_duration_minutes
 import com.agustin.tarati.shared.generated.resources.tournament_filter_all
 import com.agustin.tarati.shared.generated.resources.tournament_format
 import com.agustin.tarati.shared.generated.resources.tournament_players_of
@@ -85,18 +86,18 @@ import com.agustin.tarati.shared.generated.resources.tournament_status_active
 import com.agustin.tarati.shared.generated.resources.tournament_status_cancelled
 import com.agustin.tarati.shared.generated.resources.tournament_status_finished
 import com.agustin.tarati.shared.generated.resources.tournament_status_registering
-import com.agustin.tarati.shared.generated.resources.tournament_type_arena
-import com.agustin.tarati.shared.generated.resources.tournament_type_round_robin
-import com.agustin.tarati.shared.generated.resources.tournament_type_swiss
 import com.agustin.tarati.shared.generated.resources.tournaments_finished_section
 import com.agustin.tarati.shared.generated.resources.user_name
+import com.agustin.tarati.shared.generated.resources.validation_arena_duration
 import com.agustin.tarati.shared.generated.resources.validation_max_gte_min
 import com.agustin.tarati.shared.generated.resources.validation_max_players_count
 import com.agustin.tarati.shared.generated.resources.validation_min_players_count
 import com.agustin.tarati.shared.generated.resources.validation_players_number
 import com.agustin.tarati.ui.components.TooltipIconButton
 import com.agustin.tarati.ui.theme.TaratiIcons
+import com.agustin.tarati.ui.theme.icon
 import com.agustin.tarati.ui.theme.timeControlIcon
+import com.agustin.tarati.ui.theme.tournamentTypeLabel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -431,15 +432,20 @@ private fun TournamentCard(
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    when (tournament.type) {
-                        TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
-                        TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
-                        TournamentType.ARENA -> localizedString(Res.string.tournament_type_arena)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        tournament.type.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        tournamentTypeLabel(tournament.type),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -485,6 +491,9 @@ private fun CreateTournamentDialog(
     var spectatingAllowed by remember { mutableStateOf(true) }
     var minPlayers by remember { mutableStateOf("4") }
     var maxPlayers by remember { mutableStateOf("16") }
+    var durationMinutes by remember { mutableStateOf("60") }
+
+    val isArena = selectedType == TournamentType.ARENA
 
     val minInt = minPlayers.toIntOrNull()
     val maxInt = maxPlayers.toIntOrNull()
@@ -495,6 +504,12 @@ private fun CreateTournamentDialog(
         maxInt < minInt -> localizedString(Res.string.validation_max_gte_min)
         else -> null
     }
+
+    // Arena requiere una ventana de duración (1–360 min); el resto de formatos no la usan.
+    val durationInt = durationMinutes.toIntOrNull()
+    val durationError: String? = if (isArena && (durationInt == null || durationInt < 1 || durationInt > 360)) {
+        localizedString(Res.string.validation_arena_duration)
+    } else null
 
     // Presets de tiempo control
     val tcPresets = mapOf(
@@ -527,14 +542,9 @@ private fun CreateTournamentDialog(
                         FilterChip(
                             selected = selectedType == type,
                             onClick = { selectedType = type },
-                            label = {
-                                Text(
-                                    when (type) {
-                                        TournamentType.ROUND_ROBIN -> localizedString(Res.string.tournament_type_round_robin)
-                                        TournamentType.SWISS -> localizedString(Res.string.tournament_type_swiss)
-                                        TournamentType.ARENA -> localizedString(Res.string.tournament_type_arena)
-                                    }
-                                )
+                            label = { Text(tournamentTypeLabel(type)) },
+                            leadingIcon = {
+                                Icon(type.icon, null, Modifier.size(16.dp))
                             },
                         )
                     }
@@ -555,6 +565,21 @@ private fun CreateTournamentDialog(
                             },
                         )
                     }
+                }
+                // Duración — solo Arena (ventana de tiempo fija)
+                if (isArena) {
+                    OutlinedTextField(
+                        value = durationMinutes,
+                        onValueChange = { durationMinutes = it },
+                        label = { Text(localizedString(Res.string.tournament_duration_minutes)) },
+                        singleLine = true,
+                        isError = durationError != null,
+                        supportingText = if (durationError != null) {
+                            { Text(durationError, color = MaterialTheme.colorScheme.error) }
+                        } else null,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 // Rated toggle — invitados solo juegan no puntuado
                 Row(
@@ -625,10 +650,11 @@ private fun CreateTournamentDialog(
                         minPlayers = minInt ?: 4,
                         maxPlayers = maxInt ?: 16,
                         spectatingAllowed = if (isGuest) true else spectatingAllowed,
+                        durationMinutes = if (isArena) durationInt else null,
                     )
                     onCreate(request)
                 },
-                enabled = name.isNotBlank() && playerError == null,
+                enabled = name.isNotBlank() && playerError == null && durationError == null,
             ) { Text(localizedString(Res.string.create)) }
         },
         dismissButton = {

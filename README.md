@@ -229,7 +229,8 @@ All desktop installers and the Android APK are also published on itch.io:
 - **Achievements** — cross-platform, synced to server; Google Play Games integration on Android
 - **Bilingual support** — Spanish and English with in-app selector
 - **Online multiplayer** — matchmaking, Glicko-2 rating, leaderboard, public profiles, follows, challenges,
-  spectator mode, rematches, reconnection and tournaments (Round Robin & Swiss) at [tarati.tech](https://tarati.tech)
+  spectator mode, rematches, reconnection and tournaments (Round Robin, Swiss, Arena & single-elimination)
+  at [tarati.tech](https://tarati.tech)
 - **Guest access** — play online without registering
 - **Adaptive sidebar** — in wide-screen layouts, lobby, settings and library coexist alongside the board
 - **Multiplatform** — same shared codebase across Android, Desktop and Web
@@ -390,7 +391,7 @@ server/
 ├── redis/                     # TaratiRedisClient (Kreds)
 ├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
 ├── services/                  # AuthService, EmailService, GuestCleanupJob
-└── tournament/                # TournamentEngine (Round Robin & Swiss), TournamentManager
+└── tournament/                # TournamentEngine (Round Robin, Swiss, Arena & Elimination), TournamentManager
 ```
 
 500+ tests (400+ client · 114 server) and Compose previews.

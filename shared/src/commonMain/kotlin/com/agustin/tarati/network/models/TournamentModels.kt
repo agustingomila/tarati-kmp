@@ -11,12 +11,14 @@ import kotlin.time.Instant
  * ROUND_ROBIN: todos contra todos, emparejamientos generados al inicio.
  * SWISS: emparejamiento por puntos por ronda, evitando repetir rivales.
  * ARENA: ventana de tiempo fija; partidas continuas hasta que vence el timer.
+ * ELIMINATION: bracket de eliminación directa; sembrado por rating, BYEs si N no es potencia de 2;
+ *              empate → revancha con colores invertidos (con tope de revanchas por slot).
  *
  * [key] es el valor almacenado en la columna tournaments.type.
  */
 @Serializable
 enum class TournamentType {
-    ROUND_ROBIN, SWISS, ARENA;
+    ROUND_ROBIN, SWISS, ARENA, ELIMINATION;
 
     val key: String get() = name.lowercase()
 }
@@ -182,6 +184,11 @@ data class TournamentRoundDto(
  *
  * gameId es null hasta que el GameSessionManager crea la partida al iniciar la ronda.
  * result es null hasta que la partida termina: "white_wins" | "black_wins" | "draw".
+ *
+ * bracketPosition: posición del slot dentro de la ronda en torneos de Eliminación
+ *                  (null en Round Robin / Swiss / Arena). Los ganadores de los slots
+ *                  2k y 2k+1 de la ronda R se enfrentan en el slot k de la ronda R+1.
+ *                  Un BYE se representa con whiteId == blackId (el jugador con pase libre).
  */
 @Immutable
 @Serializable
@@ -194,4 +201,8 @@ data class TournamentPairingDto(
     val gameId: String?,
     val result: String?,
     val status: TournamentGameStatus,
-)
+    val bracketPosition: Int? = null,
+) {
+    /** True si este emparejamiento es un BYE (avance automático sin partida). */
+    val isBye: Boolean get() = whiteId == blackId
+}

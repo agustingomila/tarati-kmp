@@ -75,43 +75,11 @@ object TaratiIcons {
         )
     }
 
-    val Error: ImageVector by lazy {
+    /** 🗂 árbol de bracket (torneo por Eliminación). */
+    val AccountTree: ImageVector by lazy {
         icon(
-            name = "Error",
-            autoMirror = true,
-            pathData = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
-        )
-    }
-
-    val Home: ImageVector by lazy {
-        icon(
-            name = "Home",
-            autoMirror = true,
-            pathData = "M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"
-        )
-    }
-
-    val Sort: ImageVector by lazy {
-        icon(
-            name = "Sort",
-            autoMirror = true,
-            pathData = "M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"
-        )
-    }
-
-    val Public: ImageVector by lazy {
-        icon(
-            name = "Public",
-            autoMirror = true,
-            pathData = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-.61.08-1.21.21-1.78L8.99 15v1c0 1.1.9 2 2 2v1.93C7.06 19.43 4 16.07 4 12zm13.89 5.4c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41C17.92 5.77 20 8.65 20 12c0 2.08-.81 3.98-2.11 5.4z"
-        )
-    }
-
-    val CloudOff: ImageVector by lazy {
-        icon(
-            name = "CloudOff",
-            autoMirror = true,
-            pathData = "M24 15c0-2.64-2.05-4.78-4.65-4.96C18.67 6.59 15.64 4 12 4c-1.33 0-2.57.36-3.65.97l1.49 1.49C10.51 6.17 11.23 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 .99-.48 1.85-1.21 2.4l1.41 1.41c1.09-.92 1.8-2.27 1.8-3.81zM4.41 3.86L3 5.27l2.77 2.77h-.42C2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h11.73l2 2 1.41-1.41L4.41 3.86zM6 18c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73l8 8H6z"
+            name = "AccountTree",
+            pathData = "M22 11V3h-7v3H9V3H2v8h7V8h2v10h4v3h7v-8h-7v3h-2V8h2v3z",
         )
     }
 
@@ -192,6 +160,13 @@ object TaratiIcons {
         )
     }
 
+    val CloudOff: ImageVector by lazy {
+        icon(
+            name = "CloudOff",
+            autoMirror = true,
+            pathData = "M24 15c0-2.64-2.05-4.78-4.65-4.96C18.67 6.59 15.64 4 12 4c-1.33 0-2.57.36-3.65.97l1.49 1.49C10.51 6.17 11.23 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 .99-.48 1.85-1.21 2.4l1.41 1.41c1.09-.92 1.8-2.27 1.8-3.81zM4.41 3.86L3 5.27l2.77 2.77h-.42C2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h11.73l2 2 1.41-1.41L4.41 3.86zM6 18c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73l8 8H6z"
+        )
+    }
     // ── D ────────────────────────────────────────────────────────────────────
 
     /**
@@ -244,6 +219,14 @@ object TaratiIcons {
         )
     }
 
+    val Error: ImageVector by lazy {
+        icon(
+            name = "Error",
+            autoMirror = true,
+            pathData = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+        )
+    }
+
     /** ˅ chevron hacia abajo / expandir. */
     val ExpandLess: ImageVector by lazy {
         icon("ExpandLess", "M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z")
@@ -252,6 +235,26 @@ object TaratiIcons {
     /** ˄ chevron hacia arriba / colapsar. */
     val ExpandMore: ImageVector by lazy {
         icon("ExpandMore", "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z")
+    }
+
+    // ── G ────────────────────────────────────────────────────────────────────
+
+    /** 👥 grupo de personas / feed de seguidos. */
+    val Group: ImageVector by lazy {
+        icon(
+            name = "Group",
+            pathData = "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
+        )
+    }
+
+    // ── H ────────────────────────────────────────────────────────────────────
+
+    val Home: ImageVector by lazy {
+        icon(
+            name = "Home",
+            autoMirror = true,
+            pathData = "M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"
+        )
     }
 
     // ── I ────────────────────────────────────────────────────────────────────
@@ -299,14 +302,6 @@ object TaratiIcons {
         )
     }
 
-    /** 👥 grupo de personas / feed de seguidos. */
-    val Group: ImageVector by lazy {
-        icon(
-            name = "Group",
-            pathData = "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
-        )
-    }
-
     /**
      * 🌐 idioma / lenguaje.
      * Corregido: path 24px (el original usaba viewport 960px).
@@ -323,6 +318,14 @@ object TaratiIcons {
         icon(
             name = "Lock",
             pathData = "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z",
+        )
+    }
+
+    /** ← salir / cerrar sesión. */
+    val Logout: ImageVector by lazy {
+        icon(
+            name = "Logout",
+            pathData = "M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z",
         )
     }
 
@@ -366,6 +369,14 @@ object TaratiIcons {
     /** ▶ reproducir / iniciar. */
     val PlayArrow: ImageVector by lazy {
         icon("PlayArrow", "M8 5v14l11-7z")
+    }
+
+    val Public: ImageVector by lazy {
+        icon(
+            name = "Public",
+            autoMirror = true,
+            pathData = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-.61.08-1.21.21-1.78L8.99 15v1c0 1.1.9 2 2 2v1.93C7.06 19.43 4 16.07 4 12zm13.89 5.4c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41C17.92 5.77 20 8.65 20 12c0 2.08-.81 3.98-2.11 5.4z"
+        )
     }
 
     // ── R ────────────────────────────────────────────────────────────────────
@@ -468,6 +479,14 @@ object TaratiIcons {
         )
     }
 
+    val Sort: ImageVector by lazy {
+        icon(
+            name = "Sort",
+            autoMirror = true,
+            pathData = "M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"
+        )
+    }
+
     /** Donación voluntaria. AutoMirrored. */
     val Supporter: ImageVector by lazy {
         icon(
@@ -500,14 +519,6 @@ object TaratiIcons {
         icon(
             name = "Visibility",
             pathData = "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
-        )
-    }
-
-    /** ← salir / cerrar sesión. */
-    val Logout: ImageVector by lazy {
-        icon(
-            name = "Logout",
-            pathData = "M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z",
         )
     }
 
