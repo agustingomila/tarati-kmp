@@ -3,6 +3,7 @@ package com.agustin.tarati.services.achievements
 import com.google.android.gms.games.AchievementsClient
 import com.google.android.gms.games.GamesSignInClient
 import com.google.android.gms.games.achievement.Achievement
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 
 /**
  * Implementación de [IAchievementsRepository] para Android usando Google Play Games Services.
@@ -41,6 +43,8 @@ class AchievementsRepositoryImpl(
 ) : IAchievementsRepository {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    private val logger = getLogger("AchievementsRepositoryImpl")
 
     // Estado interno: mapa de achievement ID → progreso
     private val _achievements = MutableStateFlow<Map<String, Float>>(emptyMap())
@@ -103,9 +107,11 @@ class AchievementsRepositoryImpl(
             // Actualizar estado
             _achievements.value = achievementMap
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Log error pero no crashear - continuar con mapa vacío o actual
-            e.printStackTrace()
+            logger.error("Error loading achievements", e)
         }
     }
 
@@ -137,9 +143,11 @@ class AchievementsRepositoryImpl(
             // Actualizar estado local inmediatamente
             _achievements.value += (achievementId to 1.0f)
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Log error pero continuar
-            e.printStackTrace()
+            logger.error("Error unlocking achievement $achievementId", e)
         }
     }
 
@@ -155,9 +163,11 @@ class AchievementsRepositoryImpl(
             // Actualizar estado local inmediatamente
             _achievements.value += (achievementId to progress)
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // Log error pero continuar
-            e.printStackTrace()
+            logger.error("Error updating progress for $achievementId", e)
         }
     }
 

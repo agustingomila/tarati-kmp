@@ -1,7 +1,9 @@
 package com.agustin.tarati.services.achievements
 
 import android.app.Activity
+import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.google.android.gms.games.PlayGames
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +61,8 @@ class GamesAuthManager(
 ) {
     private val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
 
+    private val logger = getLogger("GamesAuthManager")
+
     private val _isAuthenticated = MutableStateFlow(false)
     private val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
@@ -79,8 +83,10 @@ class GamesAuthManager(
             val result = gamesSignInClient.isAuthenticated().await()
             _isAuthenticated.value = result.isAuthenticated
             result.isAuthenticated
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error("Silent sign-in failed", e)
             _isAuthenticated.value = false
             false
         }
@@ -99,8 +105,10 @@ class GamesAuthManager(
             val result = gamesSignInClient.signIn().await()
             _isAuthenticated.value = result.isAuthenticated
             result.isAuthenticated
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error("Interactive sign-in failed", e)
             _isAuthenticated.value = false
             false
         }
@@ -117,7 +125,7 @@ class GamesAuthManager(
             // gamesSignInClient.signOut()
             _isAuthenticated.value = false
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error("Sign-out failed", e)
         }
     }
 }

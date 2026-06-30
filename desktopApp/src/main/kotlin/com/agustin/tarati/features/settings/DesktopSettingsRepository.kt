@@ -2,6 +2,7 @@ package com.agustin.tarati.features.settings
 
 
 import com.agustin.tarati.core.domain.ai.services.Difficulty
+import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.core.domain.game.board.BoardOrientation
 import com.agustin.tarati.core.domain.game.time.TimeControl
 import com.agustin.tarati.core.domain.game.time.TimeControlMode
@@ -36,6 +37,8 @@ class DesktopSettingsRepository : SettingsRepository {
 
     private val prefs: Preferences = Preferences.userNodeForPackage(javaClass)
         .node("settings")
+
+    private val logger = getLogger("DesktopSettingsRepository")
 
     // ── Theme & UI ─────────────────────────────────────────────────────────────
 
@@ -363,7 +366,7 @@ class DesktopSettingsRepository : SettingsRepository {
             prefs.flush()
         } catch (e: Exception) {
             // Log but don't crash - preferences may be read-only in some environments
-            println("Warning: Could not flush preferences: ${e.message}")
+            logger.warn("Could not flush preferences: ${e.message}")
         }
     }
 

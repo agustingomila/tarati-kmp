@@ -1,6 +1,7 @@
 package com.agustin.tarati
 
 import android.app.Application
+import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.services.sound.SoundManager
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
@@ -22,7 +23,7 @@ class TaratiApplication : Application() {
             val soundManager: SoundManager? = getKoin().getOrNull()
             soundManager?.release()
         } catch (e: Exception) {
-            e.printStackTrace()
+            getLogger("TaratiApplication").error("Error releasing SoundManager on terminate", e)
         }
         stopKoin()
         super.onTerminate()

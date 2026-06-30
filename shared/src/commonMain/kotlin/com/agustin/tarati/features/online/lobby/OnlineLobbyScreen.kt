@@ -72,6 +72,8 @@ import com.agustin.tarati.ui.layout.CompanionPanelHeader
 import com.agustin.tarati.ui.layout.DisplayMode
 import com.agustin.tarati.ui.theme.TaratiBackground
 import com.agustin.tarati.ui.theme.TaratiIcons
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -203,6 +205,11 @@ fun OnlineLobbyScreen(
                     }
                     if (connectionViewModel.isConnected) Result.success(Unit)
                     else Result.failure(Exception(couldNotConnectMsg))
+                } catch (e: TimeoutCancellationException) {
+                    // El timeout de 5s es esperado: el servidor no respondió a tiempo.
+                    Result.failure(Exception(couldNotConnectMsg))
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     Result.failure(Exception(couldNotConnectMsg))
                 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.agustin.tarati.core.utils.logging.LoggingFactory.getLogger
 import com.agustin.tarati.features.online.auth.IAuthViewModel
 import com.agustin.tarati.network.client.TaratiWebSocketClient
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,6 +79,8 @@ class ConnectionViewModel(
             logger.debug("Connected as ${userInfo.username}")
             Result.success(userInfo)
 
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Connection failed: ${e.message}")
             _connectionState.value = ConnectionState.Error(
@@ -195,6 +198,8 @@ class ConnectionViewModel(
                     // Éxito: syncWebSocketState(Connected) habrá seteado Online ya
                     logger.debug("Auto-reconnect attempt ${index + 1} succeeded")
                     return@launch
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     logger.debug("Auto-reconnect attempt ${index + 1} failed: ${e.message}")
                 }

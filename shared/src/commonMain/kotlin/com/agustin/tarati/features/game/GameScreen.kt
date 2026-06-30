@@ -86,6 +86,8 @@ import com.agustin.tarati.ui.layout.LocalCompanionPanelController
 import com.agustin.tarati.ui.layout.LocalScreenLayout
 import com.agustin.tarati.ui.layout.ScreenLayout
 import com.agustin.tarati.ui.theme.TaratiBackground
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -252,6 +254,11 @@ fun GameScreen(
                     }
                     if (connectionViewModel.isConnected) Result.success(Unit)
                     else Result.failure(Exception(couldNotConnectMsg))
+                } catch (e: TimeoutCancellationException) {
+                    // El timeout de 5s es esperado: el servidor no respondió a tiempo.
+                    Result.failure(Exception(couldNotConnectMsg))
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (_: Exception) {
                     Result.failure(Exception(couldNotConnectMsg))
                 }
@@ -375,6 +382,8 @@ fun GameScreen(
                     scope.launch {
                         try {
                             onlineGameViewModel.makeOnlineMove(move)
+                        } catch (e: CancellationException) {
+                            throw e
                         } catch (e: Exception) {
                             bus.toast(UIMessage.Toast(onlineMoveFailedMsg.replace($$"%1$s", e.message.orEmpty())))
                         }

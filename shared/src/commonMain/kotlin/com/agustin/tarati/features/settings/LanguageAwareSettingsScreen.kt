@@ -1,7 +1,6 @@
 package com.agustin.tarati.features.settings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import com.agustin.tarati.services.localization.LocalAppLanguage
 
@@ -31,12 +30,6 @@ fun LanguageAwareSettingsScreen(
 ) {
     // Observar el código de idioma actual (String: "es", "en", etc.)
     val currentLanguage = LocalAppLanguage.current
-
-    // DEBUG: Ver cuando cambia el idioma en SettingsScreen
-    LaunchedEffect(currentLanguage) {
-        println("LanguageAwareSettings: Language detected: $currentLanguage")
-        println("LanguageAwareSettings: Forcing recomposition with key()")
-    }
 
     // Forzar reconstrucción completa cuando cambie el idioma
     // key() hace que todo el árbol de SettingsScreen se descarte y reconstruya

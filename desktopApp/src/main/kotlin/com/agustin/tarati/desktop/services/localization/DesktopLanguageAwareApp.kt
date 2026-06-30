@@ -46,7 +46,6 @@ fun DesktopLanguageAwareApp(
     // Update JVM default locale when language changes
     LaunchedEffect(languageCode) {
         Locale.setDefault(currentLocale)
-        println("Desktop language changed to: $languageCode")
     }
 
     // Provide the current language code to the composition tree

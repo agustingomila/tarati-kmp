@@ -246,7 +246,7 @@ Todos los instaladores de escritorio y el APK de Android también están publica
 
 | Componente                | Librería / Versión                                                            |
 |---------------------------|-------------------------------------------------------------------------------|
-| Lenguaje                  | Kotlin 2.4.0                                                                 |
+| Lenguaje                  | Kotlin 2.4.0                                                                  |
 | Arquitectura              | Kotlin Multiplatform (KMP)                                                    |
 | UI                        | Compose Multiplatform 1.10.3, Material Design 3                               |
 | Inyección de dependencias | Koin 4.2.2                                                                    |
@@ -394,7 +394,7 @@ server/
 ├── models/                    # Role, User, AuthResponse
 ├── rating/                    # Glicko-2 RatingCalculator, RatingService
 ├── redis/                     # TaratiRedisClient (Kreds)
-├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
+├── routes/                    # Auth/Admin/Tournament + Profile/Social/Game/Achievement/Billing/Lobby Routes
 ├── services/                  # AuthService, EmailService, GuestCleanupJob
 └── tournament/                # TournamentEngine (Round Robin, Swiss, Arena y Eliminación), TournamentManager
 ```

@@ -241,7 +241,7 @@ All desktop installers and the Android APK are also published on itch.io:
 
 | Component            | Library / Version                                                         |
 |----------------------|---------------------------------------------------------------------------|
-| Language             | Kotlin 2.4.0                                                             |
+| Language             | Kotlin 2.4.0                                                              |
 | Architecture         | Kotlin Multiplatform (KMP)                                                |
 | UI                   | Compose Multiplatform 1.10.3, Material Design 3                           |
 | Dependency injection | Koin 4.2.2                                                                |
@@ -389,7 +389,7 @@ server/
 ├── models/                    # Role, User, AuthResponse
 ├── rating/                    # Glicko-2 RatingCalculator, RatingService
 ├── redis/                     # TaratiRedisClient (Kreds)
-├── routes/                    # AuthRoutes, ProtectedRoutes, TournamentRoutes, AdminRoutes
+├── routes/                    # Auth/Admin/Tournament + Profile/Social/Game/Achievement/Billing/Lobby Routes
 ├── services/                  # AuthService, EmailService, GuestCleanupJob
 └── tournament/                # TournamentEngine (Round Robin, Swiss, Arena & Elimination), TournamentManager
 ```
